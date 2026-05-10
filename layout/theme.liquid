@@ -530,9 +530,10 @@
       {% render 'drawer-cart' %}
     {% endif %}
 
-    {% comment %} Commune Stack Drawer {% endcomment %}
-    {% render 'stack-drawer' %}
+    {% comment %} Commune Stack — store + drawer {% endcomment %}
+    {{ 'commune-stack.css' | asset_url | stylesheet_tag }}
     <script src="{{ 'commune-stack.js' | asset_url }}" defer></script>
+    {% render 'stack-drawer' %}
 
     <script
       src="{{ 'alpine.bundle.js' | asset_url }}"

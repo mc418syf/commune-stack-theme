@@ -346,7 +346,7 @@
             <button
               type="button"
               class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
-              @click.prevent="$store.modals.open('stack')"
+              @click.prevent="$dispatch('open-stack')"
               aria-label="Open stack"
             >
               {%- if show_icons -%}
@@ -441,7 +441,7 @@
             <button
               type="button"
               class="inline-flex items-center {{ item_spacing }}"
-              @click.prevent="$store.modals.open('stack')"
+              @click.prevent="$dispatch('open-stack')"
               aria-label="Open stack"
             >
               <div class="relative my-auto align-middle">

@@ -1,122 +1,145 @@
 {% comment %}
-  Stack Drawer — teleports into #left-drawer-slot.
-  Opened via $store.modals.open('stack') / register('stack','leftDrawer').
+  Commune Stack Drawer — standalone overlay, not part of the theme modal system.
+  Opened by dispatching the custom window event "open-stack" from anywhere on the page.
+  e.g. $dispatch('open-stack') in Alpine, or window.dispatchEvent(new Event('open-stack'))
 {% endcomment %}
 
 <div
-  x-data="{
-    init() {
-      $store.modals.register('stack', 'leftDrawer');
-    },
-    openStack() {
-      $store.modals.open('stack');
-    }
-  }"
-  x-init="init()"
+  x-data="{ open: false }"
+  @open-stack.window="open = true"
+  @keydown.escape.window="open = false"
+  x-teleport="body"
   x-cloak
 >
-  <template x-teleport="#left-drawer-slot">
-    <div
-      class="flex min-h-screen flex-col"
-      data-modal-label="Your Stack"
-      x-show="$store.modals.leftDrawer.contents === 'stack'"
-    >
-      {{- 'commune-stack.css' | asset_url | stylesheet_tag -}}
+  {% comment %} Backdrop {% endcomment %}
+  <div
+    x-show="open"
+    @click="open = false"
+    x-transition:enter="transition-opacity ease duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition-opacity ease duration-300"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="fixed inset-0 bg-black/30"
+    style="z-index: 200; display: none;"
+  ></div>
 
-      {{- 'commune-stack.js' | asset_url | script_tag -}}
-
-      <!-- Header -->
-      <div class="sticky top-0 z-10 flex items-center justify-between border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing py-4">
-        <div>
-          <h2 class="text-base font-normal">Your Stack</h2>
-          <p class="mt-0.5 text-xs text-scheme-secondary" x-text="$store.stack.count > 0 ? $store.stack.count + ' piece' + ($store.stack.count === 1 ? '' : 's') + ' — ready to view' : 'Add pieces to book a viewing'"></p>
-        </div>
-        <button
-          @click.prevent="$store.modals.close('stack')"
-          class="absolute right-0 top-0 block h-full"
-          type="button"
-        >
-          <span class="sr-only">Close</span>
-          <div class="my-auto mr-section-horizontal-spacing h-6 w-6">
-            {%- render 'icon-close' -%}
-          </div>
-        </button>
+  {% comment %} Panel {% endcomment %}
+  <div
+    x-show="open"
+    x-transition:enter="transition ease-[cubic-bezier(0.16,1,0.3,1)] duration-500"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition ease-[cubic-bezier(0.16,1,0.3,1)] duration-400"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+    class="fixed right-0 top-0 h-full flex flex-col overflow-hidden bg-scheme-background text-scheme-text"
+    data-color-scheme="{{ settings.modal_color_scheme | default: 'scheme3' }}"
+    style="z-index: 201; width: 420px; max-width: 100vw; display: none;"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Your Stack"
+  >
+    {% comment %} Header {% endcomment %}
+    <div class="flex shrink-0 items-center justify-between border-b border-current/10 px-6 py-5">
+      <div>
+        <h2 class="text-base font-normal">Your Stack</h2>
+        <p
+          class="mt-0.5 text-xs text-scheme-secondary"
+          x-text="$store.stack.count > 0
+            ? $store.stack.count + ' piece' + ($store.stack.count === 1 ? '' : 's') + ' — ready to view'
+            : 'Add pieces to book a viewing'"
+        ></p>
       </div>
-
-      <!-- Empty state -->
-      <div
-        x-show="$store.stack.count === 0"
-        class="flex flex-1 flex-col items-center justify-center gap-4 px-section-horizontal-spacing py-16 text-center"
+      <button
+        type="button"
+        @click="open = false"
+        class="flex h-8 w-8 items-center justify-center text-scheme-secondary hover:text-scheme-text"
+        aria-label="Close stack"
       >
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-20">
-          <rect x="4" y="6" width="32" height="6" rx="1" fill="currentColor"/>
-          <rect x="4" y="17" width="32" height="6" rx="1" fill="currentColor"/>
-          <rect x="4" y="28" width="32" height="6" rx="1" fill="currentColor"/>
-        </svg>
-        <p class="text-sm text-scheme-secondary leading-relaxed">Your stack is empty.<br>Browse the archive and add pieces<br>you'd like to try on.</p>
-        <button
-          @click="$store.modals.close('stack')"
-          class="mt-2 border-b border-current pb-0.5 text-xs uppercase tracking-widest"
-        >
-          Browse the archive
-        </button>
-      </div>
-
-      <!-- Items list -->
-      <div x-show="$store.stack.count > 0" class="-mb-gridline flex-1">
-        <template x-for="item in $store.stack.items" :key="item.variantId">
-          <div class="flex gap-4 border-b-gridline border-gridline-color px-section-horizontal-spacing py-4">
-            <!-- Image -->
-            <a :href="item.url" class="shrink-0">
-              <div class="commune-stack-thumb bg-scheme-secondary/10">
-                <img
-                  x-show="item.image"
-                  :src="item.image"
-                  :alt="item.title"
-                  class="h-full w-full object-cover"
-                />
-              </div>
-            </a>
-            <!-- Info -->
-            <div class="flex min-w-0 flex-1 flex-col gap-1">
-              <p class="text-xs uppercase tracking-widest text-scheme-secondary" x-text="item.vendor"></p>
-              <a :href="item.url" class="text-sm leading-snug" x-text="item.title"></a>
-              <p class="text-xs text-scheme-secondary" x-show="item.size" x-text="'Size: ' + item.size"></p>
-              <p class="mt-1 text-sm" x-text="item.price"></p>
-            </div>
-            <!-- Remove -->
-            <button
-              @click="$store.stack.remove(item.variantId)"
-              class="shrink-0 self-start text-scheme-secondary hover:text-scheme-text"
-              type="button"
-              aria-label="Remove from stack"
-            >
-              <div class="h-4 w-4">{%- render 'icon-close' -%}</div>
-            </button>
-          </div>
-        </template>
-      </div>
-
-      <!-- Footer -->
-      <div
-        x-show="$store.stack.count > 0"
-        class="sticky bottom-0 mt-auto border-t-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing py-5"
-      >
-        <div class="commune-stack-note mb-4 border-l-2 border-scheme-text pl-3">
-          <p class="text-xs leading-relaxed text-scheme-secondary">Our team will prepare each piece before your visit. No commitment to purchase.</p>
-        </div>
-        <a
-          href="/pages/stack"
-          class="theme-button flex w-full items-center justify-center gap-2 py-3 text-sm uppercase tracking-widest"
-          @click="$store.modals.close('stack')"
-        >
-          Book Appointment
-          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-        </a>
-      </div>
-
+        {%- render 'icon-close' -%}
+      </button>
     </div>
-  </template>
+
+    {% comment %} Empty state {% endcomment %}
+    <div
+      x-show="$store.stack.count === 0"
+      class="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16 text-center"
+    >
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-20">
+        <rect x="3" y="5" width="30" height="5.5" rx="0.8" fill="currentColor"/>
+        <rect x="3" y="15.25" width="30" height="5.5" rx="0.8" fill="currentColor"/>
+        <rect x="3" y="25.5" width="30" height="5.5" rx="0.8" fill="currentColor"/>
+      </svg>
+      <p class="text-sm leading-relaxed text-scheme-secondary">
+        Your stack is empty.<br>
+        Browse the archive and add pieces<br>
+        you'd like to try on.
+      </p>
+      <button
+        type="button"
+        @click="open = false"
+        class="mt-2 border-b border-current pb-0.5 text-xs uppercase tracking-widest"
+      >
+        Browse the archive
+      </button>
+    </div>
+
+    {% comment %} Items {% endcomment %}
+    <div x-show="$store.stack.count > 0" class="flex-1 overflow-y-auto">
+      <template x-for="item in $store.stack.items" :key="item.variantId">
+        <div class="flex gap-4 border-b border-current/10 px-6 py-4">
+          {% comment %} Thumbnail {% endcomment %}
+          <a :href="item.url" class="shrink-0" @click="open = false">
+            <div class="commune-stack-thumb bg-scheme-secondary/10">
+              <img
+                x-show="item.image"
+                :src="item.image"
+                :alt="item.title"
+                class="h-full w-full object-cover"
+              />
+            </div>
+          </a>
+          {% comment %} Info {% endcomment %}
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            <p class="text-xs uppercase tracking-widest text-scheme-secondary" x-text="item.vendor"></p>
+            <a :href="item.url" class="text-sm leading-snug" x-text="item.title" @click="open = false"></a>
+            <p class="text-xs text-scheme-secondary" x-show="item.size" x-text="'Size: ' + item.size"></p>
+            <p class="mt-1 text-sm" x-text="item.price"></p>
+          </div>
+          {% comment %} Remove {% endcomment %}
+          <button
+            type="button"
+            @click="$store.stack.remove(item.variantId)"
+            class="h-5 w-5 shrink-0 self-start text-scheme-secondary hover:text-scheme-text"
+            aria-label="Remove from stack"
+          >
+            {%- render 'icon-close' -%}
+          </button>
+        </div>
+      </template>
+    </div>
+
+    {% comment %} Footer {% endcomment %}
+    <div
+      x-show="$store.stack.count > 0"
+      class="shrink-0 border-t border-current/10 px-6 py-5"
+    >
+      <p class="mb-4 text-xs leading-relaxed text-scheme-secondary">
+        Our team will prepare each piece before your visit. No commitment to purchase.
+      </p>
+      <a
+        href="/pages/stack"
+        class="theme-button flex w-full items-center justify-center gap-2 py-3 text-sm uppercase tracking-widest"
+        @click="open = false"
+      >
+        Book Appointment
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </div>
+
+  </div>
 </div>

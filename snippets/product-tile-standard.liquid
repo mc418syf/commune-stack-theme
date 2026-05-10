@@ -375,9 +375,9 @@ PLP product card
                     size: {{ stack_size | json }}
                   });
                   $dispatch('stack-updated');
-                  $store.modals.open('stack');
+                  $dispatch('open-stack');
                 } else {
-                  $store.modals.open('stack');
+                  $dispatch('open-stack');
                 }
               "
             >
