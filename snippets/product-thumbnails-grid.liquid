@@ -1,0 +1,87 @@
+{%- liquid
+  assign media_index = 0
+
+  if mobile_only or desktop_only
+    if mobile_only
+      assign display_classes = 'grid lg:hidden'
+    endif
+
+    if desktop_only
+      assign display_classes = 'hidden lg:grid'
+    endif
+  else
+    assign display_classes = 'grid'
+  endif
+-%}
+
+<ul
+  class="{{ display_classes }} grid-cols-5 gap-gridline border-b-gridline border-gridline-color bg-gridline-color"
+  @keydown.right.prevent.stop="$focus.wrap().next()"
+  @keydown.down.prevent.stop="$focus.wrap().next()"
+  @keydown.left.prevent.stop="$focus.wrap().previous()"
+  @keydown.up.prevent.stop="$focus.wrap().previous()"
+>
+  {% for media_id_string in media_ids_array %}
+    {%- liquid
+      assign media_id = media_id_string | plus: 0
+      assign media = product.media | where: 'id', media_id | first
+    -%}
+    <li
+      class="bg-scheme-background{% unless settings.fill_image_to_border_edge %} p-1 lg:p-2{% endunless %}"
+    >
+      <a
+        href="{{ media.preview_image.src }}"
+        :role="`button`"
+        @click.prevent="splide.go({{ media_index }})"
+        @keydown.space.prevent.stop
+        @keyup.space.prevent.stop="splide.go({{ media_index }})"
+        class="product-thumbnail relative block w-full {% if active_thumbnail_style == 'indent' %}transition-transform duration-[50ms]{% else %}transition-opacity duration-75{% endif %}"
+        {% if active_thumbnail_style == 'indent' %}
+          :class="
+            {
+              'scale-75' : splideIndex === {{ media_index }},
+              'scale-100' : splideIndex !== {{ media_index }}
+            }
+          "
+        {% else %}
+          :class="
+            {
+              'opacity-40' : splideIndex === {{ media_index }},
+              'opacity-100' : splideIndex !== {{ media_index }}
+            }
+          "
+        {% endif %}
+      >
+        {% render 'image-crop',
+          image: media,
+          ratio: thumbnails_ratio,
+          sizes: sizes
+        %}
+        {% if media.media_type != 'image' %}
+          <div class="absolute bottom-1 right-1 h-6 w-6 bg-scheme-background p-0.5 text-scheme-text/60">
+            {% if media.media_type == 'model' %}
+              {% render 'icon-3d-model' %}
+            {% elsif media.media_type == 'video'
+              or media.media_type == 'external_video'
+            %}
+              {% render 'icon-video' %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </a>
+    </li>
+    {% assign media_index = media_index | plus: 1 %}
+  {% endfor %}
+  {%- liquid
+    assign items_on_last_row = media_index | modulo: 5
+    assign placeholder_width = 5 | minus: items_on_last_row
+  -%}
+  {%- if items_on_last_row != 0 -%}
+    <li
+      style="--placeholder-width: {{ placeholder_width }};"
+      class="col-span-placeholder-width bg-scheme-background"
+      aria-hidden="true"
+      role="presentation"
+    ></li>
+  {%- endif -%}
+</ul>

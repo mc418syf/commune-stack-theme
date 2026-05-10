@@ -1,0 +1,161 @@
+{%- liquid
+  unless poster_preload
+    assign poster_preload = false
+  endunless
+
+  unless poster_loading
+    assign poster_loading = null
+  endunless
+
+  assign id = section.id | append: '-' | append: video.id
+  assign media_class = 'absolute inset-0 w-full h-full object-cover object-center'
+  assign preview_image_media_class = media_class | append: ' transition duration-300 scale-100 group-hover:scale-105'
+
+  if ratio != 'natural'
+    assign ratio_percentage = 1 | divided_by: ratio | times: 100
+  else
+    assign ratio_percentage = 1 | divided_by: video.aspect_ratio | times: 100
+  endif
+
+  if video == blank and ratio == 'natural'
+    assign ratio_percentage = 56.25
+  endif
+
+  assign container_class = 'group relative pb-[var(--ratio-percent)]'
+
+  if fill
+    if fill_only_on_desktop
+      assign container_class = 'group relative pb-[var(--ratio-percent)] lg:pb-0 lg:absolute lg:inset-0'
+    else
+      assign container_class = 'absolute inset-0'
+    endif
+  endif
+-%}
+
+<div
+  class="{{ container_class }}"
+  style="--ratio-percent: {{ ratio_percentage }}%;"
+>
+  {%- case mode -%}
+    {%- when 'autoplay' -%}
+      <div
+        id="{{ id }}"
+        class="absolute inset-0 h-full w-full"
+        x-data="Video('{{ mode | strip }}')"
+        x-intersect:enter.half="play(true)"
+        x-intersect:leave.half="pause"
+      >
+        <div
+          class="html-video-wrapper"
+          x-data="HTMLVideo"
+          @play="play"
+          @pause="pause"
+        >
+          {%- if video != blank -%}
+            {{
+              video
+              | video_tag:
+                autoplay: false,
+                image_size: '2048x',
+                loop: true,
+                controls: false,
+                preload: 'none',
+                class: media_class,
+                muted: true,
+                id: player_id,
+                x-ref: 'video'
+            }}
+          {%- else -%}
+            <video autoplay muted class="{{ media_class }}">
+              <source
+                src="{{ 'placeholder-video.mp4' | asset_url }}"
+                type="video/mp4"
+              >
+              Your browser does not support the video tag.
+            </video>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- when 'preview' -%}
+      <div
+        id="{{ id }}"
+        class="absolute h-full w-full"
+        x-data="Video({{ playback | json }})"
+        x-intersect:leave="pause"
+      >
+        <div
+          class="relative h-full w-full"
+        >
+          <template x-if="!enabled">
+            <button
+              @click="enable"
+              class="group/button absolute inset-0 h-full w-full"
+              type="button"
+              aria-label="{{ 'media.play_video' | t }}"
+            >
+              <span
+                class="text-scheme-background-overlay group-hover/button:text-scheme-accent-overlay absolute left-1/2 top-1/2 z-20 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 transform items-center justify-center rounded-full bg-scheme-background transition-opacity group-hover/button:bg-scheme-accent lg:h-20 lg:w-20"
+              >
+                <span class="inline-block h-8 w-8">
+                  {%- render 'icon-play' -%}
+                </span>
+              </span>
+              {%- if video != blank -%}
+                {{
+                  video.preview_image
+                  | image_url: width: 2000
+                  | image_tag:
+                    class: preview_image_media_class,
+                    preload: poster_preload,
+                    loading: poster_loading,
+                    sizes: sizes
+                }}
+              {%- else -%}
+                {{
+                  'image'
+                  | placeholder_svg_tag: 'w-full h-full bg-scheme-placeholder-background text-scheme-placeholder-foreground fill-current'
+                }}
+              {%- endif -%}
+            </button>
+          </template>
+          <template x-if="enabled">
+            <div
+              class="html-video-wrapper {{ wrapper_class }}"
+              x-data="HTMLVideo"
+              @play="play"
+              @pause="pause"
+            >
+              {%- if video != blank -%}
+                {{
+                  video
+                  | video_tag:
+                    autoplay: true,
+                    image_size: '2048x',
+                    loop: loop,
+                    controls: true,
+                    preload: 'none',
+                    class: media_class,
+                    muted: false,
+                    id: player_id,
+                    x-ref: 'video'
+                }}
+              {%- else -%}
+                <video x-ref="video" autoplay muted class="{{ media_class }}">
+                  <source
+                    src="{{ 'placeholder-video.mp4' | asset_url }}"
+                    type="video/mp4"
+                  >
+                  Your browser does not support the video tag.
+                </video>
+              {%- endif -%}
+            </div>
+          </template>
+        </div>
+      </div>
+  {%- endcase -%}
+</div>
+
+{% unless request.design_mode %}
+  <script src="{{ 'video.js' | asset_url }}" type="module"></script>
+  <script src="{{ 'html-video.js' | asset_url }}" type="module"></script>
+{% endunless %}

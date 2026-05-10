@@ -1,0 +1,67 @@
+{% if sold_out %}
+  <s>{{ 'products.product.sold_out' | t }}</s>
+{% else %}
+  {% if on_sale and sold_out != true %}
+    <s
+      ><span class="sr-only">
+        {{- 'products.product.regular_price' | t -}}
+      </span>
+      {%- if settings.currency_code_enabled == true -%}
+        {{- product.compare_at_price | money_with_currency -}}
+      {%- else -%}
+        {{- product.compare_at_price | money -}}
+      {%- endif -%}
+    </s>
+  {% endif %}
+  {% if on_sale %}
+    {% if product.price_varies %}
+      {% liquid
+        if settings.currency_code_enabled == true
+          assign sale_price = product.price | money_with_currency
+        else
+          assign sale_price = product.price | money
+        endif
+      %}
+
+      <span class="text-scheme-accent"
+        ><span class="sr-only">
+          {{- 'products.product.sale_price' | t -}}
+        </span>
+        {{- 'products.product.on_sale_from_html' | t: price: sale_price -}}
+      </span>
+    {% else %}
+      <span class="text-scheme-accent"
+        ><span class="sr-only">
+          {{- 'products.product.sale_price' | t -}}
+        </span>
+        {%- if settings.currency_code_enabled == true -%}
+          {{- product.price | money_with_currency -}}
+        {%- else -%}
+          {{- product.price | money -}}
+        {%- endif -%}
+      </span>
+    {% endif %}
+  {% else %}
+    {% if product.price_varies %}
+      {%- if settings.currency_code_enabled == true -%}
+        {%- assign price = product.price | money_with_currency -%}
+      {%- else -%}
+        {%- assign price = product.price | money -%}
+      {%- endif -%}
+      <span>
+        {{-
+          'products.product.from_lowest_price_html'
+          | t: lowest_price: price
+        -}}
+      </span>
+    {% else %}
+      <span>
+        {%- if settings.currency_code_enabled == true -%}
+          {{- product.price | money_with_currency -}}
+        {%- else -%}
+          {{- product.price | money -}}
+        {%- endif -%}
+      </span>
+    {% endif %}
+  {% endif %}
+{% endif %}

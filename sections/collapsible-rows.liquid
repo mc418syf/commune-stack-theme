@@ -1,0 +1,176 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign heading_font = section.settings.heading_font
+  assign heading_font_size = section.settings.heading_font_size
+-%}
+
+<section
+  class="overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  {% if section.settings.title != '' %}
+    {%- render 'section-title',
+      title: section.settings.title,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  <ul>
+    {% for block in section.blocks %}
+      <li {{ block.shopify_attributes }}>
+        {%- render 'collapsible',
+          title: block.settings.title,
+          id: block.id,
+          expanded_content: block.settings.expanded_content,
+          heading_font: heading_font,
+          heading_font_size: heading_font_size,
+          expanded_content_max_width: section.settings.expanded_content_max_width,
+          last_in_loop: forloop.last
+        -%}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% schema %}
+{
+  "name": "Collapsible rows",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Collapsible rows"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Heading font",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "font-main",
+          "label": "Body"
+        }
+      ],
+      "default": "font-heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "options": [
+        {
+          "value": "text-heading-standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "text-heading-standard",
+      "info": "Applies when heading font is set to “Heading”"
+    },
+    {
+      "type": "select",
+      "id": "expanded_content_max_width",
+      "label": "Max width of expanded content",
+      "options": [
+        {
+          "value": "",
+          "label": "None"
+        },
+        {
+          "value": "max-w-sm",
+          "label": "Small"
+        },
+        {
+          "value": "max-w-lg",
+          "label": "Medium"
+        },
+        {
+          "value": "max-w-xl",
+          "label": "Large"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Row",
+      "type": "row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "expanded_content",
+          "label": "Expanded content",
+          "default": "<p>Use this text to share information about your brand with your customers.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collapsible rows",
+      "blocks": [
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

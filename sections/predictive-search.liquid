@@ -1,0 +1,277 @@
+{%- if predictive_search.performed -%}
+  {%- liquid
+    if predictive_search.resources.products.size > 0
+      assign results = true
+    endif
+
+    if predictive_search.resources.collections.size > 0 or predictive_search.resources.articles.size > 0 or predictive_search.resources.pages.size > 0
+      assign results = true
+      assign columns = true
+    endif
+
+    assign uppercase = settings.header_uppercase
+    assign base_font_class = settings.header_font
+
+    if uppercase
+      assign base_font_class = base_font_class | append: ' uppercase'
+    endif
+
+    if columns
+      assign product_sizes = '(min-width: 1024px) calc(100vw / 4), 100vw'
+    else
+      assign product_sizes = '(min-width: 1024px) calc((100vw / 12 * 9) / 4), 100vw'
+    endif
+
+    assign article_sizes = '4rem'
+  -%}
+
+  <div
+    id="predictive-search-results"
+    x-ref="results"
+    class="text-left"
+    data-color-scheme="scheme1"
+  >
+    <div
+      x-show="! loading && resultsHTML"
+      x-transition:enter="ease duration-200"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      class="grid bg-gridline-color text-scheme-text lg:grid-cols-12 gap-gutter{% if results %} border-b-gridline border-gridline-color{% endif %}"
+    >
+      {%- if predictive_search.resources.queries.size > 0 -%}
+        <div class="col-span-full">
+          <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+            <h2 class="font-heading text-lg">
+              {{- 'general.search.suggestions' | t -}}
+            </h2>
+          </div>
+          <ul
+            id="predictive-search-results-collections-list"
+            class="grid grid-cols-1 gap-gutter bg-gridline-color"
+            role="listbox"
+          >
+            {%- for query in predictive_search.resources.queries -%}
+              <li
+                id="predictive-search-option-query-{{ forloop.index }}"
+                class="query-suggestion justify-star relative flex items-center bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text [font-weight:bolder] [&_mark]:bg-transparent [&_mark]:font-normal"
+                role="option"
+                :aria-selected="isSelected"
+                data-search-option
+              >
+                <a href="{{ query.url }}">
+                  <p class="text-base" aria-label="{{ query.text }}">
+                    {{ query.styled_text }}
+                  </p>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if predictive_search.resources.products.size > 0 -%}
+        <div class="{% if columns %}lg:col-span-9{% else %}lg:col-span-12{% endif %} border-gridline-color bg-scheme-background text-scheme-text">
+          {%- if columns -%}
+            <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+              <h2 class="font-heading text-lg">
+                {{- 'general.search.products' | t -}}
+              </h2>
+            </div>
+          {%- endif -%}
+          <ul
+            id="predictive-search-results-list"
+            class="grid grid-cols-1 gap-gutter bg-gridline-color lg:grid-cols-4"
+            role="listbox"
+            aria-labelledby="predictive-search-products"
+          >
+            {% assign counter = 0 %}
+            {%- for product in predictive_search.resources.products -%}
+              {%- assign counter = counter | plus: 1 -%}
+              <li
+                id="predictive-search-option-{{ forloop.index }}"
+                class="bg-scheme-background text-scheme-text"
+                role="option"
+                :aria-selected="isSelected"
+                data-search-option
+              >
+                {% if settings.predictive_search_product_tile_type
+                    == 'text_overlay'
+                %}
+                  {%- render 'product-tile-text-overlay',
+                    product: product,
+                    sizes: product_sizes,
+                    loading: 'eager',
+                    section_color: 'scheme1',
+                    products_per_row_mobile: 1
+                  -%}
+                {% else %}
+                  {%- render 'product-tile-standard',
+                    product: product,
+                    sizes: product_sizes,
+                    loading: 'eager',
+                    section_color: 'scheme1',
+                    products_per_row_mobile: 1
+                  -%}
+                {% endif %}
+              </li>
+            {%- endfor -%}
+            {%- assign items_on_last_row = counter | modulo: 4 -%}
+            {%- assign placeholder_width = 4 | minus: items_on_last_row -%}
+            {%- if items_on_last_row != 0 -%}
+              <li
+                style="--placeholder-width: {{ placeholder_width }};"
+                class="none absolute bg-scheme-background lg:static lg:col-span-placeholder-width lg:block"
+                aria-hidden="true"
+                role="presentation"
+              ></li>
+            {%- endif -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if columns -%}
+        <div class="border-gridline-color bg-scheme-background text-scheme-text lg:col-span-3">
+          {%- if predictive_search.resources.collections.size > 0 -%}
+            <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+              <h2 class="font-heading text-lg">
+                {{- 'general.search.collections' | t -}}
+              </h2>
+            </div>
+            <ul
+              id="predictive-search-results-collections-list"
+              class="grid grid-cols-1 gap-gutter bg-gridline-color{% if predictive_search.resources.articles.size > 0 or predictive_search.resources.pages.size > 0 %} border-b-gridline border-gridline-color{% endif %}"
+              role="listbox"
+            >
+              {%- for collection in predictive_search.resources.collections -%}
+                <li
+                  id="predictive-search-option-collection-{{ forloop.index }}"
+                  class="justify-star relative flex items-center bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text"
+                  role="option"
+                  :aria-selected="isSelected"
+                  data-search-option
+                >
+                  <a href="{{ collection.url }}">
+                    <p class="text-base">{{ collection.title }}</p>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if predictive_search.resources.articles.size > 0 -%}
+            <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+              <h2 class="font-heading text-lg">
+                {{- 'general.search.articles' | t -}}
+              </h2>
+            </div>
+            <ul
+              id="predictive-search-results-articles-list"
+              class="grid grid-cols-1 gap-gutter bg-gridline-color{% if predictive_search.resources.pages.size > 0 %} border-b-gridline border-gridline-color{% endif %}"
+              role="listbox"
+            >
+              {%- for article in predictive_search.resources.articles -%}
+                <li
+                  id="predictive-search-option-articles-{{ forloop.index }}"
+                  class="relative bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text"
+                  role="option"
+                  :aria-selected="isSelected"
+                  data-search-option
+                >
+                  <a class="absolute inset-0 z-10" href="{{ article.url }}"
+                    ><span class="sr-only">{{ article.title }}</span></a
+                  >
+                  <div class="justify-star flex items-center">
+                    {%- if article.image != blank -%}
+                      <div class="mr-4 w-16">
+                        {% render 'image-crop',
+                          image: article.image,
+                          sizes: article_sizes,
+                          loading: 'eager',
+                          ratio: 1
+                        %}
+                      </div>
+                    {%- endif -%}
+                    <div class="text-base">
+                      <p>{{ article.title }}</p>
+                      <p class="mt-2">
+                        {{
+                          article.published_at
+                          | time_tag: format: 'month_day_year'
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if predictive_search.resources.pages.size > 0 -%}
+            <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+              <h2 class="font-heading text-lg">
+                {{- 'general.search.pages' | t -}}
+              </h2>
+            </div>
+            <ul
+              id="predictive-search-results-pages-list"
+              class="grid grid-cols-1 gap-gutter bg-gridline-color"
+              role="listbox"
+            >
+              {%- for page in predictive_search.resources.pages -%}
+                <li
+                  id="predictive-search-option-pages-{{ forloop.index }}"
+                  class="justify-star relative flex items-center bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text"
+                  role="option"
+                  :aria-selected="isSelected"
+                  data-search-option
+                >
+                  <a href="{{ page.url }}">
+                    <p class="text-base">{{ page.title }}</p>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if predictive_search.resources.products.size == 0 and columns -%}
+        <div
+          class="hidden bg-scheme-background text-scheme-text lg:col-span-9 lg:block"
+        ></div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if results -%}
+    <div
+      :class="{ 'opacity-0 pointer-events-none' : loading }"
+      class="predictive-search__option relative z-10 py-5 text-center"
+      id="predictive-search-option-search-keywords"
+      role="option"
+      :aria-selected="isSelected"
+      data-search-option
+    >
+      <button class="inline-flex items-center justify-between">
+        {{- 'general.search.view_all' | t -}}
+      </button>
+    </div>
+  {%- else -%}
+    <div class="py-6 text-center">
+      <p>
+        {{ 'general.search.no_results' | t: terms: predictive_search.terms }}
+      </p>
+    </div>
+  {%- endif -%}
+
+  <span class="hidden" id="predictive-search-count">
+    {%- if search.results_count == 0 -%}
+      {{- 'general.search.no_results' | t: terms: predictive_search.terms -}}
+    {%- else -%}
+      {{-
+        'general.search.results_with_count'
+        | t:
+          terms: predictive_search.terms,
+          count: predictive_search.resources.products.size
+      -}}
+    {%- endif -%}
+  </span>
+{%- endif -%}

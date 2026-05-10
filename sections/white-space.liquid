@@ -1,0 +1,68 @@
+<section
+  id="section-{{ section.id }}"
+  class="{% if section.settings.hide_bottom_border_above %}-mt-gridline{% endif %} overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section.settings.color_scheme }}"
+></section>
+
+{%- style -%}
+  #section-{{ section.id }} {
+    height: calc(var(--spacing) * ({{ section.settings.height }} - 1));
+  }
+
+  @media screen and (min-width: 768px) {
+    #section-{{ section.id }} {
+      height: calc(var(--spacing) * {{ section.settings.height }});
+    }
+  }
+{%- endstyle -%}
+
+{% schema %}
+{
+  "name": "White space",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add blank space between sections."
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "min": 2,
+      "max": 18,
+      "step": 0.5,
+      "unit": "x",
+      "label": "Height",
+      "info": "Multiples of theme [content spacing](/editor?context=theme&category=grid)",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_bottom_border_above",
+      "label": "Hide bottom border of section above",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "White space"
+    }
+  ]
+}
+{% endschema %}

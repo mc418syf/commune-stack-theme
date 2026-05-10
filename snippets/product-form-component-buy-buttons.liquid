@@ -1,0 +1,292 @@
+{%- liquid
+  assign gift_card_recipient_feature_active = false
+
+  if block and block.settings.show_gift_card_recipient and product.gift_card?
+    assign gift_card_recipient_feature_active = true
+  endif
+
+  unless current_variant
+    assign current_variant = product.selected_or_first_available_variant
+  endunless
+-%}
+
+<div
+  {% if settings.cart_type == 'drawer' %}
+    x-data="ProductForm"
+  {% endif %}
+  {% if block %}
+    {{ block.shopify_attributes }}
+  {% endif %}
+>
+  {% form 'product', product, id: product_form_id %}
+    {{ form | payment_terms }}
+
+    <div class="hidden no-js:block">
+      <label class="mt-theme block" for="variant_{{ section.id }}">
+        {{- 'products.product.variant' | t -}}
+      </label>
+      {% unless quick_buy %}
+        <div class="relative mt-2 w-fit">
+          <select
+            name="id"
+            id="variant_{{ section.id }}"
+            class="appearance-none rounded-none border-b-text border-scheme-text bg-scheme-background py-1 pr-6 text-scheme-text"
+          >
+            {% for variant in product.variants %}
+              <option
+                {% if variant == current_variant %}
+                  selected="selected"
+                {% endif %}
+                {% unless variant.available %}
+                  disabled="disabled"
+                {% endunless %}
+                x-bind:selected="currentVariantId === {{ variant.id }}"
+                value="{{ variant.id }}"
+              >
+                {{ variant.title }}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex w-4">
+            <span class="my-auto h-auto w-4">
+              {%- render 'icon-chevron-down' -%}
+            </span>
+          </div>
+        </div>
+      {% else %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+      {% endunless %}
+    </div>
+
+    <div
+      class="text-sm {% if quick_buy %}bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing z-10{% else %}mb-4 mt-8{% endif %}"
+      x-show="errorMessage"
+      x-transition:enter="transition ease duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      style="display: none;"
+    >
+      <span class="text-scheme-accent" x-text="errorMessage"></span>
+    </div>
+
+    {% if gift_card_recipient_feature_active %}
+      <div class="my-4">
+        {%
+          render 'gift-card-recipient-form',
+          product: product,
+          form: form,
+        %}
+      </div>
+    {% endif %}
+
+    {%- if settings.ajax_cart_method == 'page'
+      or settings.open_drawer_on_add_to_cart == false
+    -%}
+      <div
+        class="{% if quick_buy %}bg-scheme-background text-sm space-y-1 [&_a[href]]:text-sm px-section-horizontal-spacing py-section-vertical-spacing z-10{% else %}mb-8 mt-4{% endif %}"
+        x-show="addedToCart"
+        x-transition:enter="transition ease duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease duration-300"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        style="display: none;"
+      >
+        <p>{{ 'cart.popup.added_to_cart' | t }}!</p>
+        <p class="has-theme-links">
+          {{
+            'products.product.add_to_cart_confirm_html'
+            | t:
+              cart_url: routes.cart_url,
+              link_url: routes.all_products_collection_url
+          -}}
+          .
+        </p>
+      </div>
+    {%- endif -%}
+
+    <div
+      class="add-to-cart-container {% unless quick_buy %} max-w-2xl mt-8{% endunless %}"
+    >
+      {%- liquid
+        unless quick_buy
+          if block and block.settings.enable_payment_button
+            assign cta_button_classes = 'theme-button--secondary'
+          else
+            assign cta_button_classes = 'theme-button'
+          endif
+        else
+          assign cta_button_classes = quick_buy_button_classes
+        endunless
+      -%}
+
+      <button
+        id="addToCartButton"
+        class="add-to-cart flex w-full justify-center px-1 py-2 {% if settings.button_uppercase %}uppercase{% endif %} {{ cta_button_classes }} {% unless current_variant.available %}opacity-50 cursor-not-allowed after:content-none{% endunless %}"
+        type="submit"
+        {% unless quick_buy %}
+          :class="
+            {
+              'opacity-50 cursor-not-allowed after:content-none': !currentVariantAvailable
+            }
+          "
+          :disabled="!currentVariantAvailable || loading"
+        {% endunless %}
+        {% unless current_variant.available %}
+          disabled="disabled"
+        {% endunless %}
+      >
+        {% unless quick_buy %}
+          <span :class="`hidden`">
+            {% if current_variant.available %}
+              {{ 'products.product.add_to_cart' | t -}}
+            {% else %}
+              {{ 'products.product.sold_out' | t }}
+            {% endif %}
+          </span>
+          <template x-if="currentVariant">
+            <span>
+              <template x-if="currentVariantAvailable">
+                <span>
+                  {{- 'products.product.add_to_cart' | t -}}
+                </span>
+              </template>
+              <template x-if="!currentVariantAvailable">
+                <span>{{ 'products.product.sold_out' | t }}</span>
+              </template>
+            </span>
+          </template>
+          <template x-if="!currentVariant">
+            <span> {{ 'products.product.unavailable' | t }}</span>
+          </template>
+        {% else %}
+          <span>
+            {%- if current_variant -%}
+              {%- if current_variant.available -%}
+                {{- 'products.product.add_to_cart' | t -}}
+              {%- else -%}
+                <span>{{ 'products.product.sold_out' | t }}</span>
+              {%- endif -%}
+            {%- else -%}
+              <span> {{ 'products.product.unavailable' | t }}</span>
+            {%- endif -%}
+          </span>
+        {% endunless %}
+      </button>
+
+      {%- if block
+        and block.settings.enable_payment_button
+        and gift_card_recipient_feature_active == false
+      -%}
+        {% liquid
+          assign payment_button_wrapper_class = 'payment-button-wrapper'
+
+          if settings.button_color == 'transparent_background_text_border'
+            assign payment_button_wrapper_class = payment_button_wrapper_class | append: 'payment-button-wrapper--text_background'
+          endif
+        %}
+        <div
+          class="{{ payment_button_wrapper_class }} color-scheme mt-2 rounded-button"
+        >
+          {{ form | payment_button }}
+        </div>
+      {%- endif -%}
+    </div>
+  {% endform %}
+
+  {% if block and block.settings.show_pickup_availability %}
+    <template x-if="currentVariant && currentVariantAvailable">
+      <div
+        x-html="
+          $fetchedFragment(
+            `{{ routes.root_url }}variants/${currentVariantId}/?section_id=pickup-availability`,
+            '.pickup-availability',
+            'opacity-50'
+          )
+        "
+      ></div>
+    </template>
+  {% endif %}
+
+  {% unless quick_buy %}
+    {%- liquid
+      assign stack_image = ''
+      if product.featured_media
+        assign stack_image = product.featured_media | image_url: width: 200
+      endif
+      assign stack_size = ''
+      for option in product.options_with_values
+        assign option_lower = option.name | downcase
+        if option_lower contains 'size'
+          assign stack_size = product.selected_or_first_available_variant.options[forloop.index0]
+        endif
+      endfor
+    -%}
+    <div
+      class="max-w-2xl mt-3"
+      x-data="{ inStack: false, stackVariantId: '{{ product.selected_or_first_available_variant.id }}' }"
+      x-init="inStack = $store.stack.has(Number(stackVariantId))"
+      @stack-updated.window="inStack = $store.stack.has(Number(stackVariantId))"
+      x-effect="if (currentVariant) { stackVariantId = String(currentVariant.id); inStack = $store.stack.has(currentVariant.id); }"
+    >
+      <button
+        type="button"
+        class="theme-button--secondary flex w-full items-center justify-center gap-2 px-1 py-2{% if settings.button_uppercase %} uppercase{% endif %}"
+        @click.prevent="
+          if (!inStack) {
+            $store.stack.add({
+              id: {{ product.id }},
+              variantId: currentVariant ? currentVariant.id : Number(stackVariantId),
+              title: {{ product.title | json }},
+              vendor: {{ product.vendor | json }},
+              price: currentVariant ? '$' + (currentVariant.price / 100).toFixed(2) : {{ product.price | money | json }},
+              image: '{{ stack_image }}',
+              url: '{{ product.url }}',
+              size: currentVariant ? (currentVariant.option1 || '') : {{ stack_size | json }}
+            });
+            $dispatch('stack-updated');
+          }
+          $store.modals.open('stack');
+        "
+      >
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="14" height="2.5" rx="0.5" fill="currentColor"/>
+          <rect x="0" y="4.25" width="14" height="2.5" rx="0.5" fill="currentColor"/>
+          <rect x="0" y="8.5" width="14" height="2.5" rx="0.5" fill="currentColor"/>
+        </svg>
+        <span x-text="inStack ? 'View Stack & Book Appointment' : 'Add to Stack — Try in Showroom'">Add to Stack — Try in Showroom</span>
+      </button>
+      <p class="mt-2 text-center text-xs text-scheme-secondary">
+        No commitment to purchase. <a href="/pages/stack" class="underline underline-offset-2">How it works →</a>
+      </p>
+    </div>
+  {% endunless %}
+</div>
+
+{% if settings.buttons_show_arrow %}
+  {% style %}
+    .add-to-cart-container .shopify-payment-button__button--unbranded:after {
+      content: '\00a0\2192';
+    }
+  {% endstyle %}
+{% endif %}
+
+{% if settings.button_color == 'transparent_background_text_border' %}
+  {% style %}
+    .add-to-cart-container .shopify-payment-button__button--unbranded {
+      color: rgb(var(--color-scheme-background));
+      background-color: rgb(var(--color-scheme-text));
+      border-color: rgb(var(--color-scheme-text));
+    }
+
+    .add-to-cart-container .shopify-payment-button__button--unbranded:hover {
+      color: rgb(var(--color-scheme-background));
+      background-color: rgb(var(--color-scheme-accent));
+      border-color: rgb(var(--color-scheme-accent));
+    }
+  {% endstyle %}
+{% endif %}

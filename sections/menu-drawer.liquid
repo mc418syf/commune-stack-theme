@@ -1,0 +1,370 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign show_borders = section.settings.show_borders
+  assign counter = 0
+
+  assign locale_selector = false
+  assign country_selector = false
+
+  if section.settings.show_country_selector and localization.available_countries.size > 1
+    assign country_selector = true
+  endif
+
+  if section.settings.show_locale_selector and shop.published_locales.size > 1
+    assign locale_selector = true
+  endif
+
+  if locale_selector or country_selector
+    assign show_localization = true
+  endif
+-%}
+
+{% capture sidebar_content %}
+  <div
+    {% if settings.header_uppercase %}
+      class="uppercase"
+    {% endif %}
+    data-modal-label="{{ 'layout.navigation.menu' | t }}"
+    data-color-scheme="{{ section_color }}"
+  >
+    <nav
+      {% unless show_borders %}
+        class="py-section-vertical-spacing inline-block"
+      {% endunless %}
+      aria-label="{{ 'general.accessibility.primary' | t }}"
+    >
+      <ul>
+        {%- for link in linklists[section.settings.menu].links -%}
+          {%- capture link_class -%}inline-block py-4 w-full {{ section.settings.text_size }}{%- endcapture -%}
+          <li
+            x-data="{ expanded: false }"
+            class="no-js-focus-wrapper break-word px-section-horizontal-spacing {% if show_borders %}border-t-gridline border-gridline-color first-of-type:border-t-0{% endif %}"
+          >
+            {%- if link.links != blank -%}
+              {%- capture child_link_class -%}inline-block py-1 {% if settings.header_uppercase %}uppercase{% endif %}{%- endcapture -%}
+              <button
+                class="relative block w-full text-left {{ link_class }} ease pr-10 transition font-body{% if settings.header_uppercase %} uppercase{% endif %}"
+                x-bind:aria-expanded="expanded ? true : 'false'"
+                @click="expanded = ! expanded"
+                aria-controls="accordion{{ counter }}"
+              >
+                {{ link.title }}
+                <span class="absolute right-0 top-1/2 flex h-6 w-6 -translate-y-1/2 transform items-center">
+                  {%- if settings.accordion_icon == 'caret' -%}
+                    <span
+                      class="inline-block w-full origin-center transform transition"
+                      :class="{ 'rotate-180' : expanded }"
+                    >
+                      {%- render 'icon-chevron-down' -%}
+                    </span>
+                  {%- else -%}
+                    <span
+                      class="inline-block w-full origin-center"
+                      x-show="!expanded"
+                    >
+                      {%- render 'icon-plus' -%}
+                    </span>
+                    <span
+                      class="inline-block w-full origin-center"
+                      x-show="expanded"
+                      style="display: none;"
+                    >
+                      {%- render 'icon-minus' -%}
+                    </span>
+                  {%- endif -%}
+                </span>
+              </button>
+              <ul
+                id="accordion{{ counter }}"
+                class="no-js-focus-container pb-2 pl-4"
+                x-show="expanded"
+                x-cloak
+              >
+                {%- assign counter = counter | plus: 1 -%}
+                {%- for child_link in link.links -%}
+                  <li x-data="{ expanded: false }" class="no-js-focus-wrapper">
+                    {%- if child_link.links != blank -%}
+                      <button
+                        class="relative w-full text-left {{ child_link_class }} pr-10"
+                        x-bind:aria-expanded="expanded ? true : 'false'"
+                        @click="expanded = ! expanded"
+                        aria-controls="accordion{{ counter }}"
+                      >
+                        {{ child_link.title }}
+                        <span class="absolute right-0 top-1/2 flex h-6 w-6 -translate-y-1/2 transform items-center">
+                          {%- if settings.accordion_icon == 'caret' -%}
+                            <span
+                              class="inline-block w-full origin-center transform transition"
+                              :class="{ 'rotate-180' : expanded }"
+                            >
+                              {%- render 'icon-chevron-down' -%}
+                            </span>
+                          {%- else -%}
+                            <span
+                              class="inline-block w-full origin-center"
+                              x-show="!expanded"
+                            >
+                              {%- render 'icon-plus' -%}
+                            </span>
+                            <span
+                              class="inline-block w-full origin-center"
+                              x-show="expanded"
+                              style="display: none;"
+                            >
+                              {%- render 'icon-minus' -%}
+                            </span>
+                          {%- endif -%}
+                        </span>
+                      </button>
+                      <ul
+                        id="accordion{{ counter }}"
+                        class="no-js-focus-container px-2 pb-2 pt-1"
+                        x-show="expanded"
+                        x-cloak
+                      >
+                        {%- assign counter = counter | plus: 1 -%}
+                        {%- for grandchild_link in child_link.links -%}
+                          <li>
+                            <a
+                              class="{{ child_link_class }}"
+                              href="{{ grandchild_link.url }}"
+                            >
+                              {{ grandchild_link.title }}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- else -%}
+                      <a
+                        class="{{ child_link_class }}"
+                        href="{{ child_link.url }}"
+                      >
+                        {{ child_link.title }}
+                      </a>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- else -%}
+              <a class="{{ link_class }}" href="{{ link.url }}">
+                {{ link.title }}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+    <div class="border-t-gridline border-gridline-color">
+      <nav class="my-6" aria-label="{{ 'general.accessibility.secondary' | t }}">
+        <ul>
+          {%- for link in linklists[section.settings.secondary_menu].links -%}
+            <li class="px-section-horizontal-spacing">
+              <a class="inline-block py-1" href="{{ link.url }}">
+                {{ link.title }}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+
+      {% if show_localization %}
+        <div class="my-6 px-section-horizontal-spacing">
+          {% render 'localization-form', wrapper_classes: 'flex-col gap-y-0', context: 'sidebar', open: 'bottom-[calc(100%_+_0.5rem)] right-auto left-0', locale_selector: locale_selector, country_selector: country_selector, button_classes: 'text-base py-2', options_max_width: 'max-w-[theme(spacing.52)]', option_text_size: 'text-base', option_padding: 'px-2 py-2' %}
+        </div>
+      {% endif %}
+
+
+      {%- if section.settings.show_search -%}
+        <form
+          class="my-6 px-section-horizontal-spacing"
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search"
+        >
+          <div class="flex w-full max-w-xs items-end">
+            <label for="{{ section.id }}-search" class="sr-only">
+              {{- 'general.search.placeholder' | t -}}
+            </label>
+            <input
+              class="min-w-0 flex-auto border-b-text border-current bg-transparent py-1.5 placeholder-current{% if settings.header_uppercase %} uppercase{% endif %}"
+              id="{{ section.id }}-search"
+              type="text"
+              name="q"
+              placeholder="{{ 'general.search.placeholder' | t }}"
+            >
+            <button
+              class="px-1"
+              type="submit"
+            >
+              <span class="inline-block h-6 w-6">
+                {%- render 'icon-search' -%}
+              </span>
+              <span class="sr-only">{{ 'general.search.submit' | t }}</span>
+            </button>
+          </div>
+        </form>
+      {%- endif -%}
+      {% if section.settings.show_social %}
+        {% assign social_style = settings.social_style %}
+        <div class="my-8 px-section-horizontal-spacing">
+          {% render 'social-icons', social_style: social_style, link_class: 'py-1', section_color: section_color %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endcapture %}
+
+<div
+  x-data="Theme_Sidebar"
+  x-init="initTeleport($root); $store.modals.register('sidebar', 'leftDrawer');"
+>
+  <template data-should-teleport="#left-drawer-slot">
+    <template x-if="$store.modals.leftDrawer.contents === 'sidebar'">
+      {{ sidebar_content }}
+    </template>
+  </template>
+</div>
+
+<noscript>
+  <section class="section-sidebar{% if settings.header_uppercase %} uppercase{% endif %}">
+    <div class="bg-scheme-background px-section-horizontal-spacing py-2 text-right text-scheme-text">
+      <button
+        class="inline-flex items-center justify-center py-2 {% if settings.header_uppercase %}uppercase{% endif %}"
+        data-menu-drawer-toggle
+      >
+        <span class="mr-2 inline-block h-6 w-6 align-middle">
+          {%- render 'icon-menu' -%}
+        </span>
+        <span>{{ 'layout.navigation.menu' | t }}</span>
+      </button>
+    </div>
+    <div class="sidebar-container z-80 border-r-grid border-grid-color fixed bottom-0 left-0 top-0 w-11/12 max-w-xl transform overflow-y-auto bg-scheme-background text-scheme-text transition-transform">
+      {{ sidebar_content }}
+    </div>
+  </section>
+
+  <style>
+    .section-sidebar {
+      display: block !important;
+    }
+
+    @media (min-width: 1024px) {
+      .section-sidebar {
+        display: none !important;
+      }
+    }
+
+    .sidebar-container {
+      position: static;
+      width: 100%;
+      max-width: 100%;
+      border-right: 0;
+      display: none;
+    }
+
+    .section-sidebar:focus-within .sidebar-container {
+      display: block !important;
+    }
+  </style>
+</noscript>
+
+{% unless request.design_mode %}
+  <script src="{{ 'sidebar.js' | asset_url }}" type="module"></script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Menu drawer",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "This section is used on mobile even when it isn’t used on desktop. Please leave it enabled."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "link_list",
+      "id": "secondary_menu",
+      "label": "Secondary menu"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "options": [
+        {
+          "value": "text-base",
+          "label": "Body"
+        },
+        {
+          "value": "text-heading-standard",
+          "label": "Standard heading"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature heading"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary heading"
+        }
+      ],
+      "default": "text-heading-standard",
+      "info": "Applies to first level links only."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_borders",
+      "label": "Show borders on main menu",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social media"
+    },
+    {
+      "type": "header",
+      "content": "Language Selector",
+      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_locale_selector",
+      "label": "Show language selector",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Country/region selector",
+      "info": "To add a country/region, go to your [payment settings.](/admin/settings/payments)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country_selector",
+      "label": "Show country/region selector",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ]
+}
+{% endschema %}

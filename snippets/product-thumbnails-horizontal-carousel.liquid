@@ -1,0 +1,96 @@
+<div
+  class="splide splide--thumbnails border-b-gridline border-gridline-color{% if mobile_only %} lg:hidden{% endif %}{% if desktop_only %} max-lg:hidden{% endif %}"
+  :class="{ 'opacity-0' : splidesInFlux }"
+  @keydown.right.prevent.stop="thumbnailsSplide.go('+1')"
+  @keydown.down.prevent.stop="thumbnailsSplide.go('+1')"
+  @keydown.left.prevent.stop="thumbnailsSplide.go('-1')"
+  @keydown.up.prevent.stop="thumbnailsSplide.go('-1')"
+  data-desktop-media-position="{{ desktop_media_position }}"
+  {% if mobile_only %}
+    data-mobile-only
+  {% endif %}
+  {% if desktop_only %}
+    data-desktop-only
+  {% endif %}
+  x-show="slideCount > 1"
+>
+  <div class="splide__track bg-gridline-color">
+    <ul
+      class="splide__list flex"
+      :class="{ 'active-state-paused' : thumbnailActiveStatePaused }"
+    >
+      {% for media_id_string in media_ids_array %}
+        {%- liquid
+          assign media_id = media_id_string | plus: 0
+          assign media = product.media | where: 'id', media_id | first
+
+          assign loading = 'lazy'
+
+          if forloop.index <= 5 and section.index <= 3
+            assign loading = 'eager'
+          endif
+
+          if single_variant_mode
+            if forloop.first
+              assign media_group_id = media.id
+            endif
+
+            if variant_media_ids_array contains media.id
+              assign media_group_id = media.id
+            endif
+          endif
+        -%}
+        <li
+          class="splide__slide product-thumbnail {% if product.media.size > 5 %}w-horizontal-thumbnail-over-5{% else %}w-horizontal-thumbnail-5-or-under{% endif %} cursor-pointer{% unless forloop.first %} [.splide:not(.is-active)_&]:hidden{% endunless %}"
+          {% if single_variant_mode and media_group_id %}
+            data-media-group-id="{{ media_group_id }}"
+          {% endif %}
+        >
+          <div
+            class="bg-scheme-background{% unless settings.fill_image_to_border_edge %} p-1 lg:p-2{% endunless %}"
+          >
+            <div
+              class="
+                relative
+                {% if active_thumbnail_style == 'indent' %}
+                   transition-transform duration-[50ms] scale-100 [.splide\_\_list:not(.active-state-paused)_.product-thumbnail.is-active_&]:scale-75
+                {% else %}
+                  transition-opacity duration-75 opacity-100 [.product-thumbnail.is-active_&]:opacity-40
+                {% endif %}
+              "
+            >
+              {% render 'image-crop',
+                image: media,
+                ratio: thumbnails_ratio,
+                sizes: sizes,
+                loading: loading
+              %}
+              {% if media.media_type != 'image' %}
+                <div class="absolute bottom-1 right-1 h-6 w-6 bg-scheme-background p-0.5 text-scheme-text/60">
+                  {% if media.media_type == 'model' %}
+                    {% render 'icon-3d-model' %}
+                  {% elsif media.media_type == 'video'
+                    or media.media_type == 'external_video'
+                  %}
+                    {% render 'icon-video' %}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+      {% if product.media.size < 5 or single_variant_mode %}
+        <li
+          class="order-last w-full bg-scheme-background"
+          aria-hidden="true"
+          role="presentation"
+          {% if single_variant_mode %}
+            style="display: none;"
+            x-show="slideCount < 5"
+          {% endif %}
+        ></li>
+      {% endif %}
+    </ul>
+  </div>
+</div>

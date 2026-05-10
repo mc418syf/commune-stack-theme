@@ -1,0 +1,141 @@
+<section
+  id="customer-register"
+  class="border-b-gridline border-gridline-color"
+  data-color-scheme="scheme1"
+>
+  <div class="bg-scheme-background py-section-vertical-spacing text-scheme-text">
+    <div class="mx-auto my-theme max-w-lg px-section-horizontal-spacing">
+      <div class="mx-auto grid gap-2 lg:gap-4">
+        <h1 class="font-heading mb-2r text-2xl">
+          {{ 'customer.register.title' | t }}
+        </h1>
+
+        {%- form 'create_customer', novalidate: 'novalidate' -%}
+          {%- if form.errors -%}
+            <div class="text-scheme-accent">
+              <h2 class="mb-2 text-base" tabindex="-1" autofocus>
+                {{ 'contact.form.error_heading' | t }}
+              </h2>
+              <ul class="mb-8 space-y-2 [&_a[href]]:underline [&_a[href]]:hover:text-scheme-accent{% if form.errors.messages.size > 1 %} list-disc{% endif %}">
+                {%- for field in form.errors -%}
+                  <li>
+                    {%- if field == 'form' -%}
+                      {{ form.errors.messages[field] }}.
+                    {%- else -%}
+                      <a href="#RegisterForm-{{ field }}">
+                        {{ form.errors.translated_fields[field] | capitalize }}
+                        {{ form.errors.messages[field] }} </a
+                      >.
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+          <div class="mt-4 space-y-4">
+            <div>
+              <label class="block" for="RegisterForm-FirstName">
+                {{ 'customer.register.first_name' | t }}
+              </label>
+              <input
+                class="w-full border-b-text border-current bg-transparent py-1"
+                type="text"
+                name="customer[first_name]"
+                id="RegisterForm-FirstName"
+                {% if form.first_name %}
+                  value="{{ form.first_name }}"
+                {% endif %}
+                autocomplete="given-name"
+              >
+            </div>
+            <div>
+              <label class="block" for="RegisterForm-LastName">
+                {{ 'customer.register.last_name' | t }}
+              </label>
+              <input
+                class="w-full border-b-text border-current bg-transparent py-1"
+                type="text"
+                name="customer[last_name]"
+                id="RegisterForm-LastName"
+                {% if form.last_name %}
+                  value="{{ form.last_name }}"
+                {% endif %}
+                autocomplete="family-name"
+              >
+            </div>
+            <div>
+              <label class="block" for="RegisterForm-email">
+                {{ 'customer.register.email' | t }}
+              </label>
+              <input
+                class="w-full border-b-text border-current bg-transparent py-1"
+                type="email"
+                name="customer[email]"
+                id="RegisterForm-email"
+                {% if form.email %}
+                  value="{{ form.email }}"
+                {% endif %}
+                spellcheck="false"
+                autocapitalize="off"
+                autocomplete="email"
+                aria-required="true"
+                {% if form.errors contains 'email' %}
+                  aria-invalid="true"
+                  aria-describedby="RegisterForm-email-error"
+                {% endif %}
+              >
+            </div>
+            {%- if form.errors contains 'email' -%}
+              <span
+                id="RegisterForm-email-error"
+                class="mt-1"
+              >
+                {{ form.errors.translated_fields.email | capitalize }}
+                {{ form.errors.messages.email }}
+              </span>
+            {%- endif -%}
+            <div>
+              <label class="block" for="RegisterForm-password">
+                {{ 'customer.register.password' | t }}
+              </label>
+              <input
+                class="w-full border-b-text border-current bg-transparent py-1"
+                type="password"
+                name="customer[password]"
+                id="RegisterForm-password"
+                aria-required="true"
+                {% if form.errors contains 'password' %}
+                  aria-invalid="true"
+                  aria-describedby="RegisterForm-password-error"
+                {% endif %}
+              >
+            </div>
+            {%- if form.errors contains 'password' -%}
+              <span
+                id="RegisterForm-password-error"
+                class="mt-1 text-scheme-accent"
+              >
+                {{ form.errors.translated_fields.password | capitalize }}
+                {{ form.errors.messages.password }}
+              </span>
+            {%- endif -%}
+          </div>
+          <div class="mt-4">
+            <button class="theme-button">
+              {{ 'customer.register.submit' | t }}
+            </button>
+
+            <div class="mt-8">
+              <a
+                class="theme-link hover:text-scheme-accent"
+                href="{{ routes.account_login_url }}"
+              >
+                {{ 'customer.login_page.title' | t }}
+              </a>
+            </div>
+          </div>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>

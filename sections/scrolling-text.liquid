@@ -1,0 +1,344 @@
+{% liquid
+  assign speed_setting = section.settings.speed | plus: 0
+  assign link = section.settings.link
+  assign text = section.settings.text
+  assign font = section.settings.font
+  assign section_color = section.settings.color_scheme
+  assign direction = section.settings.direction
+  assign repeat_text = section.settings.repeat_text
+  assign separator = section.settings.separator
+  assign separator_repeats = section.settings.separator_repeats
+  assign spacing_between_repeated_separators = section.settings.spacing_between_repeated_separators
+  assign mobile_text_scale = section.settings.mobile_text_scale
+  assign desktop_text_scale = section.settings.desktop_text_scale
+
+  capture text_size_class
+    render 'type-scale-classes', mobile_text_scale: mobile_text_scale, desktop_text_scale: desktop_text_scale
+  endcapture
+%}
+
+<section
+  class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  {% render 'scrolling-text',
+    text_size_class: text_size_class,
+    mobile_text_scale: mobile_text_scale,
+    desktop_text_scale: desktop_text_scale,
+    speed_setting: speed_setting,
+    link: link,
+    text: text,
+    font: font,
+    section_color: section_color,
+    direction: direction,
+    repeat_text: repeat_text,
+    separator: separator,
+    separator_repeats: separator_repeats,
+    spacing_between_repeated_separators: spacing_between_repeated_separators
+  %}
+</section>
+
+{% schema %}
+{
+  "name": "Scrolling text",
+  "disabled_on": {
+    "groups": [
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "If a user has reduced motion enabled the scrolling text will not animate and display as a static banner as a fallback."
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store."
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_scale",
+      "min": -2,
+      "max": 4,
+      "step": 1,
+      "label": "Mobile font size scale",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_scale",
+      "min": -2,
+      "max": 9,
+      "step": 1,
+      "label": "Desktop font size scale",
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "Font",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "font-body",
+          "label": "Body"
+        }
+      ],
+      "default": "font-heading"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 20,
+      "max": 400,
+      "step": 10,
+      "label": "Speed",
+      "default": 180
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Right to left"
+        },
+        {
+          "value": "reverse",
+          "label": "Left to right"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "checkbox",
+      "id": "repeat_text",
+      "default": true,
+      "label": "Repeat text",
+      "info": "Automatically repeat text to create an infinity effect."
+    },
+    {
+      "type": "select",
+      "id": "separator",
+      "label": "Separator",
+      "info": "Symbol to separate repeats",
+      "options": [
+        {
+          "label": "None",
+          "value": "none"
+        },
+        {
+          "label": "·",
+          "value": "&middot;"
+        },
+        {
+          "label": "•",
+          "value": "&bullet;"
+        },
+        {
+          "label": "↑",
+          "value": "&uarr;"
+        },
+        {
+          "label": "→",
+          "value": "&rarr;"
+        },
+        {
+          "label": "↓",
+          "value": "&darr;"
+        },
+        {
+          "label": "←",
+          "value": "&larr;"
+        },
+        {
+          "label": "<",
+          "value": "&lt;"
+        },
+        {
+          "label": ">",
+          "value": "&gt;"
+        },
+        {
+          "label": "^",
+          "value": "^"
+        },
+        {
+          "label": "!",
+          "value": "!"
+        },
+        {
+          "label": "¡",
+          "value": "¡"
+        },
+        {
+          "label": "?",
+          "value": "?"
+        },
+        {
+          "label": "/",
+          "value": "/"
+        },
+        {
+          "label": "|",
+          "value": "|"
+        },
+        {
+          "label": "\\",
+          "value": "\\"
+        },
+        {
+          "label": ":",
+          "value": ":"
+        },
+        {
+          "label": "∞",
+          "value": "&infin;"
+        },
+        {
+          "label": "§",
+          "value": "&sect;"
+        },
+        {
+          "label": "#",
+          "value": "&num;"
+        },
+        {
+          "label": "%",
+          "value": "%"
+        },
+        {
+          "label": "@",
+          "value": "@"
+        },
+        {
+          "label": "№",
+          "value": "&numero;"
+        },
+        {
+          "label": "×",
+          "value": "&times;"
+        },
+        {
+          "label": "÷",
+          "value": "&divide;"
+        },
+        {
+          "label": "+",
+          "value": "&plus;"
+        },
+        {
+          "label": "−",
+          "value": "&minus;"
+        },
+        {
+          "label": "=",
+          "value": "&equals;"
+        },
+        {
+          "label": "~",
+          "value": "&tilde;"
+        },
+        {
+          "label": "–",
+          "value": "&ndash;"
+        },
+        {
+          "label": "—",
+          "value": "&mdash;"
+        },
+        {
+          "label": "&",
+          "value": "&amp;"
+        },
+        {
+          "label": "*",
+          "value": "&ast;"
+        },
+        {
+          "label": "✓",
+          "value": "&check;"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "separator_repeats",
+      "label": "Repeat separator",
+      "min": 1,
+      "max": 6,
+      "unit": "x",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "spacing_between_repeated_separators",
+      "label": "Spacing between repeated separators",
+      "options": [
+        {
+          "label": "None",
+          "value": ""
+        },
+        {
+          "label": "Hair",
+          "value": "&hairsp;"
+        },
+        {
+          "label": "Thin",
+          "value": "&thinsp;"
+        },
+        {
+          "label": "Punctuation",
+          "value": "&puncsp;"
+        },
+        {
+          "label": "4-per-em",
+          "value": "&emsp14;"
+        },
+        {
+          "label": "3-per-em",
+          "value": "&emsp13;"
+        },
+        {
+          "label": "Figure",
+          "value": "&numsp;"
+        },
+        {
+          "label": "En",
+          "value": "&ensp;"
+        },
+        {
+          "label": "Em",
+          "value": "&emsp;"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scrolling text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,191 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign show_bottom_border = section.settings.show_bottom_border
+  assign logo = ''
+
+  if section.settings.logo == blank
+    assign logo = settings.logo
+  else
+    assign logo = section.settings.logo
+  endif
+
+  if logo != blank
+    case section.settings.alignment
+      when 'left'
+        assign alignment_classes = 'mr-auto'
+      when 'right'
+        assign alignment_classes = 'ml-auto'
+      when 'center'
+        assign alignment_classes = 'mx-auto'
+    endcase
+
+    assign sizes = section.settings.logo_max_width | append: 'vw'
+  else
+    case section.settings.alignment
+      when 'left'
+        assign alignment_classes = 'text-left'
+      when 'right'
+        assign alignment_classes = 'text-right'
+      when 'center'
+        assign alignment_classes = 'text-center'
+    endcase
+  endif
+-%}
+
+{%- if section.settings.home_page_only == false or template.name == 'index' -%}
+  <section
+    class="overflow-hidden {% if show_bottom_border %}border-b-gridline border-gridline-color{% endif %} bg-scheme-background text-scheme-text"
+    data-color-scheme="{{ section_color }}"
+    role="complementary"
+  >
+    <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+      {%- if logo != blank -%}
+        {%- liquid
+          assign logo_alt = logo.alt | default: shop.name | escape
+
+          if section.location == 'header'
+            assign preload = true
+          else
+            assign preload = false
+          endif
+        -%}
+        <div
+          class="{{ alignment_classes }}"
+          style="max-width: {{ section.settings.logo_max_width }}%"
+        >
+          {{
+            logo
+            | image_url: width: 3000
+            | image_tag:
+              class: 'w-full',
+              width: logo.width,
+              sizes: sizes,
+              alt: logo_alt,
+              preload: preload
+          }}
+        </div>
+      {%- else -%}
+        <div class="font-heading {% render 'type-scale-classes', mobile_text_scale: section.settings.mobile_text_scale, desktop_text_scale: section.settings.desktop_text_scale %} {{ alignment_classes }} break-word">
+          {{ shop.name }}
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Hero logo",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "home_page_only",
+      "label": "Home page only",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_border",
+      "label": "Show bottom border",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Plain text"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_scale",
+      "min": -2,
+      "max": 4,
+      "step": 1,
+      "label": "Mobile font size scale",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_scale",
+      "min": -2,
+      "max": 9,
+      "step": 1,
+      "label": "Desktop font size scale",
+      "default": 7
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "paragraph",
+      "content": "Edit your logo in [theme settings](/editor?context=theme&category=logo)."
+    },
+    {
+      "type": "header",
+      "content": "Custom logo"
+    },
+    {
+      "type": "paragraph",
+      "content": "This will override default logo settings."
+    },
+    {
+      "id": "logo",
+      "type": "image_picker",
+      "label": "Logo image"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "logo_max_width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Logo max width",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero logo"
+    }
+  ],
+  "enabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  }
+}
+{% endschema %}

@@ -1,0 +1,69 @@
+{%- assign social_accounts = 'Facebook, X, Pinterest, Instagram, Snapchat, TikTok, Tumblr, YouTube, LinkedIn, Messenger, Threads, Whatsapp, Discord, Email'
+  | split: ', '
+-%}
+<ul
+  class="{% if social_style == 'icons' %}-ml-2{% endif %}"
+  data-color-scheme="{{ section_color }}"
+>
+  {% for social in social_accounts %}
+    {%- assign social_handle = social | handleize -%}
+    {% capture social_link %}social_{{ social_handle }}_link{% endcapture %}
+
+    {% if settings[social_link] != blank %}
+      {% if social_style == 'icons' %}
+        <li class="mb-2 ml-2 inline-block">
+          <a
+            class="fill-current hover:text-scheme-accent"
+            href="{% if social_handle == 'email' %}mailto:{% endif %}{{ settings[social_link] }}"
+            target="_blank"
+          >
+            <span class="inline-block h-6 w-6" aria-hidden="true">
+              {%- liquid
+                case social_handle
+                  when 'facebook'
+                    render 'icon-facebook'
+                  when 'x'
+                    render 'icon-x'
+                  when 'pinterest'
+                    render 'icon-pinterest'
+                  when 'instagram'
+                    render 'icon-instagram'
+                  when 'snapchat'
+                    render 'icon-snapchat'
+                  when 'email'
+                    render 'icon-email'
+                  when 'tumblr'
+                    render 'icon-tumblr'
+                  when 'youtube'
+                    render 'icon-youtube'
+                  when 'linkedin'
+                    render 'icon-linkedin'
+                  when 'messenger'
+                    render 'icon-messenger'
+                  when 'threads'
+                    render 'icon-threads'
+                  when 'whatsapp'
+                    render 'icon-whatsapp'
+                  when 'discord'
+                    render 'icon-discord'
+                  when 'tiktok'
+                    render 'icon-tiktok'
+                endcase
+              -%}
+            </span>
+            <span class="sr-only">{{ social }}</span>
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a
+            class="inline-block {{ link_class }} hover:text-scheme-accent"
+            href="{% if social_handle == 'email' %}mailto:{% endif %}{{ settings[social_link] }}"
+          >
+            {{ social }}
+          </a>
+        </li>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+</ul>

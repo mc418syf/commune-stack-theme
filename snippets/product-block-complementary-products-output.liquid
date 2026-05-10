@@ -1,0 +1,99 @@
+{% liquid
+  assign enable_quick_buy = complementary_products_block.settings.enable_quick_buy
+  assign quick_buy_button_classes = complementary_products_block.settings.quick_buy_button_style
+%}
+{% if recommendations.performed and recommendations.products_count > 0 %}
+  {%- liquid
+    assign products_per_row = complementary_products_block.settings.products_per_row_desktop | plus: 0
+    assign products_per_row_mobile = complementary_products_block.settings.products_per_row_mobile | plus: 0
+
+    unless sizes
+      unless desktop_sizes_base
+        assign desktop_sizes_base = '50vw'
+      endunless
+
+      assign desktop_sizes = '(min-width: 1024px) calc(' | append: desktop_sizes_base | append: ' / ' | append: products_per_row | append: ')'
+
+      case products_per_row_mobile
+        when 1
+          assign mobile_sizes = '100vw'
+        when 2
+          assign mobile_sizes = '50vw'
+      endcase
+
+      assign sizes = desktop_sizes | append: ', ' | append: mobile_sizes
+    endunless
+  -%}
+  <div
+    class="complementary-products-block {% if complementary_products_block.settings.heading_text_style == 'body' %}complementary-products-block--font-body {% endif %}mt-8"
+    {{ complementary_products_block.shopify_attributes }}
+  >
+    <div class="complementary-products-block-container -mx-2 border-b-gridline border-gridline-color lg:-mx-4{% if complementary_products_block.settings.heading_text_style == 'heading' %} border-t-gridline{% endif %}">
+      {%- if complementary_products_block.settings.heading != '' -%}
+        <h2 class="complementary-products-block-title px-section-horizontal-spacing pb-theme{% if complementary_products_block.settings.heading_text_style == 'heading' %} font-heading text-heading-standard pt-theme-double{% else %} font-body{% endif %}">
+          {{ complementary_products_block.settings.heading }}
+        </h2>
+      {%- endif -%}
+
+      <ul
+        style="--products-per-row: {{ products_per_row }}; --products-per-row-mobile: {{ products_per_row_mobile }}"
+        class="grid grid-cols-[repeat(var(--products-per-row-mobile),_minmax(0,_1fr))] gap-gutter bg-gridline-color lg:grid-cols-[repeat(var(--products-per-row),_minmax(0,_1fr))] z-10{% if recommendations.products.size > 0 %} border-t-gridline border-gridline-color{% endif %}"
+      >
+        {%- for product in recommendations.products -%}
+          {%- assign counter = counter | plus: 1 -%}
+          <li class="bg-scheme-background text-scheme-text">
+            {% if block.settings.product_tile_type == 'text_overlay' %}
+              {%- render 'product-tile-text-overlay',
+                product: product,
+                sizes: sizes,
+                loading: 'eager',
+                section_color: section_color,
+                products_per_row_mobile: products_per_row_mobile
+              -%}
+            {% else %}
+              {%- render 'product-tile-standard',
+                product: product,
+                sizes: sizes,
+                loading: 'eager',
+                section_color: section_color,
+                products_per_row_mobile: products_per_row_mobile,
+                enable_quick_buy: enable_quick_buy,
+                quick_buy_button_classes: quick_buy_button_classes,
+                inserted: true
+              -%}
+            {% endif %}
+          </li>
+        {%- endfor -%}
+        {%- liquid
+          assign items_on_last_row = counter | modulo: products_per_row
+          assign placeholder_width = products_per_row | minus: items_on_last_row
+          assign items_on_last_row_mobile = counter | modulo: products_per_row_mobile
+          assign col_span_mobile = 2 | divided_by: products_per_row_mobile
+          assign placeholder_width_mobile = products_per_row_mobile | minus: items_on_last_row_mobile | times: col_span_mobile
+        -%}
+        {%- if items_on_last_row != 0 -%}
+          <li
+            style="--placeholder-width: {{ placeholder_width }};"
+            class="none absolute bg-scheme-background lg:static lg:col-span-placeholder-width lg:block"
+            aria-hidden="true"
+            role="presentation"
+          ></li>
+        {%- endif -%}
+        {%- if items_on_last_row_mobile != 0 -%}
+          <li
+            style="--placeholder-width-mobile: {{ placeholder_width_mobile }};"
+            class="lg:none col-span-placeholder-width-mobile block bg-scheme-background lg:absolute"
+            aria-hidden="true"
+            role="presentation"
+          ></li>
+        {%- endif -%}
+      </ul>
+    </div>
+  </div>
+{% endif %}
+
+{% if enable_quick_buy and section.settings.product_tile_type == 'standard' %}
+  {% unless request.design_mode %}
+    <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+  {% endunless %}
+{% endif %}

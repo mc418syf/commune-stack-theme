@@ -1,0 +1,259 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign products_per_row = section.settings.products_per_row_desktop | plus: 0
+  assign products_per_row_mobile = section.settings.products_per_row_mobile | plus: 0
+  assign enable_quick_buy = section.settings.enable_quick_buy
+  assign quick_buy_button_classes = section.settings.quick_buy_button_style
+  assign counter = 0
+  assign grid_cols = 12
+  assign desktop_grid_class = 'lg:grid-cols-' | append: grid_cols
+
+  case products_per_row
+    when 2
+      assign desktop_col_span = 'lg:col-span-6'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 6)'
+    when 3
+      assign desktop_col_span = 'lg:col-span-4'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 4)'
+    when 4
+      assign desktop_col_span = 'lg:col-span-3'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 3)'
+  endcase
+
+  case products_per_row_mobile
+    when 1
+      assign mobile_col_span = 'col-span-2'
+      assign sizes = sizes | append: ', 50vw'
+    when 2
+      assign mobile_col_span = 'col-span-1'
+      assign sizes = sizes | append: ', 100vw'
+  endcase
+-%}
+
+{%- if recommendations.performed -%}
+  {% if recommendations.products_count > 0 %}
+    <div
+      class="related-products"
+      data-color-scheme="{{ section_color }}"
+    >
+      <div class="related-products-container border-b-gridline border-gridline-color">
+        {% if section.settings.heading != '' %}
+          {%- render 'section-title',
+            title: section.settings.heading,
+            section_color: section_color
+          -%}
+        {% endif %}
+        <ul
+          class="grid grid-cols-2 {{ desktop_grid_class }} z-10 gap-gutter bg-gridline-color"
+          data-color-scheme="{{ section_color }}"
+        >
+          {%- for product in recommendations.products -%}
+            {%- assign counter = counter | plus: 1 -%}
+            <li class="{{ mobile_col_span }} {{ desktop_col_span }} bg-scheme-background text-scheme-text">
+              {% if section.settings.product_tile_type == 'text_overlay' %}
+                {%- render 'product-tile-text-overlay',
+                  product: product,
+                  sizes: sizes,
+                  loading: 'eager',
+                  section_color: section_color,
+                  products_per_row_mobile: products_per_row_mobile
+                -%}
+              {% else %}
+                {%- render 'product-tile-standard',
+                  product: product,
+                  sizes: sizes,
+                  loading: 'eager',
+                  section_color: section_color,
+                  products_per_row_mobile: products_per_row_mobile,
+                  enable_quick_buy: enable_quick_buy,
+                  quick_buy_button_classes: quick_buy_button_classes,
+                  inserted: true
+                -%}
+              {% endif %}
+            </li>
+          {%- endfor -%}
+          {%- liquid
+            assign items_on_last_row = counter | modulo: products_per_row
+            assign col_span = grid_cols | divided_by: products_per_row
+            assign placeholder_width = products_per_row | minus: items_on_last_row | times: col_span
+            assign items_on_last_row_mobile = counter | modulo: products_per_row_mobile
+            assign col_span_mobile = 2 | divided_by: products_per_row_mobile
+            assign placeholder_width_mobile = products_per_row_mobile | minus: items_on_last_row_mobile | times: col_span_mobile
+          -%}
+          {%- if items_on_last_row != 0 -%}
+            <li
+              style="--placeholder-width: {{ placeholder_width }};"
+              class="absolute hidden bg-scheme-background lg:static lg:col-span-placeholder-width lg:block"
+              aria-hidden="true"
+              role="presentation"
+            ></li>
+          {%- endif -%}
+          {%- if items_on_last_row_mobile != 0 -%}
+            <li
+              style="--placeholder-width-mobile: {{ placeholder_width_mobile }};"
+              class="col-span-placeholder-width-mobile block bg-scheme-background lg:absolute lg:hidden"
+              aria-hidden="true"
+              role="presentation"
+            ></li>
+          {%- endif -%}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+{%- else -%}
+  {% capture section_url %}{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.limit }}{% endcapture %}
+  <div
+    x-data
+    x-html="
+      $fetchedFragment(
+        '{{ section_url }}',
+        '.related-products'
+      )
+    "
+  ></div>
+{%- endif -%}
+
+{% if enable_quick_buy and section.settings.product_tile_type == 'standard' %}
+  {% unless request.design_mode %}
+    <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'product.js' | asset_url }}" type="module"></script>
+    {% if settings.quick_buy_variant_picker_option_style == 'drop_down' %}
+      <script
+        src="{{ 'variant-drop-down.js' | asset_url }}"
+        type="module"
+      ></script>
+    {% endif %}
+  {% endunless %}
+
+  {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Related products",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Dynamic recommendations change and improve with time. [Learn more](https://help.shopify.com/themes/development/recommended-products)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "You may also like"
+    },
+    {
+      "id": "product_tile_type",
+      "type": "select",
+      "label": "Product tile type",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text_overlay",
+          "label": "Text overlay"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "limit",
+      "label": "Maximum products to show",
+      "default": "4",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "products_per_row_desktop",
+      "label": "Products per row on desktop",
+      "default": "4",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        }
+      ]
+    },
+    {
+      "type": "radio",
+      "id": "products_per_row_mobile",
+      "label": "Products per row on mobile",
+      "default": "1",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Quick buy"
+    },
+    {
+      "type": "paragraph",
+      "content": "Only supported when product tile type is set to \"Standard\"."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_buy",
+      "label": "Enable quick buy"
+    },
+    {
+      "type": "select",
+      "id": "quick_buy_button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "theme-button",
+          "label": "Primary"
+        },
+        {
+          "value": "theme-button--secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "theme-button"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,123 @@
+{%- assign section_color = section.settings.color_scheme -%}
+<section
+  class="grid min-h-[350px] grid-cols-1 gap-gridline border-b-gridline border-gridline-color bg-gridline-color lg:min-h-[700px] lg:grid-cols-2"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text lg:flex  {{ section.settings.content_position }}">
+    <div>
+      <div class="{%- if section.settings.content_position == 'lg:justify-center' -%}text-center{%- endif -%}">
+        <h1 class="font-heading break-word text-heading-feature">
+          {{ page.title }}
+        </h1>
+      </div>
+      <div class="rte mt-theme">
+        {{ page.content }}
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text">
+    {%- assign formId = 'ContactForm' -%}
+    {% form 'contact', id: formId %}
+      {% render 'form-status', form: form, form_id: formId %}
+      <div class="lg:grid lg:grid-cols-2 lg:gap-4">
+        <div>
+          <label class="block" for="ContactFormName">
+            {{- 'contact.form.name' | t -}}
+          </label>
+          <input
+            type="text"
+            class="w-full border-b-text border-current bg-transparent py-1"
+            name="contact[name]"
+            id="ContactFormName"
+            value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+            required
+            aria-required="true"
+          >
+        </div>
+        <div>
+          <label class="mt-4 block lg:mt-0" for="ContactFormEmail">
+            {{- 'contact.form.email' | t -}}
+          </label>
+          <input
+            type="email"
+            name="contact[email]"
+            id="ContactFormEmail"
+            class="w-full border-b-text border-current bg-transparent py-1 {% if form.errors contains 'email' %}border-gridline-color{% endif %}"
+            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+            spellcheck="false"
+            autocomplete="off"
+            autocapitalize="off"
+            required
+            aria-required="true"
+          >
+        </div>
+      </div>
+
+      <label class="mt-4 block" for="ContactFormPhone">
+        {{- 'contact.form.phone' | t -}}
+      </label>
+      <input
+        type="tel"
+        name="contact[phone]"
+        id="ContactFormPhone"
+        class="w-full border-b-text border-current bg-transparent py-1"
+        value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+        pattern="[0-9\-]*"
+      >
+
+      <label class="mt-4 block" for="ContactFormMessage">
+        {{- 'contact.form.message' | t -}}
+      </label>
+      <textarea
+        rows="10"
+        name="contact[body]"
+        id="ContactFormMessage"
+        required
+        aria-required="true"
+        class="mt-1 block w-full border-text border-current bg-transparent p-2 text-sm"
+      >
+        {%- if form.body -%}
+          {{- form.body -}}
+        {%- endif -%}
+      </textarea>
+
+      <input
+        type="submit"
+        class="theme-button mt-4 block w-full lg:w-2/3"
+        value="{{ 'contact.form.submit' | t }}"
+      >
+    {% endform %}
+  </div>
+</section>
+
+{%- if section.settings.override_header_footer_color_scheme -%}
+  {%- render 'header-footer-color-scheme-override',
+    section_color: section_color
+  -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Pages - contact",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_header_footer_color_scheme",
+      "label": "Use this color scheme for header and footer",
+      "info": "This will only apply to the contact page template",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

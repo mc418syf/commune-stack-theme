@@ -1,0 +1,163 @@
+
+{%- assign pick_up_availabilities = product_variant.store_availabilities
+  | where: 'pick_up_enabled', true
+-%}
+
+{% comment %}
+Tight underline style that replaces the theme’s border/::after underline
+so you only get one underline close to the text.
+{% endcomment %}
+{% style %}
+  .pickup-availability-preview .theme-link.link-tight-underline{
+    border-bottom: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    padding-bottom: 0 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    display: inline;
+  }
+  .pickup-availability-preview .theme-link.link-tight-underline::after{
+    content: none !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+{% endstyle %}
+
+{%- if pick_up_availabilities.size > 0 -%}
+  {%- liquid
+    assign closest_location = pick_up_availabilities.first
+
+    assign label_available = 'store_availability.general.pick_up_available_at' | t
+    if label_available contains 'translation missing' or label_available contains 'store_availability.general.pick_up_available_at'
+      assign label_available = 'Pickup available at'
+    endif
+
+    assign label_unavailable = 'store_availability.general.pick_up_unavailable_at' | t
+    if label_unavailable contains 'translation missing' or label_unavailable contains 'store_availability.general.pick_up_unavailable_at'
+      assign label_unavailable = 'Pickup currently unavailable at'
+    endif
+  -%}
+
+  <div class="pickup-availability">
+    <div class="pickup-availability-preview">
+      <div class="mt-4 flex items-start lg:w-3/4">
+        <div class="mr-3 w-3 shrink-0 grow-0 pt-1">
+          {% if closest_location.available %}
+            {% render 'icon-in-stock' %}
+          {% else %}
+            {% render 'icon-out-of-stock' %}
+          {% endif %}
+        </div>
+
+        <div class="flex-auto">
+          {% if closest_location.available %}
+            <h2 class="leading-6">
+              {{ label_available }}
+              <button
+                type="button"
+                class="theme-link link-tight-underline hover:text-scheme-accent"
+                @click.prevent="$store.modals.open('pickup-availability-{{ product_variant.id }}')"
+                aria-haspopup="dialog"
+              >
+                {{ closest_location.location.name }}
+              </button>
+            </h2>
+          {% else %}
+            <h2 class="leading-6">
+              {{ label_unavailable }}
+              <button
+                type="button"
+                class="theme-link link-tight-underline hover:text-scheme-accent"
+                @click.prevent="$store.modals.open('pickup-availability-{{ product_variant.id }}')"
+                aria-haspopup="dialog"
+              >
+                {{ closest_location.location.name }}
+              </button>
+            </h2>
+          {% endif %}
+
+          <small class="mt-2 block empty:hidden">
+            {{- closest_location.pickup_time -}}
+          </small>
+          {%- comment -%} Removed the old “view store information / check other stores” line {%- endcomment -%}
+        </div>
+      </div>
+    </div>
+
+    <div class="pickup-availability-drawer" x-cloak>
+      <div
+        x-data="{ existingDrawerContents: document.getElementById('pickup-availability-drawer-contents-{{ product_variant.id }}') }"
+        x-init="
+          if (existingDrawerContents) existingDrawerContents.remove();
+          $store.modals.register('pickup-availability-{{ product_variant.id }}', 'rightDrawer');
+        "
+      >
+        <template x-teleport="#right-drawer-slot">
+          <template
+            id="pickup-availability-drawer-contents-{{ product_variant.id }}"
+            x-if="$store.modals.rightDrawer.contents === 'pickup-availability-{{ product_variant.id }}'"
+          >
+            <div
+              :data-modal-label="product_variant && product_variant.title && product_variant.title !== 'Default Title'
+                ? `${product.title} – ${product_variant.title}`
+                : product.title"
+            >
+              <div class="sticky top-0 z-1 flex items-center justify-between border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing py-4">
+                <h1 class="sticky top-0 z-1 flex items-center justify-between border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing">
+                  <span
+                    x-text="(product_variant && product_variant.title && product_variant.title !== 'Default Title')
+                      ? `${product.title} – ${product_variant.title}`
+                      : product.title"
+                  ></span>
+                </h1>
+
+                <button
+                  @click.prevent="$store.modals.close('pickup-availability-{{ product_variant.id }}')"
+                  class="absolute right-0 top-0 block h-full"
+                  type="button"
+                >
+                  <span class="sr-only">{{ 'general.accessibility.close_modal' | t }}</span>
+                  <div class="my-auto mr-section-horizontal-spacing h-6 w-6">
+                    {% render 'icon-close' %}
+                  </div>
+                </button>
+              </div>
+
+              <ul class="relative flex-auto overflow-y-auto" role="list">
+                {% for availability in pick_up_availabilities %}
+                  <li class="border-b-gridline border-gridline-color px-section-horizontal-spacing py-4">
+                    <div class="flex items-start">
+                      <div class="mr-3 inline-block w-3 pt-1">
+                        {% if availability.available %}
+                          {% render 'icon-in-stock' %}
+                        {% else %}
+                          {% render 'icon-out-of-stock' %}
+                        {% endif %}
+                      </div>
+                      <div>
+                        <p>{{ availability.location.name }}</p>
+                      </div>
+                    </div>
+
+                    <div class="mt-4">
+                      {{ availability.location.address | format_address }}
+                    </div>
+
+                    {% if availability.location.address.phone %}
+                      <a href="{{ availability.location.address.phone | replace: ' ', '' }}">
+                        {{ availability.location.address.phone }}
+                      </a>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </template>
+        </template>
+      </div>
+    </div>
+  </div>
+{%- endif -%}

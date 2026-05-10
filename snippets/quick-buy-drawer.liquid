@@ -1,0 +1,51 @@
+<aside aria-labelledby="quick-buy-drawer-slot-container" x-data>
+  <template x-teleport="body">
+    <div
+      x-show="$store.modals.quickBuyDrawer.open"
+      @keydown.escape.prevent.stop="$store.modals.close('quickBuyDrawer')"
+      @click="$store.modals.close('quickBuyDrawer')"
+      class="fixed inset-0 z-110 flex lg:block"
+      data-color-scheme="{{ settings.modal_color_scheme | default: 'scheme3' }}"
+      id="modals-quickBuyDrawer"
+      @quick-buy-drawer-is-open.window="setTimeout(() => { $focus.first() }, 120)"
+    >
+      <div
+        @click.stop
+        id="quick-buy-drawer-slot-container"
+        x-show="$store.modals.quickBuyDrawer.open"
+        x-transition:enter="duration-300 motion-reduce:duration-0 outline-0"
+        x-transition:enter-start="max-lg:translate-y-full lg:translate-x-full"
+        x-transition:leave="duration-300 motion-reduce:duration-0 outline-0"
+        x-transition:leave-end="max-lg:translate-y-full lg:translate-x-full"
+        x-trap.noscroll.inert="$store.modals.quickBuyDrawer.open"
+        class="mt-auto h-auto w-full transform border-gridline-color bg-scheme-background text-scheme-text lg:ml-auto lg:h-full lg:w-11/12 lg:max-w-md lg:overflow-y-auto lg:border-l-gridline"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="getModalLabel('quickBuyDrawer', document.getElementById('quick-buy-drawer-slot'))"
+        tabindex="-1"
+      >
+        <div class="sticky top-0 z-1 flex items-center justify-between border-y-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing py-4 lg:border-t-0">
+          <div>
+            {{ 'products.product.choose_options' | t }}
+          </div>
+          <button
+            @click.prevent="$store.modals.close('quickBuyDrawer')"
+            class="absolute right-0 top-0 block h-full"
+            type="button"
+          >
+            <span class="sr-only">
+              {{- 'general.accessibility.close_modal' | t -}}
+            </span>
+            <div class="my-auto mr-section-horizontal-spacing h-6 w-6">
+              {% render 'icon-close' %}
+            </div>
+          </button>
+        </div>
+        <div
+          id="quick-buy-drawer-slot"
+          class="max-lg:h-fit max-lg:max-h-[65vh] max-lg:overflow-y-auto"
+        ></div>
+      </div>
+    </div>
+  </template>
+</aside>

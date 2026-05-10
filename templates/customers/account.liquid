@@ -1,0 +1,208 @@
+<section
+  class="border-b-gridline border-gridline-color"
+  data-color-scheme="scheme1"
+>
+  <div class="bg-scheme-background text-scheme-text">
+    <div class="my-theme-double px-2 md:px-4">
+      <div class="md:grid md:grid-cols-12">
+        <div class="mb-8 text-center md:col-span-full">
+          <h1 class="font-heading mb-2 text-2xl md:text-4xl">
+            {{ 'customer.account.title' | t }}
+          </h1>
+          <div>
+            <a
+              class="theme-link hover:text-scheme-accent"
+              href="{{ routes.account_logout_url }}"
+            >
+              {{- 'customer.log_out' | t -}}
+            </a>
+          </div>
+        </div>
+
+        <div class="col-span-full md:col-span-8">
+          <h2 id="orders-title" class="font-heading mb-2 text-lg">
+            {{ 'customer.orders.title' | t }}
+          </h2>
+
+          {% paginate customer.orders by 20 %}
+            {%- if customer.orders.size > 0 -%}
+              <table
+                role="table"
+                aria-labelledby="orders-title"
+                class="customer mt-4 w-full"
+              >
+                <thead role="rowgroup">
+                  <tr
+                    role="row"
+                    class="md:[&>th]:border-gridline md:[&>th]:border-gridline-color md:[&>th]:p-2"
+                  >
+                    <th
+                      class="text-left"
+                      id="ColumnOrder"
+                      scope="col"
+                      role="columnheader"
+                    >
+                      {{ 'customer.orders.order_number' | t }}
+                    </th>
+                    <th
+                      class="text-left"
+                      id="ColumnDate"
+                      scope="col"
+                      role="columnheader"
+                    >
+                      {{ 'customer.orders.date' | t }}
+                    </th>
+                    <th
+                      class="text-left"
+                      id="ColumnPayment"
+                      scope="col"
+                      role="columnheader"
+                    >
+                      {{ 'customer.orders.payment_status' | t }}
+                    </th>
+                    <th
+                      class="text-left"
+                      id="ColumnFulfillment"
+                      scope="col"
+                      role="columnheader"
+                    >
+                      {{ 'customer.orders.fulfillment_status' | t }}
+                    </th>
+                    <th
+                      class="text-right"
+                      id="ColumnTotal"
+                      scope="col"
+                      role="columnheader"
+                    >
+                      {{ 'customer.orders.total' | t }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  role="rowgroup"
+                  class="border-gridline-color max-md:border-t-gridline"
+                >
+                  {%- for order in customer.orders -%}
+                    <tr
+                      role="row"
+                      class="border-gridline-color max-md:border-b-gridline [&>td]:border-gridline-color max-md:[&>td]:py-2 md:[&>td]:border-gridline md:[&>td]:p-2"
+                    >
+                      <td
+                        id="RowOrder"
+                        role="cell"
+                        headers="ColumnOrder"
+                        data-label="{{ 'customer.orders.order_number' | t }}"
+                      >
+                        <a
+                          class="max-md:theme-link font-bold after:content-[var(--links-after-content)] hover:text-scheme-accent max-md:-mb-1"
+                          href="{{ order.customer_url }}"
+                          aria-label="{{ 'customer.orders.order_number_link' | t: number: order.name }}"
+                        >
+                          {{- order.name -}}
+                        </a>
+                      </td>
+                      <td
+                        headers="RowOrder ColumnDate"
+                        role="cell"
+                        data-label="{{ 'customer.orders.date' | t }}"
+                      >
+                        {{ order.created_at | time_tag: format: 'date' }}
+                      </td>
+                      <td
+                        headers="RowOrder ColumnPayment"
+                        role="cell"
+                        data-label="{{ 'customer.orders.payment_status' | t }}"
+                      >
+                        {{ order.financial_status_label }}
+                      </td>
+                      <td
+                        headers="RowOrder ColumnFulfillment"
+                        role="cell"
+                        data-label="{{ 'customer.orders.fulfillment_status' | t }}"
+                      >
+                        {{ order.fulfillment_status_label }}
+                      </td>
+                      <td
+                        class="text-right"
+                        headers="RowOrder ColumnTotal"
+                        role="cell"
+                        data-label="{{ 'customer.orders.total' | t }}"
+                      >
+                        {{ order.total_net_amount | money_with_currency }}
+                      </td>
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            {%- else -%}
+              <p>{{ 'customer.orders.none' | t }}</p>
+            {%- endif -%}
+
+            {%- if paginate.pages > 1 -%}
+              {%- render 'pagination', paginate: paginate -%}
+            {%- endif -%}
+          {% endpaginate %}
+        </div>
+
+        <div class="col-span-full max-md:mt-8 md:col-span-3 md:col-start-10">
+          <h2 class="font-heading mb-2 text-lg">
+            {{ 'customer.account.details' | t }}
+          </h2>
+
+          <div class="mt-4">
+            <div class="empty:hidden">
+              {{ customer.default_address | format_address }}
+            </div>
+
+            <div class="mt-2">
+              <a
+                class="theme-link hover:text-scheme-accent"
+                href="{{ routes.account_addresses_url }}"
+              >
+                {{- 'customer.account.view_addresses' | t }} (
+                {{- customer.addresses_count -}}
+                )</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{%- style -%}
+  @media screen and (max-width: 767px) {
+    .customer thead,
+    .customer th,
+    .customer tfoot td:first-of-type {
+      display: none;
+    }
+
+    .customer td {
+      display: flex;
+      text-align: right;
+    }
+
+    .customer td::before {
+      color: rgba(var(--color-foreground), 0.75);
+      content: attr(data-label);
+      padding-right: 2rem;
+      flex-grow: 1;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    .customer td:first-of-type {
+      display: flex;
+      align-items: center;
+    }
+
+    .customer tr {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      width: 100%;
+    }
+  }
+{%- endstyle -%}

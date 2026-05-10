@@ -1,0 +1,81 @@
+{% liquid
+  assign section_color = settings.modal_color_scheme
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_media = current_variant.featured_media | default: product.featured_media
+
+  if product.media.size > 0
+    assign has_media = true
+  else
+    assign has_media = false
+  endif
+%}
+
+<div class="contents" data-quick-buy-root>
+  <section
+    class="bg-scheme-background text-scheme-text"
+    data-color-scheme="{{ section_color }}"
+    id="{{ section.id }}"
+    x-data="
+      Theme_Product({
+        product: {{ product | json | escape }},
+        initialVariant: {{ current_variant | json | escape }},
+        featuredMediaId: {% if featured_media %}{{ featured_media.id }}{% else %}null{% endif %},
+        optionsWithValues: {{ product.options_with_values | json | escape }},
+        shouldUpdateHistoryState: false,
+      })
+    "
+    data-product-root="{{ section.id }}"
+  >
+    <div class="product-block-area px-section-horizontal-spacing py-section-vertical-spacing">
+      <div class="grid grid-cols-5 items-center gap-4">
+        {% if has_media %}
+          <div class="col-span-1">
+            {% for media in product.media %}
+              <div
+                x-show="{{ media.id }} === currentMediaId"
+                {% unless media.id == featured_media.id %}
+                  style="display: none;"
+                {% endunless %}
+              >
+                {{
+                  media
+                  | image_url: width: 500
+                  | image_tag:
+                    loading: 'eager',
+                    sizes: '(min-width: 1024px) calc(min(24rem, 92vw) / 5),  10vw',
+                    widths: '50, 100, 150, 200, 300, 600'
+                }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="{% if has_media %}col-span-4{% else %}col-span-full{% endif %}">
+          <h1
+            class="product-title-block font-heading break-word text-heading-secondary"
+            data-product-title
+          >
+            {{ product.title | default: "" }}
+          </h1>
+          {% render 'product-form-component-price',
+            current_variant: current_variant,
+            quick_buy: true,
+            margin_classes: 'mt-2',
+            price_text_size: 'text-base'
+          %}
+        </div>
+      </div>
+      {% liquid
+        assign product_form_id = 'product-form-' | append: section.id
+        render 'product-form-component-variant-picker', option_style: settings.quick_buy_variant_picker_option_style, hide_option_labels: settings.quick_buy_variant_picker_hide_option_labels, hide_sold_out_variants: settings.quick_buy_variant_picker_hide_sold_out_variants, hide_unavailable_variants: settings.quick_buy_variant_picker_hide_unavailable_variants
+        render 'product-form-component-quantity-selector', product_form_id: product_form_id
+        render 'product-form-component-buy-buttons', product_form_id: product_form_id
+      %}
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Product quick buy"
+}
+{% endschema %}

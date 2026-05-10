@@ -1,0 +1,165 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign divisible_by_four = section.blocks.size | modulo: 4
+  assign divisible_by_three = section.blocks.size | modulo: 3
+  assign divisible_by_two = section.blocks.size | modulo: 2
+
+  if divisible_by_four == 0
+    assign grid_class = 'lg:grid-cols-4'
+  elsif divisible_by_three == 0
+    assign grid_class = 'lg:grid-cols-3'
+  elsif divisible_by_two == 0
+    assign grid_class = 'lg:grid-cols-2'
+  else
+    assign grid_class = 'lg:grid-cols-3'
+  endif
+-%}
+
+<section
+  class="border-b-gridline border-gridline-color bg-gridline-color"
+  data-color-scheme="{{ section_color }}"
+>
+  {% if section.settings.heading != '' %}
+    {%- render 'section-title',
+      title: section.settings.heading,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  <div class="grid bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text  {{ grid_class }} gap-10">
+    {%- for block in section.blocks -%}
+      <blockquote class="flex-1 {{ section.settings.text_align }}">
+        <div class="{{ section.settings.font }} {{ section.settings.text_size }} [&_a[href]]:underline [&_a[href]]:hover:text-scheme-accent">
+          {{ block.settings.quote }}
+        </div>
+        {% if block.settings.source != blank %}
+          <footer class="font-secondary mt-2 text-base">
+            - {{ block.settings.source }}
+          </footer>
+        {% endif %}
+      </blockquote>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "id": "heading",
+      "type": "text",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "Text style",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "font-body",
+          "label": "Body"
+        }
+      ],
+      "default": "font-heading"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Testimonial text size",
+      "options": [
+        {
+          "value": "text-base",
+          "label": "Body"
+        },
+        {
+          "value": "text-heading-standard",
+          "label": "Standard heading"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature heading"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary heading"
+        }
+      ],
+      "default": "text-heading-standard"
+    },
+    {
+      "type": "radio",
+      "id": "text_align",
+      "label": "Text align",
+      "default": "text-left",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Quote",
+          "default": "<p>A quote from a customer or staff member can help show of your products' unique selling points.</p>"
+        },
+        {
+          "type": "text",
+          "id": "source",
+          "label": "Source",
+          "default": "Source"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

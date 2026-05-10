@@ -1,0 +1,542 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    {{ 'brand-list.css' | asset_url | stylesheet_tag }}
+    <!-- custom header transparent + hide-logo (paste after base.bundle.css) -->
+    <style>
+      /* ===== 使 header 下拉菜单背景透明（覆盖常见主题结构） ===== */
+      /* 注意：如果你的主题使用不同 class 名称，下面规则依然尽力覆盖多数情况 */
+
+      header[data-theme-header] .no-js-focus-container,
+      header[data-theme-header] .no-js-focus-container ul,
+      header[data-theme-header] .no-js-focus-container li,
+      header[data-theme-header] .no-js-focus-container a,
+      header[data-theme-header] .header-menu .dropdown,
+      header[data-theme-header] .header-menu .submenu,
+      header[data-theme-header] .desktop-megamenu,
+      header[data-theme-header] .desktop-megamenu .megamenu__panel,
+      .header-menu .no-js-focus-container,
+      .header-menu .dropdown,
+      .header-menu .submenu,
+      .header-menu .menu,
+      .megamenu,
+      .megamenu__panel,
+      .dropdown-menu {
+        background: transparent !important;        /* 背景透明 */
+        background-color: transparent !important;
+        box-shadow: none !important;              /* 去掉阴影 */
+        border: none !important;                  /* 去掉外层 border（如需保留可删除此行） */
+      }
+
+      /* 确保每个 <li> / 链接背景也透明（有些主题在 li 上填充） */
+      header[data-theme-header] .no-js-focus-container li,
+      header[data-theme-header] .no-js-focus-container a,
+      .header-menu .no-js-focus-container li,
+      .header-menu .no-js-focus-container a {
+        background: transparent !important;
+      }
+
+      /* 保留分割线（如果你想要仍有细线分隔项，可使用下面规则启用） */
+      /* 如果你不需要分隔线，注释掉下面两行 */
+      header[data-theme-header] .no-js-focus-container li + li,
+      .header-menu .no-js-focus-container li + li {
+        border-top: 1px solid rgba(0,0,0,0.08) !important; /* 可调整颜色/粗细 */
+      }
+
+      /* 如果菜单里有阴影下划线样式，确保去掉或变透明 */
+      header[data-theme-header] .no-js-focus-container,
+      .header-menu .no-js-focus-container {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+      }
+
+      /* 文字保持可读：如果背景下内容颜色太杂，可以设一个半透明底或毛玻璃（可选） */
+      /* 取消注释下面两行可以改为半透明白并加点模糊（在现代浏览器中会有毛玻璃效果） */
+      /*
+      header[data-theme-header] .no-js-focus-container,
+      .header-menu .no-js-focus-container {
+        background: rgba(255,255,255,0.55) !important;
+        backdrop-filter: blur(6px) saturate(110%) !important;
+      }
+      */
+
+      /* 小屏 / mobile 也应用（按需） */
+      @media (max-width: 1023px) {
+        header[data-theme-header] .no-js-focus-container,
+        header[data-theme-header] .header-menu .dropdown {
+          background: transparent !important;
+          box-shadow: none !important;
+          border: none !important;
+        }
+      }
+
+      /* 防止被更高优先级选择器覆盖 — 保持文本渲染良好 */
+      header[data-theme-header] .no-js-focus-container a,
+      .header-menu .no-js-focus-container a {
+        color: inherit !important;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .product-card__badge--sold-out,
+      .badge--soldout,
+      .badge--sold-out,
+      .product__sold-out,
+      .product-form__soldout,
+      .product-card .sold-out,
+      .product-card__soldout,
+      .product-grid .sold-out,
+      .product-item .sold-out,
+      .price--sold-out,
+      .product-price--sold-out,
+      .sold-out,
+      .btn--sold-out,
+      .product__inventory--soldout,
+      .product-card__badges .badge {
+        text-transform: uppercase !important;
+        letter-spacing: 0.02em; /* 可选微调 */
+      }
+
+      /* 有的主题把文字放在 a / span / strong 内，增加 specificity */
+      .product-card .sold-out,
+      .product-card__badge--sold-out span,
+      .product-card__badge--sold-out a,
+      .product-card__badge--sold-out strong {
+        text-transform: uppercase !important;
+      }
+
+      /* 如果 sold-out 是伪元素生成（::before / ::after），也覆盖 */
+      .product-card__badge--sold-out::before,
+      .product-card__badge--sold-out::after,
+      .badge--soldout::before,
+      .badge--soldout::after,
+      .badge--sold-out::before,
+      .badge--sold-out::after {
+        text-transform: uppercase !important;
+      }
+
+      /* 有些地方是 disabled input 的 value（例如 quick-buy）；增加这个选择器覆盖 */
+      input[disabled][value*="Sold out" i],
+      input[disabled][value*="sold out" i],
+      input[aria-disabled="true"][value*="sold out" i] {
+        text-transform: uppercase !important;
+        /* 强制把 value 用 CSS 显示上变换（多数浏览器支持） */
+        -webkit-text-transform: uppercase !important;
+        text-transform: uppercase !important;
+      }
+    </style>
+
+          <style id="custom-header-transparent-and-hide-logo">
+            /* 透明 header（desktop & mobile） */
+            header[data-theme-header],
+            header,
+            header-section,
+            header-section[data-theme-header],
+            .site-header,
+            .header {
+              background: transparent !important;
+              border-bottom: 0 !important;
+              box-shadow: none !important;
+              z-index: 60 !important;
+            }
+
+            /* 防止 utility border 覆盖 */
+            .border-b-gridline { border-bottom-width: 0; }
+            .border-gridline-color { border-color: transparent; }
+
+            /* logo transition（适配多种结构） */
+            header[data-theme-header] img,
+            header img,
+            header-section img,
+            header-section .logo-img,
+            header-section .logo-img img,
+            .logo-img, .logo-img img,
+            .header-logo, .site-logo, .logo {
+              transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .22s ease;
+              transform-origin: center top;
+              will-change: transform, opacity;
+            }
+
+            /* hide-logo：当父元素被加上 hide-logo 时把 logo 移出并变透明 */
+            header.hide-logo img,
+            header.hide-logo .logo-img,
+            header.hide-logo .logo-img img,
+            header[data-theme-header].hide-logo img,
+            header[data-theme-header].hide-logo .logo-img,
+            header-section.hide-logo img,
+            header-section.hide-logo .logo-img,
+            .site-header.hide-logo img,
+            .site-header.hide-logo .logo-img {
+              transform: translateY(-120%);
+              opacity: 0;
+              pointer-events: none;
+            }
+
+            /* 若你想保持 header 高度避免跳动，可以按需取消注释 */
+            /* @media (max-width: 1023px) { header-section, header[data-theme-header] { min-height: 56px; } } */
+    </style>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system?
+      and settings.type_body_font.system?
+    -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %}
+        &ndash; tagged "{{ current_tags | join: ', ' }}"
+      {%- endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %}
+        &ndash; {{ shop.name -}}
+      {%- endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {{ content_for_header }}
+
+    {%- liquid
+      render 'meta-tags'
+      render 'js-bridge'
+    -%}
+
+    <script src="{{ 'utils.js' | asset_url }}" defer></script>
+    <script src="{{ 'images.js' | asset_url }}" defer></script>
+    <script src="{{ 'theme-events.js' | asset_url }}" defer></script>
+    <script
+      src="{{ 'polyfills-inert.bundle.min.js' | asset_url }}"
+      type="module"
+    ></script>
+    <script
+      src="{{ 'global.bundle.min.js' | asset_url }}"
+      type="module"
+    ></script>
+
+    {% if template contains 'customers' %}
+      {% comment %}theme-check-disable ParserBlockingScript{% endcomment %}
+      {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+      {{ 'customer_area.js' | shopify_asset_url | script_tag }}
+      {% comment %}theme-check-enable ParserBlockingScript{% endcomment %}
+    {% endif %}
+
+    {% if settings.cart_type == 'drawer' or template == 'cart' %}
+      <script src="{{ 'cart-items.js' | asset_url }}" type="module"></script>
+      <script src="{{ 'cart-footer.js' | asset_url }}" type="module"></script>
+      {% if settings.cart_notes_enable %}
+        <script src="{{ 'cart-note.js' | asset_url }}" type="module"></script>
+      {% endif %}
+    {% endif %}
+
+    <script src="{{ 'quantity.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'rte.js' | asset_url }}" type="module"></script>
+
+    {% if request.design_mode %}
+      <script
+        src="{{ 'filterable.js' | asset_url }}"
+        type="module"
+      ></script>
+      {% comment %} If theme editor, load all modules {% endcomment %}
+      <script src="{{ 'cart-count.js' | asset_url }}" type="module"></script>
+      <script src="{{ 'header.js' | asset_url }}" type="module"></script>
+      {% if settings.predictive_search_enabled %}
+        <script
+          src="{{ 'predictive-search.js' | asset_url }}"
+          type="module"
+        ></script>
+      {% endif %}
+      <script
+        src="{{ 'range-control.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script src="{{ 'sidebar.js' | asset_url }}" type="module"></script>
+      <script
+        src="{{ 'scrolling-items.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'scrolling-items.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'scrolling-link.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'splide.bundle.min.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'slideshows.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+      <script
+        src="{{ 'variant-drop-down.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+      <script src="{{ 'product.js' | asset_url }}" type="module"></script>
+      <script
+        src="{{ 'product-media-model.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'product-media-video.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'video.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'youtube-embed.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'vimeo-embed.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'html-video.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'background-video-youtube.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'background-video.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'video-section.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'gift-card-recipient.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'free-shipping-bar.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'promo-popup.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'privacy-banner.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'age-check.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script
+        src="{{ 'theme-editor-support.js' | asset_url }}"
+        type="module"
+      ></script>
+      <script src="{{ 'table.js' | asset_url }}" type="module"></script>
+    {% endif %}
+
+    {%- render 'css-bridge' -%}
+
+    {{ 'base.bundle.css' | asset_url | stylesheet_tag }}
+  </head>
+  <!-- custom JS: mobile 下根据滚动隐藏/显示 logo（paste before </body>） -->
+  <script id="custom-hide-logo-on-scroll">
+  (function () {
+    var MOBILE_BREAKPOINT = 1024;
+    var THRESHOLD = 12;
+    var DEBUG = false;
+
+    function dlog(){ if (!DEBUG) return; console.log.apply(console, arguments); }
+
+    function findHeader(){
+      return document.querySelector('[data-theme-header]') ||
+            document.querySelector('header[data-theme-header]') ||
+            document.querySelector('header-section') ||
+            document.querySelector('.site-header') ||
+            document.querySelector('.header') ||
+            document.querySelector('header') || null;
+    }
+
+    function findLogo(header){
+      if (!header) return null;
+      var sels = ['.logo-img','img.logo','a.logo img','.header-logo','.site-logo','.logo','img'];
+      for (var i=0;i<sels.length;i++){
+        try {
+          var el = header.querySelector(sels[i]);
+          if (el) return el;
+        } catch(e){}
+      }
+      return null;
+    }
+
+    function isMobile(){ return window.innerWidth < MOBILE_BREAKPOINT; }
+
+    var headerEl = null, logoEl = null, lastScroll = 0, ticking = false, hidden = false;
+
+    function applyHide(){
+      if (!headerEl) return;
+      headerEl.classList.add('hide-logo');
+      dlog('applyHide');
+    }
+    function removeHide(){
+      if (!headerEl) return;
+      headerEl.classList.remove('hide-logo');
+      dlog('removeHide');
+    }
+
+    function onScrollRaf(){
+      var current = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var diff = current - lastScroll;
+      if (Math.abs(diff) < THRESHOLD) return;
+      if (diff > 0) {
+        // 内容上移（用户往上滑） -> 隐藏 logo（仅 mobile）
+        if (!hidden && isMobile()) { applyHide(); hidden = true; }
+      } else {
+        // 内容下移 -> 显示 logo
+        if (hidden) { removeHide(); hidden = false; }
+      }
+      lastScroll = current;
+    }
+
+    function onScroll(){
+      if (!ticking){
+        window.requestAnimationFrame(function(){ onScrollRaf(); ticking = false; });
+        ticking = true;
+      }
+    }
+
+    function initialize(){
+      headerEl = findHeader();
+      if (!headerEl) {
+        dlog('header not found yet');
+        return false;
+      }
+      logoEl = findLogo(headerEl);
+      lastScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+
+      // bind events (use window scroll; theme usually scrolls document)
+      window.removeEventListener('scroll', onScroll);
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      window.removeEventListener('resize', onResize);
+      window.addEventListener('resize', onResize, { passive: true });
+
+      dlog('initialized', headerEl, logoEl);
+      return true;
+    }
+
+    var resizeTimer = null;
+    function onResize(){
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){
+        // 出于安全在 desktop 展示 logo
+        if (!isMobile()) { removeHide(); hidden = false; }
+      }, 150);
+    }
+
+    // try init, if not found observe DOM
+    if (!initialize()){
+      var mo = new MutationObserver(function(mutations, obs){
+        if (initialize()){
+          obs.disconnect();
+        }
+      });
+      mo.observe(document.documentElement || document.body, { childList: true, subtree: true });
+      setTimeout(function(){ try{ mo.disconnect(); }catch(e){} }, 7000);
+    }
+
+    // debug API
+    window.__customHideLogo = {
+      status: function(){ return { headerEl: headerEl, logoEl: logoEl, hidden: hidden, lastScroll: lastScroll, isMobile: isMobile() }; },
+      apply: applyHide,
+      remove: removeHide,
+      debugOn: function(){ DEBUG = true; dlog('debug on'); },
+      debugOff: function(){ dlog('debug off'); DEBUG = false; }
+    };
+
+    dlog('custom-hide-logo script loaded');
+  })();
+  </script>
+  <body>
+    <a class="skip-link" href="#MainContent">
+      {{- 'general.accessibility.skip_to_content' | t -}}
+    </a>
+
+    {% sections 'header-group' %}
+    {%- section 'menu-drawer' -%}
+    {% render 'header-group-support' %}
+
+    <main id="MainContent">
+      {{ content_for_layout }}
+    </main>
+
+    {% liquid
+      sections 'footer-group'
+      sections 'overlay-group'
+    %}
+
+    <div
+      id="screenreader-announce"
+      class="sr-only"
+      aria-live="polite"
+      role="status"
+    ></div>
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">
+        {{ 'general.accessibility.refresh_page' | t }}
+      </li>
+      <li id="a11y-selection-message">
+        {{ 'general.accessibility.selection_help' | t }}
+      </li>
+    </ul>
+
+    {% comment %} Modal containers {% endcomment %}
+    {% liquid
+      render 'left-drawer'
+      render 'right-drawer'
+      render 'quick-buy-drawer'
+      render 'promo'
+      render 'popup'
+      render 'modal'
+    %}
+
+    <script src="{{ 'modals.js' | asset_url }}" type="module"></script>
+
+    {% comment %} Modal contents {% endcomment %}
+    {% if settings.cart_type == 'drawer' %}
+      {% render 'drawer-cart' %}
+    {% endif %}
+
+    {% comment %} Commune Stack Drawer {% endcomment %}
+    {% render 'stack-drawer' %}
+    <script src="{{ 'commune-stack.js' | asset_url }}" defer></script>
+
+    <script
+      src="{{ 'alpine.bundle.js' | asset_url }}"
+      type="module"
+    ></script>
+  </body>
+</html>

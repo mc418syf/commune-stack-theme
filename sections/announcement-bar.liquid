@@ -1,0 +1,347 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign hide_on_mobile = section.settings.hide_on_mobile
+  assign display = section.settings.display
+  assign text = section.settings.text
+  assign link = section.settings.link
+-%}
+
+{%- if section.settings.home_page_only == false or template.name == 'index' -%}
+  {%- if display == 'static' -%}
+    <section
+      id="{{ section.id }}"
+      class="border-b-gridline border-gridline-color bg-scheme-background py-2 text-center text-scheme-text{% if hide_on_mobile %} hidden lg:block{% endif %}"
+      role="complementary"
+      data-color-scheme="{{ section_color }}"
+    >
+      {%- if link != blank -%}
+        <a
+          class="px-section-horizontal-spacing hover:text-scheme-accent"
+          href="{{ link }}"
+        >
+          {{ text | escape }}
+        </a>
+      {%- else -%}
+        <p class="px-section-horizontal-spacing">{{ text | escape }}</p>
+      {%- endif -%}
+    </section>
+  {%- else -%}
+    <section
+      id="{{ section.id }}"
+      class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text{% if hide_on_mobile %} hidden lg:block{% endif %}"
+      role="complementary"
+      data-color-scheme="{{ section_color }}"
+    >
+      {%- liquid
+        assign speed_setting = section.settings.speed | plus: 0
+        assign direction = section.settings.direction
+        assign repeat_text = section.settings.repeat_text
+        assign separator = section.settings.separator
+        assign separator_repeats = section.settings.separator_repeats
+        assign spacing_between_repeated_separators = section.settings.spacing_between_repeated_separators
+
+        render 'scrolling-text', id: section.id, speed_setting: speed_setting, link: link, text: text, section_color: section_color, direction: direction, repeat_text: repeat_text, separator: separator, separator_repeats: separator_repeats, spacing_between_repeated_separators: spacing_between_repeated_separators
+      -%}
+    </section>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "home_page_only",
+      "label": "Home page only",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "display",
+      "label": "Display",
+      "options": [
+        {
+          "value": "scrolling-text",
+          "label": "Scrolling text"
+        },
+        {
+          "value": "static",
+          "label": "Static"
+        }
+      ],
+      "default": "scrolling-text"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Announce something here"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link",
+      "info": "Optional"
+    },
+    {
+      "type": "header",
+      "content": "Scrolling text"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 20,
+      "max": 400,
+      "step": 10,
+      "label": "Speed",
+      "default": 180
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Right to left"
+        },
+        {
+          "value": "reverse",
+          "label": "Left to right"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "checkbox",
+      "id": "repeat_text",
+      "default": true,
+      "label": "Repeat text",
+      "info": "Automatically repeat text to create an infinity effect."
+    },
+    {
+      "type": "select",
+      "id": "separator",
+      "label": "Separator",
+      "info": "Symbol to separate repeats",
+      "options": [
+        {
+          "label": "None",
+          "value": "none"
+        },
+        {
+          "label": "·",
+          "value": "&middot;"
+        },
+        {
+          "label": "•",
+          "value": "&bullet;"
+        },
+        {
+          "label": "↑",
+          "value": "&uarr;"
+        },
+        {
+          "label": "→",
+          "value": "&rarr;"
+        },
+        {
+          "label": "↓",
+          "value": "&darr;"
+        },
+        {
+          "label": "←",
+          "value": "&larr;"
+        },
+        {
+          "label": "<",
+          "value": "&lt;"
+        },
+        {
+          "label": ">",
+          "value": "&gt;"
+        },
+        {
+          "label": "^",
+          "value": "^"
+        },
+        {
+          "label": "!",
+          "value": "!"
+        },
+        {
+          "label": "¡",
+          "value": "¡"
+        },
+        {
+          "label": "?",
+          "value": "?"
+        },
+        {
+          "label": "/",
+          "value": "/"
+        },
+        {
+          "label": "|",
+          "value": "|"
+        },
+        {
+          "label": "\\",
+          "value": "\\"
+        },
+        {
+          "label": ":",
+          "value": ":"
+        },
+        {
+          "label": "∞",
+          "value": "&infin;"
+        },
+        {
+          "label": "§",
+          "value": "&sect;"
+        },
+        {
+          "label": "#",
+          "value": "&num;"
+        },
+        {
+          "label": "%",
+          "value": "%"
+        },
+        {
+          "label": "@",
+          "value": "@"
+        },
+        {
+          "label": "№",
+          "value": "&numero;"
+        },
+        {
+          "label": "×",
+          "value": "&times;"
+        },
+        {
+          "label": "÷",
+          "value": "&divide;"
+        },
+        {
+          "label": "+",
+          "value": "&plus;"
+        },
+        {
+          "label": "−",
+          "value": "&minus;"
+        },
+        {
+          "label": "=",
+          "value": "&equals;"
+        },
+        {
+          "label": "~",
+          "value": "&tilde;"
+        },
+        {
+          "label": "–",
+          "value": "&ndash;"
+        },
+        {
+          "label": "—",
+          "value": "&mdash;"
+        },
+        {
+          "label": "&",
+          "value": "&amp;"
+        },
+        {
+          "label": "*",
+          "value": "&ast;"
+        },
+        {
+          "label": "✓",
+          "value": "&check;"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "separator_repeats",
+      "label": "Repeat separator",
+      "min": 1,
+      "max": 6,
+      "unit": "x",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "spacing_between_repeated_separators",
+      "label": "Spacing between repeated separators",
+      "options": [
+        {
+          "label": "None",
+          "value": ""
+        },
+        {
+          "label": "Hair",
+          "value": "&hairsp;"
+        },
+        {
+          "label": "Thin",
+          "value": "&thinsp;"
+        },
+        {
+          "label": "Punctuation",
+          "value": "&puncsp;"
+        },
+        {
+          "label": "4-per-em",
+          "value": "&emsp14;"
+        },
+        {
+          "label": "3-per-em",
+          "value": "&emsp13;"
+        },
+        {
+          "label": "Figure",
+          "value": "&numsp;"
+        },
+        {
+          "label": "En",
+          "value": "&ensp;"
+        },
+        {
+          "label": "Em",
+          "value": "&emsp;"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar"
+    }
+  ],
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

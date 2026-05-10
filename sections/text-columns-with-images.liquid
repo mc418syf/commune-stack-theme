@@ -1,0 +1,223 @@
+{%- liquid
+  assign section_color = 'scheme1'
+  assign text_align = section.settings.text_alignment
+  assign block_heading_level = 'h2'
+  assign ratio = section.settings.crop | plus: 0
+
+  assign divisible_by_four = section.blocks.size | modulo: 4
+  assign divisible_by_three = section.blocks.size | modulo: 3
+
+  if divisible_by_four == 0
+    assign col_span = 'lg:col-span-3'
+    assign sizes = '(min-width: 1024px) calc(100vw / 12 * 3), 100vw'
+  elsif divisible_by_three == 0
+    assign col_span = 'lg:col-span-4'
+    assign sizes = '(min-width: 1024px) calc(100vw / 12 * 4), 100vw'
+  else
+    assign col_span = 'lg:col-span-6'
+    assign sizes = '(min-width: 1024px) calc(100vw / 12 * 6), 100vw'
+  endif
+
+  assign eager_loading_limit = section.blocks.size | at_most: 4
+-%}
+
+<section class="border-b-gridline border-gridline-color bg-gridline-color">
+  {% if section.settings.title != '' %}
+    {%- assign block_heading_level = 'h3' -%}
+    {%- render 'section-title',
+      title: section.settings.title,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  <ul class="grid grid-cols-1 gap-gridline lg:grid-cols-12">
+    {% for block in section.blocks %}
+      {%- assign block_color = block.settings.color_scheme -%}
+      <li
+        class="{{ col_span }} bg-scheme-background text-base text-scheme-text {{ text_align }}"
+        {{ block.shopify_attributes }}
+        data-color-scheme="{{ block_color }}"
+      >
+        {%- if block.settings.show_image -%}
+          <div class="bg-scheme-background {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% else %}border-b-gridline border-gridline-color{% endunless %}">
+            {%- liquid
+              if block.settings.image != blank
+                assign preload = false
+                assign loading = 'lazy'
+
+                if section.index == 1 and forloop.first
+                  assign preload = true
+                endif
+
+                if section.index <= 2 and forloop.index <= eager_loading_limit
+                  assign loading = 'eager'
+                endif
+
+                render 'image-crop', image: block.settings.image, ratio: ratio, sizes: sizes, preload: preload, loading: loading
+
+              else
+                render 'image-crop-placeholder', ratio: ratio
+              endif
+            -%}
+          </div>
+        {%- endif -%}
+
+        <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+          {% if block.settings.title != '' %}
+            <{{ block_heading_level }} class="font-heading text-heading-secondary">
+              {{- block.settings.title -}}
+            </{{ block_heading_level }}>
+          {% endif %}
+          <div class="rte {% if block.settings.title != '' %}mt-2{% endif %}">
+            {{ block.settings.text }}
+          </div>
+          {% if block.settings.cta_link %}
+            <div class="mt-4">
+              <a
+                class="theme-link inline-block text-scheme-text hover:text-scheme-accent"
+                href="{{ block.settings.cta_link }}"
+              >
+                {{- block.settings.cta_text -}}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% schema %}
+{
+  "name": "Text columns with images",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "crop",
+      "label": "Crop images",
+      "options": [
+        {
+          "value": "0",
+          "label": "No crop"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-left"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_image",
+          "label": "Show image",
+          "default": true
+        },
+        {
+          "id": "image",
+          "type": "image_picker",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Share blog posts, products, or promotions with your customers. Use this text to describe products, share details on availability and style, or as a space to display recent reviews or FAQs.</p>"
+        },
+        {
+          "type": "header",
+          "content": "Call to action"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Text"
+        },
+        {
+          "type": "header",
+          "content": "Color"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "default": "scheme1",
+          "label": "Color scheme"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text columns with images",
+      "blocks": [
+        {
+          "type": "column"
+        },
+        {
+          "type": "column"
+        },
+        {
+          "type": "column"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

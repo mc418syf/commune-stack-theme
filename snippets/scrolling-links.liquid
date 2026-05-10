@@ -1,0 +1,175 @@
+{%- liquid
+  comment
+    The minimum speed possible is 20s, the maximum speed is 1s
+  endcomment
+
+  assign min_speed_setting = 20
+  assign max_speed_setting = 400
+
+  assign speed_number = min_speed_setting | plus: max_speed_setting | minus: speed_setting
+
+  assign speed_number = speed_number | divided_by: 2 | divided_by: 10
+
+  if mobile_text_scale and desktop_text_scale
+    assign mobile_text_scale = mobile_text_scale | plus: 0
+    assign desktop_text_scale = desktop_text_scale | plus: 0
+
+    assign gap_class = 'gap-2'
+
+    if desktop_text_scale >= 8
+      assign gap_class = gap_class | append: ' lg:gap-4'
+    else
+      assign gap_class = gap_class | append: ' lg:gap-2'
+    endif
+  else
+    assign gap_class = 'gap-2'
+  endif
+
+  assign content_class = 'grow-0 shrink-0'
+
+  if media_display == 'inline'
+    assign content_class = content_class | append: ' flex flex-nowrap items-center ' | append: gap_class
+  endif
+
+  assign direction = direction
+
+  assign placeholder_title = 'homepage.onboarding.product' | t
+  if type == 'collections'
+    assign placeholder_title = 'homepage.onboarding.collection' | t
+  endif
+-%}
+
+{%- capture links -%}
+  {%- for item in items limit: limit -%}
+    <a
+      x-data="Theme_ScrollingLink()"
+      class="min-touch-target {% if media_display == 'inline' and item.featured_image %}block{% endif %}" href="{{ item.url }}"
+      {% if media_display == 'hover' %}
+        x-on:mouseenter="currentLink = '{{ item.handle }}'"
+        x-on:mouseleave="currentLink = ''"
+        x-on:focus="currentLink = '{{ item.handle }}'"
+        x-on:blur="currentLink = ''"
+      {% endif %}
+    >
+      {%- if media_display == 'inline' and item.featured_image -%}
+        <div class="flex items-center justify-center {{ gap_class }}">
+          <span class="inline-block h-[1em]" style="aspect-ratio: 1/1;">
+          {%- liquid
+            if forloop.index <= 4 and section.index < 3
+              assign loading = 'eager'
+            else
+              assign loading = 'lazy'
+            endif
+
+            render 'image-crop', image: item.featured_image, sizes: '1em', loading: loading, ratio: 1
+            -%}
+
+          </span>
+          <span>{{ item.title }}</span>
+        </div>
+      {%- else -%}
+       <span>{{ item.title }}</span>
+      {%- endif -%}
+    </a>
+    {% unless separator == 'none' %}<span{% if media_display == 'inline' %} class="{{ l_padding_class }}"{% endif %}>{% for i in (1..separator_repeats) %}{{ separator }}{% unless forloop.last %}{{ spacing_between_repeated_separators }}{% endunless %}{% endfor %}</span>{% else %}{% if media_display != 'inline' %}<span class="{{ l_padding_class }}"></span>{% endif %}{% endunless %}
+  {%- else -%}
+    {%- for i in (1..3) -%}
+      <a
+        x-data="Theme_ScrollingLink()"
+        class="min-touch-target {% if media_display == 'inline' %}block{% endif %}"
+        {% if media_display == 'hover' %}
+          x-on:mouseenter="currentLink = 'placeholder'"
+          x-on:mouseleave="currentLink = ''"
+          x-on:focus="currentLink = 'placeholder'"
+          x-on:blur="currentLink = ''"
+        {% endif %}
+      >
+        {%- if media_display == 'inline' -%}
+          <div class="flex items-center justify-center {{ gap_class }}">
+            <span class="inline-block h-[1em]" style="aspect-ratio: 1/1;">
+              {% render 'image-crop-placeholder', ratio: 1 %}
+            </span>
+            <span>{{ placeholder_title }}</span>
+          </div>
+        {%- else -%}
+         <span>{{ placeholder_title }}</span>
+        {%- endif -%}
+      </a>
+      {% unless separator == 'none' %}<span{% if media_display == 'inline' %} class="{{ l_padding_class }}"{% endif %}>{% for i in (1..separator_repeats) %}{{ separator }}{% unless forloop.last %}{{ spacing_between_repeated_separators }}{% endunless %}{% endfor %}</span>{% else %}{% if media_display != 'inline' %}<span class="{{ l_padding_class }}"></span>{% endif %}{% endunless %}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{% capture content %}
+  <scrolling-items-container class="block">
+    <scrolling-items
+      style="
+        --base-scrolling-items-speed: {{ speed_number }}s;
+        --local-scrolling-items-speed-multiplier: 1;
+        --scrolling-items-speed: calc(
+            var(--base-scrolling-items-speed) * var(--global-scrolling-items-speed-multiplier) *
+              var(--local-scrolling-items-speed-multiplier)
+          );
+        --scrolling-items-direction: {{ direction }};"
+      class="block w-max whitespace-nowrap motion-safe:animate-[scrolling-items_var(--scrolling-items-speed)_linear_infinite_var(--scrolling-items-direction)] motion-safe:focus-within:[animation-play-state:paused] motion-safe:hover:[animation-play-state:paused] {{ font }} {{ text_size_class }} motion-reduce:block motion-reduce:-translate-x-1/4 motion-reduce:whitespace-normal motion-reduce:px-section-horizontal-spacing motion-reduce:text-center"
+    >
+      <scrolling-items-surface class="flex flex-nowrap items-center {{ gap_class }} {{ l_padding_class }}">
+        <scrolling-items-content class="{{ content_class }}">{{ links }}</scrolling-items-content>
+          <noscript>
+            {% liquid
+              assign fallback_repeat_limit = 11
+            %}
+            {% for i in (1..fallback_repeat_limit) %}
+              <span class="motion-reduce:hidden {{ content_class }}">{{ links }}</span>
+            {% endfor %}
+          </noscript>
+      </scrolling-items-surface>
+    </scrolling-items>
+  </scrolling-items-container>
+{% endcapture %}
+
+{% liquid
+  assign container_padding_class = 'py-2'
+
+  if mobile_text_scale and desktop_text_scale
+    if mobile_text_scale >= 4
+      assign container_padding_class = 'py-4'
+    endif
+
+    if desktop_text_scale >= 8
+      assign container_padding_class = container_padding_class | append: ' lg:py-6'
+    elsif desktop_text_scale >= 7
+      assign container_padding_class = container_padding_class | append: ' lg:py-5'
+    elsif desktop_text_scale >= 3
+      assign container_padding_class = container_padding_class | append: ' lg:py-3.5'
+    else
+      assign container_padding_class = container_padding_class | append: ' lg:py-2'
+    endif
+  endif
+%}
+
+<div
+  class="{{ container_padding_class }} overflow-hidden"
+  {% if media_display == 'hover' %}
+    x-data="{ currentLink: '' }"
+  {% endif %}
+>
+  {{ content }}
+
+  {%- if media_display == 'hover' -%}
+    {%- liquid
+      for item in items limit: limit
+        if item.featured_image
+          render 'hover-link-image', image: item.featured_image, handle: item.handle, modal: true
+        endif
+      else
+        render 'hover-link-image-placeholder', modal: true
+      endfor
+    -%}
+  {%- endif -%}
+</div>
+
+{% unless request.design_mode %}
+  <script src="{{ 'scrolling-items.js' | asset_url }}" type="module"></script>
+  <script src="{{ 'scrolling-link.js' | asset_url }}" type="module"></script>
+{% endunless %}

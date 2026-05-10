@@ -1,0 +1,14 @@
+{%- assign section_color = 'scheme1' -%}
+<section
+  id="main-cart-footer"
+  class="text-scheme-text bg-scheme-background{% if template == 'cart' %} border-b-gridline border-gridline-color{% endif %}"
+  data-color-scheme="{{ section_color }}"
+>
+  {% render 'cart-footer' %}
+</section>
+
+{% schema %}
+{
+  "name": "Cart footer"
+}
+{% endschema %}

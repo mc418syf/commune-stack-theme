@@ -1,0 +1,199 @@
+/**
+ * Fork of
+ * https://github.com/alpinejs/alpine/blob/main/packages/mask/src/index.js
+ *
+ * This adds the ability to retrigger `x-mask` on an input after changing its
+ * value from outside with a `remask` custom event
+ */
+
+function mask(Alpine) {
+  Alpine.directive('mask', (el, _ref, _ref2) => {
+    let {
+      value,
+      expression
+    } = _ref;
+    let {
+      effect,
+      evaluateLater
+    } = _ref2;
+    let templateFn = () => expression;
+    let lastInputValue = '';
+    queueMicrotask(() => {
+      if (['function', 'dynamic'].includes(value)) {
+        // This is an x-mask:function directive.
+
+        let evaluator = evaluateLater(expression);
+        effect(() => {
+          templateFn = input => {
+            let result;
+
+            // We need to prevent "auto-evaluation" of functions like
+            // x-on expressions do so that we can use them as mask functions.
+            Alpine.dontAutoEvaluateFunctions(() => {
+              evaluator(value => {
+                result = typeof value === 'function' ? value(input) : value;
+              }, {
+                scope: {
+                  // These are "magics" we'll make available to the x-mask:function:
+                  $input: input,
+                  $money: formatMoney.bind({
+                    el
+                  })
+                }
+              });
+            });
+            return result;
+          };
+
+          // Run on initialize which serves a dual purpose:
+          // - Initializing the mask on the input if it has an initial value.
+          // - Running the template function to set up reactivity, so that
+          //   when a dependency inside it changes, the input re-masks.
+          processInputValue(el, false);
+        });
+      } else {
+        processInputValue(el, false);
+      }
+
+      // Override x-model's initial value...
+      if (el._x_model) el._x_model.set(el.value);
+    });
+    el.addEventListener('input', () => processInputValue(el));
+    // Don't "restoreCursorPosition" on "blur", because Safari
+    // will re-focus the input and cause a focus trap.
+    el.addEventListener('blur', () => processInputValue(el, false));
+    el.addEventListener('remask', () => processInputValue(el, false, true));
+    function processInputValue(el) {
+      let shouldRestoreCursor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      let ignoreBackspace = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      let input = el.value;
+      let template = templateFn(input);
+
+      // If a template value is `falsy`, then don't process the input value
+      if (!template || template === 'false') return false;
+
+      // If they hit backspace, don't process input.
+      if (ignoreBackspace === false && lastInputValue.length - el.value.length === 1) {
+        return lastInputValue = el.value;
+      }
+      let setInput = () => {
+        lastInputValue = el.value = formatInput(input, template);
+      };
+      if (shouldRestoreCursor) {
+        // When an input element's value is set, it moves the cursor to the end
+        // therefore we need to track, estimate, and restore the cursor after
+        // a change was made.
+        restoreCursorPosition(el, template, () => {
+          setInput();
+        });
+      } else {
+        setInput();
+      }
+    }
+    function formatInput(input, template) {
+      // Let empty inputs be empty inputs.
+      if (input === '') return '';
+      let strippedDownInput = stripDown(template, input);
+      let rebuiltInput = buildUp(template, strippedDownInput);
+      return rebuiltInput;
+    }
+  }).before('model');
+}
+function restoreCursorPosition(el, template, callback) {
+  let cursorPosition = el.selectionStart;
+  let unformattedValue = el.value;
+  callback();
+  let beforeLeftOfCursorBeforeFormatting = unformattedValue.slice(0, cursorPosition);
+  let newPosition = buildUp(template, stripDown(template, beforeLeftOfCursorBeforeFormatting)).length;
+  el.setSelectionRange(newPosition, newPosition);
+}
+function stripDown(template, input) {
+  let inputToBeStripped = input;
+  let output = '';
+  let regexes = {
+    9: /[0-9]/,
+    a: /[a-zA-Z]/,
+    '*': /[a-zA-Z0-9]/
+  };
+  let wildcardTemplate = '';
+
+  // Strip away non wildcard template characters.
+  for (let i = 0; i < template.length; i++) {
+    if (['9', 'a', '*'].includes(template[i])) {
+      wildcardTemplate += template[i];
+      continue;
+    }
+    for (let j = 0; j < inputToBeStripped.length; j++) {
+      if (inputToBeStripped[j] === template[i]) {
+        inputToBeStripped = inputToBeStripped.slice(0, j) + inputToBeStripped.slice(j + 1);
+        break;
+      }
+    }
+  }
+  for (let i = 0; i < wildcardTemplate.length; i++) {
+    let found = false;
+    for (let j = 0; j < inputToBeStripped.length; j++) {
+      if (regexes[wildcardTemplate[i]].test(inputToBeStripped[j])) {
+        output += inputToBeStripped[j];
+        inputToBeStripped = inputToBeStripped.slice(0, j) + inputToBeStripped.slice(j + 1);
+        found = true;
+        break;
+      }
+    }
+    if (!found) break;
+  }
+  return output;
+}
+function buildUp(template, input) {
+  let clean = Array.from(input);
+  let output = '';
+  for (let i = 0; i < template.length; i++) {
+    if (!['9', 'a', '*'].includes(template[i])) {
+      output += template[i];
+      continue;
+    }
+    if (clean.length === 0) break;
+    output += clean.shift();
+  }
+  return output;
+}
+function formatMoney(input) {
+  let delimiter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '.';
+  let thousands = arguments.length > 2 ? arguments[2] : undefined;
+  let precision = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 2;
+  if (input === '-') return '-';
+  if (/^\D+$/.test(input)) return '9';
+  if (thousands === null || thousands === undefined) {
+    thousands = delimiter === ',' ? '.' : ',';
+  }
+  let addThousands = (input, thousands) => {
+    let output = '';
+    let counter = 0;
+    for (let i = input.length - 1; i >= 0; i--) {
+      if (input[i] === thousands) continue;
+      if (counter === 3) {
+        output = input[i] + thousands + output;
+        counter = 0;
+      } else {
+        output = input[i] + output;
+      }
+      counter++;
+    }
+    return output;
+  };
+  let minus = input.startsWith('-') ? '-' : '';
+  let strippedInput = input.replaceAll(new RegExp(`[^0-9\\${delimiter}]`, 'g'), '');
+  let template = Array.from({
+    length: strippedInput.split(delimiter)[0].length
+  }).fill('9').join('');
+  template = `${minus}${addThousands(template, thousands)}`;
+  if (precision > 0 && input.includes(delimiter)) template += `${delimiter}` + '9'.repeat(precision);
+  queueMicrotask(() => {
+    if (this.el.value.endsWith(delimiter)) return;
+    if (this.el.value[this.el.selectionStart - 1] === delimiter) {
+      this.el.setSelectionRange(this.el.selectionStart - 1, this.el.selectionStart - 1);
+    }
+  });
+  return template;
+}
+export { buildUp, mask as default, formatMoney, restoreCursorPosition, stripDown };

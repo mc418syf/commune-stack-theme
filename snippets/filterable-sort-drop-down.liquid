@@ -1,0 +1,106 @@
+<form
+  id="filters-form-sort-drop-down"
+  data-fragment-id="filters-form-sort-drop-down"
+  @submit.prevent="filterFormSubmit"
+  class="ml-auto"
+>
+  <div
+    data-filterable-filter-fragment="sort-drop-down"
+  >
+    <div
+      class="flex items-center self-start"
+    >
+      <button
+        type="button"
+        id="sort-drop-down-toggle"
+        x-ref="sortDropDownToggle"
+        class="flex py-2 hover:text-scheme-accent items-center{% if settings.links_uppercase %} uppercase{% endif %}"
+        x-bind:aria-expanded="sortOpen ? true : 'false'"
+        @click="sortOpen = ! sortOpen"
+        aria-controls="sort-drop-down"
+      >
+        {{ 'collections.sorting.title' | t }}
+        {%- if settings.accordion_icon == 'caret' -%}
+          <span
+            class="rotate ml-1 inline-block h-3 w-3 origin-center transform align-middle transition"
+            :class="{ 'rotate-180' : sortOpen }"
+          >
+            {%- render 'icon-chevron-down' -%}
+          </span>
+        {%- else -%}
+          <span
+            class="ml-1 inline-block h-3 w-3 origin-center align-middle"
+            x-show="!sortOpen"
+          >
+            {%- render 'icon-plus' -%}
+          </span>
+          <span
+            class="ml-1 inline-block h-3 w-3 origin-center align-middle"
+            x-show="sortOpen"
+            style="display: none;"
+          >
+            {%- render 'icon-minus' -%}
+          </span>
+        {%- endif -%}
+      </button>
+      <div
+        id="sort-drop-down"
+        class="absolute bottom-auto left-0 top-full z-20 w-full border-y-gridline border-gridline-color bg-scheme-background py-section-vertical-spacing text-scheme-text"
+        x-show="sortOpen"
+        x-cloak
+        x-transition:enter="transition ease duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        data-filterable-dropdown
+        @focusout="focusOut($event, 'sortOpen')"
+        @click.outside="clickOutside($event, 'sortOpen', false)"
+      >
+        <div
+          class="sort-wrapper flex justify-end px-section-horizontal-spacing"
+          :class="{ 'opacity-50' : loading }"
+        >
+          <div class="js-filter" data-index="sort">
+            <ul class="space-y-1">
+              {%- for option in sort_options -%}
+                <li class="flex items-center justify-start">
+                  <input
+                    type="radio"
+                    class="filter-checkbox custom-input peer sr-only"
+                    name="sort_by"
+                    value="{{ option.value | escape }}"
+                    @input.debounce="filterFormSubmit"
+                    id="Sort-drop-down-{{ option.name }}-{{ forloop.index }}"
+                    {% if option.value == sort_by -%}
+                      checked
+                    {%- endif %}
+                  >
+                  <label
+                    for="Sort-drop-down-{{ option.name }}-{{ forloop.index }}"
+                    class="flex cursor-pointer items-center capitalize hover:text-scheme-accent peer-checked:[&>span:first-child]:bg-current {% if filter_value.count == 0 and filter_value.active == false -%}text-scheme-secondary line-through{%- endif %}"
+                    {% if filter_value.count == 0
+                      and filter_value.active == false
+                    -%}
+                      disabled
+                    {% endif %}
+                  >
+                    <span
+                      class="mr-1 inline-block h-2 w-2 rounded-full border-checkbox border-current"
+                    ></span>
+                    {{ option.name | escape }}
+                  </label>
+                </li>
+              {%- endfor -%}
+            </ul>
+            <span class="inline-block" aria-hidden="true">&nbsp;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {%- if is_search -%}
+    <input type="hidden" name="q" value="{{ search_terms | escape }}">
+  {%- endif -%}
+</form>

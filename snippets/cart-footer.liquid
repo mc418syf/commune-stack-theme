@@ -1,0 +1,235 @@
+{% liquid
+  if template == 'cart'
+    assign cart_footer_class = 'md:grid md:grid-cols-12 px-section-horizontal-spacing pb-theme'
+  else
+    assign cart_footer_class = 'px-2 pb-theme'
+  endif
+
+  assign has_requires_shipping_line_item = false
+  for item in cart.items
+    if item.requires_shipping == true
+      assign has_requires_shipping_line_item = true
+      break
+    endif
+  endfor
+%}
+
+<div
+  x-data="CartFooter"
+  data-cart-footer
+>
+  <div class="{% if cart == empty %}hidden {% endif %}{{ cart_footer_class }}">
+    {% if settings.cart_notes_enable %}
+      <div class="mt-4{% if template == 'cart' %} md:col-span-5{% endif %}">
+        <label class="block" for="CartSpecialInstructions">
+          {{- 'cart.general.note' | t -}}
+        </label>
+        <textarea
+          class="mt-1 block w-full border-text border-current bg-transparent p-2 text-sm"
+          name="note"
+          id="CartSpecialInstructions"
+          form="cart"
+          :class="{ 'opacity-50 cursor-progress' : updating }"
+          :readonly="updating"
+          x-data="CartNote"
+          x-model.debounce.750ms="note"
+        >{{ cart.note }}</textarea>
+      </div>
+    {% endif %}
+    <div class="mt-4 text-center{% if template == 'cart' %} md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9{% endif %}">
+      <dl class="grid grid-cols-2 text-right">
+        {%- for discount_application in cart.cart_level_discount_applications -%}
+          <dt class="text-scheme-accent">
+            <span class="sr-only">{{- 'customer.order.discount' | t }}:</span
+            ><span>{{- discount_application.title -}}</span>
+          </dt>
+          <dd class="text-scheme-accent">
+            -{{ discount_application.total_allocated_amount | money }}
+          </dd>
+        {%- endfor -%}
+        <dt>{{ 'cart.general.subtotal' | t }}</dt>
+        <dd>{{ cart.total_price | money_with_currency }}</dd>
+      </dl>
+
+      {%- capture taxes_shipping_checkout -%}
+      {%- if shop.taxes_included and shop.shipping_policy.body != blank -%}
+        {{ 'cart.general.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
+      {%- elsif shop.taxes_included -%}
+        {{ 'cart.general.taxes_included_but_shipping_at_checkout' | t }}
+      {%- elsif shop.shipping_policy.body != blank -%}
+        {{ 'cart.general.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
+      {%- else -%}
+        {{ 'cart.general.taxes_and_shipping_at_checkout' | t }}
+      {%- endif -%}
+    {%- endcapture -%}
+
+      <p class="has-theme-links mt-4 text-right">
+        {{ taxes_shipping_checkout }}
+      </p>
+
+      <div class="{% if template == 'cart' %}no-js:lg:grid no-js:lg:grid-cols-2 no-js:lg:gap-2{% endif %} mt-4 w-full items-center justify-between">
+        <button
+          class="theme-button--secondary hidden no-js:block"
+          type="submit"
+          name="update"
+          form="cart"
+        >
+          {{- 'cart.general.update' | t -}}
+        </button>
+        {%- if settings.button_color == 'transparent_background_text_border' -%}
+          {%- assign checkout_button_classes = 'border-text border-scheme-text bg-scheme-text text-scheme-background hover:border-scheme-accent hover:bg-scheme-accent hover:text-scheme-accent-contrast' -%}
+        {%- else -%}
+          {%- assign checkout_button_classes = 'border-text border-button bg-button text-button hover:border-button-hover hover:bg-button-hover hover:text-button-hover' -%}
+        {%- endif -%}
+        <button
+          class="mt-2 w-full cursor-pointer rounded-button p-2 [text-transform:var(--button-text-transform)] after:content-[var(--button-after-content)] lg:mt-0 {{ checkout_button_classes }}"
+          type="submit"
+          name="checkout"
+          form="cart"
+        >
+          {{- 'cart.general.checkout' | t -}}
+        </button>
+      </div>
+
+      {% if additional_checkout_buttons and settings.cart_additional_buttons %}
+        <div class="additional-checkout-buttons additional-checkout-buttons--vertical mt-2 rounded-button [&_[data-shopify-buttoncontainer]]:justify-end">
+          {{ content_for_additional_checkout_buttons }}
+        </div>
+      {% endif %}
+
+      <div
+        class="mt-4 {% if template == 'cart' %}lg:text-right{% endif %} text-scheme-accent"
+        id="cart-errors"
+      ></div>
+    </div>
+  </div>
+
+  {% if cart != empty
+    and settings.enable_shipping_calculator
+    and template == 'cart'
+    and has_requires_shipping_line_item == true
+  %}
+    <div
+      x-data="ShippingCalculator"
+      class="mt-4 px-section-horizontal-spacing pb-theme-double pt-theme no-js:hidden lg:mt-8"
+    >
+      <div>{{ 'cart.shipping_calculator.title' | t }}</div>
+      <div class="mt-1">
+        <form
+          x-ref="form"
+          @submit.prevent="onSubmit"
+        >
+          <div class="flex flex-wrap items-end gap-2">
+            <div class="relative w-fit">
+              <select
+                name="shipping_address[country]"
+                class="appearance-none rounded-none border-b-text border-scheme-text bg-scheme-background py-1.5 pr-6 text-sm text-scheme-text"
+                :class="hasErrorFor('country') ? 'border-scheme-accent' : 'border-current'"
+                x-ref="countrySelect"
+                x-model="country"
+                aria-label="{{ 'cart.shipping_calculator.country' | t }}"
+              >
+                {{ country_option_tags }}
+              </select>
+              <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex w-4">
+                <span class="my-auto h-auto w-4">
+                  {%- render 'icon-chevron-down' -%}
+                </span>
+              </div>
+            </div>
+            <div
+              class="relative w-fit"
+              x-show="provinces.length"
+              style="display: none;"
+            >
+              <select
+                name="shipping_address[province]"
+                class="appearance-none rounded-none border-b-text border-scheme-text bg-scheme-background py-1.5 pr-6 text-sm text-scheme-text"
+                :class="hasErrorFor('province') ? 'border-scheme-accent' : 'border-current'"
+                aria-label="{{ 'cart.shipping_calculator.province' | t }}"
+              >
+                <template x-for="province in provinces">
+                  <option :value="province[1]" x-text="province[0]"></option>
+                </template>
+              </select>
+              <div class="pointer-events-none absolute bottom-0 right-0 top-0 flex w-4">
+                <span class="my-auto h-auto w-4">
+                  {%- render 'icon-chevron-down' -%}
+                </span>
+              </div>
+            </div>
+            <input
+              type="text"
+              name="shipping_address[zip]"
+              placeholder="{{ 'cart.shipping_calculator.zip' | t }}"
+              class="border-b-text bg-scheme-background py-1.5 text-sm placeholder-current"
+              :class="hasErrorFor('zip') ? 'border-scheme-accent' : 'border-current'"
+              aria-label="{{ 'cart.shipping_calculator.zip' | t }}"
+            >
+            <button
+              class="theme-button mt-2 w-fit shrink-0 text-sm lg:mt-0"
+              type="submit"
+            >
+              {{ 'cart.shipping_calculator.submit' | t }}
+            </button>
+          </div>
+        </form>
+      </div>
+      <template x-if="loading">
+        <div
+          class="my-4 text-sm"
+          aria-live="polite"
+        >
+          <div>{{ 'general.search.loading' | t }}&hellip;</div>
+        </div>
+      </template>
+      <template x-if="errorMessages">
+        <div class="my-4 text-sm" aria-live="polite">
+          <ul class="list-inside list-disc space-y-3 text-scheme-accent">
+            <template x-for="errorMessage in errorMessages">
+              <li x-text="errorMessage"></li>
+            </template>
+          </ul>
+        </div>
+      </template>
+      <template x-if="shippingRates.length">
+        <div
+          x-ref="results"
+          class="my-4 scroll-py-4 text-sm"
+          aria-live="polite"
+        >
+          <p x-text="shippingRatesResultsTitle"></p>
+          <ul class="list-disc space-y-3 pl-5">
+            <template x-for="shippingRate in shippingRates">
+              <li class="space-y-0.5">
+                <span
+                  class="font-bold"
+                  x-text="shippingRate.presentment_name"
+                ></span>
+                <span
+                  x-html="`&mdash; ${shippingRate.currency} ${shippingRate.price}`"
+                ></span>
+                <template x-if="shippingRate.delivery_range.length">
+                  <div>
+                    {{ 'cart.shipping_calculator.estimated_delivery_date' | t }}
+                    <span
+                      x-text="formatDate(shippingRate.delivery_range[0])"
+                    ></span>
+                    &ndash;
+                    <span
+                      x-text="formatDate(shippingRate.delivery_range[1])"
+                    ></span>
+                  </div>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </template>
+    </div>
+    <script
+      src="{{ 'shipping-calculator.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% endif %}
+</div>

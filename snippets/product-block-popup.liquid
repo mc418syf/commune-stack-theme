@@ -1,0 +1,80 @@
+{%- liquid
+  if block.settings.text_color == 'text'
+    assign color_class = 'text-scheme-text group hover:text-scheme-accent'
+  else
+    assign color_class = 'text-scheme-secondary group hover:text-scheme-accent'
+  endif
+-%}
+
+<div
+  class="product-page-popup-link mt-8"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="no-js:hidden" {{ block.shopify_attributes }}>
+    <button
+      @click.prevent="$store.modals.open('product-popup-{{ section.id }}-{{ block.id }}')"
+      aria-haspopup="dialog"
+      class="cursor-pointer {{ color_class }}{% if block.settings.icon != 'none' %} inline-flex justify-start items-center{% endif %} text-left text-base"
+    >
+      {% if block.settings.icon != 'none' -%}
+        <div class="mr-2 flex h-6 w-6 items-center">
+          {%- render 'product-icon', icon: block.settings.icon -%}
+        </div>
+      {%- endif %}
+      <div class="theme-link theme-link--no-arrow flex items-center py-1 text-base">
+        {{- block.settings.text -}}
+      </div>
+    </button>
+  </div>
+  <div
+    x-init="$store.modals.register('product-popup-{{ section.id }}-{{ block.id }}', 'popup'); initTeleport($root);"
+    x-data
+  >
+    <div x-cloak>
+      <template data-should-teleport="#popup-slot">
+        <template
+          x-if="$store.modals.popup.contents === 'product-popup-{{ section.id }}-{{ block.id }}'"
+        >
+          <div
+            class=""
+            data-modal-label="{{ block.settings.link_label }}"
+          >
+            <div class="sticky top-0 z-1 flex items-center justify-between border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing py-4">
+              <h2>{{ block.settings.page.title }}</h2>
+              <button
+                @click.prevent="$store.modals.close('popup')"
+                class="absolute right-0 top-0 block h-full"
+                type="button"
+              >
+                <span class="sr-only">
+                  {{- 'general.accessibility.close_modal' | t -}}
+                </span>
+                <div class="my-auto mr-section-horizontal-spacing h-6 w-6">
+                  {% render 'icon-close' %}
+                </div>
+              </button>
+            </div>
+            <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+              <div class="rte">{{ block.settings.page.content }}</div>
+            </div>
+          </div>
+        </template>
+      </template>
+    </div>
+  </div>
+  <noscript>
+    <a
+      href="{{ block.settings.page.url }}"
+      class="{% if block.settings.icon != 'none' %}inline-flex justify-start items-center{% endif %}"
+    >
+      {% if block.settings.icon != 'none' -%}
+        <div class="mr-2 flex h-6 w-6 items-center">
+          {%- render 'product-icon', icon: block.settings.icon -%}
+        </div>
+      {%- endif %}
+      <div class="theme-link theme-link--no-arrow flex items-center py-1 text-base">
+        {{- block.settings.text -}}
+      </div>
+    </a>
+  </noscript>
+</div>

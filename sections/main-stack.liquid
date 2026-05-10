@@ -1,0 +1,345 @@
+{% comment %}
+  Stack & Appointment Page — /pages/stack
+  Reads from $store.stack (Alpine, localStorage) client-side.
+  The appointment form submits to a Shopify contact form so you receive
+  a formatted email with the customer's stack + chosen time.
+{% endcomment %}
+
+<div
+  class="color-scheme"
+  data-color-scheme="{{ section.settings.color_scheme | default: 'default' }}"
+  x-data="CommuneStackPage()"
+  x-init="init()"
+>
+  <div class="mx-auto grid min-h-screen lg:grid-cols-[1fr_420px]">
+
+    <!-- ═══════════════════════════════════
+         LEFT — Stack Items
+    ═══════════════════════════════════ -->
+    <div class="border-b-gridline border-gridline-color px-section-horizontal-spacing py-12 lg:border-b-0 lg:border-r-gridline lg:py-16">
+
+      <div class="mb-10">
+        <p class="mb-3 text-xs uppercase tracking-widest text-scheme-secondary">Showroom Visit</p>
+        <h1 class="mb-3 text-4xl font-normal lg:text-5xl" style="font-family: var(--font-heading-family, serif); font-weight: 300;">Your Stack</h1>
+        <p class="max-w-lg text-sm leading-relaxed text-scheme-secondary">
+          These pieces will be prepared and waiting for you at our Montréal showroom. Take your time with each one — there's no pressure to purchase.
+        </p>
+      </div>
+
+      <!-- Empty state -->
+      <div x-show="stack.length === 0" class="py-16 text-center">
+        <p class="mb-6 text-sm text-scheme-secondary">Your stack is empty. Browse the archive and add pieces you'd like to try on.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="theme-button inline-block px-8 py-3 text-sm uppercase tracking-widest">
+          Browse Archive
+        </a>
+      </div>
+
+      <!-- Items -->
+      <div x-show="stack.length > 0" class="divide-y divide-gridline-color border-t-gridline border-gridline-color">
+        <template x-for="(item, idx) in stack" :key="item.variantId">
+          <div class="flex gap-5 py-6">
+            <!-- Thumb -->
+            <a :href="item.url" class="shrink-0">
+              <div class="commune-stack-thumb bg-scheme-secondary/10">
+                <img
+                  x-show="item.image"
+                  :src="item.image"
+                  :alt="item.title"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            </a>
+            <!-- Info -->
+            <div class="flex min-w-0 flex-1 flex-col">
+              <p class="mb-1 text-xs uppercase tracking-widest text-scheme-secondary" x-text="item.vendor"></p>
+              <a :href="item.url" class="mb-1 text-base leading-snug" x-text="item.title"></a>
+              <p class="mb-3 text-xs text-scheme-secondary" x-show="item.size" x-text="'Size: ' + item.size"></p>
+              <p class="mb-4 text-sm" x-text="item.price"></p>
+              <!-- Note for team -->
+              <div class="border-l-2 border-scheme-text pl-3">
+                <p class="mb-1.5 text-xs uppercase tracking-widest text-scheme-secondary">Note for our team</p>
+                <textarea
+                  class="w-full resize-none border border-gridline-color bg-transparent px-3 py-2 text-xs leading-relaxed text-scheme-text placeholder-scheme-secondary/60 focus:border-scheme-text focus:outline-none"
+                  rows="2"
+                  placeholder="e.g. curious about shoulder fit, want to see how it moves…"
+                  :value="item.note"
+                  @input="$store.stack.updateNote(item.variantId, $event.target.value)"
+                ></textarea>
+              </div>
+            </div>
+            <!-- Price + remove -->
+            <div class="flex shrink-0 flex-col items-end gap-2">
+              <button
+                type="button"
+                class="text-scheme-secondary hover:text-scheme-text"
+                @click="$store.stack.remove(item.variantId); stack = $store.stack.items"
+                aria-label="Remove from stack"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <a
+        x-show="stack.length > 0"
+        href="{{ routes.all_products_collection_url }}"
+        class="mt-8 inline-flex items-center gap-2 border-b border-gridline-color pb-0.5 text-xs uppercase tracking-widest text-scheme-secondary hover:border-scheme-text hover:text-scheme-text"
+      >
+        + Browse more pieces
+      </a>
+
+    </div>
+
+    <!-- ═══════════════════════════════════
+         RIGHT — Appointment Form
+    ═══════════════════════════════════ -->
+    <div class="px-section-horizontal-spacing py-12 lg:py-16">
+
+      <div class="mb-8">
+        <p class="mb-3 text-xs uppercase tracking-widest text-scheme-secondary">Book Your Visit</p>
+        <h2 class="mb-2 text-3xl font-normal" style="font-family: var(--font-heading-family, serif); font-weight: 300;">Private Showroom<br>Appointment</h2>
+        <p class="text-sm leading-relaxed text-scheme-secondary">Select a date and time. We'll confirm within 24 hours and have your stack ready.</p>
+      </div>
+
+      <!-- Showroom info -->
+      <div class="mb-8 border-l-2 border-scheme-text pl-4">
+        <p class="mb-2 text-xs uppercase tracking-widest text-scheme-secondary">Showroom</p>
+        <p class="text-sm leading-relaxed">
+          <strong class="font-medium">Commune237 Montréal</strong><br>
+          {{ section.settings.address | default: '237 Rue Saint-Paul O, Vieux-Montréal' }}<br>
+          <span class="text-scheme-secondary">{{ section.settings.hours | default: 'Tue–Sat, 11am–6pm, by appointment' }}</span>
+        </p>
+      </div>
+
+      <!-- Contact form — submits to Shopify email -->
+      {%- form 'contact', id: 'stack-appointment-form' -%}
+
+        <div class="flex flex-col gap-4">
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="stack-fname">First Name</label>
+              <input
+                id="stack-fname"
+                class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                type="text"
+                name="contact[first_name]"
+                required
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="stack-lname">Last Name</label>
+              <input
+                id="stack-lname"
+                class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                type="text"
+                name="contact[last_name]"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="stack-email">Email</label>
+            <input
+              id="stack-email"
+              class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+              type="email"
+              name="contact[email]"
+              required
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="stack-phone">Phone (optional)</label>
+            <input
+              id="stack-phone"
+              class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+              type="tel"
+              name="contact[phone]"
+            />
+          </div>
+
+          <!-- Date selection -->
+          <div class="flex flex-col gap-2">
+            <p class="text-xs uppercase tracking-widest text-scheme-secondary">Preferred Date</p>
+            <div class="flex gap-2 overflow-x-auto pb-1" style="-ms-overflow-style:none; scrollbar-width:none;">
+              <template x-for="day in availableDates" :key="day.iso">
+                <button
+                  type="button"
+                  class="commune-date-chip shrink-0 border border-gridline-color px-3.5 py-2.5 text-center transition-colors hover:border-scheme-text"
+                  :class="selectedDate === day.iso ? 'bg-scheme-text text-scheme-background border-scheme-text' : ''"
+                  @click="selectedDate = day.iso; selectedTime = ''"
+                >
+                  <span class="block text-xs uppercase tracking-wide opacity-60" x-text="day.dayName"></span>
+                  <span class="block text-xl leading-tight" x-text="day.date" style="font-family: var(--font-heading-family, serif);"></span>
+                </button>
+              </template>
+            </div>
+            <input type="hidden" name="contact[preferred_date]" :value="selectedDate" />
+          </div>
+
+          <!-- Time selection -->
+          <div class="flex flex-col gap-2" x-show="selectedDate">
+            <p class="text-xs uppercase tracking-widest text-scheme-secondary">Preferred Time</p>
+            <div class="grid grid-cols-3 gap-2">
+              <template x-for="slot in timeSlots" :key="slot.value">
+                <button
+                  type="button"
+                  class="border border-gridline-color py-2.5 text-xs transition-colors"
+                  :class="[
+                    selectedTime === slot.value ? 'bg-scheme-text text-scheme-background border-scheme-text' : 'hover:border-scheme-text',
+                    slot.available ? '' : 'line-through opacity-30 cursor-not-allowed pointer-events-none'
+                  ]"
+                  @click="slot.available && (selectedTime = slot.value)"
+                  :disabled="!slot.available"
+                  x-text="slot.label"
+                ></button>
+              </template>
+            </div>
+            <input type="hidden" name="contact[preferred_time]" :value="selectedTime" />
+          </div>
+
+          <!-- Hidden: stack summary -->
+          <input type="hidden" name="contact[stack_summary]" :value="stackSummary" />
+          <input type="hidden" name="contact[body]" :value="formBody" />
+
+          <!-- Summary -->
+          <div x-show="selectedDate && selectedTime" class="border border-gridline-color px-4 py-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-widest text-scheme-secondary">Your appointment</p>
+                <p class="mt-1 text-base" style="font-family: var(--font-heading-family, serif);" x-text="appointmentSummary"></p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs uppercase tracking-widest text-scheme-secondary">Duration</p>
+                <p class="mt-1 text-base" style="font-family: var(--font-heading-family, serif);">~60 min</p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="theme-button flex w-full items-center justify-center gap-3 py-3.5 text-sm uppercase tracking-widest"
+            :disabled="!selectedDate || !selectedTime || stack.length === 0"
+            :class="(!selectedDate || !selectedTime || stack.length === 0) ? 'opacity-40 cursor-not-allowed' : ''"
+          >
+            Confirm Appointment
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <p class="text-center text-xs text-scheme-secondary leading-relaxed">
+            We'll send a confirmation to your email. No payment required to book.<br>
+            Pieces are held for your visit — no commitment to purchase.
+          </p>
+
+        </div>
+      {%- endform -%}
+
+    </div>
+  </div>
+</div>
+
+<script>
+function CommuneStackPage() {
+  return {
+    stack: [],
+    selectedDate: '',
+    selectedTime: '',
+    availableDates: [],
+    timeSlots: [
+      { label: '11:00', value: '11:00', available: true },
+      { label: '11:30', value: '11:30', available: true },
+      { label: '12:00', value: '12:00', available: true },
+      { label: '12:30', value: '12:30', available: true },
+      { label: '13:00', value: '13:00', available: true },
+      { label: '14:00', value: '14:00', available: true },
+      { label: '14:30', value: '14:30', available: true },
+      { label: '15:00', value: '15:00', available: true },
+      { label: '15:30', value: '15:30', available: true },
+      { label: '16:00', value: '16:00', available: true },
+      { label: '16:30', value: '16:30', available: true },
+      { label: '17:00', value: '17:00', available: true },
+    ],
+
+    init() {
+      this.stack = this.$store.stack.items;
+      this.buildDates();
+    },
+
+    buildDates() {
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const closed = [0]; // Sunday closed; add 6 for Saturday if needed
+      const dates = [];
+      let d = new Date();
+      d.setDate(d.getDate() + 1); // start tomorrow
+      while (dates.length < 10) {
+        if (!closed.includes(d.getDay())) {
+          dates.push({
+            iso: d.toISOString().split('T')[0],
+            dayName: days[d.getDay()],
+            date: d.getDate(),
+          });
+        }
+        d.setDate(d.getDate() + 1);
+      }
+      this.availableDates = dates;
+    },
+
+    get stackSummary() {
+      return this.stack.map(i => `${i.vendor} — ${i.title}${i.size ? ' ('+i.size+')' : ''}${i.note ? ': '+i.note : ''}`).join('\n');
+    },
+
+    get formBody() {
+      return `Appointment request\nDate: ${this.selectedDate}\nTime: ${this.selectedTime}\n\nStack (${this.stack.length} pieces):\n${this.stackSummary}`;
+    },
+
+    get appointmentSummary() {
+      if (!this.selectedDate || !this.selectedTime) return '';
+      const d = new Date(this.selectedDate + 'T12:00:00');
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} · ${this.selectedTime} · ${this.stack.length} piece${this.stack.length === 1 ? '' : 's'}`;
+    }
+  };
+}
+</script>
+
+{% schema %}
+{
+  "name": "Stack & Appointment",
+  "settings": [
+    {
+      "type": "text",
+      "id": "address",
+      "label": "Showroom address",
+      "default": "237 Rue Saint-Paul O, Vieux-Montréal"
+    },
+    {
+      "type": "text",
+      "id": "hours",
+      "label": "Opening hours",
+      "default": "Tue–Sat, 11am–6pm, by appointment"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "default"
+    }
+  ],
+  "presets": [
+    { "name": "Stack & Appointment" }
+  ]
+}
+{% endschema %}

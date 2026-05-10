@@ -1,0 +1,59 @@
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+  assign tab_counter = 0
+
+  comment
+    The product is being passed in explicitly only so this snippet can work when called from the featured product section, it is not necessary for product templates
+  endcomment
+
+  for block in section.blocks
+    case block.type
+      when '@app'
+        render 'product-block-app', block: block, product: product
+      when 'title'
+        render 'product-block-title', block: block, product: product, wrap_with_link: featured_product_section
+      when 'vendor'
+        render 'product-block-vendor', block: block, product: product
+      when 'price'
+        render 'product-form-component-price', block: block, product: product, current_variant: current_variant, price_text_size: block.settings.text_size
+      when 'variant_picker'
+        render 'product-form-component-variant-picker', block: block, product: product, option_style: block.settings.option_style, hide_option_labels: block.settings.hide_option_labels, hide_sold_out_variants: block.settings.hide_sold_out_variants, hide_unavailable_variants: block.settings.hide_unavailable_variants
+      when 'quantity_selector'
+        render 'product-form-component-quantity-selector', block: block, product: product, product_form_id: product_form_id
+      when 'buy_buttons'
+        render 'product-form-component-buy-buttons', block: block, product: product, product_form_id: product_form_id
+      when 'description'
+        assign enable_collapsible_tabs = block.settings.enable_collapsible_tabs
+        assign truncate_description = block.settings.truncate_description
+        assign max_words = block.settings.max_words
+
+        render 'product-block-description', block: block, product: product, enable_collapsible_tabs: enable_collapsible_tabs, truncate_description: truncate_description, max_words: max_words
+      when 'text'
+        render 'product-block-text', block: block, product: product
+      when 'richtext'
+        render 'product-block-richtext', block: block, product: product
+      when 'information_list'
+        render 'product-block-information-list', block: block, product: product
+      when 'collapsible_tab'
+        render 'product-block-collapsible-tab', block: block, product: product, tab_counter: tab_counter
+
+        assign tab_counter = tab_counter | plus: 1
+      when 'icon_list'
+        render 'product-block-icon-list', block: block, product: product
+      when 'popup'
+        render 'product-block-popup', block: block, product: product, section_color: section_color
+      when 'share'
+        echo '<div class="mt-8" ' | append: block.shopify_attributes | append: '>'
+        render 'social-sharing', tag: 'h2', share_title: product.title, share_permalink: product.url, share_image: product, section_color: section_color
+        echo '</div>'
+      when 'complementary'
+        render 'product-block-complementary', block: block, product: product
+      when 'inventory'
+        render 'product-block-inventory', block: block, product: product
+      when 'location_inventory'
+        render 'product-block-location-inventory', block: block, product: product
+      when 'custom_liquid'
+        render 'product-block-custom-liquid', block: block, product: product
+    endcase
+  endfor
+-%}

@@ -1,0 +1,30 @@
+{% liquid
+  assign show_view_all = false
+  if link_text != '' and link_url != '' and settings.section_title_align == 'left' and show_link
+    assign show_view_all = true
+  endif
+  assign heading_width_class = ''
+  if settings.section_title_align == 'left'
+    if settings.desktop_standard_heading_scale > 3 and show_view_all == true
+      assign heading_width_class = 'lg:w-1/2'
+    endif
+  endif
+%}
+<div
+  class="{% unless hide_bottom_border %}border-b-gridline{% endunless %} border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text {% if settings.section_title_align == 'left' %}lg:flex items-end justify-between{% else %}text-center{% endif %}"
+  data-color-scheme="{{ section_color }}"
+>
+  <h2 class="{{ settings.section_title_font }} text-heading-standard {{ heading_width_class }} break-word">
+    {{ title }}
+  </h2>
+  {%- if show_view_all -%}
+    <div class="mt-4 lg:mt-0 {% if settings.section_title_align == 'left' %}lg:w-1/2 lg:text-right{% endif %}">
+      <a
+        class="theme-link inline-block text-scheme-text hover:text-scheme-accent"
+        href="{{ link_url }}"
+      >
+        {{- link_text -}}
+      </a>
+    </div>
+  {%- endif -%}
+</div>

@@ -1,0 +1,19 @@
+
+<section class="brand-list-wrapper">
+  <h1 class="text-3xl font-semibold mb-10 text-center">Brands</h1>
+
+  <!-- Brand Grid -->
+  <div class="brand-grid">
+    {% assign vendors = shop.vendors | sort %}
+    {% for vendor in vendors %}
+      {% assign vendor_products = collections.all.products | where: "vendor", vendor %}
+      {% if vendor_products.size > 0 %}
+        <div class="brand-item">
+          <a href="/collections/vendors?q={{ vendor | url_encode }}" class="block text-center hover:underline">
+            <div class="text-lg">{{ vendor }}</div>
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>

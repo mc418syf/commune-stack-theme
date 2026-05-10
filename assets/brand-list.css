@@ -1,0 +1,45 @@
+/* Brand List Wrapper */
+.brand-list-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+/* Brand Grid */
+.brand-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media screen and (min-width: 768px) {
+  /* 2 columns on desktop */
+  .brand-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.brand-item {
+  text-align: center;
+}
+
+/* Brand Image */
+.brand-image {
+  max-width: 150px;
+  margin: 10px auto;
+}
+
+.brand-item a {
+  font-size: 8px;
+  text-decoration: none;
+  color: #111827;
+}
+
+.brand-item a:hover {
+  text-decoration: underline;
+}
+
+.brand-item span {
+  color: #999;
+  cursor: not-allowed;
+}

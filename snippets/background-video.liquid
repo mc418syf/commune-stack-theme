@@ -1,0 +1,130 @@
+{% liquid
+  if video_type == 'youtube'
+    assign video_id = video_object.id
+  else
+    assign video = video_object
+  endif
+%}
+<div
+  {% if video_type == 'youtube' %}
+    x-data="BackgroundVideoYT"
+  {% elsif video_type == 'video' %}
+    x-data="BackgroundVideo"
+  {% endif %}
+  class="background-video relative h-full w-full overflow-hidden bg-black"
+  id="{{ component_id }}"
+  x-intersect:enter.margin.25%.0px.75%.0px="play"
+  x-intersect:leave.margin.25%.0px.75%.0px="pause"
+  {{ video_block.shopify_attributes }}
+>
+  {%- if video_type == 'youtube' -%}
+    <div
+      class="youtube-background"
+      :class="{ 'is-playing': playing, 'is-tall': tall }"
+    >
+      <template x-if="enabled">
+        <div
+          x-data="YouTubeEmbed"
+          @play="play"
+          @pause="pause"
+          {% if request.design_mode %}
+            @deinit="deinit"
+          {% endif %}
+        >
+          <iframe
+            id="player-{{ component_id }}"
+            src="https://www.youtube.com/embed/{{ video_id }}?autohide=0&branding=0&loop=1&playlist={{ video_id }}&cc_load_policy=0&controls=0&fs=0&iv_load_policy=3&modestbranding=1&playsinline=1&quality=hd720&mute=1&rel=0&showinfo=0&wmode=opaque&enablejsapi=1"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            class="transition-opacity duration-200 ease-in-out"
+            :class="{ 'opacity-0' : !playing, 'opacity-100' : playing }"
+            @load="onIFrameLoad"
+            x-ref="video"
+          ></iframe>
+        </div>
+      </template>
+    </div>
+
+    {%- if fallback_image -%}
+      <div x-show="showFallbackImage">
+        {%-
+          render 'image-fit' with
+          image: fallback_image
+        -%}
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if video_type == 'video' -%}
+    {% liquid
+      if video_object_natural
+        assign video_class = ''
+      elsif video_object_natural_desktop
+        assign video_class = 'object-cover absolute inset-0 w-full h-full lg:object-none lg:static lg:inset-auto'
+      else
+        assign video_class = 'object-cover absolute inset-0 w-full h-full'
+      endif
+    %}
+    <div
+      x-data="HTMLVideo"
+      @play="play"
+      @pause="pause"
+    >
+      <video
+        id="player-{{ component_id }}"
+        {% if request.design_mode %}
+          @deinit="deinit"
+        {% endif %}
+        class="{{ video_class }} transition-opacity duration-200 ease-in-out"
+        :class="{ 'opacity-0' : !playing, 'opacity-100' : playing }"
+        {% if video.alt != blank %}
+          title="{{ video.alt }}"
+        {% endif %}
+        autoplay
+        muted
+        loop
+        muted
+        playsinline
+        x-ref="video"
+      >
+        {% for source in video.sources %}
+          {% # theme-check-disable RemoteAsset %}
+          <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {% # theme-check-enable RemoteAsset %}
+        {% endfor %}
+        {%- if fallback_image -%}
+          {%-
+            render 'image-fit' with
+            image: fallback_image
+          -%}
+        {%- endif -%}
+        Sorry, your browser doesn't support embedded videos.
+      </video>
+    </div>
+  {%- endif -%}
+</div>
+
+{% if video_type == 'youtube' %}
+  {{ 'background-video-youtube.css' | asset_url | stylesheet_tag }}
+{% endif %}
+{% unless request.design_mode %}
+  {% if video_type == 'youtube' %}
+    <script
+      src="{{ 'background-video-youtube.js' | asset_url }}"
+      type="module"
+    ></script>
+    <script
+      src="{{ 'youtube-embed.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% else %}
+    <script
+      src="{{ 'html-video.js' | asset_url }}"
+      type="module"
+    ></script>
+    <script
+      src="{{ 'background-video.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% endif %}
+{% endunless %}

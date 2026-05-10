@@ -1,0 +1,12 @@
+<span class="inline-flex h-4 w-4 items-center">
+  {%- liquid
+    case settings.cart_icon
+      when 'basket'
+        render 'icon-basket'
+      when 'bag'
+        render 'icon-bag'
+      when 'cart'
+        render 'icon-cart'
+    endcase
+  -%}
+</span>

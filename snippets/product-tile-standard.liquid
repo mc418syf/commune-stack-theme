@@ -1,0 +1,602 @@
+{% comment %}
+PLP product card
+- Mobile: swipe enabled (scroll-snap + small dash dots)
+- Desktop: unchanged (no swipe)
+{% endcomment %}
+
+{% assign enable_mobile_swipe = true %}
+{% assign enable_desktop_swipe = false %}
+
+{%- liquid
+  unless preload
+    assign preload = false
+  endunless
+
+  unless loading
+    assign loading = null
+  endunless
+
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  assign sold_out = true
+  if product.available
+    assign sold_out = false
+  endif
+
+  assign show_sale_badge = settings.product_grid_show_sale_badge
+  assign show_sold_out_badge = settings.product_grid_show_sold_out_badge
+
+  case settings.under_image_display_format
+    when 'title_left_price_right'
+      if products_per_row_mobile == 2
+        assign layout_class = 'text-sm lg:text-base lg:flex'
+        assign price_class = 'text-left lg:w-2/5 lg:text-right mt-1 lg:mt-0 lg:pl-2'
+        assign title_class = 'text-left lg:w-3/5'
+      else
+        assign layout_class = 'flex'
+        assign price_class = 'text-right pl-2'
+        assign title_class = 'text-left w-3/5'
+      endif
+      assign swatch_class = 'justify-start'
+    when 'title_left_price_under'
+      assign price_class = 'text-left mt-1'
+      if products_per_row_mobile == 2
+        assign layout_class = 'text-sm lg:text-base'
+        assign price_class = price_class | append: ' lg:mt-2'
+      endif
+      assign title_class = 'text-left'
+      assign swatch_class = 'justify-start'
+    when 'title_center_price_under'
+      assign layout_class = 'text-center'
+      assign price_class = 'text-center mt-1'
+      if products_per_row_mobile == 2
+        assign layout_class = layout_class | append: ' text-sm lg:text-base'
+        assign price_class = price_class | append: ' lg:mt-2'
+      endif
+      assign title_class = 'text-center'
+      assign swatch_class = 'justify-center'
+  endcase
+
+  assign output_variant_images = false
+  assign output_second_image = false
+
+  if product.media.size > 1 and settings.products_show_second_image_on_hover
+    assign output_second_image = true
+  endif
+
+  if enable_quick_buy and product.available
+    if product.has_only_default_variant
+      assign current_variant = product.selected_or_first_available_variant
+      assign product_form_id = 'product-quick-buy-form-' | append: section.id | append: '-' | append: product.id
+    else
+      assign quick_buy_id = 'product-quick-buy-' | append: product.id | append: '-' | append: section.id
+      if product.url contains '?'
+        assign product_quick_buy_url = product.url | append: '&view=quick-buy'
+      else
+        assign product_quick_buy_url = product.url | append: '?view=quick-buy'
+      endif
+    endif
+  endif
+
+  assign has_color_option = false
+
+  if settings.enable_color_swatches_on_product_tiles
+    assign swatch_trigger = 'products.product.color_swatch_trigger' | t | downcase
+    for option in product.options_with_values
+      assign is_color = false
+      assign option_downcase = option.name | downcase
+      if option_downcase contains swatch_trigger
+        assign is_color = true
+      elsif swatch_trigger == 'color' and option_downcase contains 'colour'
+        assign is_color = true
+      endif
+      if is_color
+        assign has_color_option = true
+        assign option_index = forloop.index0
+        assign values = ''
+      endif
+      for variant in product.variants
+        assign value = variant.options[option_index]
+        unless values contains value
+          assign values = values | join: ','
+          assign values = values | append: ',' | append: value
+          assign values = values | split: ','
+          if variant.featured_media
+            assign variants_with_images_ids = variants_with_images_ids | append: variant.id | append: ','
+          endif
+        endunless
+      endfor
+      break
+    endfor
+  endif
+
+  if variants_with_images_ids
+    assign variants_with_images_ids_array = variants_with_images_ids | split: ','
+    if variants_with_images_ids_array.size > 0
+      assign output_variant_images = true
+      assign output_second_image = false
+    endif
+  endif
+-%}
+
+<div
+  class="group relative flex h-full flex-col text-center hover:text-scheme-accent"
+  {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}
+    x-data="{ currentSwatchVariantId: '{{ product.selected_or_first_available_variant.id }}', productUrl: '{{ product.url }}' }"
+  {% endif %}
+  data-color-scheme="{{ section_color }}"
+>
+  {%- comment -%} Overlay link only where it won’t block swipe {%- endcomment -%}
+  {% unless enable_quick_buy and settings.quick_buy_position == 'over_image' %}
+    <a
+      href="{{ product.url }}"
+      {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}:href="productUrl"{% endif %}
+      class="absolute inset-0 z-10 {% if enable_mobile_swipe %}hidden lg:block{% endif %}"
+    >
+      <span class="sr-only">{{ product.title }}</span>
+    </a>
+  {% endunless %}
+
+  <div class="relative">
+    {%- if show_sold_out_badge and sold_out -%}
+      <div class="pointer-events-none absolute right-2 top-2 z-10 bg-scheme-accent p-2 text-scheme-background">
+        {{ 'products.product.sold_out' | t }}
+      </div>
+    {%- elsif show_sale_badge and on_sale -%}
+      <div class="pointer-events-none absolute right-2 top-2 z-10 bg-scheme-accent p-2 text-scheme-background">
+        {{ 'products.product.on_sale' | t }}
+      </div>
+    {%- endif -%}
+
+    <div class="w-full {% unless settings.fill_image_to_border_edge %}pt-2 lg:pt-4 {% if reduce_gutter %}px-1 lg:px-section-horizontal-spacing{% else %}px-section-horizontal-spacing {% endif %}{% else %}border-b-gridline border-gridline-color pb-0{% endunless %}">
+      <div class="relative z-0">
+
+        {%- comment -%} MOBILE: swipeable gallery (overlay dots) {%- endcomment -%}
+        {% if enable_mobile_swipe %}
+          {%- liquid
+            assign _contain = true
+            assign _ratio = settings.product_grid_image_size | plus: 0
+            if settings.product_grid_image_size == 'natural'
+              assign _contain = false
+              assign _ratio = 0.75
+            endif
+
+            assign images_only = product.media | where: 'media_type', 'image'
+            assign ordered = ''
+            if product.featured_media and product.featured_media.media_type == 'image'
+              assign ordered = ordered | append: product.featured_media.id | append: ','
+            endif
+            for m in images_only
+              unless product.featured_media and m.id == product.featured_media.id
+                assign ordered = ordered | append: m.id | append: ','
+              endunless
+            endfor
+            assign ordered_ids = ordered | split: ',' | uniq | slice: 0, 4
+            assign img_count = ordered_ids | size
+          -%}
+
+          <div class="lg:hidden relative" id="plp-{{ section.id }}-{{ product.id }}">
+            <ul class="plp-snap-track">
+              {% for idstr in ordered_ids %}
+                {%- assign mid = idstr | plus: 0 -%}
+                {%- assign media = images_only | where: 'id', mid | first -%}
+                {% if media %}
+                  <li class="plp-snap-slide">
+                    <a href="{{ product.url }}">
+                      <div class="relative" style="padding-top: {{ 1 | divided_by: _ratio | times: 100 }}%;">
+                        {% render 'image-fit',
+                          image: media,
+                          sizes: sizes,
+                          preload: preload,
+                          loading: loading,
+                          contain: _contain
+                        %}
+                      </div>
+                    </a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+
+            {% if img_count > 1 %}
+              <!-- overlay dots on bottom of the image -->
+              <div class="plp-dots plp-dots--overlay" aria-hidden="true">
+                {% for i in (1..img_count) %}
+                  <span class="plp-dot{% if forloop.first %} is-active{% endif %}"></span>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <script>
+            (function(){
+              var root=document.getElementById('plp-{{ section.id }}-{{ product.id }}');
+              if(!root) return;
+              var track=root.querySelector('.plp-snap-track');
+              var dots=[].slice.call(root.querySelectorAll('.plp-dot'));
+              if(!track || !dots.length) return;
+              function setActive(i){ for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('is-active',k===i);} }
+              function onScroll(){
+                var i=Math.round(track.scrollLeft / track.clientWidth);
+                if(i<0) i=0; if(i>=dots.length) i=dots.length-1;
+                setActive(i);
+              }
+              track.addEventListener('scroll', onScroll, {passive:true});
+              setActive(0);
+            })();
+          </script>
+        {% endif %}
+
+
+        {%- comment -%} DESKTOP: theme default (no swipe) {%- endcomment -%}
+        <div class="hidden lg:block">
+          {%- liquid
+            assign object_contain_grid = false
+            unless settings.product_grid_image_size == 'natural'
+              assign object_contain_grid = true
+              assign ratio = settings.product_grid_image_size | plus: 0
+              assign contain = true
+            endunless
+
+            assign object_crop_grid = false
+            if force_crop
+              assign object_crop_grid = true
+              assign ratio = force_crop_ratio
+            endif
+
+            if object_contain_grid and settings.product_grid_image_crop_style == 'cover'
+              assign contain = false
+            endif
+          -%}
+          {% if object_contain_grid %}
+            <div class="relative" style="padding-top: {{ 1 | divided_by: ratio | times: 100 }}%;">
+              {% if product.featured_media != blank %}
+                {% render 'image-fit',
+                  image: product.featured_media,
+                  sizes: sizes,
+                  preload: preload,
+                  loading: loading,
+                  contain: contain
+                %}
+              {% endif %}
+            </div>
+          {% elsif object_crop_grid %}
+            {% if product.featured_media != blank %}
+              {% render 'image-crop',
+                image: product.featured_media,
+                sizes: sizes,
+                preload: preload,
+                loading: loading,
+                ratio: ratio
+              %}
+            {% endif %}
+          {% else %}
+            {%- liquid
+              if product.featured_media != blank
+                render 'image', image: product.featured_media, sizes: sizes, preload: preload, loading: loading
+              else
+                echo '<div class="relative pt-[100%]"></div>'
+              endif
+            -%}
+          {% endif %}
+
+          {% if output_second_image %}
+            {% render 'image-fit',
+              image: product.media[1].preview_image,
+              contain: contain,
+              sizes: sizes,
+              preload: false,
+              loading: loading,
+              extra_classes: 'z-10 bg-scheme-background opacity-0 transition-opacity duration-200 ease-in-out group-hover:opacity-100 group-focus-within:opacity-100'
+            %}
+          {% endif %}
+
+          {% if output_variant_images %}
+            {% for variant_id_string in variants_with_images_ids_array %}
+              {%- liquid
+                assign variant_id = variant_id_string | plus: 0
+                assign variant = product.variants | where: 'id', variant_id | first
+              -%}
+              <div
+                class="contents"
+                x-data="{ shown: false, top: false }"
+                x-init="
+                  if (currentSwatchVariantId === '{{ variant.id }}') { shown = true; top = true; }
+                  $watch('currentSwatchVariantId', (value) => {
+                    if (value === '{{ variant.id }}') { shown = true; top = true; }
+                    else { top = false; setTimeout(() => { shown = false; }, 200) }
+                  });
+                "
+                :class="{
+                  '[&>image-with-placeholder>img]:opacity-100': shown,
+                  '[&>image-with-placeholder>img]:z-30': top
+                }"
+              >
+                {% render 'image-fit',
+                  image: variant.featured_media.preview_image,
+                  contain: object_contain_grid,
+                  sizes: sizes,
+                  loading: 'lazy',
+                  extra_classes: 'z-20 bg-scheme-background opacity-0 transition-opacity duration-200 ease-in-out'
+                %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        {% if enable_quick_buy and settings.quick_buy_position == 'over_image' %}
+          <a
+            href="{{ product.url }}"
+            {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}:href="productUrl"{% endif %}
+            class="absolute inset-0 z-35 {% if enable_mobile_swipe %}hidden lg:block{% endif %}"
+          >
+            <span class="sr-only">{{ product.title }}</span>
+          </a>
+        {% endif %}
+
+        {% unless sold_out %}
+          {%- liquid
+            assign stack_variant = product.selected_or_first_available_variant
+            assign stack_image = ''
+            if product.featured_media
+              assign stack_image = product.featured_media | image_url: width: 200
+            endif
+            assign stack_size = ''
+            for option in product.options_with_values
+              assign option_lower = option.name | downcase
+              if option_lower contains 'size'
+                assign stack_size = stack_variant.options[forloop.index0]
+              endif
+            endfor
+          -%}
+          <div
+            class="hidden lg:block"
+            x-data="{ inStack: false }"
+            x-init="inStack = $store.stack.has({{ stack_variant.id }})"
+            @stack-updated.window="inStack = $store.stack.has({{ stack_variant.id }})"
+          >
+            <button
+              type="button"
+              class="commune-stack-tile-btn z-40"
+              :data-in-stack="inStack"
+              @click.prevent="
+                if (!inStack) {
+                  $store.stack.add({
+                    id: {{ product.id }},
+                    variantId: {{ stack_variant.id }},
+                    title: {{ product.title | json }},
+                    vendor: {{ product.vendor | json }},
+                    price: {{ stack_variant.price | money | json }},
+                    image: '{{ stack_image }}',
+                    url: '{{ product.url }}',
+                    size: {{ stack_size | json }}
+                  });
+                  $dispatch('stack-updated');
+                  $store.modals.open('stack');
+                } else {
+                  $store.modals.open('stack');
+                }
+              "
+            >
+              <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="13" height="2.2" rx="0.4" fill="currentColor"/>
+                <rect x="0" y="3.9" width="13" height="2.2" rx="0.4" fill="currentColor"/>
+                <rect x="0" y="7.8" width="13" height="2.2" rx="0.4" fill="currentColor"/>
+              </svg>
+              <span x-text="inStack ? 'View Stack' : 'Add to Stack'">Add to Stack</span>
+            </button>
+          </div>
+        {% endunless %}
+
+      </div>
+    </div>
+
+    {%- liquid
+      assign meta_class = 'justify-between py-4'
+      if reduce_gutter
+        assign meta_class = meta_class | append: ' px-1 lg:px-section-horizontal-spacing'
+      else
+        assign meta_class = meta_class | append: ' px-section-horizontal-spacing '
+      endif
+      if settings.product_grid_uppercase
+        assign meta_class = meta_class | append: ' uppercase'
+      endif
+      if enable_quick_buy
+        assign meta_class = meta_class | append: ' relative'
+      endif
+    -%}
+
+    <div class="{{ meta_class }} {{ layout_class }}">
+      {% if enable_quick_buy and settings.quick_buy_position == 'over_image' %}
+        <a
+          href="{{ product.url }}"
+          {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}:href="productUrl"{% endif %}
+          class="absolute inset-0 z-10 {% if enable_mobile_swipe %}hidden lg:block{% endif %}"
+        >
+          <span class="sr-only">{{ product.title }}</span>
+        </a>
+      {% endif %}
+
+      <div class="{{ title_class }} break-word">
+        {% if settings.product_grid_show_vendor and product.vendor != '' %}
+          <p class="mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
+        {% endif %}
+        <a href="{{ product.url }}" class="inline-block">
+          <p aria-hidden="true" class="{% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
+        </a>
+      </div>
+
+      <div class="{{ price_class }}">
+        {% if sold_out %}
+          <s class="text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</s>
+        {% else %}
+          {% if on_sale and sold_out != true %}
+            <s class="block lg:inline">
+              <span class="sr-only">{{- 'products.product.regular_price' | t -}}</span>
+              {%- if settings.currency_code_enabled == true -%}
+                {{- product.compare_at_price | money_with_currency -}}
+              {%- else -%}
+                {{- product.compare_at_price | money -}}
+              {%- endif -%}
+            </s>
+          {% endif %}
+          {% if on_sale %}
+            {% if product.price_varies %}
+              {% liquid
+                if settings.currency_code_enabled == true
+                  assign sale_price = product.price | money_with_currency
+                else
+                  assign sale_price = product.price | money
+                endif
+              %}
+              <span class="text-scheme-accent">
+                <span class="sr-only">{{- 'products.product.sale_price' | t -}}</span><br>
+                {{ 'products.product.on_sale_from_html' | t: price: sale_price -}}
+              </span>
+            {% else %}
+              <span class="text-scheme-accent">
+                <span class="sr-only">{{- 'products.product.sale_price' | t -}}</span>
+                {%- if settings.currency_code_enabled == true -%}
+                  {{- product.price | money_with_currency -}}
+                {%- else -%}
+                  {{- product.price | money -}}
+                {%- endif -%}
+              </span>
+            {% endif %}
+          {% else %}
+            {% if product.price_varies %}
+              {%- if settings.currency_code_enabled == true -%}
+                {%- assign price = product.price | money_with_currency -%}
+              {%- else -%}
+                {%- assign price = product.price | money -%}
+              {%- endif -%}
+              <span>{{ 'products.product.from_lowest_price_html' | t: lowest_price: price -}}</span>
+            {% else %}
+              <span>{%- if settings.currency_code_enabled == true -%}{{- product.price | money_with_currency -}}{%- else -%}{{- product.price | money -}}{%- endif -%}</span>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+
+        {% assign unit_price_variant = product.first_available_variant %}
+        {% if unit_price_variant.unit_price %}
+          <p class="{% if sold_out %}text-scheme-secondary line-through{% endif %} text-xs">
+            <span data-unit-price>
+              {%- if settings.currency_code_enabled == true -%}
+                {{- unit_price_variant.unit_price | money_with_currency -}}
+              {%- else -%}
+                {{- unit_price_variant.unit_price | money -}}
+              {%- endif -%}
+            </span>
+            <span>/</span>
+            <span data-unit-price-measurement-reference-value>
+              {%- if unit_price_variant.unit_price_measurement.reference_value != 1 -%}
+                {{- unit_price_variant.unit_price_measurement.reference_value -}}
+              {%- endif -%}
+            </span>
+            <span data-unit-price-measurement-reference-unit>
+              {{- unit_price_variant.unit_price_measurement.reference_unit -}}
+            </span>
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if enable_quick_buy and settings.quick_buy_position == 'under_meta' %}
+    <div class="mt-auto flex w-full pb-2 {% unless settings.fill_image_to_border_edge %}lg:pb-4{% endunless %} {% if reduce_gutter %}px-1 lg:px-section-horizontal-spacing{% else %}px-section-horizontal-spacing{% endif %}">
+      {% unless product.has_only_default_variant %}
+        <div class="relative z-10 w-full">
+          {% if product.available %}
+            <a href="{{ product.url }}" :role="`button`" class="block {{ quick_buy_button_classes }} w-full" @click.prevent="$store.modals.open('{{ quick_buy_id }}')">
+              {{ 'products.product.choose_options' | t }}
+            </a>
+          {% else %}
+            <button type="button" class="block {{ quick_buy_button_classes }} w-full cursor-not-allowed opacity-50 after:content-none" disabled>
+              {{ 'products.product.sold_out' | t }}
+            </button>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="relative z-10 w-full" x-data="QuickBuy">
+          {% render 'product-form-component-buy-buttons',
+            product: product,
+            current_variant: current_variant,
+            product_form_id: product_form_id,
+            quick_buy: true,
+            quick_buy_button_classes: quick_buy_button_classes
+          %}
+        </div>
+      {% endunless %}
+    </div>
+  {% endif %}
+
+  {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}
+    {% assign swatch_trigger = 'products.product.color_swatch_trigger' | t | downcase %}
+    {% for option in product.options_with_values %}
+      {%- liquid
+        assign is_color = false
+        assign option_downcase = option.name | downcase
+        if option_downcase contains swatch_trigger
+          assign is_color = true
+        elsif swatch_trigger == 'color' and option_downcase contains 'colour'
+          assign is_color = true
+        endif
+      -%}
+      {% if is_color %}
+        <div class="pb-4 {% if reduce_gutter %}px-1 lg:px-section-horizontal-spacing{% else %}px-section-horizontal-spacing{% endif %}">
+          {% liquid
+            assign option_index = forloop.index0
+            assign values = ''
+          %}
+          <div class="relative z-10 -mx-1 flex {{ swatch_class }} -mt-2 flex-wrap">
+            {% for variant in product.variants %}
+              {% assign value = variant.options[option_index] %}
+              {% unless values contains value %}
+                {% liquid
+                  assign values = values | join: ','
+                  assign values = values | append: ',' | append: value
+                  assign values = values | split: ','
+                  assign color_image = value | handle | append: '.' | append: 'png' | file_img_url: '50x' | prepend: 'https:'
+                  assign color_swatch_fallback = value | split: ' ' | last | handle
+                %}
+                <a
+                  href="{{ variant.url }}"
+                  class="mx-1 mt-2 rounded-button border-text border-scheme-text/0 p-px"
+                  :class="{ 'border-scheme-text' : currentSwatchVariantId === '{{ variant.id }}', 'border-scheme-text/0' : currentSwatchVariantId !== '{{ variant.id }}' }"
+                  @click.prevent="currentSwatchVariantId = '{{ variant.id }}'; productUrl = '{{ variant.url }}'"
+                >
+                  <span class="block rounded-button p-2" style="background-image: url({{ color_image }}); background-color: {{ color_swatch_fallback }};"></span>
+                  <span class="sr-only">{{ value }}</span>
+                </a>
+              {% endunless %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if enable_quick_buy and product.available and product.has_only_default_variant == false %}
+    <div
+      x-data
+      x-init="{% unless inserted %}initTeleport($root);{% endunless %} $store.modals.register('{{ quick_buy_id }}', 'quickBuyDrawer');"
+      class="hidden"
+    >
+      <template {% if inserted %}x-teleport="#quick-buy-drawer-slot"{% else %}data-should-teleport="#quick-buy-drawer-slot"{% endif %}>
+        <template x-if="$store.modals.quickBuyDrawer.contents === '{{ quick_buy_id }}'">
+          <div
+            data-modal-label="{{ 'products.product.choose_product_options' | t: product_name: product.title | escape }}"
+            x-html="$fetchedFragment('{{ product_quick_buy_url }}','[data-quick-buy-root]')"
+          >
+            <div class="my-16 px-section-horizontal-spacing text-center">
+              {{ 'general.search.loading' | t }}&hellip;
+            </div>
+          </div>
+        </template>
+      </template>
+    </div>
+  {% endif %}
+</div>

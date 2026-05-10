@@ -1,0 +1,131 @@
+{% comment %}theme-check-disable MissingTemplate{% endcomment %}
+{%- liquid
+  assign section_color = section.settings.color_scheme | default: 'scheme1'
+  assign video = section.settings.video
+
+  assign poster_preload = false
+  assign poster_loading = 'lazy'
+
+  if section.index == 1
+    assign poster_preload = true
+  endif
+
+  if section.index <= 3
+    assign poster_loading = 'eager'
+  endif
+-%}
+
+<section
+  class="video overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  {% if section.settings.title != '' %}
+    {%- render 'section-title',
+      title: section.settings.title,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  <div
+    class="{% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% endunless %}"
+  >
+    {%- render 'video',
+      video: video,
+      mode: section.settings.mode,
+      container_id: section.id,
+      ratio: section.settings.aspect_ratio,
+      poster_preload: poster_preload,
+      poster_loading: poster_loading
+    -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Video",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "id": "title",
+      "type": "text",
+      "label": "Heading"
+    },
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "id": "video",
+      "type": "video",
+      "label": "Video",
+      "info": "If set, will be used instead of the embedded video option. Offers improved performance."
+    },
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "Mode",
+      "options": [
+        {
+          "value": "preview",
+          "label": "Preview"
+        },
+        {
+          "value": "autoplay",
+          "label": "Autoplay"
+        }
+      ],
+      "default": "preview",
+      "info": "Autoplay will not play sound or show controls."
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Aspect ratio",
+      "default": "1.778",
+      "options": [
+        {
+          "value": "natural",
+          "label": "Natural"
+        },
+        {
+          "value": "1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "1.333",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "0.6667",
+          "label": "Portrait (2:3)"
+        },
+        {
+          "value": "1.778",
+          "label": "Widescreen (16:9)"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video"
+    }
+  ]
+}
+{% endschema %}

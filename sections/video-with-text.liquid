@@ -1,0 +1,384 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign video = section.settings.video
+
+  assign video_color_scheme = section.settings.video_color_scheme
+  assign video_position = section.settings.video_position
+
+  assign text_size_class = section.settings.text_size
+  assign text_align = section.settings.text_alignment
+  assign text_position = section.settings.text_position
+
+  assign indent_video = section.settings.indent_video
+  assign font = section.settings.font
+
+  case section.settings.video_size
+    when 'third'
+      assign text_width_desktop = 'lg:col-span-8'
+
+      if video_position == 'right'
+        assign video_width_desktop = 'lg:col-start-9 lg:col-end-13'
+      else
+        assign video_width_desktop = 'lg:col-span-4'
+      endif
+
+      assign sizes = '(min-width: 1024px) calc(100vw / 3), 100vw'
+    when 'half'
+      assign text_width_desktop = 'lg:col-span-6'
+
+      if video_position == 'right'
+        assign video_width_desktop = 'lg:col-start-7 lg:col-end-13'
+      else
+        assign video_width_desktop = 'lg:col-span-6'
+      endif
+
+      assign sizes = '(min-width: 1024px) 50vw, 100vw'
+    when 'two_thirds'
+      assign text_width_desktop = 'lg:col-span-4'
+
+      if video_position == 'right'
+        assign video_width_desktop = 'lg:col-start-5 lg:col-end-13'
+      else
+        assign video_width_desktop = 'lg:col-span-8'
+      endif
+
+      assign sizes = '(min-width: 1024px) calc(100vw / 3 * 2), 100vw'
+  endcase
+
+  assign poster_preload = false
+  assign poster_loading = 'lazy'
+
+  if section.index == 1
+    assign poster_preload = true
+  endif
+
+  if section.index <= 3
+    assign poster_loading = 'eager'
+  endif
+-%}
+
+<section class="grid grid-flow-row-dense grid-cols-1 gap-gutter overflow-hidden border-b-gridline border-gridline-color bg-gridline-color lg:grid-cols-12">
+  <div
+    class="bg-scheme-background {{ video_width_desktop }} {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4 h-full w-full{% endunless %} {% if indent_video %}p-8 lg:p-16{% endif %}"
+    data-color-scheme="{{ video_color_scheme }}"
+  >
+    <div class="relative min-h-full">
+      {%- render 'video',
+        video: video,
+        sizes: sizes,
+        mode: section.settings.mode,
+        container_id: section.id,
+        ratio: section.settings.video_aspect_ratio,
+        poster_preload: poster_preload,
+        poster_loading: poster_loading
+      -%}
+    </div>
+  </div>
+
+  <div
+    class="{{ text_width_desktop }} relative flex bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text {{ text_position }}"
+    data-color-scheme="{{ section_color }}"
+  >
+    <div class="{{ text_align }} break-word w-full">
+      {%- if section.settings.title != blank -%}
+        <h2 class="font-heading text-heading-standard">
+          {{ section.settings.title }}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.richtext != blank -%}
+        <div class="rte {{ text_size_class }}  {% if section.settings.title != '' %}mt-4{% endif %} {{ font }}">
+          {{ section.settings.richtext }}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.cta_link != blank
+        and section.settings.cta_text != ''
+      -%}
+        <div class="mt-4 text-0">
+          {%- case section.settings.cta_style -%}
+            {%- when 'link' -%}
+              <a
+                class="theme-link inline-block text-scheme-text hover:text-scheme-accent"
+                href="{{ section.settings.cta_link }}"
+              >
+                {{- section.settings.cta_text -}}
+              </a>
+            {%- when 'button' -%}
+              <a
+                href="{{ section.settings.cta_link }}"
+                class="theme-button inline-block"
+              >
+                {{- section.settings.cta_text -}}
+              </a>
+          {%- endcase -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Video with text",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video"
+    },
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "Mode",
+      "options": [
+        {
+          "value": "preview",
+          "label": "Preview"
+        },
+        {
+          "value": "autoplay",
+          "label": "Autoplay"
+        }
+      ],
+      "default": "preview",
+      "info": "Autoplay will not play sound or show controls."
+    },
+    {
+      "type": "select",
+      "id": "video_position",
+      "label": "Video position on desktop",
+      "default": "right",
+      "options": [
+        {
+          "value": "right",
+          "label": "Right"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "video_size",
+      "label": "Video size on desktop",
+      "default": "half",
+      "options": [
+        {
+          "value": "third",
+          "label": "One third"
+        },
+        {
+          "value": "half",
+          "label": "One half"
+        },
+        {
+          "value": "two_thirds",
+          "label": "Two thirds"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "video_aspect_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        {
+          "value": "natural",
+          "label": "Natural"
+        },
+        {
+          "value": "1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "1.333",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "0.6667",
+          "label": "Portrait (2:3)"
+        },
+        {
+          "value": "1.778",
+          "label": "Widescreen (16:9)"
+        }
+      ],
+      "default": "natural"
+    },
+    {
+      "type": "checkbox",
+      "id": "indent_video",
+      "label": "Indent video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "fill_video",
+      "label": "Fit video to text",
+      "default": false,
+      "info": "This setting will crop the image on desktop"
+    },
+    {
+      "type": "color_scheme",
+      "id": "video_color_scheme",
+      "label": "Video color scheme",
+      "info": "Video color scheme is used for background color if video is indented",
+      "default": "scheme1"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "richtext",
+      "label": "Text",
+      "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "Font",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "font-body",
+          "label": "Body"
+        }
+      ],
+      "default": "font-body"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "options": [
+        {
+          "value": "text-base",
+          "label": "Body"
+        },
+        {
+          "value": "text-heading-standard",
+          "label": "Standard heading"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature heading"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary heading"
+        }
+      ],
+      "default": "text-base"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-left"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text position",
+      "options": [
+        {
+          "value": "items-start",
+          "label": "Top"
+        },
+        {
+          "value": "items-center",
+          "label": "Middle"
+        },
+        {
+          "value": "items-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "items-center"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "link",
+          "label": "Link"
+        },
+        {
+          "value": "button",
+          "label": "Button"
+        }
+      ],
+      "default": "link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video with text"
+    }
+  ]
+}
+{% endschema %}

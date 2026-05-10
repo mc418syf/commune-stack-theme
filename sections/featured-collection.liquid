@@ -1,0 +1,293 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign collection = section.settings.collection
+  assign product_limit = section.settings.grid | times: section.settings.rows
+  assign products_per_row = section.settings.grid
+  assign products_per_row_mobile = section.settings.grid_mobile | plus: 0
+  assign show_view_all = section.settings.show_view_all
+  assign enable_quick_buy = section.settings.enable_quick_buy
+  assign quick_buy_button_classes = section.settings.quick_buy_button_style
+  assign view_all_text = 'collections.general.view_all' | t
+  assign counter = 0
+  assign grid_cols = 12
+
+  case products_per_row
+    when 2
+      assign desktop_col_span = 'lg:col-span-6'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 6)'
+    when 3
+      assign desktop_col_span = 'lg:col-span-4'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 4)'
+    when 4
+      assign desktop_col_span = 'lg:col-span-3'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 3)'
+    when 5
+      assign grid_cols = 10
+      assign desktop_col_span = 'lg:col-span-2'
+      assign sizes = '(min-width: 1024px) calc(100vw / 10 * 2)'
+  endcase
+
+  case products_per_row_mobile
+    when 1
+      assign mobile_col_span = 'col-span-2'
+      assign sizes = sizes | append: ', 50vw'
+    when 2
+      assign mobile_col_span = 'col-span-1'
+      assign sizes = sizes | append: ', 100vw'
+  endcase
+
+  assign desktop_grid_class = 'lg:grid-cols-' | append: grid_cols
+-%}
+
+<section
+  class="featured-collection border-b-gridline border-gridline-color"
+  data-color-scheme="{{ section_color }}"
+>
+  {% liquid
+    if section.settings.title != ''
+      render 'section-title', title: section.settings.title, show_link: show_view_all, link_text: view_all_text, link_url: collection.url, section_color: section_color
+    endif
+  %}
+
+  <div class="bg-scheme-background">
+    <ul class="grid grid-cols-2 {{ desktop_grid_class }} gap-gutter bg-gridline-color">
+      {% for product in collection.products limit: product_limit %}
+        {% liquid
+          assign counter = counter | plus: 1
+
+          if section.index <= 3 and forloop.index <= products_per_row_mobile
+            assign loading = 'eager'
+          else
+            assign loading = 'lazy'
+          endif
+        %}
+        <li class="{{ mobile_col_span }} {{ desktop_col_span }} bg-scheme-background text-scheme-text">
+          {% if section.settings.product_tile_type == 'text_overlay' %}
+            {%- render 'product-tile-text-overlay',
+              product: product,
+              sizes: sizes,
+              loading: loading,
+              section_color: section_color,
+              products_per_row_mobile: products_per_row_mobile
+            -%}
+          {% else %}
+            {%- render 'product-tile-standard',
+              product: product,
+              sizes: sizes,
+              loading: loading,
+              section_color: section_color,
+              products_per_row_mobile: products_per_row_mobile,
+              enable_quick_buy: enable_quick_buy,
+              quick_buy_button_classes: quick_buy_button_classes
+            -%}
+          {% endif %}
+        </li>
+      {% else %}
+        {% for i in (1..product_limit) %}
+          <li class="{{ mobile_col_span }} {{ desktop_col_span }} bg-scheme-background text-scheme-text">
+            <a href="#" class="block">
+              {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+              <div class="border-b-gridline border-gridline-color {% unless settings.fill_image_to_border_edge %}}p-2 lg:p-4{% endunless %}">
+                <div>
+                  {{
+                    'product-'
+                    | append: current
+                    | placeholder_svg_tag: 'text-scheme-placeholder-foreground bg-scheme-placeholder-background fill-current'
+                  }}
+                </div>
+              </div>
+              <div class="flex justify-between p-4">
+                <p class="w-3/4">
+                  {{ 'homepage.onboarding.product_title' | t }}
+                </p>
+                <p>
+                  {% if settings.currency_code_enabled == true -%}
+                    {{- 1999 | money_with_currency -}}
+                  {%- else -%}
+                    {{- 1999 | money -}}
+                  {%- endif %}
+                </p>
+              </div>
+            </a>
+          </li>
+        {% endfor %}
+      {% endfor %}
+      {%- if collection.products.size > 0 -%}
+        {%- liquid
+          assign items_on_last_row = counter | modulo: products_per_row
+          assign col_span = grid_cols | divided_by: products_per_row
+          assign placeholder_width = products_per_row | minus: items_on_last_row | times: col_span
+          assign items_on_last_row_mobile = counter | modulo: products_per_row_mobile
+          assign col_span_mobile = 2 | divided_by: products_per_row_mobile
+          assign placeholder_width_mobile = products_per_row_mobile | minus: items_on_last_row_mobile | times: col_span_mobile
+        -%}
+        {%- if items_on_last_row != 0 -%}
+          <li
+            style="--placeholder-width: {{ placeholder_width }};"
+            class="absolute hidden bg-scheme-background lg:static lg:col-span-placeholder-width lg:block"
+            aria-hidden="true"
+            role="presentation"
+          ></li>
+        {%- endif -%}
+        {%- if items_on_last_row_mobile != 0 -%}
+          <li
+            style="--placeholder-width-mobile: {{ placeholder_width_mobile }};"
+            class="col-span-placeholder-width-mobile block bg-scheme-background lg:absolute lg:hidden"
+            aria-hidden="true"
+            role="presentation"
+          ></li>
+        {%- endif -%}
+      {%- endif -%}
+    </ul>
+  </div>
+
+  {%- render 'view-all',
+    title: section.settings.title,
+    show_link: show_view_all,
+    link_text: view_all_text,
+    link_url: collection.url,
+    section_color: section_color
+  -%}
+</section>
+
+{% if enable_quick_buy and section.settings.product_tile_type == 'standard' %}
+  {% unless request.design_mode %}
+    <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'product.js' | asset_url }}" type="module"></script>
+    {% if settings.quick_buy_variant_picker_option_style == 'drop_down' %}
+      <script
+        src="{{ 'variant-drop-down.js' | asset_url }}"
+        type="module"
+      ></script>
+    {% endif %}
+  {% endunless %}
+
+  {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured collection"
+    },
+    {
+      "id": "collection",
+      "type": "collection",
+      "label": "Collection"
+    },
+    {
+      "id": "product_tile_type",
+      "type": "select",
+      "label": "Product tile type",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text_overlay",
+          "label": "Text overlay"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "range",
+      "id": "grid",
+      "label": "Products per row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "rows",
+      "label": "Rows",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "radio",
+      "id": "grid_mobile",
+      "label": "Products per row on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show “View all” link",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Quick buy"
+    },
+    {
+      "type": "paragraph",
+      "content": "Only supported when product tile type is set to \"Standard\"."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_buy",
+      "label": "Enable quick buy"
+    },
+    {
+      "type": "select",
+      "id": "quick_buy_button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "theme-button",
+          "label": "Primary"
+        },
+        {
+          "value": "theme-button--secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "theme-button"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured collection"
+    }
+  ]
+}
+{% endschema %}

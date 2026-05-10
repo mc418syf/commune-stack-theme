@@ -1,0 +1,629 @@
+{% liquid
+  assign section_color = section.settings.color_scheme
+  assign show_title = section.settings.show_title
+  assign show_rss = section.settings.show_rss
+  assign enable_tag_filter = section.settings.enable_tag_filter
+  assign show_author = section.settings.show_author
+  assign show_date = section.settings.show_date
+  assign show_excerpt = section.settings.show_excerpt
+  assign show_tags = section.settings.show_tags
+  assign show_comments = section.settings.show_comments
+  assign show_link = section.settings.show_link
+  assign ratio = section.settings.crop | plus: 0
+%}
+
+{% paginate blog.articles by section.settings.no_posts %}
+  <section
+    class="blog border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+    data-color-scheme="{{ section_color }}"
+  >
+    {%- if show_title -%}
+      <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+        <h1 class="font-heading flex items-baseline gap-1.5 text-heading-feature{% if settings.section_title_align == 'center' %} text-center{% endif %}">
+          {{ blog.title }}
+          {% if show_rss %}
+            <a
+              class="h-4 w-4 shrink-0"
+              href="{{ shop.url }}{{ blog.url }}.atom"
+            >
+              <span class="h-full w-full">
+                {%- render 'icon-rss' -%}
+              </span>
+              <span class="sr-only">RSS</span>
+            </a>
+          {% endif %}
+        </h1>
+      </div>
+    {%- endif -%}
+
+    {% if enable_tag_filter and blog.all_tags.size > 0 %}
+      <div class="relative border-b-gridline border-gridline-color bg-scheme-background text-scheme-text">
+        <div
+          class="from-scheme-background-0 pointer-events-none absolute bottom-0 right-0 top-0 w-8 bg-gradient-to-r via-scheme-background to-scheme-background lg:hidden"
+        ></div>
+        <nav
+          class="overflow-x-auto px-section-horizontal-spacing py-section-vertical-spacing-half"
+          role="navigation"
+          aria-label="{{ 'blogs.article.tags' | t }}"
+        >
+          <ul class="flex lg:flex-wrap {% if settings.section_title_align == 'center' %}lg:justify-center{% else %}lg:justify-start{% endif %} -mx-2 whitespace-nowrap lg:-mx-4">
+            <li class="inline-block px-section-horizontal-spacing">
+              <a
+                {% unless current_tags %}
+                  aria-current="page"
+                {% endunless %}
+                class="block py-section-vertical-spacing-half"
+                href="{{ blog.url }}"
+                ><span class="border-b-text {% unless current_tags %}border-current{% else %}border-transparent{% endunless %}">
+                  {{- 'blogs.article.all_topics' | t -}}
+                </span></a
+              >
+            </li>
+            {% for tag in blog.all_tags %}
+              {% if current_tags contains tag %}
+                <li class="inline-block px-section-horizontal-spacing">
+                  <a
+                    aria-current="page"
+                    class="block py-section-vertical-spacing-half"
+                    href="{{ blog.url }}/tagged/{{ tag | handle }}"
+                    ><span class="border-b-text border-current">
+                      {{- tag -}}
+                    </span></a
+                  >
+                </li>
+              {% else %}
+                <li class="inline-block px-section-horizontal-spacing">
+                  <a
+                    class="block py-section-vertical-spacing-half"
+                    href="{{ blog.url }}/tagged/{{ tag | handle }}"
+                    ><span class="border-b-text border-transparent">
+                      {{- tag -}}
+                    </span></a
+                  >
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+
+    {%- case section.settings.layout -%}
+      {% when 'feature' %}
+        <ol>
+          {% assign counter = 0 %}
+          {% for article in blog.articles %}
+            {% capture cycle %}{% cycle 'odd', 'even' %}{% endcapture %}
+
+            {%- liquid
+              assign alternate = false
+
+              if cycle == 'odd' and section.settings.desktop_image_position == 'alternate'
+                assign alternate = true
+              endif
+
+              case section.settings.feature_image_width
+                when 'one-third'
+                  assign content_width_desktop = 'lg:col-span-8'
+                  assign desktop_sizes = 'calc(100vw / 3)'
+
+                  if section.settings.desktop_image_position == 'right' or alternate
+                    assign image_width_desktop = 'lg:col-start-9 lg:col-end-13'
+                  else
+                    assign image_width_desktop = 'lg:col-span-4'
+                  endif
+                when 'one-half'
+                  assign content_width_desktop = 'lg:col-span-6'
+                  assign desktop_sizes = 'calc(50vw)'
+
+                  if section.settings.desktop_image_position == 'right' or alternate
+                    assign image_width_desktop = 'lg:col-start-7 lg:col-end-13'
+                  else
+                    assign image_width_desktop = 'lg:col-span-6'
+                  endif
+                when 'three-fifths'
+                  assign content_width_desktop = 'lg:col-span-5'
+                  assign desktop_sizes = 'calc((100vw / 5) * 3)'
+
+                  if section.settings.desktop_image_position == 'right' or alternate
+                    assign image_width_desktop = 'lg:col-start-6 lg:col-end-13'
+                  else
+                    assign image_width_desktop = 'lg:col-span-7'
+                  endif
+                when 'two-thirds'
+                  assign content_width_desktop = 'lg:col-span-4'
+                  assign desktop_sizes = 'calc((100vw / 3) * 2)'
+
+                  if section.settings.desktop_image_position == 'right' or alternate
+                    assign image_width_desktop = 'lg:col-start-5 lg:col-end-13'
+                  else
+                    assign image_width_desktop = 'lg:col-span-8'
+                  endif
+              endcase
+
+              assign sizes = '(min-width: 1024px) ' | append: desktop_sizes | append: ', 100vw'
+
+              assign counter = counter | plus: 1
+
+              assign preload = false
+              assign loading = 'lazy'
+
+              if forloop.first
+                if section.index == 1
+                  assign preload = true
+                endif
+
+                if section.index <= 3
+                  assign loading = 'eager'
+                endif
+              endif
+            -%}
+
+            <li class="relative grid grid-flow-row-dense gap-gutter overflow-hidden bg-gridline-color lg:grid-cols-12 group{% unless forloop.first %} border-t-gridline border-gridline-color{% endunless %}">
+              <a
+                class="absolute inset-0 z-10"
+                href="{{ article.url }}"
+                ><span class="sr-only">
+                  {{-
+                    'blogs.article.read_more_title'
+                    | t: title: article.title
+                  -}}
+                </span></a
+              >
+              {%- if article.image != blank -%}
+                <div class="{{ image_width_desktop }} full-h relative bg-scheme-background {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4 flex items-center{% endunless %}">
+                  {% render 'image-crop',
+                    image: article.image,
+                    sizes: sizes,
+                    preload: preload,
+                    loading: loading,
+                    ratio: ratio,
+                    crop: section.settings.crop
+                  %}
+                </div>
+              {%- endif -%}
+              <div class="{{ content_width_desktop }} bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text lg:flex  {{ section.settings.feature_content_position }}  {% if article.image == blank %}col-span-2{% endif %}  overflow-hidden">
+                <div class="lg:w-2/3">
+                  <h2 class="font-heading break-word text-heading-standard">
+                    {{ article.title }}
+                  </h2>
+
+                  {%- if show_author -%}
+                    <p class="mt-2">
+                      {{
+                        'blogs.article.by_author'
+                        | t: author: article.author
+                      }}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if show_date -%}
+                    <p class="mt-2">
+                      {{
+                        article.published_at
+                        | time_tag: format: 'month_day_year'
+                      }}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if show_excerpt -%}
+                    <div class="rte mt-4">
+                      {%- if article.excerpt.size > 0 %}
+                        {{ article.excerpt }}
+                      {%- else -%}
+                        {{ article.content | strip_html | truncate: 150 }}
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+
+                  {% if article.tags.size > 0 and show_tags %}
+                    <div class="mt-4">
+                      <ul
+                        class="m-0 -mx-1 p-0"
+                        aria-label="{{ 'blogs.article.tags' | t }}"
+                      >
+                        {% for tag in article.tags %}
+                          <li class="inline-block px-1">
+                            <a
+                              href="{{ blog.url }}/tagged/{{ tag | handle }}"
+                              class="article__grid-tag"
+                              >#{{ tag -}}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+
+                  {% if show_comments %}
+                    <ul class="mt-4">
+                      {% if blog.comments_enabled?
+                        and article.comments_count > 0
+                      %}
+                        <li>
+                          <a href="{{ article.url }}#comments">
+                            {{
+                              'blogs.comments.comments_with_count'
+                              | t: count: article.comments_count
+                            }}
+                          </a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  {% endif %}
+
+                  {% if show_link %}
+                    <div class="mt-4">
+                      <span
+                        class="theme-link group-hover:text-scheme-accent"
+                        href="{{ article.url }}"
+                        aria-label="{{ 'blogs.article.read_more_title' | t: title: article.title }}"
+                      >
+                        {{- 'blogs.article.read_more' | t }}
+                      </span>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ol>
+      {% when 'grid' %}
+        <ol class="grid grid-cols-1 gap-gutter bg-gridline-color lg:grid-cols-3">
+          {%- liquid
+            assign counter = 0
+            assign sizes = '(min-width: 1024px) calc(100vw / 3), 100vw'
+          -%}
+          {% for article in blog.articles %}
+            {%- liquid
+              assign counter = counter | plus: 1
+
+              assign preload = false
+              assign loading = 'lazy'
+
+              if forloop.first
+                if section.index == 1
+                  assign preload = true
+                endif
+
+                if section.index <= 3
+                  assign loading = 'eager'
+                endif
+              endif
+            -%}
+            <li class="group relative bg-scheme-background text-scheme-text">
+              <a class="absolute inset-0 z-10" href="{{ article.url }}"
+                ><span class="sr-only">
+                  {{-
+                    'blogs.article.read_more_title'
+                    | t: title: article.title
+                  -}}
+                </span></a
+              >
+              <div class="block h-full">
+                {%- if article.image != blank -%}
+                  <div class="full-h bg-scheme-background {% if settings.fill_image_to_border_edge %}border-b-gridline border-gridline-color{% else %}pt-2 px-section-horizontal-spacing lg:pt-4{% endif %}">
+                    <div class="relative">
+                      {%
+                        render 'image-crop' with
+                        image: article.image,
+                        sizes: sizes,
+                        preload: preload,
+                        loading: loading,
+                        ratio: ratio,
+                        crop: section.settings.crop
+                      %}
+                    </div>
+                  </div>
+                {%- endif -%}
+
+                <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+                  <h2 class="font-heading break-word text-heading-secondary">
+                    {{ article.title }}
+                  </h2>
+
+                  {%- if show_author -%}
+                    <p class="mt-2">
+                      {{
+                        'blogs.article.by_author'
+                        | t: author: article.author
+                      }}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if show_date -%}
+                    <p class="mt-2">
+                      {{
+                        article.published_at
+                        | time_tag: format: 'month_day_year'
+                      }}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if show_excerpt -%}
+                    <div class="rte mt-4">
+                      {%- if article.excerpt.size > 0 %}
+                        {{ article.excerpt }}
+                      {%- else -%}
+                        {{ article.content | strip_html | truncate: 150 }}
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+
+                  {% if article.tags.size > 0 and show_tags %}
+                    <div class="mt-4">
+                      <ul
+                        class="m-0 -mx-1 p-0"
+                        aria-label="{{ 'blogs.article.tags' | t }}"
+                      >
+                        {% for tag in article.tags %}
+                          <li class="inline-block px-1">
+                            <a
+                              href="{{ blog.url }}/tagged/{{ tag | handle }}"
+                              class="article__grid-tag"
+                              >#{{ tag -}}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+
+                  {% if show_comments %}
+                    <ul class="mt-4">
+                      {% if blog.comments_enabled?
+                        and article.comments_count > 0
+                      %}
+                        <li>
+                          <a href="{{ article.url }}#comments">
+                            {{
+                              'blogs.comments.comments_with_count'
+                              | t: count: article.comments_count
+                            }}
+                          </a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  {% endif %}
+
+                  {% if show_link %}
+                    <div class="mt-4">
+                      <span
+                        class="theme-link group-hover:text-scheme-accent"
+                        href="{{ article.url }}"
+                        aria-label="{{ 'blogs.article.read_more_title' | t: title: article.title }}"
+                      >
+                        {{- 'blogs.article.read_more' | t }}
+                      </span>
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+          {%- assign items_on_last_row = counter | modulo: 3 -%}
+          {%- assign placeholder_width = 3 | minus: items_on_last_row -%}
+          {%- if items_on_last_row != 0 -%}
+            <li
+              style="--placeholder-width: {{ placeholder_width }};"
+              class="none absolute bg-scheme-background lg:static lg:col-span-placeholder-width lg:block"
+              aria-hidden="true"
+              role="presentation"
+            ></li>
+          {%- endif -%}
+        </ol>
+    {% endcase %}
+
+    {% if paginate.pages > 1 %}
+      {% render 'pagination' with paginate: paginate, section_color: section_color %}
+    {% endif %}
+  </section>
+{% endpaginate %}
+
+{%- if section.settings.override_header_footer_color_scheme -%}
+  {%- render 'header-footer-color-scheme-override',
+    section_color: section_color
+  -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Blog pages",
+  "class": "blog-template",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "feature",
+          "label": "Feature"
+        },
+        {
+          "value": "grid",
+          "label": "Grid"
+        }
+      ],
+      "default": "feature"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rss",
+      "label": "Show RSS icon",
+      "default": false,
+      "info": "If title is hidden RSS link will also be hidden"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_tag_filter",
+      "label": "Enable filtering by tag",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Feature layout"
+    },
+    {
+      "type": "select",
+      "id": "feature_content_position",
+      "label": "Content position",
+      "options": [
+        {
+          "value": "lg:items-top",
+          "label": "Top"
+        },
+        {
+          "value": "lg:items-center",
+          "label": "Middle"
+        },
+        {
+          "value": "lg:items-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "lg:items-center"
+    },
+    {
+      "type": "select",
+      "id": "feature_image_width",
+      "label": "Desktop image width",
+      "options": [
+        {
+          "value": "one-third",
+          "label": "One third"
+        },
+        {
+          "value": "one-half",
+          "label": "One half"
+        },
+        {
+          "value": "three-fifths",
+          "label": "Three fifths"
+        },
+        {
+          "value": "two-thirds",
+          "label": "Two thirds"
+        }
+      ],
+      "default": "one-half"
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_position",
+      "label": "Desktop image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        },
+        {
+          "value": "alternate",
+          "label": "Alternate"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "header",
+      "content": "Articles"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show excerpt",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show tags",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_comments",
+      "label": "Show comments",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_link",
+      "label": "Show read more link",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "crop",
+      "label": "Crop images",
+      "options": [
+        {
+          "value": "0",
+          "label": "No crop"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "no_posts",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "label": "No of posts per page",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_header_footer_color_scheme",
+      "label": "Use this color scheme for header and footer",
+      "info": "This will only apply to the blog template",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

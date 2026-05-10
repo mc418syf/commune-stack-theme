@@ -1,0 +1,74 @@
+<div
+  class="collapsible-tab mt-8"
+  {{ block.shopify_attributes }}
+>
+  <div
+    class="{% if tab_counter == 0 %}border-t-gridline {% endif %}-mx-2 border-b-gridline border-gridline-color px-section-horizontal-spacing py-2 lg:-mx-4"
+    x-data="{ open: false }"
+  >
+    <h2
+      {% unless block.settings.heading_text_style == 'heading' %}
+        class="text-base"
+      {% endunless %}
+    >
+      <button
+        @click="open = !open"
+        class="{{ block.settings.heading_text_style }} flex w-full cursor-pointer items-center justify-between text-left"
+        type="button"
+        :aria-expanded="open ? true : 'false'"
+      >
+        <div class="flex items-center justify-start">
+          {% if block.settings.icon != 'none' -%}
+            <div class="mr-2 flex h-6 w-6 shrink-0 items-center">
+              {%- render 'product-icon', icon: block.settings.icon -%}
+            </div>
+          {%- endif %}
+          <div
+            class="flex items-center text-base"
+          >
+            {{ block.settings.heading }}
+          </div>
+        </div>
+        {%- if settings.accordion_icon == 'plus_minus' -%}
+          <div class="inline-block h-6 w-6 shrink-0" x-show="!open">
+            {%- render 'icon-plus' -%}
+          </div>
+          <div
+            class="inline-block h-6 w-6 shrink-0"
+            x-show="open"
+            style="display: none;"
+          >
+            {%- render 'icon-minus' -%}
+          </div>
+        {%- else -%}
+          <div class="flex h-6 w-6 shrink-0 items-center" x-show="!open">
+            {%- render 'icon-chevron-down' -%}
+          </div>
+          <div
+            class="flex h-6 w-6 shrink-0 items-center"
+            x-show="open"
+            style="display: none;"
+          >
+            {%- render 'icon-chevron-up' -%}
+          </div>
+        {%- endif -%}
+      </button>
+    </h2>
+    <div
+      class="rte py-4"
+      x-show="open"
+      style="display: none;"
+      id="{{ block.id }}"
+    >
+      {{ block.settings.content }}
+      {{ block.settings.page.content }}
+    </div>
+  </div>
+  <noscript>
+    <div class="rte mt-8">
+      <h2 class="text-heading-standard"></h2>
+      {{ block.settings.content }}
+      {{ block.settings.page.content }}
+    </div>
+  </noscript>
+</div>

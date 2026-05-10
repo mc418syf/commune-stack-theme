@@ -1,0 +1,60 @@
+/* Commune237 Stack — minimal styles that can't be done with Tailwind alone */
+
+.commune-stack-thumb {
+  width: 72px;
+  height: 96px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* "Add to Stack" button that appears on tile hover */
+.commune-stack-tile-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.group:hover .commune-stack-tile-btn,
+.commune-stack-tile-btn:focus {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* "Added" state */
+.commune-stack-tile-btn[data-in-stack="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+
+/* Stack badge on nav */
+.commune-stack-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 9px;
+  font-size: 10px;
+  line-height: 1;
+  margin-left: 4px;
+}

@@ -1,0 +1,41 @@
+{% liquid
+  assign modal_id = 'image-zoom-' | append: section.id
+  assign zoom_section_url = product.url | append: '?section_id=main-product-zoom'
+%}
+<div
+  x-data
+  x-init="initTeleport($root)"
+  x-cloak
+>
+  <template data-should-teleport="#modal-slot">
+    <template x-if="$store.modals.modal.contents === '{{ modal_id }}'">
+      <div class="bg-scheme-background text-scheme-text">
+        <button
+          @click.prevent="$store.modals.close('{{ modal_id }}')"
+          type="button"
+          class="absolute right-2 top-2 ml-auto block w-8 p-1"
+        >
+          <span class="sr-only">
+            {{- 'general.accessibility.close_modal' | t -}}
+          </span>
+          <span class="inline-block h-6 w-6">
+            {%- render 'icon-close' -%}
+          </span>
+        </button>
+        <div
+          id="{{ modal_id }}"
+          data-modal-label="{{ product.title }}, {{ 'products.product.media' | t }}"
+          x-html="
+            $fetchedFragment(
+              '{{ zoom_section_url }}',
+              '.product-zoom'
+            )
+          "
+        ></div>
+      </div>
+    </template>
+  </template>
+</div>
+{% unless request.design_mode %}
+  <script src="{{ 'zoom.js' | asset_url }}" type="module"></script>
+{% endunless %}

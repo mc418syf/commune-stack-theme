@@ -1,0 +1,206 @@
+{% schema %}
+{
+  "name": "Brand List",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand List Section Settings"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Our Brands"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Brand Text Color",
+      "default": "rgb(0,0,0)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand_images",
+      "label": "Show Brand Logos",
+      "default": false
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "Default",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+
+<section class="brand-list-wrapper">
+  <h1 class="brand-section-title">{{ settings.section_title }}</h1>
+
+  {% assign vendors = shop.vendors | sort %}
+  {% assign alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+
+  {%- comment -%}
+  先计算有哪些首字母（去重、排序），非 A-Z 皆归入 '#'
+  {%- endcomment -%}
+  {% assign letters = "" %}
+  {% for vendor in vendors %}
+    {% assign trimmed = vendor | strip %}
+    {% if trimmed != blank %}
+      {% assign first = trimmed | slice: 0, 1 | upcase %}
+      {% if alpha contains first %}
+        {% assign letter = first %}
+      {% else %}
+        {% assign letter = "#" %}
+      {% endif %}
+      {% unless letters contains letter %}
+        {% if letters == "" %}
+          {% assign letters = letter %}
+        {% else %}
+          {% assign letters = letters | append: "," | append: letter %}
+        {% endif %}
+      {% endunless %}
+    {% endif %}
+  {% endfor %}
+  {% assign letters_array = letters | split: "," | sort %}
+
+  <div class="brand-groups">
+    {% for l in letters_array %}
+      <div class="brand-group" id="group-{{ l }}">
+        <!-- 左侧大字母（组标题）-->
+        <div class="group-letter" aria-hidden="true">{{ l }}</div>
+
+        <!-- 右侧：该组品牌，两列 -->
+        <div class="group-grid">
+          {% for vendor in vendors %}
+            {% assign trimmed = vendor | strip %}
+            {% if trimmed != blank %}
+              {% assign first = trimmed | slice: 0, 1 | upcase %}
+              {% if alpha contains first %}
+                {% assign data_letter = first %}
+              {% else %}
+                {% assign data_letter = "#" %}
+              {% endif %}
+
+              {% if data_letter == l %}
+                <div class="brand-item">
+                  <a href="/collections/vendors?q={{ vendor | url_encode }}" class="brand-link" style="color: {{ settings.brand_color }}">
+                    <span class="brand-name">{{ vendor }}</span>
+                    {% if settings.show_brand_images %}
+                      <div class="brand-image" aria-hidden="true">
+                        <img src="{{ 'vendor_logos/' | append: vendor | append: '.jpg' | asset_url }}" alt="{{ vendor }} logo" loading="lazy">
+                      </div>
+                    {% endif %}
+                  </a>
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+  /* 强制品牌行显示手形指针并允许 pointer events（最直接的 override） */
+.brand-link,
+.brand-link * {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* 如果存在用于禁用链接的 aria-disabled / disabled 样式，可覆盖为可点击（谨慎使用） */
+.brand-link[aria-disabled="true"],
+.brand-link[disabled] {
+  cursor: pointer !important;
+  opacity: 1 !important;          /* 视需要移除禁用样式外观 */
+  pointer-events: auto !important;
+}
+
+/* ---------- 容器 ---------- */
+.brand-list-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  overflow: visible !important;
+}
+.brand-section-title {
+  font-size: 34px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.4px;
+}
+
+/* 每组为一行：左侧大字母 + 右侧品牌区域 */
+.brand-group {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+/* 左侧组字母（大字）*/
+.group-letter {
+  flex: 0 0 96px;       /* 固定左侧宽度，可调整 */
+  font-size: 56px;
+  font-weight: 600;
+  color:rgb(0, 0, 0);
+  line-height: 1;
+  letter-spacing: 2px;
+  text-align: left;
+}
+
+/* 右侧品牌区域（两列）*/
+.group-grid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 两列 */
+  gap: 18px 56px;                 /* 行间距 / 列间距 */
+  align-items: start;
+}
+
+/* 单个品牌项（右对齐品牌文字）*/
+.brand-item { width: 100%; }
+.brand-link { display: block; text-decoration: none; color:rgb(0, 0, 0) ; text-align: left; }
+.brand-name {
+  display: block;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.02;
+  font-size: 28px;
+  padding: 6px 0;
+  color: rgb(0, 0, 0);
+}
+
+/* logo（若启用）在品牌项右侧显示 */
+.brand-image { margin-top: 6px; max-height: 48px; display:flex; align-items:center; justify-content:flex-end; }
+.brand-image img { max-height:48px; width:auto; display:inline-block; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .brand-list-wrapper { padding: 1.5rem 12px; }
+  .brand-group {
+    display: block;               /* 窄屏回退为堆叠：字母在上，品牌在下 */
+    margin-bottom: 1.75rem;
+  }
+  .group-letter { font-size: 36px; margin-bottom: 0.5rem; flex: none; }
+  .group-grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); gap: 14px 18px; }
+  .brand-section-title { font-size: 26px; margin-bottom: 1rem; }
+  .brand-name { font-size: 20px; }
+  .brand-link { text-align: left; }
+  .brand-image { justify-content: flex-end; }
+}
+
+@media (max-width: 480px) {
+  .group-grid { grid-template-columns: 1fr; gap: 12px; }
+  .group-letter { font-size: 28px; }
+  .brand-name { font-size: 18px; }
+}
+
+/* 保证不会被父元素裁剪 */
+.brand-list-wrapper, .brand-groups { overflow: visible !important; }
+</style>

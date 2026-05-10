@@ -1,0 +1,65 @@
+{%- liquid
+  unless heading_font
+    assign heading_font = 'font-body'
+  endunless
+
+  if heading_font == 'font-heading'
+    if heading_font_size != blank
+      assign heading_font_size = heading_font_size
+    else
+      assign heading_font_size = 'text-heading-secondary'
+    endif
+  endif
+
+  unless tag
+    assign tag = 'div'
+  endunless
+-%}
+
+<{{ tag }}
+  x-data="{ expanded: false }"
+  class="border-b-gridline border-gridline-color px-section-horizontal-spacing{% if last_in_loop %} -mb-gridline{% endif %}"
+>
+  <h2 class="{{ heading_font }} {{ heading_font_size }} break-word">
+    <button
+      type="button"
+      @click="expanded = ! expanded"
+      aria-controls="expanded-{{ id }}"
+      :aria-expanded="expanded ? true : 'false'"
+      class="break-word flex w-full cursor-pointer items-center justify-between py-4 text-left"
+    >
+      <div class="break-word flex items-center">
+        {{- title | strip -}}
+      </div>
+      {%- if settings.accordion_icon == 'plus_minus' -%}
+        <div class="flex h-6 w-6 shrink-0 items-center" x-show="!expanded">
+          {% render 'icon-plus' %}
+        </div>
+        <div
+          class="flex h-6 w-6 shrink-0 items-center"
+          x-show="expanded"
+          style="display: none;"
+        >
+          {%- render 'icon-minus' -%}
+        </div>
+      {%- else -%}
+        <div
+          class="ease-gentle flex h-6 w-6 shrink-0 rotate-0 items-center transition-transform duration-[280ms]"
+          :class="{ 'rotate-180' : expanded, 'rotate-0' : ! expanded }"
+        >
+          {%- render 'icon-chevron-down' -%}
+        </div>
+      {%- endif -%}
+    </button>
+  </h2>
+  <div
+    id="expanded-{{ id }}"
+    x-show="expanded"
+    x-collapse
+    x-cloak
+  >
+    <div class="rte richtext break-word pb-theme text-base {{ expanded_content_max_width }}">
+      {{ expanded_content }}
+    </div>
+  </div>
+</{{ tag }}>

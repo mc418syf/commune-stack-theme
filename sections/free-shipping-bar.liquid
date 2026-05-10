@@ -1,0 +1,369 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign display = section.settings.display
+
+  comment
+    Threshold
+  endcomment
+
+  for threshold_rule in localization.market.metafields.switch.free_shipping_threshold.value
+    unless threshold_rule contains ':'
+      assign market_threshold = threshold_rule | strip
+    else
+      assign country_code = threshold_rule | split: ':' | first | strip
+
+      if localization.country.iso_code == country_code
+        assign country_threshold = threshold_rule | split: ':' | last | strip
+        break
+      endif
+    endunless
+  endfor
+
+  unless country_threshold == blank and market_threshold == blank
+    assign threshold = country_threshold | default: market_threshold | times: 100
+  else
+    assign threshold = settings.free_shipping_threshold | times: 100
+  endunless
+
+  comment
+    Subtotal
+  endcomment
+
+  assign subtotal = cart.items_subtotal_price
+
+  if subtotal < threshold
+    assign amount = threshold | minus: subtotal | money
+    if cart.item_count > 0
+      assign content_html = 'free_shipping_progress.not_achieved_html' | t: amount: amount
+    else
+      assign content_html = 'free_shipping_progress.not_started_html' | t: amount: amount
+    endif
+  else
+    assign content_html = 'free_shipping_progress.achieved' | t
+  endif
+-%}
+
+{% if threshold != 0 and threshold != blank %}
+  {%- capture content -%}
+    <span data-content x-html-if-set="contentHTML">{{ content_html }}</span>
+  {%- endcapture -%}
+
+  {%- if display == 'static' -%}
+    <section
+      id="{{ section.id }}"
+      class="border-b-gridline border-gridline-color bg-scheme-background py-2 text-center text-scheme-text"
+      role="complementary"
+      data-color-scheme="{{ section_color }}"
+      x-data="FreeShippingBar"
+    >
+      <p class="px-section-horizontal-spacing">{{ content }}</p>
+    </section>
+  {%- else -%}
+    <section
+      id="{{ section.id }}"
+      class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+      role="complementary"
+      data-color-scheme="{{ section_color }}"
+      x-data="FreeShippingBar"
+    >
+      {%- liquid
+        assign speed_setting = section.settings.speed | plus: 0
+        assign direction = section.settings.direction
+        assign repeat_text = section.settings.repeat_text
+        assign separator = section.settings.separator
+        assign separator_repeats = section.settings.separator_repeats
+        assign spacing_between_repeated_separators = section.settings.spacing_between_repeated_separators
+
+        render 'scrolling-text', id: section.id, speed_setting: speed_setting, text: content, section_color: section_color, direction: direction, repeat_text: repeat_text, separator: separator, separator_repeats: separator_repeats, spacing_between_repeated_separators: spacing_between_repeated_separators
+      -%}
+    </section>
+  {%- endif -%}
+
+  {% unless request.design_mode %}
+    <script
+      src="{{ 'free-shipping-bar.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% endunless %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Free shipping bar",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Configure the threshold in Theme Settings > Cart > Free shipping threshold. If the market is configured to have free shipping progress disabled, this section won’t show."
+    },
+    {
+      "type": "radio",
+      "id": "display",
+      "label": "Display",
+      "options": [
+        {
+          "value": "scrolling-text",
+          "label": "Scrolling text"
+        },
+        {
+          "value": "static",
+          "label": "Static"
+        }
+      ],
+      "default": "static"
+    },
+    {
+      "type": "header",
+      "content": "Scrolling text"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 20,
+      "max": 400,
+      "step": 10,
+      "label": "Speed",
+      "default": 180
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Right to left"
+        },
+        {
+          "value": "reverse",
+          "label": "Left to right"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "checkbox",
+      "id": "repeat_text",
+      "default": true,
+      "label": "Repeat text",
+      "info": "Automatically repeat text to create an infinity effect."
+    },
+    {
+      "type": "select",
+      "id": "separator",
+      "label": "Separator",
+      "info": "Symbol to separate repeats",
+      "options": [
+        {
+          "label": "None",
+          "value": "none"
+        },
+        {
+          "label": "·",
+          "value": "&middot;"
+        },
+        {
+          "label": "•",
+          "value": "&bullet;"
+        },
+        {
+          "label": "↑",
+          "value": "&uarr;"
+        },
+        {
+          "label": "→",
+          "value": "&rarr;"
+        },
+        {
+          "label": "↓",
+          "value": "&darr;"
+        },
+        {
+          "label": "←",
+          "value": "&larr;"
+        },
+        {
+          "label": "<",
+          "value": "&lt;"
+        },
+        {
+          "label": ">",
+          "value": "&gt;"
+        },
+        {
+          "label": "^",
+          "value": "^"
+        },
+        {
+          "label": "!",
+          "value": "!"
+        },
+        {
+          "label": "¡",
+          "value": "¡"
+        },
+        {
+          "label": "?",
+          "value": "?"
+        },
+        {
+          "label": "/",
+          "value": "/"
+        },
+        {
+          "label": "|",
+          "value": "|"
+        },
+        {
+          "label": "\\",
+          "value": "\\"
+        },
+        {
+          "label": ":",
+          "value": ":"
+        },
+        {
+          "label": "∞",
+          "value": "&infin;"
+        },
+        {
+          "label": "§",
+          "value": "&sect;"
+        },
+        {
+          "label": "#",
+          "value": "&num;"
+        },
+        {
+          "label": "%",
+          "value": "%"
+        },
+        {
+          "label": "@",
+          "value": "@"
+        },
+        {
+          "label": "№",
+          "value": "&numero;"
+        },
+        {
+          "label": "×",
+          "value": "&times;"
+        },
+        {
+          "label": "÷",
+          "value": "&divide;"
+        },
+        {
+          "label": "+",
+          "value": "&plus;"
+        },
+        {
+          "label": "−",
+          "value": "&minus;"
+        },
+        {
+          "label": "=",
+          "value": "&equals;"
+        },
+        {
+          "label": "~",
+          "value": "&tilde;"
+        },
+        {
+          "label": "–",
+          "value": "&ndash;"
+        },
+        {
+          "label": "—",
+          "value": "&mdash;"
+        },
+        {
+          "label": "&",
+          "value": "&amp;"
+        },
+        {
+          "label": "*",
+          "value": "&ast;"
+        },
+        {
+          "label": "✓",
+          "value": "&check;"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "separator_repeats",
+      "label": "Repeat separator",
+      "min": 1,
+      "max": 6,
+      "unit": "x",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "spacing_between_repeated_separators",
+      "label": "Spacing between repeated separators",
+      "options": [
+        {
+          "label": "None",
+          "value": ""
+        },
+        {
+          "label": "Hair",
+          "value": "&hairsp;"
+        },
+        {
+          "label": "Thin",
+          "value": "&thinsp;"
+        },
+        {
+          "label": "Punctuation",
+          "value": "&puncsp;"
+        },
+        {
+          "label": "4-per-em",
+          "value": "&emsp14;"
+        },
+        {
+          "label": "3-per-em",
+          "value": "&emsp13;"
+        },
+        {
+          "label": "Figure",
+          "value": "&numsp;"
+        },
+        {
+          "label": "En",
+          "value": "&ensp;"
+        },
+        {
+          "label": "Em",
+          "value": "&emsp;"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Free shipping bar"
+    }
+  ],
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

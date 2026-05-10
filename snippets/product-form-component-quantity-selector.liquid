@@ -1,0 +1,40 @@
+<div
+  class="product-quantity-block mt-8"
+  {% if block %}
+    {{- block.shopify_attributes -}}
+  {% endif %}
+>
+  <label class="{{ label_class }}" for="Quantity">
+    {{- 'products.product.quantity' | t }}:</label
+  >
+  <div x-data="Quantity" class="-mx-2 mt-2 flex items-center">
+    <button
+      type="button"
+      class="h-7 w-7 fill-current p-2"
+      @click="decrement"
+      aria-label="'{ 'general.accessibility.decrement_one' | t }}"
+    >
+      {% render 'icon-minus' %}
+    </button>
+    <input
+      form="{{ product_form_id }}"
+      class="w-10 appearance-none border-b-text border-scheme-text bg-transparent p-2 text-center"
+      type="number"
+      id="Quantity"
+      name="quantity"
+      value="1"
+      min="1"
+      step="1"
+      x-ref="quantityInput"
+      x-model.number.fill="quantity"
+    >
+    <button
+      type="button"
+      class="h-7 w-7 fill-current p-2"
+      @click="increment"
+      aria-label="{{ 'general.accessibility.increment_one' | t }}"
+    >
+      {% render 'icon-plus' %}
+    </button>
+  </div>
+</div>

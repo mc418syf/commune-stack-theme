@@ -1,0 +1,95 @@
+{%- liquid
+  unless price_text_size
+    if settings.desktop_feature_heading_scale > 4
+      assign price_text_size = 'text-heading-standard'
+    else
+      assign price_text_size = 'text-base'
+    endif
+  endunless
+
+  if price_text_size contains 'heading'
+    assign price_font_class = 'font-heading'
+  else
+    assign price_font_class = 'font-body'
+  endif
+
+  unless margin_classes
+    assign margin_classes = 'mt-8'
+  endunless
+
+  unless current_variant
+    assign current_variant = product.selected_or_first_available_variant
+  endunless
+-%}
+
+<div
+  class="product-price-block {{ margin_classes }} {{ price_font_class }} {{ price_text_size }}"
+  :class="{ 'invisible': !currentVariant }"
+  {% if block %}
+    {{ block.shopify_attributes }}
+  {% endif %}
+>
+  <span class="sr-only">
+    {{- 'products.product.regular_price' | t -}}
+  </span>
+  <span
+    x-html="formatMoney(currentPrice)"
+    :class="{ 'text-scheme-accent': currentVariant && product.compare_at_price_max && currentVariant.compare_at_price > currentVariant.price, 'invisible': !currentVariant }"
+  >
+    {{ current_variant.price | money }}
+  </span>
+
+  {% if product.compare_at_price_max > product.price %}
+    <template x-if="currentVariant && product.compare_at_price_max && currentVariant.compare_at_price > currentVariant.price">
+      <span>
+        <span class="sr-only">
+          {{- 'products.product.sale_price' | t -}}
+        </span>
+        <s
+          x-html="formatMoney(currentVariant.compare_at_price)"
+        >
+          {% if current_variant.compare_at_price > current_variant.price %}
+            {{ current_variant.compare_at_price | money }}
+          {% endif %}
+        </s>
+      </span>
+    </template>
+  {% endif %}
+
+  <template x-if="currentVariant && currentVariant.unit_price">
+    <div class="font-body text-sm">
+      <span class="sr-only">
+        {{- 'products.product.unit_price_label' | t -}}
+      </span>
+      <span x-html="formatMoney(currentVariant.unit_price)">
+        {{- current_variant.unit_price | money -}}
+      </span>
+      <span aria-hidden="true"> / </span>
+      <span class="sr-only">
+        {{- 'general.accessibility.unit_price_separator' | t -}}
+      </span>
+      <span x-html="currentVariant.unit_price_measurement.reference_value != 1? currentVariant.unit_price_measurement.reference_value :''">
+        {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+          {{- current_variant.unit_price_measurement.reference_value -}}
+        {%- endif -%}
+      </span>
+      <span x-html="currentVariant.unit_price_measurement.reference_unit">
+        {{- current_variant.unit_price_measurement.reference_unit -}}
+      </span>
+    </div>
+  </template>
+
+  {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
+    <div class="font-body mt-2 text-sm">
+      {%- if cart.taxes_included -%}
+        {{ 'products.product.include_taxes' | t }}
+      {%- endif -%}
+      {%- if shop.shipping_policy.body != blank -%}
+        {{
+          'products.product.shipping_policy_html'
+          | t: link: shop.shipping_policy.url
+        }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>

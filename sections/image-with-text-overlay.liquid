@@ -1,0 +1,260 @@
+{%- liquid
+  assign height = section.settings.height
+  assign content_position = section.settings.content_position
+  assign content_width_desktop = section.settings.content_width_desktop
+  assign color_scheme = section.settings.color_scheme
+  assign image = section.settings.image
+  assign image_mobile = section.settings.image_mobile
+  assign indent_image = section.settings.indent_image
+  assign heading_size_class = section.settings.heading_size
+  assign title = section.settings.title
+  assign text = section.settings.text
+  assign cta_link = section.settings.cta_link
+  assign cta_text = section.settings.cta_text
+  assign cta_style = section.settings.cta_style
+  assign scheme_text_color_only = section.settings.scheme_text_color_only
+  assign indent_image_mobile = section.settings.indent_image_mobile
+
+  if scheme_text_color_only
+    assign section_color_scheme = 'scheme1'
+  else
+    assign section_color_scheme = color_scheme
+  endif
+
+  if section.index == 1
+    assign preload = true
+  else
+    assign preload = false
+  endif
+-%}
+
+<section>
+  {%- render 'image-with-text-overlay',
+    height: height,
+    image: image,
+    image_mobile: image_mobile,
+    preload: preload,
+    indent_image: indent_image,
+    indent_image_mobile: section.settings.indent_image_mobile,
+    content_position: content_position,
+    heading_size_class: heading_size_class,
+    section_color_scheme: section_color_scheme,
+    color_scheme: color_scheme,
+    scheme_text_color_only: scheme_text_color_only,
+    content_width_desktop: content_width_desktop,
+    title: title,
+    text: text,
+    cta_link: cta_link,
+    cta_text: cta_text,
+    cta_style: cta_style
+  -%}
+</section>
+
+{% schema %}
+{
+  "name": "Image with text overlay",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "id": "image",
+      "type": "image_picker",
+      "label": "Image",
+      "info": "1800 x 800px .jpg recommended"
+    },
+    {
+      "id": "image_mobile",
+      "type": "image_picker",
+      "label": "Mobile image",
+      "info": "800 x 1200px .jpg recommended"
+    },
+    {
+      "type": "checkbox",
+      "id": "indent_image",
+      "label": "Indent image on desktop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "indent_image_mobile",
+      "label": "Indent image on mobile",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        {
+          "value": "natural",
+          "label": "Natural"
+        },
+        {
+          "value": "full_screen",
+          "label": "Full screen"
+        }
+      ],
+      "default": "natural"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Image with text overlay"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "text-heading-standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "text-heading-feature"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "justify-start items-start text-left",
+          "label": "Top left"
+        },
+        {
+          "value": "justify-center items-start text-center",
+          "label": "Top center"
+        },
+        {
+          "value": "justify-end items-start text-right",
+          "label": "Top right"
+        },
+        {
+          "value": "justify-start items-center text-left",
+          "label": "Left"
+        },
+        {
+          "value": "justify-center items-center text-center",
+          "label": "Center"
+        },
+        {
+          "value": "justify-end items-center text-right",
+          "label": "Right"
+        },
+        {
+          "value": "justify-start items-end text-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "justify-center items-end text-center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "justify-end items-end text-right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "justify-center items-center text-center"
+    },
+    {
+      "type": "select",
+      "id": "content_width_desktop",
+      "label": "Width on desktop",
+      "default": "lg:w-2/3",
+      "options": [
+        {
+          "value": "lg:w-1/3",
+          "label": "One third"
+        },
+        {
+          "value": "lg:w-1/2",
+          "label": "One half"
+        },
+        {
+          "value": "lg:w-2/3",
+          "label": "Two thirds"
+        },
+        {
+          "value": "lg:w-full",
+          "label": "Full width"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    },
+    {
+      "id": "scheme_text_color_only",
+      "type": "checkbox",
+      "label": "Apply text color only",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "link",
+          "label": "Link"
+        },
+        {
+          "value": "button",
+          "label": "Button"
+        }
+      ],
+      "default": "link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text overlay"
+    }
+  ]
+}
+{% endschema %}

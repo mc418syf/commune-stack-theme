@@ -1,0 +1,38 @@
+<div
+  x-html-if-set="drawerToggleHTML"
+  data-fragment-id="drawer-toggle"
+  class="{{ container_classes }}"
+>
+  <button
+    type="button"
+    class="flex py-2 hover:text-scheme-accent items-center{% if settings.links_uppercase %} uppercase{% endif %}"
+    @click="$store.modals.open('filters')"
+  >
+    {{ 'collections.filters.title_tags' | t }}
+    {% if total_active_values > 0 -%}
+      ({{ total_active_values }})
+    {%- endif %}
+    {%- if settings.accordion_icon == 'caret' -%}
+      <span
+        class="rotate ml-1 inline-block h-3 w-3 origin-center transform align-middle transition"
+        :class="{ 'rotate-180' : filtersOpen }"
+      >
+        {%- render 'icon-chevron-down' -%}
+      </span>
+    {%- else -%}
+      <span
+        class="ml-1 inline-block h-3 w-3 origin-center align-middle"
+        x-show="!filtersOpen"
+      >
+        {%- render 'icon-plus' -%}
+      </span>
+      <span
+        class="ml-1 inline-block h-3 w-3 origin-center align-middle"
+        x-show="filtersOpen"
+        style="display: none;"
+      >
+        {%- render 'icon-minus' -%}
+      </span>
+    {%- endif -%}
+  </button>
+</div>

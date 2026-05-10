@@ -1,0 +1,436 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign heading_size_class = section.settings.heading_size
+
+  if section.settings.autoplay
+    assign no_border_on_slide = true
+  endif
+-%}
+
+<section
+  class="relative border-b-gridline border-gridline-color bg-scheme-background pb-theme-double text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  <div
+    x-data="
+      Theme_Slideshow({
+        autoplay: {{ section.settings.autoplay }},
+        autoplayInterval: {{ section.settings.autoplay_interval }},
+      })
+    "
+    class="splide"
+  >
+    {% if section.settings.autoplay %}
+      <button
+        class="absolute left-0 top-0 z-10 p-2"
+        type="button"
+        aria-label="{{ 'sections.slideshow.pause_slideshow' | t }}"
+        data-play="{{ 'sections.slideshow.rotate_slideshow' | t }}"
+        data-pause="{{ 'sections.slideshow.pause_slideshow' | t }}"
+      >
+        <span class="relative flex items-center justify-center">
+          <span
+            x-show="playing"
+            style="display: none;"
+            class="inline-block w-6"
+          >
+            {%- render 'icon-pause' -%}
+          </span>
+          <span x-show="!playing" class="inline-block w-6">
+            {%- render 'icon-play' -%}
+          </span>
+        </span>
+      </button>
+    {% endif %}
+
+    <div class="splide__track">
+      <ul class="splide__list">
+        {% for block in section.blocks %}
+          {%- liquid
+            assign height = section.settings.height
+
+            unless forloop.first
+              assign height = 'full_height'
+            endunless
+
+            assign preload = false
+            assign loading = 'lazy'
+
+            if forloop.first
+              if section.index == 1
+                assign preload = true
+              endif
+
+              if section.index <= 3
+                assign loading = 'eager'
+              endif
+            endif
+
+            assign content_position = block.settings.content_position
+            assign content_width_desktop = block.settings.content_width_desktop
+            assign color_scheme = block.settings.color_scheme
+            assign scheme_text_color_only = block.settings.scheme_text_color_only
+            assign image = block.settings.image
+            assign image_mobile = block.settings.image_mobile
+            assign indent_image = block.settings.indent_image
+            assign title = block.settings.title
+            assign text = block.settings.text
+            assign cta_link = block.settings.cta_link
+            assign cta_text = block.settings.cta_text
+            assign cta_style = block.settings.cta_style
+          -%}
+          <li
+            class="splide__slide{% unless forloop.first %} [.splide:not(.is-active)_&]:hidden{% endunless %}"
+            data-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- render 'image-with-text-overlay',
+              height: height,
+              image: image,
+              image_mobile: image_mobile,
+              preload: preload,
+              indent_image: indent_image,
+              no_border: no_border_on_slide,
+              content_position: content_position,
+              heading_size_class: heading_size_class,
+              section_color_scheme: section_color,
+              color_scheme: color_scheme,
+              scheme_text_color_only: scheme_text_color_only,
+              content_width_desktop: content_width_desktop,
+              title: title,
+              text: text,
+              cta_link: cta_link,
+              cta_text: cta_text,
+              cta_style: cta_style,
+              loading: loading
+            -%}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% if section.settings.autoplay %}
+      <div class="bg-gridline-color/30">
+        <div
+          style="width: 0%;"
+          :style="{ width : `${rate * 100}%` }"
+          class="progress-bar h-gridline transform-gpu bg-gridline-color will-change-[width]"
+        ></div>
+      </div>
+    {% endif %}
+    {% if section.blocks.size > 1 %}
+      <div
+        class="mx-1 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 no-js:hidden lg:mx-4{% if settings.fill_image_to_border_edge %} mt-2{% endif %}"
+        x-data="
+          {
+            paginationIsWrapped: false,
+            checkIfWrapped() {
+              this.paginationIsWrapped = hasWrappedChildren(this.$refs.pagination)
+            }
+          }
+        "
+        x-init="checkIfWrapped"
+        @resize.window.debounce.250="checkIfWrapped"
+      >
+        <ul x-ref="pagination" class="splide__pagination"></ul>
+        <div
+          class="splide__arrows col-end-last flex items-center justify-end gap-1 text-scheme-text"
+          :class="{ 'items-start pt-0.5' : paginationIsWrapped, 'items-center' : !paginationIsWrapped }"
+        >
+          <button class="splide__arrow splide__arrow--prev w-8">
+            <span class="sr-only">
+              {{- 'sections.slideshow.previous_slide' | t -}}
+            </span>
+            <span class="block">
+              {% render 'icon-arrow-left' %}
+            </span>
+          </button>
+          <button class="splide__arrow splide__arrow--next w-8">
+            <span class="sr-only">
+              {{- 'sections.slideshow.next_slide' | t -}}
+            </span>
+            <span class="block">
+              {% render 'icon-arrow-right' %}
+            </span>
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% unless request.design_mode %}
+  <script src="{{ 'splide.bundle.min.js' | asset_url }}" type="module"></script>
+  <script src="{{ 'slideshows.js' | asset_url }}" type="module"></script>
+{% endunless %}
+
+{{ 'modules-slideshow.bundle.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "Slideshow",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        {
+          "value": "natural",
+          "label": "Adapt to first slide"
+        },
+        {
+          "value": "full_screen",
+          "label": "Full screen"
+        }
+      ],
+      "default": "natural"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "text-heading-standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "text-heading-feature"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-rotate slides",
+      "info": "This will show a play and pause button and disable dragging."
+    },
+    {
+      "type": "select",
+      "id": "autoplay_interval",
+      "label": "Change slides every",
+      "options": [
+        {
+          "value": "5000",
+          "label": "5 Seconds"
+        },
+        {
+          "value": "6000",
+          "label": "6 Seconds"
+        },
+        {
+          "value": "7000",
+          "label": "7 Seconds"
+        },
+        {
+          "value": "8000",
+          "label": "8 Seconds"
+        },
+        {
+          "value": "9000",
+          "label": "9 Seconds"
+        },
+        {
+          "value": "10000",
+          "label": "10 Seconds"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "id": "image",
+          "type": "image_picker",
+          "label": "Image",
+          "info": "1800 x 800px .jpg recommended"
+        },
+        {
+          "id": "image_mobile",
+          "type": "image_picker",
+          "label": "Mobile image",
+          "info": "800 x 1200px .jpg recommended"
+        },
+        {
+          "type": "checkbox",
+          "id": "indent_image",
+          "label": "Indent image",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Image slide"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Position",
+          "options": [
+            {
+              "value": "justify-start items-start text-left",
+              "label": "Top left"
+            },
+            {
+              "value": "justify-center items-start text-center",
+              "label": "Top center"
+            },
+            {
+              "value": "justify-end items-start text-right",
+              "label": "Top right"
+            },
+            {
+              "value": "justify-start items-center text-left",
+              "label": "Left"
+            },
+            {
+              "value": "justify-center items-center text-center",
+              "label": "Center"
+            },
+            {
+              "value": "justify-end items-center text-right",
+              "label": "Right"
+            },
+            {
+              "value": "justify-start items-end text-left",
+              "label": "Bottom left"
+            },
+            {
+              "value": "justify-center items-end text-center",
+              "label": "Bottom center"
+            },
+            {
+              "value": "justify-end items-end text-right",
+              "label": "Bottom right"
+            }
+          ],
+          "default": "justify-center items-center text-center"
+        },
+        {
+          "type": "select",
+          "id": "content_width_desktop",
+          "label": "Width on desktop",
+          "default": "lg:w-2/3",
+          "options": [
+            {
+              "value": "lg:w-1/3",
+              "label": "One third"
+            },
+            {
+              "value": "lg:w-1/2",
+              "label": "One half"
+            },
+            {
+              "value": "lg:w-2/3",
+              "label": "Two thirds"
+            },
+            {
+              "value": "lg:w-full",
+              "label": "Full width"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Call to action"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "cta_style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "link",
+              "label": "Link"
+            },
+            {
+              "value": "button",
+              "label": "Button"
+            }
+          ],
+          "default": "link"
+        },
+        {
+          "type": "header",
+          "content": "Color"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "default": "scheme1",
+          "label": "Color scheme"
+        },
+        {
+          "id": "scheme_text_color_only",
+          "type": "checkbox",
+          "label": "Apply text color only",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slideshow",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

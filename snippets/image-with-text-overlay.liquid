@@ -1,0 +1,141 @@
+{% liquid
+  unless loading
+    assign loading = null
+  endunless
+
+  unless preload
+    assign preload = false
+  endunless
+
+  if image_mobile != blank
+    assign desktop_preload = false
+  else
+    assign desktop_preload = preload
+  endif
+%}
+<div
+  class="bg-scheme-background{% unless no_border %} border-b-gridline border-gridline-color {% endunless %}relative group overflow-hidden {% if height == 'full_screen' %}h-screen-less-gridline first-section:h-screen-less-header-group-less-gridline{% elsif height == 'full_height' %}h-full{% else %}h-auto{% endif %}"
+  data-color-scheme="{{ section_color_scheme }}"
+>
+  {% if cta_link != blank %}
+    <a href="{{ cta_link }}" class="absolute inset-0 z-11"
+      ><span class="sr-only">
+        {%- if cta_text != blank -%}
+          {{- cta_text -}}
+        {%- elsif image and image.alt != blank -%}
+          {{- image.alt -}}
+        {%- endif -%}
+      </span></a
+    >
+  {% endif %}
+  <div
+    class="text-scheme-text indent-mobile-image {% unless scheme_text_color_only %} bg-scheme-background{% endunless %}{% unless indent_image_mobile or indent_image %}{% unless settings.fill_image_to_border_edge %} p-2 lg:p-4{% endunless %}{% endunless %}{% if indent_image %} lg:p-16{% endif %} h-full w-full"
+    data-color-scheme="{{ color_scheme }}"
+  >
+    <div class="{% if settings.fill_image_to_border_edge == false or height == 'full_screen' or height == 'full_height' %}relative h-full w-full{% endif %}">
+      {% if image != blank %}
+        <div
+          {% if image_mobile != blank %}
+            class="hidden lg:block"
+          {% endif %}
+        >
+          {% if height == 'full_screen' or height == 'full_height' %}
+            {% render 'image-fit',
+              image: image,
+              loading: loading,
+              preload: desktop_preload
+            %}
+          {% else %}
+            {% render 'image',
+              image: image,
+              loading: loading,
+              preload: desktop_preload
+            %}
+          {% endif %}
+        </div>
+
+        {% if image_mobile != blank %}
+          <div class="lg:hidden">
+            {% assign image = image_mobile %}
+            {% if height == 'full_screen' or height == 'full_height' %}
+              {% render 'image-fit',
+                image: image,
+                loading: loading,
+                preload: preload
+              %}
+            {% else %}
+              {% render 'image',
+                image: image,
+                loading: loading,
+                preload: preload
+              %}
+            {% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div
+          class="bg-scheme-placeholder-background p-8 text-scheme-placeholder-foreground {% if height == 'full_screen' or height == 'full_height' %}absolute inset-0{% endif %}"
+        >
+          {{
+            'lifestyle-1'
+            | placeholder_svg_tag: 'w-full h-full text-scheme-placeholder-foreground bg-scheme-placeholder-background/0 fill-current'
+          }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div
+    class="group absolute bottom-0 left-0 right-0 top-0 z-10 px-section-horizontal-spacing py-section-vertical-spacing"
+    data-color-scheme="{{ color_scheme }}"
+  >
+    <div class="flex h-full w-full {{ content_position }} {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% endunless %}">
+      <div
+        class="{{ content_width_desktop }} text-scheme-text"
+      >
+        {% if title != blank %}
+          <h2 class="font-heading {{ heading_size_class }} break-word">
+            {{ title }}
+          </h2>
+        {% endif %}
+
+        {% if text != blank %}
+          <div class="rte mt-4 text-base">
+            {{ text }}
+          </div>
+        {% endif %}
+
+        {% if cta_link != blank and cta_text != '' %}
+          <div class="mt-8 text-0">
+            {%- case cta_style -%}
+              {%- when 'link' -%}
+                <span
+                  class="theme-link inline-block text-scheme-text group-hover:text-scheme-accent"
+                >
+                  {{- cta_text -}}
+                </span>
+              {%- when 'button' -%}
+                <span
+                  class="theme-button theme-button--in-group inline-block"
+                >
+                  {{- cta_text -}}
+                </span>
+            {%- endcase -%}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% if indent_image_mobile %}
+<style>
+  @media (max-width: 1023px) {
+    .indent-mobile-image {
+      padding-left: 0rem !important;
+      padding-right: 0rem !important;
+      padding-top: 15rem !important;
+      padding-bottom: 15rem !important;
+    }
+  }
+</style>
+{% endif %}

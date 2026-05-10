@@ -1,0 +1,71 @@
+{% if section.settings.enabled or request.design_mode %}
+  <section
+    data-color-scheme="{{ section.settings.color_scheme | default: 'scheme2' }}"
+    x-data="
+      PrivacyBanner(
+        { enabled: {{ section.settings.enabled | default: false }}, }
+      )
+    "
+    x-show="shown"
+    x-transition:enter="transition duration-300 motion-reduce:duration-0 delay-75 outline-0"
+    x-transition:enter-start="translate-y-full"
+    x-transition:enter-end="-translate-y-[--bottom]"
+    x-transition:leave="transition duration-300 motion-reduce:duration-0 outline-0"
+    x-transition:leave-start="-translate-y-[--bottom]"
+    x-transition:leave-end="translate-y-full"
+    class="pointer-events-auto fixed bottom-0 left-0 right-0 top-auto z-50 mt-auto grid w-full -translate-y-[--bottom] items-center gap-4 overflow-y-auto bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text md:grid-cols-[1fr,_auto]"
+    id="{{ section.id }}"
+    style="display: none;"
+    :class="{ 'transition duration-300 motion-reduce:duration-0 delay-75' : transition }"
+    :style="`--bottom: ${bottom}`"
+  >
+    <p>
+      {{ 'privacy_banner.message' | t }}
+    </p>
+    <div class="">
+      <button
+        class="theme-button mr-3"
+        type="button"
+        @click="accept"
+      >
+        {{ 'privacy_banner.accept' | t }}
+      </button>
+      <button
+        class="theme-button--secondary"
+        type="button"
+        @click="decline"
+      >
+        {{ 'privacy_banner.decline' | t }}
+      </button>
+    </div>
+  </section>
+{% endif %}
+
+{% unless request.design_mode %}
+  <script src="{{ 'privacy-banner.js' | asset_url }}" type="module"></script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Privacy banner",
+  "class": "contents",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable privacy banner",
+      "info": "This banner uses Shopify’s [Customer Privacy API](https://shopify.dev/api/consent-tracking). If you require showing a banner under different conditions, consider using a dedicated app."
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ]
+}
+{% endschema %}

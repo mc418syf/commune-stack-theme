@@ -1,0 +1,59 @@
+{%- assign form_id = 'Contact-' | append: section_id -%}
+<section
+  class="border-b-gridline border-gridline-color bg-scheme-background py-section-vertical-spacing text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="justify-center px-section-horizontal-spacing">
+    <div class="{{ text_size_class }}{% if text_size_class contains 'xl' %} lg:w-1/2{% endif %}">
+      {% if section_title != blank %}
+        <h2 class="font-heading text-heading-standard" for="Email">
+          {{ section_title | escape }}
+        </h2>
+      {% endif %}
+
+      {% if subheading != blank %}
+        <div class="[&_a[href]]:underline [&_a[href]]:hover:text-scheme-accent{% if section_title != blank %} mt-2{% endif %}">
+          {{ subheading }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="mt-theme-half lg:w-1/3">
+      {% form 'customer', id: form_id %}
+        {% if form.errors and template.suffix != 'contact' %}
+          {{ form.errors | default_errors }}
+        {% endif %}
+
+        {% if form.posted_successfully? %}
+          <p class="lg:ml-theme-half">
+            {{ 'general.newsletter_form.confirmation' | t }}
+          </p>
+        {% else %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="flex items-end">
+            <label class="sr-only" for="Email-{{ section.id }}">
+              {{- 'general.newsletter_form.email_placeholder' | t -}}
+            </label>
+            <input
+              type="email"
+              class="font-body block w-full border-b-text border-current bg-transparent pb-1 leading-[inherit] placeholder-current"
+              name="contact[email]"
+              id="Email-{{ section.id }}"
+              value="{% if customer.email != blank %}{{ customer.email }}{% endif %}"
+              placeholder="{{ 'general.newsletter_form.email_placeholder' | t }}"
+              autocorrect="off"
+              autocapitalize="off"
+            >
+            <button
+              class="theme-link mt-2 shrink-0 py-1 leading-[inherit] hover:text-scheme-accent lg:ml-2 lg:mt-0"
+              type="submit"
+              name="commit"
+              id="Subscribe"
+            >
+            </button>
+          </div>
+        {% endif %}
+      {% endform %}
+    </div>
+  </div>
+</section>

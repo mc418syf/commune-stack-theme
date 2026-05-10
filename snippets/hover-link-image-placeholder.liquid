@@ -1,0 +1,19 @@
+{%- liquid
+  assign condition = "isLgBreakpoint() && currentLink === 'placeholder'"
+-%}
+<div
+  class="{% if modal %}pointer-events-none fixed left-1/2 top-1/2 z-10 w-third-screen -translate-x-1/2 -translate-y-1/2 {% endif %}no-js:hidden"
+  x-show="{{ condition }}"
+  x-transition:enter="transition-opacity duration-200"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition-opacity duration-200"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  style="display: none;"
+  :aria-hidden="{{ condition }}"
+>
+  <div class="w-full bg-scheme-background">
+    {% render 'image-crop-placeholder', ratio: 1 %}
+  </div>
+</div>

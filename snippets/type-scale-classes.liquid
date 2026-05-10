@@ -1,0 +1,7 @@
+{%- liquid
+  assign mobile_type_scale_classes = 'text-scale-n-2,text-scale-n-1,text-scale-n0,text-scale-n1,text-scale-n2,text-scale-n3,text-scale-n4,text-scale-n5,text-scale-n6,text-scale-n7,text-scale-n8,text-scale-n9,text-scale-n10' | split: ','
+  assign desktop_type_scale_classes = 'lg:text-scale-n-2,lg:text-scale-n-1,lg:text-scale-n0,lg:text-scale-n1,lg:text-scale-n2,lg:text-scale-n3,lg:text-scale-n4,lg:text-scale-n5,lg:text-scale-n6,lg:text-scale-n7,lg:text-scale-n8,lg:text-scale-n9,lg:text-scale-n10' | split: ','
+  assign text_scale_mobile = mobile_text_scale | plus: 2
+  assign text_scale_desktop = desktop_text_scale | plus: 2
+  echo mobile_type_scale_classes[text_scale_mobile] | append: ' ' | append: desktop_type_scale_classes[text_scale_desktop]
+-%}

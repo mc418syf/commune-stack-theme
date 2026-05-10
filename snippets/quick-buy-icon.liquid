@@ -1,0 +1,164 @@
+{%- liquid
+  if product.available
+    if product.has_only_default_variant
+      assign id_suffix = section.id | append: '-' | append: product.id
+
+      assign product_form_id = 'product-quick-buy-form-' | append: id_suffix
+      assign product_form_messages_id = 'product-quick-buy-form-messages-' | append: id_suffix
+    else
+      assign quick_buy_id = 'product-quick-buy-' | append: product.id
+    endif
+  endif
+
+  if product.url contains '?'
+    assign product_quick_buy_url = product.url | append: '&view=quick-buy'
+  else
+    assign product_quick_buy_url = product.url | append: '?view=quick-buy'
+  endif
+
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+<button
+  class="min-touch-target relative z-10 mb-1.5 disabled:pointer-events-none disabled:cursor-not-allowed disabled:text-scheme-text/40 md:mb-0 md:inline-flex {% if style == 'icon' %}md:h-6 md:w-6{% endif %} md:items-center [&:not([disabled])]:hover:text-scheme-accent {% unless product.available %}max-md:hidden{% endunless %}"
+  {% unless product.available %}
+    disabled
+  {% endunless %}
+  {% if product.available %}
+    {% if product.has_only_default_variant %}
+      @click.prevent="$root.querySelector('form').dispatchEvent(new Event('submit'))"
+      :class="{ 'text-scheme-text/40' : loading }"
+    {% else %}
+      @click.prevent="$store.modals.open('{{ quick_buy_id }}')"
+    {% endif %}
+  {% endif %}
+>
+  {%- if style == 'icon' -%}
+    <div class="contents">
+      <span class="border-theme inline-block h-6 w-6">
+        {%- liquid
+          case settings.cart_icon
+            when 'basket'
+              render 'icon-basket'
+            when 'bag'
+              render 'icon-bag'
+            when 'cart'
+              render 'icon-cart'
+          endcase
+        -%}
+      </span>
+    </div>
+  {%- endif %}
+
+  {% if product.available and style == 'text' %}
+    <span class="theme-link theme-link--no-arrow inline pb-0.5">
+      {% if product.has_only_default_variant %}
+        {{ 'products.product.add' | t }}
+      {% else %}
+        {{ 'products.product.choose_options' | t }}
+      {% endif %}
+    </span>
+  {% endif %}
+  {% if product.available and product.has_only_default_variant %}
+    <div
+      {% if settings.cart_type == 'drawer' %}
+        x-data="ProductForm"
+      {% endif %}
+    >
+      {% form 'product',
+        product,
+        id: product_form_id,
+        data-messages-id: product_form_messages_id
+      %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+      {% endform %}
+    </div>
+    <div
+      x-init="$store.modals.register('{{ product_form_messages_id }}', 'popup'); initTeleport($root);"
+      x-data
+    >
+      <div style="display: none;">
+        <template data-should-teleport="#popup-slot">
+          <template
+            x-if="$store.modals.popup.contents === '{{ product_form_messages_id }}'"
+          >
+            <div
+              class=""
+              data-modal-label="{{ block.settings.link_label }}"
+            >
+              <div class="sticky top-0 z-1 flex items-center justify-between border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing py-4">
+                <h2>{{ product.title }}</h2>
+                <button
+                  @click.prevent="$store.modals.close('popup')"
+                  class="absolute right-0 top-0 block h-full"
+                  type="button"
+                >
+                  <span class="sr-only">
+                    {{- 'general.accessibility.close_modal' | t -}}
+                  </span>
+                  <div class="my-auto mr-section-horizontal-spacing h-6 w-6">
+                    {% render 'icon-close' %}
+                  </div>
+                </button>
+              </div>
+              <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+                <div>
+                  <div
+                    x-show="errorMessage"
+                    class="text-scheme-accent"
+                    x-text="errorMessage"
+                  ></div>
+                  <div x-show="addedToCart" class="space-y-1 text-base">
+                    <p>{{ 'cart.popup.added_to_cart' | t }}!</p>
+                    <p class="has-theme-links">
+                      {{
+                        'products.product.add_to_cart_confirm_html'
+                        | t:
+                          cart_url: routes.cart_url,
+                          link_url: routes.all_products_collection_url
+                      -}}
+                      .
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+      </div>
+    </div>
+  {% endif %}
+</button>
+{% if product.available %}
+  {% unless product.has_only_default_variant %}
+    <div
+      x-init="{% unless inserted %}initTeleport($el);{% endunless %} $store.modals.register('{{ quick_buy_id }}', 'quickBuyDrawer');"
+      class="hidden"
+    >
+      <template
+        {% if inserted %}
+          x-teleport="#quick-buy-drawer-slot"
+        {% else %}
+          data-should-teleport="#quick-buy-drawer-slot"
+        {% endif %}
+      >
+        <template
+          x-if="$store.modals.quickBuyDrawer.contents === '{{ quick_buy_id }}'"
+        >
+          <div
+            data-modal-label="{{ 'products.product.choose_product_options' | t: product_name: product.title | escape }}"
+            x-html="
+              $fetchedFragment(
+                '{{ product_quick_buy_url }}',
+                '[data-quick-buy-root]'
+              )
+            "
+          >
+            <div class="my-16 px-section-horizontal-spacing text-center">
+              {{ 'general.search.loading' | t }}&hellip;
+            </div>
+          </div>
+        </template>
+      </template>
+    </div>
+  {% endunless %}
+{% endif %}

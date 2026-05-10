@@ -1,0 +1,295 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign menu = section.settings.menu
+  assign display = section.settings.display
+  assign paragraph_separator = section.settings.paragraph_separator
+  assign text_align = section.settings.text_alignment
+  assign show_image_on_hover = section.settings.show_image_on_hover
+  assign superscript = section.settings.superscript
+
+  case display
+    when 'paragraph'
+      assign list_class = 'inline'
+    when 'list_mobile_paragraph_desktop'
+      assign list_class = 'lg:inline'
+  endcase
+-%}
+
+<section
+  class="featured-navigation border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  x-data="{ currentLink: '' }"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+    <nav
+      role="navigation"
+      class="{% render 'type-scale-classes', mobile_text_scale: section.settings.mobile_text_scale, desktop_text_scale: section.settings.desktop_text_scale %} {{ text_align }} w-full"
+      aria-label="{{ linklists[menu].title }}"
+    >
+      <ul class="space-y-1">
+        {%- for link in linklists[menu].links -%}
+          {%- liquid
+            assign image = blank
+            assign menu_item_is_collection = false
+            if show_image_on_hover
+              case link.type
+                when 'catalog_link'
+                  assign image = collections.all.image | default: collections.all.products.first.featured_image
+                when 'collection_link'
+                  if link.object.image != blank or link.object.products.first != blank
+                    assign image = link.object.image | default: link.object.products.first.featured_image
+                  endif
+                when 'product_link'
+                  if link.object.featured_image != blank
+                    assign image = link.object.featured_image
+                  endif
+                when 'article_link'
+                  if link.object.image != blank
+                    assign image = link.object.image
+                  endif
+              endcase
+            endif
+
+            if superscript == 'product_count'
+              case link.type
+                when 'collection_link'
+                  assign menu_item_is_collection = true
+                  assign products_count = link.object.products_count
+              endcase
+            endif
+          -%}
+          {%- if superscript != 'none' -%}
+            {%- capture superscript_content -%}<sup class="{%- if superscript == 'index' %}pr-1{%- else -%}pl-1{%- endif -%}">{%- if superscript == 'index' %}{{ forloop.index }}{%- endif -%}{%- if superscript == 'product_count' and menu_item_is_collection %}{{ products_count }}{%- endif -%}</sup>{%- endcapture -%}
+          {%- endif -%}
+          <li class="{{ list_class }}">
+            <a
+              href="{{ link.url }}"
+              class="font-heading break-word relative hover:text-scheme-accent"
+              x-on:mouseenter="currentLink = '{{ link.title | handleize }}'"
+              x-on:mouseleave="currentLink = ''"
+              x-on:focus="currentLink = '{{ link.title | handleize }}'"
+              x-on:blur="currentLink = ''"
+            >
+              {% if superscript == 'index' -%}
+                {{- superscript_content -}}
+              {%- endif -%}
+              <span class="hover:underline">{{ link.title }}</span>
+              {%- if superscript == 'product_count'
+                and menu_item_is_collection
+              -%}
+                {{- superscript_content -}}
+              {%- endif %}
+            </a>
+            {%- if paragraph_separator != 'none'
+              and display != 'list'
+              and forloop.last == false
+            -%}
+              <span class="{%- if display == 'list_mobile_paragraph_desktop' -%}hidden lg:inline{%- endif -%}">
+                {%- if paragraph_separator == 'hyphen' -%}-{%- endif -%}
+                {%- if paragraph_separator == 'emdash' -%}&mdash;{%- endif -%}
+                {%- if paragraph_separator == 'dot' -%}&middot;{%- endif -%}
+                {%- if paragraph_separator == 'bullet' -%}&bull;{%- endif -%}
+              </span>
+            {%- endif -%}
+            {%- liquid
+              assign handle = link.title | handleize
+
+              if image != blank
+                render 'hover-link-image', image: image, handle: handle, modal: true
+              endif
+            -%}
+          </li>
+        {% else %}
+          {%- for i in (1..5) -%}
+            {%- if superscript != 'none' -%}
+              {%- capture superscript_content -%}<sup class="{%- if superscript == 'index' %}pr-1{%- else -%}pl-1{%- endif -%}">{%- if superscript == 'index' %}{{ forloop.index }}{%- endif -%}{%- if superscript == 'product_count' %}{% cycle '3', '12', '11', '8', '6' -%}{%- endif -%}</sup>{%- endcapture -%}
+            {%- endif -%}
+            <li
+              class="{{ list_class }}"
+            >
+              <a
+                class="font-heading break-word relative hover:text-scheme-accent"
+                href="#"
+                x-on:mouseenter="currentLink = 'placeholder'"
+                x-on:mouseleave="currentLink = ''"
+                x-on:focus="currentLink = 'placeholder'"
+                x-on:blur="currentLink = ''"
+              >
+                {% if superscript == 'index' -%}
+                  {{- superscript_content -}}
+                {%- endif -%}
+                <span class="hover:underline">
+                  {{- 'homepage.onboarding.link_title' | t -}}
+                </span>
+                {%- if superscript == 'product_count' -%}
+                  {{- superscript_content -}}
+                {%- endif %}
+              </a>
+              {%- if paragraph_separator != 'none'
+                and display != 'list'
+                and forloop.last == false
+              -%}
+                <span class="{%- if display == 'list_mobile_paragraph_desktop' -%}hidden lg:inline{%- endif -%}">
+                  {%- if paragraph_separator == 'hyphen' -%}-{%- endif -%}
+                  {%- if paragraph_separator == 'emdash' -%}&mdash;{%- endif -%}
+                  {%- if paragraph_separator == 'dot' -%}&middot;{%- endif -%}
+                  {%- if paragraph_separator == 'bullet' -%}&bull;{%- endif -%}
+                </span>
+              {%- endif -%}
+              {%- render 'hover-link-image-placeholder', modal: true -%}
+            </li>
+          {%- endfor %}
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured navigation",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu",
+      "info": "This menu won't show dropdown items"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_scale",
+      "min": -2,
+      "max": 4,
+      "step": 1,
+      "label": "Mobile font size scale",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_scale",
+      "min": -2,
+      "max": 9,
+      "step": 1,
+      "label": "Desktop font size scale",
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "display",
+      "label": "Display",
+      "options": [
+        {
+          "value": "list",
+          "label": "List"
+        },
+        {
+          "value": "paragraph",
+          "label": "Paragraph"
+        },
+        {
+          "value": "list_mobile_paragraph_desktop",
+          "label": "List mobile, paragraph desktop"
+        }
+      ],
+      "default": "list"
+    },
+    {
+      "type": "select",
+      "id": "paragraph_separator",
+      "label": "Paragraph word separator",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "hyphen",
+          "label": "Hyphen"
+        },
+        {
+          "value": "emdash",
+          "label": "Emdash"
+        },
+        {
+          "value": "dot",
+          "label": "Dot"
+        },
+        {
+          "value": "bullet",
+          "label": "Bullet"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "superscript",
+      "label": "Superscript",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "index",
+          "label": "Index"
+        },
+        {
+          "value": "product_count",
+          "label": "Collection products count"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_on_hover",
+      "label": "Show menu images on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured navigation"
+    }
+  ]
+}
+{% endschema %}

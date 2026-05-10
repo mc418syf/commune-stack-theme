@@ -1,0 +1,68 @@
+{%- assign section_color = section.settings.color_scheme -%}
+
+<section
+  class="gap-gutter overflow-hidden border-b-gridline border-gridline-color bg-gridline-color text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="bg-scheme-background">
+    <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+      {%- if section.settings.title -%}
+        <h2 class="font-heading mb-4 text-2xl">{{ section.settings.title }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.subheading != blank -%}
+        <div class="rte font-body mb-4 text-base">
+          {{ section.settings.subheading }}
+        </div>
+      {%- endif -%}
+
+      {{ section.settings.custom_liquid }}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Liquid",
+  "disabled_on": {
+    "groups": [
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "id": "title",
+      "type": "text",
+      "label": "Title",
+      "default": "Custom Liquid"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Sub-heading",
+      "default": "Sub-heading goes here"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Custom Liquid"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Liquid",
+      "category": "Advanced Layout"
+    }
+  ]
+}
+{% endschema %}

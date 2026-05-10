@@ -1,0 +1,597 @@
+{% style %}
+  @media (min-width: 1024px) {
+    #filters-form-filters-drop-down .filters-wrapper {
+      position: relative;
+      background: rgba(255, 255, 255, 0.4) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+    }
+
+    #filters-form-filters-drop-down .filters-wrapper > *,
+    #filters-form-filters-drop-down .filters-wrapper [class*="bg-scheme-background"] {
+      background: transparent !important;
+    }
+
+    /* === Brand list 3 columns === */
+    .filters-wrapper .js-filter ul {
+      columns: 3 !important;
+      column-gap: 2rem !important;
+    }
+  }
+{% endstyle %}
+
+{% if show_sort and context != 'drawer' %}
+  <div
+    class="w-full border-b-gridline border-gridline-color py-section-vertical-spacing"
+    x-data="{ expanded: {% if start_collapsed %}false{% else %}true{% endif %} }"
+    data-filterable-filter-fragment="sort-sidebar"
+    :class="{ 'opacity-50' : loading }"
+  >
+    <h3 class="px-4">
+      <button
+        class="break-word flex w-full items-center justify-between"
+        type="button"
+        @click="expanded = ! expanded"
+      >
+        {{ 'collections.sorting.title' | t }}
+        {%- if settings.accordion_icon == 'plus_minus' -%}
+          <div
+            class="flex h-4 w-4 shrink-0 items-center"
+            x-show="!expanded"
+            {% unless start_collapsed %}
+              style="display: none;"
+            {% endunless %}
+          >
+            {% render 'icon-plus' %}
+          </div>
+          <div
+            class="flex h-4 w-4 shrink-0 items-center"
+            x-show="expanded"
+            {% if start_collapsed %}
+              style="display: none;"
+            {% endif %}
+          >
+            {%- render 'icon-minus' -%}
+          </div>
+        {%- else -%}
+          <div
+            class="ease-gentle flex h-4 w-4 shrink-0 {% if start_collapsed %}rotate-0{% else %}rotate-180{% endif %} items-center transition-transform duration-[280ms]"
+            :class="{ 'rotate-180' : expanded, 'rotate-0' : ! expanded }"
+          >
+            {%- render 'icon-chevron-down' -%}
+          </div>
+        {%- endif -%}
+      </button>
+    </h3>
+    <div
+      class="flex items-center self-start"
+      x-show="expanded"
+      x-collapse
+      {% if start_collapsed %}
+        style="display: none;"
+      {% endif %}
+    >
+      <div
+        id="sort-sidebar-{{ context }}"
+        class="mt-4 w-full"
+      >
+        <div
+          class="sort-wrapper flex justify-start px-4"
+        >
+          <div class="js-filter" data-index="sort">
+            <ul class="space-y-1">
+              {%- for option in sort_options -%}
+                <li class="flex items-center justify-start">
+                  <input
+                    type="radio"
+                    class="filter-checkbox custom-input peer sr-only"
+                    value="{{ option.value | escape }}"
+                    @input.debounce="filterFormSubmit"
+                    id="Sort-sidebar-{{ context }}-{{ option.name }}-{{ forloop.index }}"
+                    name="sort_by"
+                    {% if option.value == sort_by -%}
+                      checked
+                    {%- endif %}
+                  >
+                  <label
+                    for="Sort-sidebar-{{ context }}-{{ option.name }}-{{ forloop.index }}"
+                    class="
+                      flex cursor-pointer items-center capitalize hover:text-scheme-accent
+                      peer-checked:[&>span:first-child]:bg-current {% if filter_value.count == 0 and filter_value.active == false -%}text-scheme-secondary line-through{%- endif %}
+                    "
+                    {% if filter_value.count == 0
+                      and filter_value.active == false
+                    -%}
+                      disabled
+                    {% endif %}
+                  >
+                    <span
+                      class="mr-1 inline-block h-2 w-2 rounded-full border-checkbox border-current"
+                    ></span>
+                    {{ option.name | escape }}
+                  </label>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% if show_filters %}
+  <div
+    class="w-full"
+    :class="{ 'opacity-50' : loading }"
+  >
+    <div
+      id="filters-sidebar-{{ context }}"
+    >
+      <div class="pb-8">
+        <div>
+          {%- for filter in filters -%}
+            {%- liquid
+              if settings.enable_color_swatches_in_filters
+                assign is_color = false
+
+                assign swatch_trigger = 'products.product.color_swatch_trigger' | t | downcase
+
+                assign filter_downcase = filter.label | downcase
+
+                if filter_downcase contains swatch_trigger
+                  assign is_color = true
+                elsif swatch_trigger == 'color' and filter_downcase contains 'colour'
+                  assign is_color = true
+                endif
+              endif
+
+              assign presentation = filter.presentation
+            -%}
+            <div
+              class="w-full border-b-gridline border-gridline-color py-section-vertical-spacing"
+              data-index="{{ forloop.index }}"
+              x-data="{ expanded: {% if start_collapsed %}false{% else %}true{% endif %} }"
+              data-filterable-filter-fragment="{{ filter.param_name }}"
+            >
+              <h3
+                class="px-4"
+              >
+                <button
+                  class="break-word flex w-full items-center justify-between"
+                  type="button"
+                  @click="expanded = ! expanded"
+                >
+                  {{ filter.label }}
+                  {%- if filter.active_values.size > 0 -%}
+                    ({{ filter.active_values.size }})
+                  {%- endif -%}
+                  {%- if settings.accordion_icon == 'plus_minus' -%}
+                    <div
+                      class="flex h-4 w-4 shrink-0 items-center"
+                      x-show="!expanded"
+                      {% unless start_collapsed %}
+                        style="display: none;"
+                      {% endunless %}
+                    >
+                      {% render 'icon-plus' %}
+                    </div>
+                    <div
+                      class="flex h-4 w-4 shrink-0 items-center"
+                      x-show="expanded"
+                      {% if start_collapsed %}
+                        style="display: none;"
+                      {% endif %}
+                    >
+                      {%- render 'icon-minus' -%}
+                    </div>
+                  {%- else -%}
+                    <div
+                      class="ease-gentle flex h-4 w-4 shrink-0 {% if start_collapsed %}rotate-0{% else %}rotate-180{% endif %} items-center transition-transform duration-[280ms]"
+                      :class="{ 'rotate-180' : expanded, 'rotate-0' : ! expanded }"
+                    >
+                      {%- render 'icon-chevron-down' -%}
+                    </div>
+                  {%- endif -%}
+                </button>
+              </h3>
+              <div
+                class="px-4"
+                x-show="expanded"
+                x-collapse
+                {% if start_collapsed %}
+                  x-cloak
+                {% endif %}
+              >
+                {%- case filter.type -%}
+                  {%- when 'list', 'boolean' -%}
+                    {% if presentation == 'swatch' or presentation == 'image' %}
+                      <ul class="-mx-[calc(theme(borderWidth[text])_+_1px)] mt-4 flex flex-wrap items-center justify-start gap-0.5">
+                        {%- for filter_value in filter.values -%}
+                          <li class="relative">
+                            <input
+                              type="checkbox"
+                              class="custom-input peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                              name="{{ filter_value.param_name }}"
+                              value="{{ filter_value.value }}"
+                              @input.debounce="filterFormSubmit"
+                              id="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                              {% if filter_value.active -%}
+                                checked
+                              {%- endif %}
+                              {% if filter_value.count == 0
+                                and filter_value.active == false
+                              -%}
+                                disabled
+                              {%- endif %}
+                              :disabled="loading"
+                            >
+                            <label
+                              for="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                              class="relative block cursor-pointer border-text border-transparent p-[2px] peer-checked:border-scheme-text {% if filter_value.count == 0 and filter_value.active == false -%}{%- else -%}[&>span:first-of-type]:hidden{%- endif %}"
+                              {% if filter_value.count == 0
+                                and filter_value.active == false
+                              -%}
+                                disabled
+                              {% endif %}
+                            >
+                              {%- capture value_style -%}
+                                {%- if presentation == 'swatch' and filter_value.swatch.color != blank or filter_value.swatch.image != blank -%}
+                                  {%- assign swatch_color = filter_value.swatch.color -%}
+                                  {%- assign swatch_image = filter_value.swatch.image -%}
+                                  background-position: {{ swatch_image.presentation.focal_point | default: 'center' }};{% if swatch_image != blank %} background-image: url({{ swatch_image | image_url: width: 120 }});{% else %}{% endif %}{% if swatch_color != blank %} background-color: rgb({{ swatch_color.rgb }});{% endif %}
+                                {%- elsif presentation == 'image' and filter_value.image != blank -%}
+                                  {%- assign filter_value_image = filter_value.image -%}
+                                  background-image: url({{ filter_value_image | image_url: width: 120 }}); background-position: {{ filter_value_image.presentation.focal_point | default: 'center' }};
+                                {%- endif -%}
+                              {%- endcapture -%}
+                              <span
+                                class="absolute inset-0 z-10 h-full w-full bg-scheme-background/25"
+                              >
+                                <span
+                                  class="absolute bottom-0 left-0 top-1/2 z-10 h-[var(--text-border-width)] w-full -translate-y-1/2 -rotate-45 transform bg-scheme-text"
+                                ></span>
+                              </span>
+                              <span
+                                class="block h-6 w-6 rounded-button bg-scheme-text/20 bg-full"
+                                {% if value_style != blank %}
+                                  style="{{ value_style }}"
+                                {% endif %}
+                              ></span>
+                              <span
+                                class="sr-only"
+                              >
+                                {{- filter_value.label -}}
+                              </span>
+                            </label>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% elsif is_color %}
+                      <ul class="-mx-[calc(theme(borderWidth[text])_+_1px)] mt-4 flex flex-wrap items-center justify-start gap-0.5">
+                        {%- for filter_value in filter.values -%}
+                          {%- liquid
+                            assign color_image_url = filter_value.value | handle | append: '.' | append: 'png' | file_img_url: '110x' | prepend: 'https:'
+                            assign color_swatch_fallback = filter_value.value | split: ' ' | last | handle
+                          -%}
+                          <li class="relative">
+                            <input
+                              type="checkbox"
+                              class="custom-input peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                              name="{{ filter_value.param_name }}"
+                              value="{{ filter_value.value }}"
+                              @input.debounce="filterFormSubmit"
+                              id="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                              {% if filter_value.active -%}
+                                checked
+                              {%- endif %}
+                              {% if filter_value.count == 0
+                                and filter_value.active == false
+                              -%}
+                                disabled
+                              {%- endif %}
+                              :disabled="loading"
+                            >
+                            <label
+                              for="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                              class="relative block cursor-pointer border-text border-transparent p-[2px] peer-checked:border-scheme-text {% if filter_value.count == 0 and filter_value.active == false -%}{%- else -%}[&>span:first-of-type]:hidden{%- endif %}"
+                              {% if filter_value.count == 0
+                                and filter_value.active == false
+                              -%}
+                                disabled
+                              {% endif %}
+                            >
+                              <span
+                                class="absolute inset-0 z-10 h-full w-full bg-scheme-background/25"
+                              >
+                                <span
+                                  class="absolute bottom-0 left-0 top-1/2 z-10 h-[var(--text-border-width)] w-full -translate-y-1/2 -rotate-45 transform bg-scheme-text"
+                                ></span>
+                              </span>
+                              <span
+                                class="block h-6 w-6 rounded-button bg-scheme-text/20 bg-full"
+                                style="
+                                  background-image: url({{ color_image_url }});
+                                  background-color: {{ color_swatch_fallback }};
+                                "
+                              ></span>
+                              <span
+                                class="sr-only"
+                              >
+                                {{- filter_value.label -}}
+                              </span>
+                            </label>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      <ul class="mt-4 space-y-1">
+                        {%- for filter_value in filter.values -%}
+                          <li class="flex items-center justify-start">
+                            <input
+                              type="checkbox"
+                              class="filter-checkbox custom-input peer sr-only"
+                              name="{{ filter_value.param_name }}"
+                              value="{{ filter_value.value }}"
+                              @input.debounce="filterFormSubmit"
+                              id="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                              {% if filter_value.active -%}
+                                checked
+                              {%- endif %}
+                              {% if filter_value.count == 0
+                                and filter_value.active == false
+                              -%}
+                                disabled
+                              {%- endif %}
+                              :disabled="loading"
+                            >
+                            <label
+                              for="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                              class="cursor-pointer {% if settings.links_uppercase %}uppercase{% elsif section.settings.capitalize_filters %}capitalize{% endif %} flex items-center peer-checked:[&>span:first-child]:bg-current {% if filter_value.count == 0 and filter_value.active == false -%}text-scheme-secondary line-through{%- else -%}hover:text-scheme-accent{%- endif %}"
+                              {% if filter_value.count == 0
+                                and filter_value.active == false
+                              -%}
+                                disabled
+                              {% endif %}
+                            >
+                              <span
+                                class="mr-1 inline-block h-2 w-2 rounded-full border-checkbox border-current"
+                              ></span>
+                              {{ filter_value.label }}
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {% endif %}
+                    <noscript>
+                      <div class="mt-4">
+                        <button
+                          class="theme-button w-fit"
+                          type="submit"
+                        >
+                          {{ 'collections.filters.apply' | t }}
+                        </button>
+                      </div>
+                    </noscript>
+                  {%- when 'price_range' -%}
+                    {% liquid
+                      assign uses_comma_decimals = false
+                      assign currencies_using_comma_decimals = 'ANG,ARS,BRL,BYN,BYR,CLF,CLP,COP,CRC,CZK,DKK,EUR,HRK,HUF,IDR,ISK,MZN,NOK,PLN,RON,RUB,SEK,TRY,UYU,VES,VND' | split: ','
+
+                      if currencies_using_comma_decimals contains cart.currency.iso_code
+                        assign uses_comma_decimals = true
+                      endif
+
+                      assign price_range_not_full_range = false
+
+                      if filter.min_value.value or filter.max_value.value
+                        if filter.min_value.value != 0 or filter.max_value.value != filter.range_max
+                          assign price_range_not_full_range = true
+                        endif
+                      endif
+                    %}
+                    <div
+                      x-data="Theme_RangeControl(0, {{ filter.range_max }}, {{ filter.min_value.value | default: 0 }}, {{ filter.max_value.value | default: filter.range_max }})"
+                      :style="`--range-start: ${rangeStartInPercent}%; --range-end: ${rangeEndInPercent}%; --range: ${rangeInPercent}%;`"
+                      :class="{ 'pointer-events-none cursor-not-allowed' : loading }"
+                    >
+                      {% if settings.enable_price_range_control %}
+                        <div
+                          class="mt-4"
+                        >
+                          <div
+                            class="range-control invisible h-[var(--text-border-width,_0px)]"
+                            :class="{ 'invisible h-[var(--text-border-width,_0px)]': ! ready }"
+                          >
+                            <input
+                              class="range-control__edge z-10"
+                              type="range"
+                              :min="min"
+                              :max="max"
+                              step="100"
+                              x-model.number="valueA"
+                              @change="handleRangeStartControlChange"
+                              :disabled="loading"
+                            >
+                            <input
+                              class="range-control__edge z-10"
+                              type="range"
+                              :min="min"
+                              :max="max"
+                              step="100"
+                              x-model.number="valueB"
+                              @change="handleRangeEndControlChange"
+                              :disabled="loading"
+                            >
+                            <input
+                              class="range-control__center z-20"
+                              type="range"
+                              :min="min"
+                              :max="max"
+                              step="100"
+                              @mousedown="$el.classList.add('grabbing')"
+                              @mouseup="$el.classList.remove('grabbing');"
+                              @change="handleRangeCenterControlChange"
+                              x-model.number="valueCenter"
+                              x-ref="centerHandle"
+                              :disabled="loading"
+                            >
+                            <div
+                              class="range-control__indicator -z-10"
+                            ></div>
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="-mx-1 mt-2 flex items-end justify-between">
+                        <div class="mx-1 flex items-center justify-center">
+                          <div class="relative">
+                            <label
+                              class="mb-1 block"
+                              for="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                            >
+                              {{- 'collections.filters.from' | t -}}
+                            </label>
+                            <div class="flex items-center border-text border-current">
+                              <span class="py-2 pl-2 pr-1 text-scheme-text/50">
+                                {{- cart.currency.symbol -}}
+                              </span>
+                              <input
+                                class="font-body block border-0 bg-transparent py-2 pl-1 pr-2"
+                                id="price-range-start-field-{{ section.id }}-sidebar-{{ context }}"
+                                placeholder="{{ 0 | money_without_currency | replace: '.00', '' }}"
+                                x-ref="rangeStartDirectInputField"
+                                x-mask:dynamic="$money($input{% if uses_comma_decimals %}, ','{% endif %})"
+                                @input="handleRangeStartDirectInputFieldInput"
+                                @change="handleRangeStartDirectInputFieldChange"
+                                size="5"
+                                {% if filter.min_value.value %}
+                                  value="{{ filter.min_value.value | money_without_currency | replace: '.00', '' }}"
+                                {% endif %}
+                                inputmode="numeric"
+                                :disabled="loading"
+                              >
+                              <input
+                                name="{{ filter.min_value.param_name }}"
+                                type="hidden"
+                                class="block"
+                                id="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                                x-ref="rangeStartFormField"
+                                @change="filterFormSubmit"
+                                @indirect-change.debounce.1250ms="filterFormSubmit"
+                                x-model.number="rangeStartInMajorUnits"
+                                :disabled="loading"
+                              >
+                            </div>
+                          </div>
+                        </div>
+                        <div class="p-2">&ndash;</div>
+                        <div class="mx-1 flex items-center justify-center">
+                          <div class="relative">
+                            <label
+                              class="mb-1 block"
+                              for="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                            >
+                              {{- 'collections.filters.to' | t -}}
+                            </label>
+                            <div class="flex items-center border-text border-current">
+                              <span class="py-2 pl-2 pr-1 text-scheme-text/50">
+                                {{- cart.currency.symbol -}}
+                              </span>
+                              <input
+                                class="font-body block border-0 bg-transparent py-2 pl-1 pr-2"
+                                id="price-range-end-field-{{ section.id }}-sidebar-{{ context }}"
+                                placeholder="{{ filter.range_max | money_without_currency | replace: '.00', '' }}"
+                                x-mask:dynamic="$money($input{% if uses_comma_decimals %}, ','{% endif %})"
+                                x-ref="rangeEndDirectInputField"
+                                @input="handleRangeEndDirectInputFieldInput"
+                                @change="handleRangeEndDirectInputFieldChange"
+                                size="5"
+                                {% if filter.max_value.value %}
+                                  value="{{ filter.max_value.value | money_without_currency | replace: '.00', '' }}"
+                                {% endif %}
+                                inputmode="numeric"
+                                :disabled="loading"
+                              >
+                              <input
+                                name="{{ filter.max_value.param_name }}"
+                                type="hidden"
+                                class="block"
+                                id="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
+                                x-ref="rangeEndFormField"
+                                @change="filterFormSubmit"
+                                @indirect-change.debounce.1250ms="filterFormSubmit"
+                                x-model.number="rangeEndInMajorUnits"
+                                :disabled="loading"
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <noscript>
+                      <div class="mt-4">
+                        <button
+                          class="theme-button w-fit"
+                          type="submit"
+                        >
+                          {{ 'collections.filters.apply' | t }}
+                        </button>
+                      </div>
+                    </noscript>
+                {%- endcase -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{%- if is_search -%}
+  <input type="hidden" name="q" value="{{ search_terms | escape }}">
+{%- endif -%}
+{% if context == 'drawer' %}
+  <div
+    class="sticky bottom-0 mt-auto flex items-baseline justify-between gap-5 border-t-gridline border-gridline-color bg-scheme-background px-4 py-4 text-scheme-text"
+    data-filterable-filter-fragment="clear"
+  >
+    <button
+      class="theme-button theme-button--no-arrow grow text-center"
+      type="button"
+      @click.prevent="$store.modals.close('filters')"
+    >
+      {{ 'collections.filters.apply' | t }}
+    </button>
+    {% if total_active_values > 0 or price_range_not_full_range %}
+      <a
+        class="theme-link theme-link--no-arrow shrink-0 text-scheme-text hover:text-scheme-accent"
+        href="{{ clear_url }}"
+        @click.prevent="clearAllFilters"
+      >
+        {{- 'collections.filters.clear' | t -}}
+      </a>
+    {% endif %}
+  </div>
+{% else %}
+  <div
+    class="mb-10 mr-auto block px-4 text-left"
+    data-filterable-filter-fragment="clear-sidebar-{{ context }}"
+  >
+    {% if total_active_values > 0 or price_range_not_full_range %}
+      <a
+        class="theme-link theme-link--no-arrow text-scheme-text hover:text-scheme-accent"
+        href="{{ clear_url }}"
+        @click.prevent="clearAllFilters"
+      >
+        {{- 'collections.filters.clear' | t -}}
+      </a>
+    {% else %}
+      <!-- Desktop spacer -->
+      <span
+        class="theme-link theme-link-no-arrow invisible inline-block"
+        aria-hidden="true"
+        >&nbsp;</span
+      >
+    {% endif %}
+  </div>
+{% endif %}
+

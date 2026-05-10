@@ -1,0 +1,327 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign font = section.settings.font
+  assign text_size_class = section.settings.text_size
+  assign ratio = section.settings.crop | plus: 0
+  assign counter = 0
+  assign grid_cols = 12
+
+  assign divisible_by_five = section.blocks.size | modulo: 5
+  assign divisible_by_four = section.blocks.size | modulo: 4
+  assign divisible_by_three = section.blocks.size | modulo: 3
+
+  if divisible_by_five == 0
+    assign grid_cols = 10
+    assign col_span = 'lg:col-span-2'
+    assign sizes = '(min-width: 1024px) 20vw, 100vw'
+  elsif divisible_by_four == 0
+    assign col_span = 'lg:col-span-3'
+    assign sizes = '(min-width: 1024px) calc(100vw / 12 * 3), 100vw'
+  elsif divisible_by_three == 0
+    assign col_span = 'lg:col-span-4'
+    assign sizes = '(min-width: 1024px) calc(100vw / 12 * 4), 100vw'
+  else
+    assign col_span = 'lg:col-span-6'
+    assign sizes = '(min-width: 1024px) 50vw, 100vw'
+  endif
+
+  assign desktop_grid_class = 'lg:grid-cols-' | append: grid_cols
+
+  assign eager_loading_limit = section.blocks.size | at_most: 4
+-%}
+
+<section
+  class="featured-collection gap-gutter border-b-gridline border-gridline-color"
+  data-color-scheme="{{ section_color }}"
+>
+  {% if section.settings.title != '' %}
+    {%- render 'section-title',
+      title: section.settings.title,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  {%- if section.blocks.size > 0 -%}
+    <ul class="grid grid-cols-1 {{ desktop_grid_class }} gap-gutter bg-gridline-color">
+      {% for block in section.blocks %}
+        {%- liquid
+          assign counter = counter | plus: 1
+          assign content_position = block.settings.content_position
+          assign indent_image = block.settings.indent_image
+          assign collection = collections[block.settings.collection]
+
+          unless block.settings.follow_section_color_scheme
+            assign block_color = block.settings.color_scheme
+          else
+            assign block_color = section_color
+          endunless
+
+          assign scheme_text_color_only = block.settings.scheme_text_color_only
+
+          assign preload = false
+          assign loading = 'lazy'
+
+          if section.index == 1 and forloop.first
+            assign preload = true
+          endif
+
+          if section.index <= 2 and forloop.index <= eager_loading_limit
+            assign loading = 'eager'
+          endif
+        -%}
+
+        <li
+          class="{{ col_span }} relative bg-scheme-background"
+          {{ block.shopify_attributes }}
+        >
+          <a
+            class="group relative block h-full text-scheme-text hover:text-scheme-accent{% unless scheme_text_color_only %} bg-scheme-background{% endunless %}"
+            href="{{ collection.url }}"
+            data-color-scheme="{{ block_color }}"
+          >
+            <div class="flex h-full items-center justify-center {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% endunless %} {% if indent_image %}p-8 lg:p-16{% endif %}">
+              <div
+                class="relative w-full"
+              >
+                {% if collection.image != blank
+                  or collection.products.first != blank
+                %}
+                  {%- assign image = collection.image
+                    | default: collection.products.first.featured_image
+                  -%}
+                  {% render 'image-crop',
+                    image: image,
+                    ratio: ratio,
+                    sizes: sizes,
+                    preload: preload,
+                    loading: loading
+                  %}
+                {%- else -%}
+                  {% render 'image-crop-placeholder', ratio: ratio %}
+                {%- endif -%}
+              </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 top-0 z-10 flex px-section-horizontal-spacing py-4 {{ content_position }}">
+              <div class="text-scheme-text {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% endunless %} break-word w-full">
+                <div class="{{ text_size_class }} {{ font }}">
+                  {% if collection.title == blank %}
+                    {{ 'homepage.onboarding.collection_title' | t }}
+                  {% else %}
+                    {{ collection.title }}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+      {% if section.blocks.size == 1 or section.blocks.size == 7 %}
+        <li
+          class="hidden bg-scheme-background lg:col-span-6 lg:block"
+          aria-hidden="true"
+          role="presentation"
+          data-color-scheme="{{ section.settings.color_scheme }}"
+        ></li>
+      {% endif %}
+    </ul>
+  {%- else -%}
+    {%- render 'no-blocks' -%}
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Collection list",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "Font",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "font-body",
+          "label": "Body"
+        }
+      ],
+      "default": "font-heading"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "options": [
+        {
+          "value": "text-base",
+          "label": "Body"
+        },
+        {
+          "value": "text-heading-standard",
+          "label": "Standard heading"
+        },
+        {
+          "value": "text-heading-feature",
+          "label": "Feature heading"
+        },
+        {
+          "value": "text-heading-secondary",
+          "label": "Secondary heading"
+        }
+      ],
+      "default": "text-heading-standard"
+    },
+    {
+      "type": "select",
+      "id": "crop",
+      "label": "Crop images",
+      "options": [
+        {
+          "value": "0",
+          "label": "No crop"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "label": "Collection",
+          "id": "collection",
+          "type": "collection"
+        },
+        {
+          "type": "checkbox",
+          "id": "indent_image",
+          "label": "Indent image",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "justify-start items-start text-left",
+              "label": "Top left"
+            },
+            {
+              "value": "justify-center items-start text-center",
+              "label": "Top center"
+            },
+            {
+              "value": "justify-end items-start text-right",
+              "label": "Top right"
+            },
+            {
+              "value": "justify-start items-center text-left",
+              "label": "Left"
+            },
+            {
+              "value": "justify-center items-center text-center",
+              "label": "Center"
+            },
+            {
+              "value": "justify-end items-center text-right",
+              "label": "Right"
+            },
+            {
+              "value": "justify-start items-end text-left",
+              "label": "Bottom left"
+            },
+            {
+              "value": "justify-center items-end text-center",
+              "label": "Bottom center"
+            },
+            {
+              "value": "justify-end items-end text-right",
+              "label": "Bottom right"
+            }
+          ],
+          "default": "justify-center items-center text-center"
+        },
+        {
+          "type": "header",
+          "content": "Color"
+        },
+        {
+          "type": "checkbox",
+          "id": "follow_section_color_scheme",
+          "label": "Follow section color scheme",
+          "default": true
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "default": "scheme1",
+          "label": "Color scheme"
+        },
+        {
+          "id": "scheme_text_color_only",
+          "type": "checkbox",
+          "label": "Apply text color only",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection list",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

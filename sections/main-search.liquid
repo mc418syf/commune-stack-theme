@@ -1,0 +1,437 @@
+{% paginate search.results by 12 %}
+  {% liquid
+    assign show_sort = section.settings.enable_sorting
+    assign show_filters = false
+
+    if search.filters != empty
+      if section.settings.enable_filtering == true
+        assign show_filters = true
+      endif
+    endif
+
+    assign filters_layout_on_desktop = section.settings.filters_layout_on_desktop
+    assign collapse_filters = section.settings.collapse_filters
+
+    if show_filters
+      assign total_active_values = 0
+      assign has_price_range_filters = false
+
+      for filter in search.filters
+        assign total_active_values = total_active_values | plus: filter.active_values.size
+      endfor
+
+      assign price_range_filters = search.filters | where: 'type', 'price_range'
+
+      if price_range_filters.size > 0
+        assign has_price_range_filters = true
+      endif
+    endif
+
+    assign sort_by = search.sort_by | default: search.default_sort_by
+    assign terms = search.terms | escape
+    assign results_url = '?q=' | append: terms | append: '&sort_by=' | append: sort_by
+
+    assign enable_quick_buy = section.settings.enable_quick_buy
+    assign quick_buy_button_classes = section.settings.quick_buy_button_style
+  %}
+
+  <div
+    id="filterable"
+    class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+    {% if show_filters or show_sort %}
+      x-data="Filterable"
+    {% else %}
+      x-data
+    {% endif %}
+    data-color-scheme="scheme1"
+  >
+    <div class="grid gap-gutter bg-gridline-color lg:grid-cols-12">
+      <div class="bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text lg:col-span-12">
+        <h1
+          class="font-heading text-heading-standard {% if settings.section_title_align == 'center' %}text-center{% endif %}"
+          data-main-search-title
+        >
+          {% if search.performed %}
+            <span class="sr-only">
+              {{- 'general.search.heading' | t: count: search.results_count -}}
+              :</span
+            >
+            {{
+              'general.search.results_with_count'
+              | t: terms: search.terms, count: search.results_count
+            }}
+          {% else %}
+            {{ 'general.search.title' | t }}
+          {% endif %}
+        </h1>
+      </div>
+
+      <div class="bg-scheme-background px-section-horizontal-spacing py-2 text-scheme-text lg:col-span-12">
+        <form
+          action="{{ routes.search_url }}"
+          method="get"
+          class="input-group search"
+          role="search"
+        >
+          <label for="search-{{ section.id }}" class="hidden">
+            {{- 'general.search.placeholder' | t -}}
+          </label>
+          <div class="flex items-center justify-between">
+            <button
+              class="mr-4 py-2"
+              type="submit"
+            >
+              <span class="mb-1 flex h-6 w-6 items-center">
+                {%- render 'icon-search' -%}
+              </span>
+              <span class="sr-only">{{ 'general.search.submit' | t }}</span>
+            </button>
+            <input
+              autofocus
+              id="search-{{ section.id }}"
+              type="text"
+              name="q"
+              value="{{ search.terms | escape }}"
+              placeholder="{{ 'general.search.placeholder' | t }}"
+              class="font-body block w-full bg-transparent pb-1 placeholder-current"
+              aria-label="{{ 'general.search.placeholder' | t }}"
+              data-search-input
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if search.performed %}
+      <p
+        class="sr-only"
+        id="results-count"
+        role="status"
+        data-fragment-id="count"
+        x-html-if-set="countHTML"
+      >
+        {{ 'general.search.results_count' | t: count: search.results_count }}
+      </p>
+
+      {% if show_sort or show_filters %}
+        <div class="relative flex items-center justify-between border-t-gridline border-gridline-color px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
+          {%- liquid
+            if filters_layout_on_desktop == 'drop_down'
+              assign toggle_container_class = 'block md:hidden'
+            endif
+            if show_filters
+              render 'filterable-drawer-toggle', container_classes: toggle_container_class, total_active_values: total_active_values
+              if filters_layout_on_desktop == 'drop_down'
+                render 'filterable-filters-drop-down', filters: search.filters, total_active_values: total_active_values, section_color: 'scheme1', clear_url: results_url, container_classes: 'hidden md:block', is_search: true, search_terms: search.terms
+              endif
+            endif
+
+            if show_sort
+              render 'filterable-sort-drop-down', sort_options: search.sort_options, sort_by: sort_by, is_search: true, search_terms: search.terms
+            endif
+          -%}
+        </div>
+      {% endif %}
+
+      <div
+        id="results"
+        data-fragment-id="results"
+        x-html-if-set="resultsHTML"
+        class="grid gap-gutter border-t-text border-scheme-text bg-gridline-color text-scheme-text lg:grid-cols-12"
+        :class="{ 'opacity-10' : loading }"
+      >
+        {% if search.results_count == 0 %}
+          <div class="bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text lg:col-span-12">
+            <p>{{ 'general.search.no_results' | t }}</p>
+          </div>
+        {% else %}
+          {% liquid
+            assign has_product_results = false
+            assign has_article_results = false
+            assign has_page_results = false
+
+            for item in search.results
+              if item.object_type == 'product'
+                assign has_product_results = true
+              endif
+              if item.object_type == 'article'
+                assign has_article_results = true
+              endif
+              if item.object_type == 'page'
+                assign has_page_results = true
+              endif
+            endfor
+
+            if has_article_results or has_page_results
+              assign desktop_col_span = 'lg:col-span-9'
+
+              assign product_sizes = '(min-width: 1024px) calc(((100vw / 12) * 9 )/ 4), 100vw'
+              assign article_sizes = '4rem'
+            else
+              assign desktop_col_span = 'lg:col-span-12'
+
+              assign product_sizes = '(min-width: 1024px) calc(100vw / 4), 100vw'
+            endif
+          %}
+
+          <div class="{{ desktop_col_span }} bg-scheme-background text-scheme-text{% unless has_product_results %} max-lg:hidden{% endunless %}">
+            {% if has_product_results %}
+              <ul class="grid h-full grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-4">
+                {% assign counter = 0 %}
+                {% for item in search.results %}
+                  {% if item.object_type == 'product' %}
+                    {% liquid
+                      assign counter = counter | plus: 1
+
+                      if section.index <= 3 and forloop.index <= 1
+                        assign loading = 'eager'
+                      else
+                        assign loading = 'lazy'
+                      endif
+                    %}
+                    <li class="bg-scheme-background text-scheme-text">
+                      {% assign product = item %}
+                      {% if section.settings.product_tile_type == 'text_overlay'
+                      %}
+                        {%- render 'product-tile-text-overlay',
+                          product: product,
+                          section_color: 'scheme1',
+                          products_per_row_mobile: 2,
+                          sizes: product_sizes,
+                          loading: loading
+                        -%}
+                      {% else %}
+                        {%- render 'product-tile-standard',
+                          product: product,
+                          section_color: 'scheme1',
+                          products_per_row_mobile: 2,
+                          sizes: product_sizes,
+                          loading: loading,
+                          enable_quick_buy: enable_quick_buy,
+                          quick_buy_button_classes: quick_buy_button_classes
+                        -%}
+                      {% endif %}
+                    </li>
+                  {% endif %}
+                {% endfor %}
+                {%- assign items_on_last_row = counter | modulo: 4 -%}
+                {%- assign placeholder_width = 4 | minus: items_on_last_row -%}
+                {%- if items_on_last_row != 0 -%}
+                  <li
+                    style="--placeholder-width: {{ placeholder_width }};"
+                    class="none absolute bg-scheme-background lg:static lg:col-span-placeholder-width lg:block"
+                    aria-hidden="true"
+                    role="presentation"
+                  ></li>
+                {%- endif -%}
+              </ul>
+            {% else %}
+              <div
+                class="col-span-full bg-scheme-background"
+                aria-hidden="true"
+                role="presentation"
+              ></div>
+            {% endif %}
+          </div>
+          {% if has_article_results or has_page_results %}
+            <div class="bg-scheme-background text-scheme-text lg:col-span-3">
+              {% if has_article_results %}
+                <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+                  <h2 class="font-heading text-lg">Articles</h2>
+                </div>
+                <div class="relative grid grid-cols-1 gap-gutter bg-gridline-color {% if has_page_results %}border-b-gridline border-gridline-color{% endif %}">
+                  {% for item in search.results %}
+                    {% if item.object_type == 'article' %}
+                      {% assign article = item %}
+                      <div class="justify-star relative flex items-center bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text">
+                        <a
+                          href="{{ article.url }}"
+                          class="absolute inset-0 z-10"
+                          ><span class="sr-only">{{- article.title -}}</span>
+                        </a>
+                        {%- if article.image != blank -%}
+                          <div class="mr-4 w-16">
+                            {% render 'image-crop',
+                              image: article.image,
+                              ratio: 1,
+                              sizes: article_sizes,
+                              loading: 'lazy'
+                            %}
+                          </div>
+                        {%- endif -%}
+                        <div>
+                          <h3 class="font-heading">{{- article.title -}}</h3>
+                          <p class="mt-2">
+                            {{
+                              article.published_at
+                              | time_tag: format: 'month_day_year'
+                            }}
+                          </p>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              {% if has_page_results %}
+                <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+                  <h2 class="font-heading text-lg">Pages</h2>
+                </div>
+                <div class="grid grid-cols-1 gap-gutter bg-gridline-color">
+                  {% for item in search.results %}
+                    {% if item.object_type == 'page' %}
+                      {% assign page = item %}
+                      <div class="justify-star relative flex items-center bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text">
+                        <a
+                          href="{{ page.url }}"
+                          class="absolute inset-0 z-10"
+                          ><span class="sr-only">{{- page.title -}}</span>
+                        </a>
+                        <div>
+                          <h3 class="font-heading">{{- page.title -}}</h3>
+                          <p class="mt-2">
+                            {{ page.content | strip_html | truncate: 100 }}
+                          </p>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+          {% if paginate.pages > 1 %}
+            <div class="lg:col-span-full">
+              {% render 'pagination',
+                paginate: paginate,
+                no_border: true,
+                section_color: 'scheme1'
+              %}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+    {% if show_filters %}
+      {%- render 'mobile-filter-drawer',
+        context: 'drawer',
+        show_filters: show_filters,
+        show_sort: show_sort,
+        filters: search.filters,
+        total_active_values: total_active_values,
+        section_color: 'scheme1',
+        clear_url: results_url,
+        sort_options: search.sort_options,
+        sort_by: sort_by,
+        start_collapsed: collapse_filters,
+        is_search: true,
+        search_terms: search.terms
+      -%}
+    {% endif %}
+  </div>
+{% endpaginate %}
+
+{% if has_price_range_filters %}
+  {{ 'range-control.css' | asset_url | stylesheet_tag }}
+
+  {% unless request.design_mode %}
+    <script
+      src="{{ 'range-control.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% endunless %}
+{% endif %}
+
+{% unless request.design_mode %}
+  {% if show_filters or show_sort %}
+    <script src="{{ 'filterable.js' | asset_url }}" type="module"></script>
+  {% endif %}
+{% endunless %}
+
+{% if enable_quick_buy and section.settings.product_tile_type == 'standard' %}
+  {% unless request.design_mode %}
+    <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'product.js' | asset_url }}" type="module"></script>
+    {% if settings.quick_buy_variant_picker_option_style == 'drop_down' %}
+      <script
+        src="{{ 'variant-drop-down.js' | asset_url }}"
+        type="module"
+      ></script>
+    {% endif %}
+  {% endunless %}
+
+  {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Search results",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Filtering and Sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Enable filtering",
+      "info": "[Customize filters](/admin/menus)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Enable sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "collapse_filters",
+      "label": "Collapse filters",
+      "info": "Does not apply to desktop drop down layout",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "capitalize_filters",
+      "label": "Capitalize labels"
+    },
+    {
+      "type": "select",
+      "id": "filters_layout_on_desktop",
+      "label": "Filters layout on desktop",
+      "info": "Drawer is the default mobile layout",
+      "default": "drop_down",
+      "options": [
+        {
+          "value": "drop_down",
+          "label": "Drop down"
+        },
+        {
+          "value": "drawer",
+          "label": "Drawer"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Product results"
+    },
+    {
+      "id": "product_tile_type",
+      "type": "select",
+      "label": "Product tile type",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text_overlay",
+          "label": "Text overlay"
+        }
+      ],
+      "default": "standard"
+    }
+  ]
+}
+{% endschema %}

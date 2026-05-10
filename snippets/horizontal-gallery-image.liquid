@@ -1,0 +1,46 @@
+{%- liquid
+  assign height_aspect_ratio = 1.00 | divided_by: image.aspect_ratio
+
+  assign desktop_media_width = desktop_media_height | divided_by: height_aspect_ratio
+
+  assign sizes = '(min-width: 1024px) ' | append: desktop_media_height | append: 'vh, 100vw'
+-%}
+<style>
+  #responsiveImageFeatureTemplate-{{ image.id }} {
+    height: 0;
+    padding-top: {{ 100 | divided_by: image.aspect_ratio }}%;
+  }
+
+  @media (min-width: 1024px) {
+    #responsiveImageFeatureTemplate-{{ image.id }} {
+      height: {{ desktop_media_height }}vh;
+      width: {{ desktop_media_width }}vh;
+    }
+  }
+</style>
+<image-with-placeholder
+  id="responsiveImageFeatureTemplate-{{ image.id }}"
+  data-image-id="{{ image.id }}"
+  class="relative mx-auto my-0 w-full overflow-hidden"
+  {{ wrapper_attributes }}
+>
+  {{
+    image
+    | image_url: width: 2000
+    | image_tag:
+      class: 'peer/image block absolute top-0 left-0 transition-opacity duration-200 ease-in-out w-full max-w-full h-auto',
+      sizes: sizes,
+      tabindex: '-1',
+      loading: loading
+  }}
+  {% unless no_placeholder %}
+    <div
+      class="absolute inset-0 h-full w-full bg-scheme-text opacity-[0.05] peer-[.is-complete]/image:opacity-0 no-js:hidden"
+    ></div>
+  {% endunless %}
+  <noscript>
+    <div class="absolute left-0 top-0 h-full w-full">
+      {{ image | image_url: width: 2000 | image_tag: loading: loading }}
+    </div>
+  </noscript>
+</image-with-placeholder>

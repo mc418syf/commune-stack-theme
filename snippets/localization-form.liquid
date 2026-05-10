@@ -1,0 +1,192 @@
+{%- liquid
+  assign form_id = context | append: '-localization-form'
+
+  if context == 'header' and settings.header_uppercase
+    assign uppercase = true
+  endif
+-%}
+{%- form 'localization', id: form_id -%}
+  <div class="flex gap-4{% if wrapper_classes %} {{ wrapper_classes }}{% endif %}">
+    {%- if locale_selector -%}
+      {% if context == 'header'
+        and localization.available_languages.size == 2
+      %}
+        <div class="inline-flex items-center{% if uppercase %} uppercase{% endif %}">
+          {%- for language in localization.available_languages -%}
+            <div class="label-only-input relative py-2" x-data>
+              <input
+                class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                id="{{ language.iso_code }}"
+                type="radio"
+                name="locale_code"
+                lang="{{ language.iso_code }}"
+                value="{{ language.iso_code }}"
+                @click="$el.closest('form').submit()"
+                @keyup.space="$el.closest('form').submit()"
+                @keyup.enter="$el.closest('form').submit()"
+                {%- if language.iso_code == localization.language.iso_code %}
+                  checked
+                {% endif %}
+              >
+              <label
+                class="border-b-text border-b-transparent text-scheme-text hover:text-scheme-accent peer-checked:border-b-current"
+                for="{{ language.iso_code }}"
+              >
+                {{- language.iso_code | capitalize -}}
+              </label>
+            </div>
+            {%- if forloop.first -%}
+              <span class="inline-block px-1">/</span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {% else %}
+        <div class="inline-block shrink-0 select-none">
+          <h2 class="sr-only" id="lang-heading-{{ context }}">
+            {{ 'general.language.dropdown_label' | t }}
+          </h2>
+          <div
+            class="relative"
+            x-data="{ expanded: false }"
+            @keydown.escape.prevent.stop="expanded = false"
+            @click.outside="expanded = false"
+          >
+            <button
+              type="button"
+              class="{{ button_classes | default: 'border-b-text border-scheme-text py-1 text-sm' }}{% if uppercase %} uppercase{% endif %}"
+              :aria-expanded="expanded"
+              aria-controls="lang-list-{{ context }}"
+              aria-describedby="lang-heading-{{ context }}"
+              @click.prevent="expanded = ! expanded"
+            >
+              {{ form.current_locale.endonym_name }}
+              <span
+                class="rotate ml-1 inline-block w-3 origin-center transform fill-current transition"
+                :class="{ 'rotate-180': expanded }"
+              >
+                {% render 'icon-chevron-down' %}
+              </span>
+            </button>
+            <div
+              class="absolute {{ open }}{% if open_mobile %} {{ open_mobile }}{% endif %}"
+              x-show="expanded"
+              style="display: none;"
+            >
+              <ul
+                id="lang-list-{{ context }}"
+                class="relative z-10 flex max-h-[30vh] w-max {{ options_max_width }} snap-y snap-mandatory flex-col gap-[--text-border-width] overflow-y-auto border-text border-gridline-color bg-gridline-color {{ option_text_size }}"
+                x-transition:enter="transition ease duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease duration-300"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                :aria-hidden="! expanded"
+              >
+                {% for locale in form.available_locales %}
+                  <li class="flex items-center bg-scheme-background {{ option_padding }} coarse-pointer:min-h-[44px] coarse-pointer:min-w-[44px]">
+                    <button
+                      class="break-word text-left [text-wrap:balance] hover:text-scheme-accent{% if uppercase %} uppercase{% endif %}"
+                      type="button"
+                      lang="{{ locale.iso_code }}"
+                      {% if locale.iso_code == form.current_locale.iso_code %}
+                        aria-current="true"
+                      {% endif %}
+                      @click.prevent="$refs.input.value = '{{ locale.iso_code }}'; $root.closest('form').submit();"
+                    >
+                      <span class="{% if locale.iso_code == form.current_locale.iso_code %}border-scheme-text border-b-text{% else %}border-transparent border-b-text{% endif %}">
+                        {{- locale.endonym_name -}}
+                      </span>
+                    </button>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+            <input
+              x-ref="input"
+              type="hidden"
+              name="locale_code"
+              id="LocaleSelector"
+              value="{{ form.current_locale.iso_code }}"
+            >
+          </div>
+        </div>
+      {% endif %}
+    {%- endif -%}
+    {%- if country_selector -%}
+      <div class="inline-block shrink-0 select-none">
+        <h2 class="sr-only" id="country-heading-{{ context }}">
+          {{ 'general.country.dropdown_label' | t }}
+        </h2>
+        <div
+          class="relative"
+          x-data="{ expanded: false }"
+          @keydown.escape.prevent.stop="expanded = false"
+          @click.outside="expanded = false"
+        >
+          <button
+            type="button"
+            class="{{ button_classes | default: 'border-b-text border-scheme-text py-1 text-sm' }}{% if uppercase %} uppercase{% endif %}"
+            :aria-expanded="expanded"
+            aria-controls="country-list-{{ context }}"
+            aria-describedby="country-heading-{{ context }}"
+            @click.prevent="expanded = ! expanded"
+          >
+            {{ localization.country.name }} (
+            {{- localization.country.currency.iso_code }}
+            {{ localization.country.currency.symbol }})
+            <span
+              class="rotate ml-1 inline-block w-3 origin-center transform fill-current transition"
+              :class="{ 'rotate-180': expanded }"
+            >
+              {% render 'icon-chevron-down' %}
+            </span>
+          </button>
+          <div
+            class="absolute {{ open }}{% if open_mobile %} {{ open_mobile }}{% endif %}"
+            x-show="expanded"
+            style="display: none;"
+          >
+            <ul
+              id="country-list-{{ context }}"
+              class="relative z-10 flex max-h-[30vh] w-max {{ options_max_width }} snap-y snap-mandatory flex-col gap-[--text-border-width] overflow-y-auto border-text border-gridline-color bg-gridline-color {{ option_text_size }}"
+              x-transition:enter="transition ease duration-300"
+              x-transition:enter-start="opacity-0"
+              x-transition:enter-end="opacity-100"
+              x-transition:leave="transition ease duration-300"
+              x-transition:leave-start="opacity-100"
+              x-transition:leave-end="opacity-0"
+              :aria-hidden="! expanded"
+            >
+              {% for country in localization.available_countries %}
+                <li class="flex items-center bg-scheme-background {{ option_padding }} coarse-pointer:min-h-[44px] coarse-pointer:min-w-[44px]">
+                  <button
+                    class="break-word text-left [text-wrap:balance] hover:text-scheme-accent{% if uppercase %} uppercase{% endif %}"
+                    type="button"
+                    {% if country.iso_code == localization.country.iso_code %}
+                      aria-current="true"
+                    {% endif %}
+                    @click.prevent="$refs.input.value = '{{ country.iso_code }}'; $root.closest('form').submit();"
+                  >
+                    <span class="{% if country.iso_code == localization.country.iso_code %}border-scheme-text border-b-text{% else %}border-transparent border-b-text{% endif %}">
+                      {{- country.name }} ({{ country.currency.iso_code }}
+                      {{ country.currency.symbol }})</span
+                    >
+                  </button>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+
+          <input
+            x-ref="input"
+            type="hidden"
+            name="country_code"
+            id="CountrySelector"
+            value="{{ localization.country.iso_code }}"
+          >
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+{%- endform -%}

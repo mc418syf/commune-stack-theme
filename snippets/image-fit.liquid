@@ -1,0 +1,46 @@
+{%- liquid
+  unless sizes
+    assign sizes = '100vw'
+  endunless
+
+  unless widths
+    assign widths = '200, 350, 450, 750, 850, 960, 1280, 1440, 1536, 1706, 1782, 1920, 2560, 2880, 3000'
+  endunless
+
+  unless loading
+    assign loading = null
+  endunless
+
+  unless preload
+    assign preload = false
+  endunless
+
+  if contain
+    assign object_class = 'object-contain'
+  else
+    assign object_class = 'object-cover'
+  endif
+
+  assign image_class = 'peer/image block absolute inset-0 w-full h-full ' | append: object_class
+
+  if extra_classes
+    assign image_class = image_class | append: ' ' | append: extra_classes
+  endif
+-%}
+
+<image-with-placeholder>
+  {{
+    image
+    | image_url: width: 3000
+    | image_tag:
+      loading: loading,
+      class: image_class,
+      sizes: sizes,
+      widths: widths
+  }}
+  {% unless no_placeholder %}
+    <div
+      class="absolute inset-0 h-full w-full bg-scheme-text opacity-[0.05] peer-[.is-complete]/image:opacity-0 no-js:hidden"
+    ></div>
+  {% endunless %}
+</image-with-placeholder>

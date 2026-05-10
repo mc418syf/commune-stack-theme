@@ -1,0 +1,37 @@
+<div x-data>
+  <template x-teleport="body">
+    <div
+      x-show="$store.modals.modal.open"
+      @keydown.escape.prevent.stop="$store.modals.close('modal')"
+      @click="$store.modals.close('modal')"
+      class="fixed inset-0 z-110"
+      data-color-scheme="{{ settings.modal_color_scheme | default: 'scheme3' }}"
+      id="modals-modal"
+      @modal-is-open.window="setTimeout(() => { $focus.first() }, 120)"
+    >
+      <div x-show="$store.modals.modal.open" class="flex h-full w-full">
+        <div
+          @click.stop
+          x-show="$store.modals.modal.open"
+          x-trap.noscroll.inert="$store.modals.modal.open"
+          class="
+            relative
+            m-auto
+            h-full
+            w-full
+            overflow-y-auto
+            bg-scheme-background
+            text-scheme-text
+          "
+          id="modal-slot"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="getModalLabel('modal', $el)"
+          tabindex="-1"
+        >
+          <!-- Modal content is teleported here -->
+        </div>
+      </div>
+    </div>
+  </template>
+</div>

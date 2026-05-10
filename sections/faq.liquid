@@ -1,0 +1,184 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign heading_font = section.settings.heading_font
+  assign two_columns_desktop = section.settings.two_columns_desktop
+-%}
+
+<section
+  class="overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  {% if section.settings.title != '' %}
+    {%- render 'section-title',
+      title: section.settings.title,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  <ul
+    {% if two_columns_desktop %}
+      class="lg:hidden"
+    {% endif %}
+  >
+    {% for block in section.blocks %}
+      {%- render 'collapsible',
+        tag: 'li',
+        title: block.settings.question,
+        id: block.id,
+        expanded_content: block.settings.answer,
+        heading_font: heading_font,
+        expanded_content_max_width: section.settings.expanded_content_max_width,
+        last_in_loop: forloop.last
+      -%}
+    {% endfor %}
+  </ul>
+
+  {%- if two_columns_desktop -%}
+    <div class="hidden gap-gutter bg-gridline-color lg:-mb-gridline lg:grid lg:grid-cols-2">
+      <ul class="bg-scheme-background">
+        {% for block in section.blocks %}
+          {%- liquid
+            assign mod = forloop.index0 | modulo: 2
+          -%}
+          {%- if mod == 0 -%}
+            {%- render 'collapsible',
+              tag: 'li',
+              title: block.settings.question,
+              id: block.id,
+              expanded_content: block.settings.answer,
+              heading_font: heading_font,
+              expanded_content_max_width: section.settings.expanded_content_max_width,
+              last_in_loop: false
+            -%}
+          {%- endif -%}
+        {% endfor %}
+      </ul>
+      <ul class="bg-scheme-background">
+        {% for block in section.blocks %}
+          {%- liquid
+            assign mod = forloop.index0 | modulo: 2
+          -%}
+          {%- if mod != 0 -%}
+            {%- render 'collapsible',
+              tag: 'li',
+              title: block.settings.question,
+              id: block.id,
+              expanded_content: block.settings.answer,
+              heading_font: heading_font,
+              expanded_content_max_width: section.settings.expanded_content_max_width,
+              last_in_loop: false
+            -%}
+          {%- endif -%}
+        {% endfor %}
+      </ul>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "FAQs"
+    },
+    {
+      "type": "header",
+      "content": "Tabs"
+    },
+    {
+      "type": "checkbox",
+      "id": "two_columns_desktop",
+      "default": true,
+      "label": "Two columns on desktop"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Heading font",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "font-main",
+          "label": "Body"
+        }
+      ],
+      "default": "font-heading"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Question",
+      "type": "question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Frequently asked question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Use this text to share the answer to the question with your customers.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

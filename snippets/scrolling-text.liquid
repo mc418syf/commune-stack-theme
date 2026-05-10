@@ -1,0 +1,124 @@
+{%- liquid
+  comment
+    The minimum speed possible is 20s, the maximum speed is 1s
+  endcomment
+
+  assign min_speed_setting = 20
+  assign max_speed_setting = 400
+
+  assign speed_number = min_speed_setting | plus: max_speed_setting | minus: speed_setting
+
+  assign speed_number = speed_number | divided_by: 2 | divided_by: 10
+
+  if repeat_text
+    if mobile_text_scale and desktop_text_scale
+      assign mobile_text_scale = mobile_text_scale | plus: 0
+      assign desktop_text_scale = desktop_text_scale | plus: 0
+
+      if mobile_text_scale >= 3
+        assign l_padding_class = 'pl-2'
+        assign x_padding_class = 'pl-2'
+      else
+        assign l_padding_class = 'pl-1'
+        assign x_padding_class = 'pl-1'
+      endif
+
+      if desktop_text_scale >= 2
+        assign l_padding_class = l_padding_class | append: ' lg:pl-4'
+        assign x_padding_class = x_padding_class | append: ' lg:px-4'
+      elsif desktop_text_scale >= 8
+        assign l_padding_class = l_padding_class | append: ' lg:pl-5'
+        assign x_padding_class = x_padding_class | append: ' lg:px-5'
+      else
+        assign l_padding_class = l_padding_class | append: ' lg:pl-2'
+        assign x_padding_class = x_padding_class | append: ' lg:px-2'
+      endif
+    else
+      assign l_padding_class = 'pl-1 lg:pl-2'
+      assign x_padding_class = 'px-1 lg:px-2'
+    endif
+
+    assign content_class = 'grow-0 shrink-0'
+
+    if separator != 'none'
+      assign content_class = content_class | append: ' ' | append: l_padding_class
+    else
+      assign content_class = content_class | append: ' ' | append: x_padding_class
+    endif
+  else
+    assign content_class = 'shrink-0 pl-[100vw]'
+  endif
+-%}
+
+{% if repeat_text %}
+  {% capture text_with_separator %}{{ text }}{% unless separator == 'none' %}<span class="{{ l_padding_class }}">{% for i in (1..separator_repeats) %}{{ separator }}{% unless forloop.last %}{{ spacing_between_repeated_separators }}{% endunless %}{% endfor %}</span>{% endunless %}{% endcapture %}
+  {% assign text = text_with_separator %}
+{% endif %}
+
+{% capture content %}
+  <scrolling-items-container class="block">
+    <scrolling-items
+      style="
+        --base-scrolling-items-speed: {{ speed_number }}s;
+        --local-scrolling-items-speed-multiplier: 1;
+        --scrolling-items-speed: calc(
+            var(--base-scrolling-items-speed) * var(--global-scrolling-items-speed-multiplier) *
+              var(--local-scrolling-items-speed-multiplier)
+          );
+        --scrolling-items-direction: {{ direction }};"
+      class="block w-max whitespace-nowrap motion-safe:animate-[scrolling-items_var(--scrolling-items-speed)_linear_infinite_var(--scrolling-items-direction)] motion-safe:focus-within:[animation-play-state:paused] motion-safe:hover:[animation-play-state:paused] {{ font }} {{ text_size_class }} motion-reduce:block motion-reduce:whitespace-normal motion-reduce:px-section-horizontal-spacing motion-reduce:text-center {% if repeat_text %} motion-reduce:-translate-x-1/4{% endif %}"
+    >
+      <scrolling-items-surface class="flex flex-nowrap items-center">
+        <scrolling-items-content class="{{ content_class }}">{{ text }}</scrolling-items-content>
+          <noscript>
+            {% liquid
+              if repeat_text
+                assign fallback_repeat_limit = 11
+              else
+                assign fallback_repeat_limit = 1
+              endif
+            %}
+            {% for i in (1..fallback_repeat_limit) %}
+              <span class="motion-reduce:hidden {{ content_class }}">{{ text }}</span>
+            {% endfor %}
+          </noscript>
+      </scrolling-items-surface>
+    </scrolling-items>
+  </scrolling-items-container>
+{% endcapture %}
+
+{% liquid
+  assign container_padding_class = 'py-2'
+
+  if mobile_text_scale and desktop_text_scale
+    if mobile_text_scale >= 4
+      assign container_padding_class = 'py-4'
+    endif
+
+    if desktop_text_scale >= 8
+      assign container_padding_class = container_padding_class | append: ' lg:py-6'
+    elsif desktop_text_scale >= 7
+      assign container_padding_class = container_padding_class | append: ' lg:py-5'
+    elsif desktop_text_scale >= 3
+      assign container_padding_class = container_padding_class | append: ' lg:py-3.5'
+    else
+      assign container_padding_class = container_padding_class | append: ' lg:py-2'
+    endif
+  endif
+%}
+
+<div
+  class="{{ container_padding_class }} overflow-hidden"
+>
+  {%- if link != blank -%}
+    <a href="{{ link }}" class="text-scheme-text hover:text-scheme-accent">
+      {{ content }}
+    </a>
+  {% else %}
+    {{ content }}
+  {% endif %}
+</div>
+
+{% unless request.design_mode %}
+  <script src="{{ 'scrolling-items.js' | asset_url }}" type="module"></script>
+{% endunless %}

@@ -1,0 +1,278 @@
+<div
+  class="{% unless settings.fill_image_to_border_edge %}p-2 lg:p-0{% endunless %}"
+  data-color-scheme="{{ section_color }}"
+>
+  <div
+    class="relative w-full"
+    data-media-id="{{ media.id }}"
+    data-product-single-media-wrapper
+    {% if media.media_type == 'image' %}
+      data-product-media-type-image data-product-image-index="{{ image_index }}"
+      {% if section.settings.enable_image_zoom %}
+        @click.prevent="openZoom({{ image_index }})"
+        @keyup.enter.prevent="openZoom({{ image_index }})" tabindex="0"
+        role="button"
+      {% endif %}
+    {% endif %}
+    {% if media.media_type == 'video' or media.media_type == 'external_video' %}
+      role="figure" data-product-media-type-video
+      data-enable-video-looping="{{ enable_video_looping }}"
+    {% endif %}
+    {% if media.media_type == 'model' %}
+      data-product-media-type-model
+    {% endif %}
+    {% if media.media_type == 'external_video' %}
+      data-video-id="{{ media.external_id }}"
+    {% endif %}
+  >
+    {% case media.media_type %}
+      {% when 'image' %}
+        {%- liquid
+          if slideshow_enabled
+            render 'horizontal-gallery-image', image: media.image, desktop_media_height: desktop_media_height, loading: loading
+
+          else
+            render 'image', image: media.image, loading: loading
+          endif
+          assign image_index = image_index | plus: 1
+        -%}
+      {% when 'external_video', 'video' %}
+        {% liquid
+          comment
+            Shopify rounds 16/9 aspect ratios too much,
+            resulting in some horizontal bars peeking through
+          endcomment
+
+          assign rounded_media_aspect_ratio_as_string = media.aspect_ratio | round: 2 | append: ''
+
+          if rounded_media_aspect_ratio_as_string contains '1.77' or rounded_media_aspect_ratio_as_string contains '1.78'
+            assign media_aspect_ratio = 1.77777778
+          else
+            assign media_aspect_ratio = media.aspect_ratio
+          endif
+
+          assign aspect_ratio = media_aspect_ratio | times: 100.0
+          assign aspect_ratio = 100.0 | divided_by: aspect_ratio
+
+          assign desktop_media_width = desktop_media_height | divided_by: aspect_ratio
+
+          assign video_sizes = '(min-width: 1024px) ' | append: desktop_media_height | append: 'vh, 100vw'
+        %}
+        <style>
+          #responsiveExternalVideoFeatureTemplate-{{ media.id }} {
+            height: 0;
+            padding-top: {{ 100 | divided_by: media_aspect_ratio }}%;
+          }
+
+          {%- if slideshow_enabled -%}
+          @media (min-width: 1024px) {
+            #responsiveExternalVideoFeatureTemplate-{{ media.id }} {
+              height: {{ desktop_media_height }}vh;
+              width: {{ desktop_media_width }}vh;
+            }
+          }
+          {%- endif -%}
+        </style>
+        {%- assign featured_video = media -%}
+        <div
+          id="{{ section.id }}-{{ media.id }}"
+          x-data="Theme_ProductMediaVideo"
+        >
+          <div
+            id="responsiveExternalVideoFeatureTemplate-{{ media.id }}"
+            class="relative"
+            x-intersect:leave="pause"
+          >
+            <template x-if="!enabled">
+              <button
+                @click="enable"
+                class="group/button absolute inset-0 h-full w-full"
+                type="button"
+                aria-label="{{ 'media.play_video' | t }}"
+              >
+                <span
+                  class="lg:w-18 lg:h-18 text-scheme-background-overlay absolute left-1/2 top-1/2 z-40 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 transform items-center justify-center rounded-full bg-scheme-background transition-opacity group-hover/button:bg-scheme-accent group-hover/button:text-scheme-accent-contrast"
+                >
+                  <span class="inline-block h-8 w-8">
+                    {%- render 'icon-play' -%}
+                  </span>
+                </span>
+                {%
+                  render 'image-fit',
+                  image: featured_video.preview_image,
+                  sizes: video_sizes,
+                  loading: loading,
+                %}
+              </button>
+            </template>
+            <template x-if="enabled">
+              {%- liquid
+                assign video_class = 'video absolute inset-0 h-full w-full'
+                assign player_id = 'player-' | append: section.id | append: '-' | append: media.id
+              -%}
+              {% case featured_video.media_type %}
+                {% when 'external_video' %}
+                  {% assign video_class = video_class
+                    | append: ' js-'
+                    | append: featured_video.host
+                  %}
+                  {% if featured_video.host == 'youtube' %}
+                    <div
+                      x-data="YouTubeEmbed"
+                      @play="play"
+                      @pause="pause"
+                      {% if request.design_mode %}
+                        @deinit="deinit"
+                      {% endif %}
+                    >
+                      {{
+                        featured_video
+                        | external_video_url:
+                          enablejsapi: 1,
+                          autoplay: true,
+                          loop: enable_video_looping,
+                          playlist: featured_video.external_id
+                        | external_video_tag:
+                          id: player_id,
+                          class: video_class,
+                          loading: loading,
+                          x-ref: 'video',
+                          alpineonloadattr: 'onIFrameLoad'
+                        | replace: 'alpineonloadattr', 'x-on:load'
+                      }}
+                    </div>
+                  {% else %}
+                    <div
+                      x-data="VimeoEmbed"
+                      @play="play"
+                      @pause="pause"
+                      {% if request.design_mode %}
+                        @deinit="deinit"
+                      {% endif %}
+                    >
+                      {{
+                        featured_video
+                        | external_video_url:
+                          autoplay: true,
+                          loop: enable_video_looping,
+                          player_id: media.id
+                        | external_video_tag:
+                          id: player_id,
+                          class: video_class,
+                          loading: loading,
+                          x-ref: 'video'
+                      }}
+                    </div>
+                  {% endif %}
+                {% when 'video' %}
+                  <div
+                    x-data="HTMLVideo"
+                    @play="play"
+                    @pause="pause"
+                  >
+                    {{
+                      featured_video
+                      | video_tag:
+                        autoplay: true,
+                        image_size: '2048x',
+                        loop: enable_video_looping,
+                        controls: true,
+                        preload: 'none',
+                        class: video_class,
+                        muted: true,
+                        id: player_id,
+                        loading: loading,
+                        x-ref: 'video'
+                    }}
+                  </div>
+              {% endcase %}
+            </template>
+          </div>
+        </div>
+        {% unless request.design_mode %}
+          <script
+            src="{{ 'product-media-video.js' | asset_url }}"
+            type="module"
+          ></script>
+          {% case featured_video.media_type %}
+            {% when 'external_video' %}
+              {% if featured_video.host == 'youtube' %}
+                <script
+                  src="{{ 'youtube-embed.js' | asset_url }}"
+                  type="module"
+                ></script>
+              {% elsif featured_video.host == 'vimeo' %}
+                <script
+                  src="{{ 'vimeo-embed.js' | asset_url }}"
+                  type="module"
+                ></script>
+              {% endif %}
+            {% when 'video' %}
+              <script
+                src="{{ 'html-video.js' | asset_url }}"
+                type="module"
+              ></script>
+          {% endcase %}
+        {% endunless %}
+      {% when 'model' %}
+        <style>
+           #responsiveModelFeatureTemplate-{{ media.id }} {
+             height: 0;
+             padding-top: 100%;
+           }
+           {%- if slideshow_enabled -%}
+            {%- assign model_sizes = '(min-width: 1024px) ' | append: desktop_media_height | append: 'vh, 100vw' %}
+           @media (min-width: 1024px) {
+             #responsiveModelFeatureTemplate-{{ media.id }} {
+               height: {{ desktop_media_height }}vh;
+               width: {{ desktop_media_height }}vh;
+             }
+           }
+          {%- endif -%}
+        </style>
+        <div
+          id="responsiveModelFeatureTemplate-{{ media.id }}"
+          class="relative w-full"
+          x-data="Theme_Model"
+          x-intersect:enter.once="_init"
+        >
+          <div x-show="!enabled">
+            {{
+              media
+              | image_url: width: 2000
+              | image_tag:
+                class: 'absolute inset-0 w-full h-full',
+                sizes: model_sizes,
+                loading: loading
+            }}
+          </div>
+          <template x-if="enabled">
+            {{
+              media
+              | model_viewer_tag:
+                image_size: '2000x',
+                reveal: 'interaction',
+                toggleable: true,
+                data-model-id: media.id,
+                class: 'absolute inset-0 w-full h-full',
+                background-color: 'white'
+            }}
+          </template>
+        </div>
+        {% unless request.design_mode %}
+          <script
+            src="{{ 'product-media-model.js' | asset_url }}"
+            type="module"
+          ></script>
+        {% endunless %}
+        <link
+          id="ModelViewerStyle"
+          rel="stylesheet"
+          href="https://cdn.shopify.com/shopifycloud/model-viewer-ui/assets/v1.0/model-viewer-ui.css"
+          media="print"
+          onload="this.media='all'"
+        >
+        {{ 'shopify-model-viewer-ui.css' | asset_url | stylesheet_tag }}
+    {% endcase %}
+  </div>
+</div>

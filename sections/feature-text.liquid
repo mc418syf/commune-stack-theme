@@ -1,0 +1,227 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign text_align = section.settings.text_alignment
+  assign font = section.settings.font
+
+  case section.settings.desktop_width
+    when 'two_thirds'
+      assign desktop_width = 'lg:w-3/4'
+    when 'half'
+      assign desktop_width = 'lg:w-1/2'
+    else
+      assign desktop_width = 'lg:w-full'
+  endcase
+
+  case section.settings.desktop_alignment
+    when 'left'
+      assign desktop_alignment = 'justify-start'
+    when 'right'
+      assign desktop_alignment = 'justify-end'
+    else
+      assign desktop_alignment = 'justify-center'
+  endcase
+-%}
+
+<section
+  class="overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+    <div class="flex  {{ text_align }} {{ desktop_alignment }}">
+      <div class="w-full {{ desktop_width }}">
+        <div class="rte {{ font }} {% render 'type-scale-classes', mobile_text_scale: section.settings.mobile_text_scale, desktop_text_scale: section.settings.desktop_text_scale %} {{ font }} break-word">
+          {{ section.settings.text }}
+        </div>
+
+        {%- if section.settings.cta_link != blank
+          and section.settings.cta_text != ''
+        -%}
+          <div class="mt-4 text-0">
+            {%- case section.settings.cta_style -%}
+              {%- when 'link' -%}
+                <a
+                  class="theme-link inline-block text-scheme-text hover:text-scheme-accent"
+                  href="{{ section.settings.cta_link }}"
+                >
+                  {{- section.settings.cta_text -}}
+                </a>
+
+              {%- when 'button' -%}
+                <a
+                  href="{{ section.settings.cta_link }}"
+                  class="theme-button inline-block"
+                >
+                  {{- section.settings.cta_text -}}
+                </a>
+            {%- endcase -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Feature text",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_scale",
+      "min": -2,
+      "max": 4,
+      "step": 1,
+      "label": "Mobile font size scale",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_scale",
+      "min": -2,
+      "max": 9,
+      "step": 1,
+      "label": "Desktop font size scale",
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "Font",
+      "options": [
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        },
+        {
+          "value": "rte font-body",
+          "label": "Body"
+        }
+      ],
+      "default": "font-heading"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-left"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "link",
+          "label": "Link"
+        },
+        {
+          "value": "button",
+          "label": "Button"
+        }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "header",
+      "content": "Desktop layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full"
+        },
+        {
+          "value": "two_thirds",
+          "label": "Two thirds"
+        },
+        {
+          "value": "half",
+          "label": "Half"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "desktop_alignment",
+      "label": "Position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left",
+      "info": "Does not apply when width is set to full."
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Feature text"
+    }
+  ]
+}
+{% endschema %}

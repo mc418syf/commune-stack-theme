@@ -1,0 +1,272 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign logo_alignment = section.settings.logo_alignment
+  assign display = section.settings.display
+
+  if display == 'scrolling'
+    assign speed_setting = section.settings.speed | plus: 0
+
+    assign direction = section.settings.direction
+
+    capture text_size_class
+      render 'type-scale-classes', mobile_text_scale: section.settings.mobile_text_scale, desktop_text_scale: section.settings.desktop_text_scale
+    endcapture
+
+    comment
+      The minimum speed possible is 20s, the maximum speed is 1s
+    endcomment
+
+    assign min_speed_setting = 20
+    assign max_speed_setting = 400
+
+    assign speed_number = min_speed_setting | plus: max_speed_setting | minus: speed_setting
+
+    assign speed_number = speed_number | divided_by: 2 | divided_by: 10
+
+    assign x_padding_class = ''
+
+    assign content_class = 'grow-0 shrink-0'
+
+    assign content_class = content_class | append: ' ' | append: x_padding_class
+  endif
+
+  assign sizes = section.settings.max_width | append: 'px'
+-%}
+<section
+  class="border-b-gridline border-gridline-color bg-gridline-color"
+  style="--logo-width: {{ section.settings.max_width }}px"
+>
+  {% liquid
+    if section.settings.heading != ''
+      render 'section-title', title: section.settings.heading, section_color: section_color
+    endif
+  %}
+
+  {% capture logos %}
+    {%- for block in section.blocks -%}
+      {% if block.settings.image != blank %}
+        {% capture content %}
+          <div class="relative" style="padding-top: 100%;">
+            {% render 'image-fit',
+              image: block.settings.image,
+              sizes: sizes,
+              no_placeholder: true,
+              contain: true
+            %}
+          </div>
+        {% endcapture %}
+
+        <div
+          class="relative block max-w-[--logo-width] {% if display == 'static' %}w-1/3{% else %}w-[--logo-width]{% endif %} mx-5 lg:mt-0"
+        >
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="block">
+              {{ content }}
+            </a>
+          {%- else -%}
+            {{ content }}
+          {%- endif -%}
+        </div>
+      {% else %}
+        <div
+          class="relative block max-w-[--logo-width] {% if display == 'static' %}w-1/3{% else %}w-[--logo-width]{% endif %} px-5 lg:mt-0"
+          data-color-scheme="{{ section_color }}"
+        >
+          {{
+            'logo'
+            | placeholder_svg_tag: 'w-full h-full text-scheme-text fill-current'
+          }}
+        </div>
+      {% endif %}
+    {%- endfor -%}
+  {% endcapture %}
+
+  {% if display == 'static' %}
+    <div
+      class="flex flex-wrap items-center gap-y-4 bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text lg:flex-nowrap{% unless logo_alignment == 'left' %} justify-center{% endunless %}"
+      data-color-scheme="{{ section_color }}"
+    >
+      {{ logos }}
+    </div>
+  {% else %}
+    <div
+      class="overflow-hidden bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text"
+      data-color-scheme="{{ section_color }}"
+    >
+      <scrolling-items-container class="block">
+        <scrolling-items
+          style="
+            --base-scrolling-items-speed: {{ speed_number }}s;
+            --local-scrolling-items-speed-multiplier: 1;
+            --scrolling-items-speed: calc(
+                var(--base-scrolling-items-speed) * var(--global-scrolling-items-speed-multiplier) *
+                  var(--local-scrolling-items-speed-multiplier)
+              );
+            --scrolling-items-direction: {{ direction }};
+          "
+          class="block w-max whitespace-nowrap motion-safe:animate-[scrolling-items_var(--scrolling-items-speed)_linear_infinite_var(--scrolling-items-direction)] motion-safe:hover:[animation-play-state:paused] {{ text_size_class }} motion-reduce:block motion-reduce:-translate-x-1/4 motion-reduce:whitespace-normal motion-reduce:px-section-horizontal-spacing motion-reduce:text-center"
+        >
+          <scrolling-items-surface class="flex flex-nowrap items-center">
+            <scrolling-items-content class="{{ content_class }}">
+              <div class="flex items-center">
+                {{- logos -}}
+              </div>
+            </scrolling-items-content>
+            <noscript>
+              {% for i in (1..11) %}
+                <span
+                  class="motion-reduce:hidden {{ content_class }}"
+                  aria-hidden="true"
+                >
+                  {{- logos -}}
+                </span>
+              {% endfor %}
+            </noscript>
+          </scrolling-items-surface>
+        </scrolling-items>
+      </scrolling-items-container>
+    </div>
+  {% endif %}
+</section>
+
+{% unless request.design_mode %}
+  <script src="{{ 'scrolling-items.js' | asset_url }}" type="module"></script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Logo list",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "id": "heading",
+      "type": "text",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 20,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo max width",
+      "default": 150
+    },
+    {
+      "type": "select",
+      "id": "logo_alignment",
+      "label": "Logo alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "display",
+      "label": "Display",
+      "options": [
+        {
+          "value": "scrolling",
+          "label": "Scrolling"
+        },
+        {
+          "value": "static",
+          "label": "Static"
+        }
+      ],
+      "default": "static"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 20,
+      "max": 400,
+      "step": 10,
+      "label": "Scrolling speed",
+      "default": 180
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scrolling direction",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Right to left"
+        },
+        {
+          "value": "reverse",
+          "label": "Left to right"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Logo list",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

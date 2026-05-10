@@ -1,0 +1,295 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign blog = section.settings.blog
+  assign show_view_all = section.settings.show_view_all
+
+  assign post_heading_level = 'h2'
+
+  assign ratio = section.settings.crop | plus: 0
+
+  assign view_all_text = 'blogs.article.view_all_blogs' | t: blog: blog.title
+  assign counter = 0
+
+  case section.settings.post_limit
+    when 2
+      assign desktop_col_span = 'lg:col-span-6'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 6)'
+      assign item_col_width = 6
+    when 3
+      assign desktop_col_span = 'lg:col-span-4'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 4)'
+      assign item_col_width = 4
+    when 4
+      assign desktop_col_span = 'lg:col-span-3'
+      assign sizes = '(min-width: 1024px) calc(100vw / 12 * 3)'
+      assign item_col_width = 3
+  endcase
+
+  assign sizes = sizes | append: ', 100vw'
+
+  assign eager_loading_limit = section.settings.post_limit | at_most: 4
+-%}
+
+{%- capture placeholder_image -%}
+  <div class="{% if settings.fill_image_to_border_edge %}border-b-gridline border-gridline-color{% else %}p-2 lg:p-4{% endif %}" data-color-scheme="{{ section_color }}">
+    <div class="relative h-full w-full">
+      {% render 'image-crop-placeholder' with
+        ratio: ratio,
+      %}
+    </div>
+  </div>
+{%- endcapture -%}
+
+<section
+  class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  {% liquid
+    if section.settings.title != ''
+      assign post_heading_level = 'h3'
+
+      render 'section-title', title: section.settings.title, show_link: show_view_all, link_text: view_all_text, link_url: blog.url, section_color: section_color
+    endif
+  -%}
+
+  <ol class="grid grid-cols-1 gap-gutter bg-gridline-color lg:grid-cols-12">
+    {% for article in blog.articles limit: section.settings.post_limit %}
+      {% liquid
+        assign counter = counter | plus: 1
+
+        if section.index == 1 and forloop.first
+          assign preload = true
+        else
+          assign preload = false
+        endif
+
+        if section.index <= 2 and forloop.index <= eager_loading_limit
+          assign loading = 'eager'
+        else
+          assign loading = 'lazy'
+        endif
+      %}
+
+      <li class="{{ desktop_col_span }} group relative bg-scheme-background text-scheme-text">
+        <a class="absolute inset-0 z-10" href="{{ article.url }}"
+          ><span class="sr-only">
+            {{- 'blogs.article.read_more_title' | t: title: article.title -}}
+          </span></a
+        >
+        <div class="block h-full">
+          {%- if section.settings.blog_show_images -%}
+            {%- if article.image != blank -%}
+              <div class="full-h bg-scheme-background {% if settings.fill_image_to_border_edge %}border-b-gridline border-gridline-color{% else %}pt-2 px-section-horizontal-spacing lg:pt-4{% endif %}">
+                <div class="relative">
+                  {% render 'image-crop',
+                    image: article.image,
+                    ratio: ratio,
+                    sizes: sizes,
+                    loading: loading,
+                    preload: preload
+                  %}
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+
+          <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+            <{{ post_heading_level }} class="font-heading break-word text-heading-secondary">
+              {{- article.title -}}
+            </{{ post_heading_level }}>
+
+            {% if section.settings.blog_show_author %}
+              <p class="mt-2">
+                {{ 'blogs.article.by_author' | t: author: article.author }}
+              </p>
+            {% endif %}
+
+            {% if section.settings.blog_show_date %}
+              <p class="mt-2">
+                {{ article.published_at | time_tag: format: 'month_day_year' }}
+              </p>
+            {% endif %}
+
+            <div class="rte mt-4">
+              {% if article.excerpt.size > 0 %}
+                {{ article.excerpt }}
+              {% else %}
+                {{ article.content | strip_html | truncate: 150 }}
+              {% endif %}
+            </div>
+
+            <div class="mt-4">
+              <span class="theme-link inline-flex items-center justify-center align-top group-hover:text-scheme-accent">
+                {{- 'blogs.article.read_more' | t -}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </li>
+    {% else %}
+      {%- for i in (1..section.settings.post_limit) -%}
+        <li class="{{ desktop_col_span }} group relative bg-scheme-background text-scheme-text">
+          <a class="absolute inset-0 z-10" href="#"
+            ><span class="sr-only">
+              {{- 'blogs.article.read_more' | t -}}
+            </span></a
+          >
+          <div class="block h-full">
+            {%- if section.settings.blog_show_images -%}
+              {{ placeholder_image }}
+            {%- endif -%}
+
+            <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+              <{{ post_heading_level }} class="font-heading text-heading-standard">
+                {{- 'homepage.onboarding.blog_title' | t -}}
+              </{{ post_heading_level }}>
+
+              {% if section.settings.blog_show_author %}
+                <p class="mt-1">{{ 'homepage.onboarding.blog_author' | t }}</p>
+              {% endif %}
+
+              <div class="rte mt-4">
+                {{ 'homepage.onboarding.blog_excerpt' | t }}
+              </div>
+
+              <div class="mt-4">
+                <span class="theme-link inline-flex items-center justify-center align-top group-hover:text-scheme-accent">
+                  {{- 'blogs.article.read_more' | t -}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </li>
+      {%- endfor -%}
+    {% endfor %}
+
+    {%- if blog.articles.size > 0 -%}
+      {%- liquid
+        assign items_on_last_row = counter | modulo: section.settings.post_limit
+        assign items_remaining = section.settings.post_limit | minus: items_on_last_row
+        assign placeholder_width = item_col_width | times: items_remaining
+      -%}
+      {%- if items_on_last_row != 0 -%}
+        <li
+          style="--placeholder-width: {{ placeholder_width }};"
+          class="
+            none absolute bg-scheme-background lg:static
+            lg:col-span-placeholder-width lg:block
+          "
+          aria-hidden="true"
+          role="presentation"
+        ></li>
+      {%- endif -%}
+    {%- endif -%}
+  </ol>
+
+  {%- render 'view-all',
+    title: section.settings.title,
+    show_link: show_view_all,
+    link_text: view_all_text,
+    link_url: blog.url,
+    section_color: section_color
+  -%}
+</section>
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Blog posts"
+    },
+    {
+      "id": "blog",
+      "type": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "range",
+      "id": "post_limit",
+      "label": "Posts",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_images",
+      "label": "Show post images",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_author",
+      "label": "Show author",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_date",
+      "label": "Show date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show “View all” link",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "crop",
+      "label": "Crop images",
+      "options": [
+        {
+          "value": "0",
+          "label": "No crop"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog posts",
+      "settings": {
+        "blog": "News",
+        "post_limit": 3
+      }
+    }
+  ]
+}
+{% endschema %}

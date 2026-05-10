@@ -1,0 +1,936 @@
+{%- liquid
+  assign layout = section.settings.layout
+  assign section_color = section.settings.color_scheme
+  assign overlay_text_color_scheme = section.settings.overlay_text_color_scheme
+  assign show_icons = section.settings.show_icons
+
+  if section.settings.overlay_homepage and template.name == 'index'
+    assign overlay_header = true
+
+    if section.settings.sticky_header
+      assign overlay_header_with_sticky = true
+    else
+      assign overlay_header_without_sticky = true
+    endif
+  endif
+
+  assign drop_down_flex_alignment = 'justify-center'
+
+  if section.settings.layout contains 'menu_left'
+    assign drop_down_flex_alignment = 'justify-start'
+  endif
+
+  assign locale_selector = false
+  assign country_selector = false
+
+  if section.settings.show_country_selector and localization.available_countries.size > 1
+    assign country_selector = true
+  endif
+
+  if section.settings.show_locale_selector and shop.published_locales.size > 1
+    assign locale_selector = true
+  endif
+
+  if locale_selector or country_selector
+    assign show_localization = true
+  endif
+
+  assign item_spacing = section.settings.header_vertical_spacing
+-%}
+
+{%- capture header_logo -%}
+  <a
+    href="{{ routes.root_url }}"
+    class="header-logo-mobile-centered break-word my-auto inline-block {{ item_spacing }}"
+  >
+    {% if template.name == 'index' %}
+      <h1 class="contents">
+    {% endif %}
+    {% if settings.logo != blank %}
+      <div class="max-w-[var(--logo-max-width)]">
+        {% liquid
+          assign logo = settings.logo
+
+          assign logo_max_width_mobile = section.settings.logo_max_width_mobile
+          assign logo_max_width_mobile_2x = section.settings.logo_max_width_mobile | times: 2
+          assign logo_max_width_mobile_3x = section.settings.logo_max_width_mobile | times: 3
+
+          assign logo_max_width = section.settings.logo_max_width
+          assign logo_max_width_2x = section.settings.logo_max_width | times: 2
+          assign logo_max_width_3x = section.settings.logo_max_width | times: 3
+        %}
+        {%- unless overlay_header_without_sticky
+          and section.settings.overlay_logo != blank
+        -%}
+          <img
+            src="{{ logo | image_url: width: logo_max_width }}"
+            srcset="
+              {%- if logo_max_width != logo_max_width_mobile -%}
+                {{- logo | image_url: width: logo_max_width_mobile }} {{ logo_max_width_mobile }}w,
+                {{- logo | image_url: width: logo_max_width_mobile_2x }} {{ logo_max_width_mobile_2x }}w,
+                {{- logo | image_url: width: logo_max_width_mobile_3x }} {{ logo_max_width_mobile_3x }}w,
+              {%- endif -%}
+              {{- logo | image_url: width: logo_max_width }} {{ logo_max_width }}w,
+              {{- logo | image_url: width: logo_max_width_2x }} {{ logo_max_width_2x }}w,
+              {{- logo | image_url: width: logo_max_width_3x }} {{ logo_max_width_3x }}w
+            "
+            width="{{ logo.width }}"
+            height="{{ logo.height }}"
+            loading="eager"
+            {% if logo_max_width != logo_max_width_mobile %}
+              sizes="(min-width: 1024px) {{ logo_max_width }}px, {{ logo_max_width_mobile }}px"
+            {% else %}
+              sizes="{{ logo_max_width_mobile }}px"
+            {% endif %}
+            alt="{{ logo.alt | default: shop.name }}"
+            {% if overlay_header_with_sticky
+              and section.settings.overlay_logo != blank
+            %}
+              x-show="isStuck"
+            {% endif %}
+          >
+        {% endunless %}
+
+        {% if overlay_header and section.settings.overlay_logo != blank %}
+          {% assign overlay_logo = section.settings.overlay_logo %}
+          <img
+            src="{{ overlay_logo | image_url: width: logo_max_width }}"
+            srcset="
+              {%- if logo_max_width != logo_max_width_mobile -%}
+                {{- overlay_logo | image_url: width: logo_max_width_mobile }} {{ logo_max_width_mobile }}w,
+                {{- overlay_logo | image_url: width: logo_max_width_mobile_2x }} {{ logo_max_width_mobile_2x }}w,
+                {{- overlay_logo | image_url: width: logo_max_width_mobile_3x }} {{ logo_max_width_mobile_3x }}w,
+              {%- endif -%}
+              {{- overlay_logo | image_url: width: logo_max_width }} {{ logo_max_width }}w,
+              {{- overlay_logo | image_url: width: logo_max_width_2x }} {{ logo_max_width_2x }}w,
+              {{- overlay_logo | image_url: width: logo_max_width_3x }} {{ logo_max_width_3x }}w
+            "
+            width="{{ overlay_logo.width }}"
+            height="{{ overlay_logo.height }}"
+            loading="eager"
+            {% if logo_max_width != logo_max_width_mobile %}
+              sizes="(min-width: 1024px) {{ logo_max_width }}px, {{ logo_max_width_mobile }}px"
+            {% else %}
+              sizes="{{ logo_max_width_mobile }}px"
+            {% endif %}
+            {% if overlay_header_with_sticky %}
+              x-show="!isStuck"
+            {% endif %}
+          >
+        {% endif %}
+      </div>
+    {% else %}
+      {{ shop.name }}
+    {% endif %}
+    {% if template.name == 'index' %}
+      </h1>
+    {% endif %}
+  </a>
+{%- endcapture -%}
+
+{%- liquid
+  capture header_menu
+    render 'header-menu', layout: layout, drop_down_flex_alignment: drop_down_flex_alignment, item_spacing: item_spacing
+  endcapture
+-%}
+
+{%- capture header_menu_toggle -%}
+  <button
+    class="inline-block no-js:hidden lg:hidden {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
+    :aria-expanded="$store.modals.leftDrawer.contents === 'sidebar'"
+    @click="$store.modals.leftDrawer.open ? $store.modals.close('sidebar') : $store.modals.open('sidebar')"
+  >
+    {%- if show_icons -%}
+      <span class="sr-only">{{ 'layout.navigation.menu' | t }}</span>
+      <span class="header-menu-toggle-icon inline-block h-6 w-6 align-middle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="3" y1="9" x2="21" y2="9"/>
+          <line x1="3" y1="15" x2="21" y2="15"/>
+        </svg>
+      </span>
+    {%- else -%}
+      {{ 'layout.navigation.menu' | t }}
+    {%- endif -%}
+  </button>
+{%- endcapture -%}
+
+{%- capture header_cart %}
+  <a
+    href="{{ routes.cart_url }}"
+    class="inline-flex {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
+    {% if settings.cart_type == 'drawer' and template != 'cart' %}
+      data-cart-drawer-toggle
+      :aria-expanded="$store.modals.rightDrawer.contents === 'cart'"
+      @click.prevent="$store.modals.open('cart')"
+      @keydown.space="$store.modals.open('cart')"
+    {% endif %}
+  >
+    {%- if show_icons -%}
+      <div class="relative my-auto align-middle">
+        <span
+          x-show="$store.cartCount.count > 0"
+          class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
+          data-color-scheme="{{ section_color }}"
+        ></span>
+        <span class="inline-block h-6 w-6 fill-current align-top">
+          {%- liquid
+            case settings.cart_icon
+              when 'basket'
+                render 'icon-basket'
+              when 'bag'
+                render 'icon-bag'
+              when 'cart'
+                render 'icon-cart'
+            endcase
+          -%}
+        </span>
+        <span class="sr-only" x-text="$store.cartCount.countWithText()">
+          {% if cart.item_count == 1 %}
+            {{- 'cart.popup.cart_count.one' | t: count: cart.item_count -}}
+          {% else %}
+            {{- 'cart.popup.cart_count.other' | t: count: cart.item_count -}}
+          {% endif %}
+        </span>
+      </div>
+    {%- else -%}
+      <span class="my-auto">
+        {{- 'layout.cart.title' | t }} (<span x-text="$store.cartCount.count">
+          {{- cart.item_count -}}</span
+        >)</span
+      >
+    {%- endif -%}
+  </a>
+{%- endcapture -%}
+
+{%- liquid
+  if show_localization
+    capture localization_form
+      assign button_class = 'text-base ' | append: item_spacing
+      render 'localization-form', context: 'header', wrapper_classes: 'justify-end max-lg:hidden', open: 'top-full left-0 right-auto', locale_selector: locale_selector, country_selector: country_selector, button_classes: button_class, options_max_width: 'max-w-[theme(spacing.64)]', option_text_size: 'text-base', option_padding: 'px-4 py-2'
+    endcapture
+  endif
+-%}
+
+{% if overlay_header %}
+  {% style %}
+    #{{ section.id }} {
+      --color-gridline: {{ section.settings.overlay_text_color_scheme.settings.text.rgb }};
+    }
+
+    {% if overlay_header_with_sticky %}
+      #{{ section.id }}.is-stuck {
+        --color-gridline: {{ section.settings.color_scheme.settings.text.rgb }};
+      }
+    {% endif %}
+    {% style %}
+{% endstyle %}
+  {% endstyle %}
+{% endif %}
+
+<header-section
+  x-data="Theme_Header"
+  class="block{% if overlay_header %} absolute top-0 left-0 right-0 z-50{% endif %}"
+  :class="{ 'is-stuck' : isStuck }"
+  {% if section.settings.sticky_header %}
+    data-sticky="true"
+  {% endif %}
+  {% if overlay_header %}
+    data-overlay-header="true"
+  {% endif %}
+  data-color-scheme="{{ section_color }}"
+  data-overlay-header-with-sticky="{{ overlay_header_with_sticky | default: false }}"
+  data-overlay-text-color-scheme="{{ overlay_text_color_scheme }}"
+  id="{{ section.id }}"
+  data-theme-header
+>
+  <header
+    x-ref="header"
+    :class="$store.modals.leftDrawer.open ? 'drawer-open-header' : ''"
+    class="relative z-10 border-b-gridline border-gridline-color text-scheme-text {% unless overlay_header %} border-gridline-color bg-scheme-background{% endunless %}"
+    data-color-scheme="{%- if overlay_header_without_sticky -%}{{ overlay_text_color_scheme }}{%- else -%}{{ section_color }}{%- endif -%}"
+  >
+    <nav
+      class="relative hidden{% if settings.header_uppercase %} uppercase{% endif %}{% unless layout contains 'menu_drawer' %} lg:block{% endunless %}"
+      aria-label="{{ 'general.accessibility.primary' | t }}"
+    >
+      <div class="flex items-stretch px-section-horizontal-spacing justify-between{% if layout contains 'spread' %} flex-wrap {% endif %}">
+        <div class="flex items-stretch{% if layout contains 'center' %} flex-grow w-1/3{% endif %}">
+          {% if layout contains 'logo_left' %}
+            <div class="flex{% unless layout contains 'spread' %} mr-6{% endunless %}">
+              {{ header_logo }}
+            </div>
+          {% endif %}
+          {% if layout contains 'menu_left' %}
+            {{ header_menu }}
+          {% endif %}
+        </div>
+
+        {% if layout contains 'menu_spread' %}
+          {{ header_menu }}
+        {% elsif layout contains 'center' %}
+          <div class="{% unless layout contains 'logo_center' %}flex-grow w-1/3 lg:w-3/4 {% endunless %}flex items-stretch justify-center text-center">
+            {% if layout contains 'logo_center' %}
+              {{ header_logo }}
+            {% endif %}
+            {% if layout contains 'menu_center' %}
+              {{ header_menu }}
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {%- if shop.customer_accounts_enabled
+          and layout == 'logo_left_menu_spread'
+          and show_icons == false
+        -%}
+          <div class="{% unless layout contains 'spread' %}ml-4 flex items-stretch {% endunless %}whitespace-nowrap">
+            {{ customer_accounts }}
+          </div>
+        {%- endif -%}
+
+        {% if section.settings.show_search
+          and layout == 'logo_left_menu_spread'
+          and show_icons == false
+        %}
+          <div class="{% unless layout contains 'spread' %}ml-4 flex items-stretch {% endunless %}whitespace-nowrap">
+            {% render 'header-search',
+              layout: layout,
+              header_item_spacing: item_spacing,
+              section_color: section_color,
+              show_icons: show_icons
+            %}
+          </div>
+        {%- endif -%}
+
+        <div class="flex items-stretch justify-end gap-x-4 text-right {% if layout contains 'center' %} flex-grow flex-wrap w-1/3{% endif %}">
+          {%- liquid
+            if layout contains 'menu_right'
+              echo header_menu
+            endif
+
+            if show_localization
+              echo '<div class="ml-4 my-auto shrink-0">'
+              echo localization_form
+              echo '</div>'
+            endif
+
+            assign show_extras = false
+
+            if layout != 'logo_left_menu_spread'
+              assign show_extras = true
+            endif
+
+            if layout == 'logo_left_menu_spread' and show_icons
+              assign show_extras = true
+            endif
+          -%}
+
+          {%- if shop.customer_accounts_enabled and show_extras -%}
+            <div class="flex items-stretch whitespace-nowrap">
+              {{ customer_accounts }}
+            </div>
+          {%- endif -%}
+
+          {% if section.settings.show_search and show_extras %}
+            <div class="flex items-stretch whitespace-nowrap">
+              {% render 'header-search',
+                layout: layout,
+                header_item_spacing: item_spacing,
+                section_color: section_color,
+                show_icons: show_icons
+              %}
+            </div>
+          {% endif %}
+
+          {% comment %} Stack nav button — desktop {% endcomment %}
+          <div class="flex items-stretch whitespace-nowrap" x-data>
+            <button
+              type="button"
+              class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
+              @click.prevent="$store.modals.open('stack')"
+              aria-label="Open stack"
+            >
+              {%- if show_icons -%}
+                <div class="relative my-auto align-middle">
+                  <span
+                    x-show="$store.stack.count > 0"
+                    class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
+                    data-color-scheme="{{ section_color }}"
+                  ></span>
+                  <svg class="inline-block h-6 w-6 fill-current align-top" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                    <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                    <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                  </svg>
+                  <span class="sr-only">Stack (<span x-text="$store.stack.count">0</span>)</span>
+                </div>
+              {%- else -%}
+                <span class="my-auto">
+                  Stack (<span x-text="$store.stack.count">0</span>)
+                </span>
+              {%- endif -%}
+            </button>
+          </div>
+
+          <div class="flex items-stretch whitespace-nowrap">
+            {{ header_cart }}
+          </div>
+        </div>
+      </div>
+
+      {% if layout contains 'menu_below' %}
+        <div class="flex items-center justify-center border-t-gridline border-gridline-color px-section-horizontal-spacing">
+          {{ header_menu }}
+        </div>
+      {% endif %}
+    </nav>
+
+    {% comment %}
+      Mobile Nav
+    {% endcomment %}
+    <nav
+      aria-label="{{ 'general.accessibility.header' | t }}"
+      class="{% unless layout contains 'menu_drawer' %}lg:hidden{% endunless %}{% if settings.header_uppercase %} uppercase{% endif %}"
+    >
+      <div class="flex items-center justify-between px-section-horizontal-spacing lg:relative">
+        <div class="flex gap-2 items-center{% if layout contains 'logo_center' %} flex-grow w-1/3{% endif %}">
+          {% if layout contains 'logo_left' %}
+            {{ header_menu_toggle }}
+            <div>
+              {{ header_logo }}
+            </div>
+          {% endif %}
+          {% if layout contains 'logo_center' %}
+            {{ header_menu_toggle }}
+          {% endif %}
+        </div>
+
+        {% if layout contains 'logo_center' %}
+          <div class="shrink-0 justify-center text-center">
+            {{ header_logo }}
+          </div>
+        {% endif %}
+
+        <div class="flex justify-end gap-2 text-right{% if layout contains 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
+          {% if layout contains 'menu_drawer' %}
+            {%- if show_localization -%}
+              <div class="my-auto hidden shrink-0 lg:block">
+                {{ localization_form }}
+              </div>
+            {%- endif -%}
+
+            {%- if shop.customer_accounts_enabled -%}
+              <div class="hidden whitespace-nowrap lg:block">
+                {{ customer_accounts }}
+              </div>
+            {%- endif -%}
+          {% endif %}
+
+          {% if section.settings.show_search %}
+            <div class="whitespace-nowrap lg:ml-4">
+              {% render 'header-search',
+                layout: layout,
+                header_item_spacing: item_spacing,
+                section_color: section_color,
+                show_icons: show_icons,
+                location: 'mobile'
+              %}
+            </div>
+          {% endif %}
+          {% comment %} Stack button — mobile {% endcomment %}
+          <div class="whitespace-nowrap lg:ml-4" x-data>
+            <button
+              type="button"
+              class="inline-flex items-center {{ item_spacing }}"
+              @click.prevent="$store.modals.open('stack')"
+              aria-label="Open stack"
+            >
+              <div class="relative my-auto align-middle">
+                <span
+                  x-show="$store.stack.count > 0"
+                  class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
+                ></span>
+                <svg class="inline-block h-6 w-6 fill-current align-top" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                  <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                  <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                </svg>
+                <span class="sr-only">Stack</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="whitespace-nowrap lg:ml-4">
+            {{ header_cart }}
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+</header-section>
+
+{%- liquid
+  if settings.enable_breadcrumbs
+    render 'breadcrumbs', section_color: 'header'
+  endif
+-%}
+
+<noscript>
+  {% style %}
+    .no-js-focus-wrapper:focus-within .no-js-focus-container {
+      display: block !important;
+    }
+
+    {% if layout == 'logo_center_menu_drawer' %}
+      .section-sidebar {
+        display: block !important;
+      }
+    {%- endif -%}
+  {% endstyle %}
+</noscript>
+
+{% style %}
+  /* === Sticky header === */
+  {% if section.settings.sticky_header %}
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    :root {
+      --sticky-header-height: 66px;
+    }
+  {% else %}
+    :root {
+      --sticky-header-height: 0;
+    }
+  {% endif %}
+
+  /* === Force sticky on mobile === */
+  @media (max-width: 1023px) {
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: 120;
+    }
+    #shopify-section-{{ section.id }} nav {
+      position: relative;
+    }
+  }
+
+  /* === Logo width === */
+  #shopify-section-{{ section.id }} {
+    --logo-max-width: {{ section.settings.logo_max_width_mobile }}px;
+  }
+  @media (min-width: 1024px) {
+    #shopify-section-{{ section.id }} {
+      --logo-max-width: {{ section.settings.logo_max_width }}px;
+    }
+  }
+
+  /* === Mobile centered logo === */
+  @media (max-width: 1023px) {
+    #shopify-section-{{ section.id }} a.header-logo-mobile-centered {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 40;
+      pointer-events: auto;
+    }
+    #shopify-section-{{ section.id }} a.header-logo-mobile-centered .max-w-\[var\(--logo-max-width\)\] {
+      max-width: calc(var(--logo-max-width) * 0.9);
+    }
+  }
+
+  /* === Frosted glass header === */
+  #shopify-section-{{ section.id }} header {
+    position: relative;
+    background: transparent !important;
+    border-bottom: none !important;
+    transition: background 0.7s cubic-bezier(0.16,1,0.3,1),
+                backdrop-filter 0.7s cubic-bezier(0.16,1,0.3,1),
+                -webkit-backdrop-filter 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  #shopify-section-{{ section.id }} header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.00) 100%
+    );
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  }
+
+  /* === Remove gridlines === */
+  #shopify-section-{{ section.id }} .border-b-gridline {
+    border-bottom: none !important;
+    border-bottom-width: 0 !important;
+  }
+
+  /* === Frosted glass dropdown === */
+  #shopify-section-{{ section.id }} .submenu {
+    isolation: isolate;
+    background: transparent !important;
+    border: none !important;
+  }
+  #shopify-section-{{ section.id }} .submenu::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.20) 0%,
+      rgba(255, 255, 255, 0.00) 100%
+    );
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  }
+  #shopify-section-{{ section.id }} .submenu li,
+  #shopify-section-{{ section.id }} .submenu a {
+    border: none !important;
+  }
+
+  /* === Drawer open header === */
+  #shopify-section-{{ section.id }} header.drawer-open-header {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  #shopify-section-{{ section.id }} header.drawer-open-header::before {
+    display: none !important;
+  }
+
+/* === Frosted glass search bar === */
+  #shopify-section-{{ section.id }} [x-ref="searchComponent"] {
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: none !important;
+    top: 0 !important;
+    padding-top: calc(var(--sticky-header-height, 56px) + 0.5rem) !important;
+  }
+  /* === Frosted glass search results === */
+#shopify-section-{{ section.id }} [x-ref="searchComponent"] {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: none !important;
+}
+
+/* === Frosted glass predictive results === */
+#shopify-section-{{ section.id }} .predictive-search-results > div {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: none !important;
+}
+
+/* === Remove result divider lines === */
+#shopify-section-{{ section.id }} .predictive-search-results li,
+#shopify-section-{{ section.id }} .predictive-search-results a {
+  border-bottom: none !important;
+  border-top: none !important;
+}
+
+/* === 2 products per row in search results === */
+#shopify-section-{{ section.id }} .predictive-search-results ul.grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+/* === Remove search input border === */
+#shopify-section-{{ section.id }} input[type="search"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* === Menu icon rotation === */
+.header-menu-toggle-icon {
+  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.drawer-open .header-menu-toggle-icon {
+  transform: rotate(90deg);
+}
+{% endstyle %}
+<script
+  type="module"
+>
+  if (!customElements.get('header-section')) {
+    class HeaderSection extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        if (this.getAttribute('data-sticky')) {
+          document.documentElement.style.setProperty(
+            '--sticky-header-height',
+            `${this.getBoundingClientRect().height}px`
+          );
+        } else {
+          document.documentElement.style.setProperty(
+            '--sticky-header-height',
+            '0'
+          );
+        }
+      }
+    }
+
+    customElements.define('header-section', HeaderSection);
+  }
+</script>
+
+{% unless request.design_mode %}
+  <script src="{{ 'cart-count.js' | asset_url }}" type="module"></script>
+  <script src="{{ 'header.js' | asset_url }}" type="module"></script>
+
+  {% if settings.predictive_search_enabled %}
+    <script
+      src="{{ 'predictive-search.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% endif %}
+  <script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.effect(() => {
+      if (Alpine.store('modals').leftDrawer.open) {
+        document.body.classList.add('drawer-open');
+      } else {
+        document.body.classList.remove('drawer-open');
+      }
+    });
+  });
+</script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header relative z-20",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "paragraph",
+      "content": "Edit your logo in [theme settings](/editor?context=theme&category=logo)."
+    },
+    {
+      "type": "range",
+      "id": "logo_max_width",
+      "min": 20,
+      "max": 350,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 250
+    },
+    {
+      "type": "range",
+      "id": "logo_max_width_mobile",
+      "min": 20,
+      "max": 180,
+      "step": 10,
+      "unit": "px",
+      "label": "Mobile logo width",
+      "default": 80
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu",
+      "info": "This menu is only displayed on desktop. To change navigation for mobile/drawer menu, go to sidebar settings."
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "logo_left_menu_left",
+          "label": "Logo left / menu left"
+        },
+        {
+          "value": "logo_left_menu_right",
+          "label": "Logo left / menu right"
+        },
+        {
+          "value": "logo_left_menu_center",
+          "label": "Logo left / menu center"
+        },
+        {
+          "value": "logo_left_menu_spread",
+          "label": "Logo left / menu spread"
+        },
+        {
+          "value": "logo_left_menu_below",
+          "label": "Logo left / menu below"
+        },
+        {
+          "value": "logo_center_menu_left",
+          "label": "Logo center / menu left"
+        },
+        {
+          "value": "logo_center_menu_drawer",
+          "label": "Logo center / menu drawer"
+        }
+      ],
+      "label": "Desktop layout"
+    },
+    {
+      "type": "select",
+      "id": "header_vertical_spacing",
+      "label": "Vertical spacing",
+      "options": [
+        {
+          "value": "py-4",
+          "label": "Medium"
+        },
+        {
+          "value": "py-2",
+          "label": "Small"
+        }
+      ],
+      "default": "py-4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Sticky header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icons",
+      "label": "Show icons",
+      "info": "Show icons for menu, search,account and cart"
+    },
+    {
+      "type": "header",
+      "content": "Dropdown menus"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_all_navigation_links",
+      "label": "Enable links to drop-down link headings"
+    },
+    {
+      "type": "select",
+      "id": "dropdown_heading_font",
+      "label": "Heading font",
+      "options": [
+        {
+          "value": "font-body",
+          "label": "Body"
+        },
+        {
+          "value": "font-heading",
+          "label": "Heading"
+        }
+      ],
+      "default": "font-body"
+    },
+    {
+      "type": "select",
+      "id": "dropdown_text_align",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "label": "Text align"
+    },
+    {
+      "type": "select",
+      "id": "dropdown_style",
+      "options": [
+        {
+          "value": "grid_with_border",
+          "label": "Grid with border"
+        },
+        {
+          "value": "columns",
+          "label": "Columns"
+        }
+      ],
+      "label": "Style"
+    },
+    {
+      "type": "header",
+      "content": "Language Selector",
+      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_locale_selector",
+      "label": "Show language selector",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Country/region selector",
+      "info": "To add a country/region, go to your [payment settings.](/admin/settings/payments)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country_selector",
+      "label": "Show country/region selector",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "header",
+      "content": "Overlay Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay_homepage",
+      "label": "Overlay header over home page"
+    },
+    {
+      "type": "color_scheme",
+      "id": "overlay_text_color_scheme",
+      "label": "Overlay text color scheme",
+      "info": "Only the text color from the scheme will be used",
+      "default": "scheme4"
+    },
+    {
+      "type": "image_picker",
+      "id": "overlay_logo",
+      "label": "Overlay logo image"
+    }
+  ]
+}
+{% endschema %}

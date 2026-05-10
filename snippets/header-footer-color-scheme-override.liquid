@@ -1,0 +1,21 @@
+{% liquid
+  assign color_scheme = settings.color_schemes | where: 'id', section_color.id | first
+%}
+
+<style>
+  html {
+    background-color: rgb({{ color_scheme.settings.background.red }} {{ color_scheme.settings.background.green }} {{ color_scheme.settings.background.blue }});
+    color: rgb({{ color_scheme.settings.text.red }} {{ color_scheme.settings.text.green }} {{ color_scheme.settings.text.blue }});
+  }
+
+  [data-theme-header][data-color-scheme],
+  [data-theme-header][data-color-scheme] [data-color-scheme],
+  [data-theme-footer][data-color-scheme],
+  [data-theme-footer][data-color-scheme] [data-color-scheme]  {
+    --color-scheme-text: {{ color_scheme.settings.text.red }} {{ color_scheme.settings.text.green }} {{ color_scheme.settings.text.blue }};
+    --color-scheme-background: {{ color_scheme.settings.background.red }} {{ color_scheme.settings.background.green }} {{ color_scheme.settings.background.blue }};
+    --color-scheme-accent: {{ color_scheme.settings.accent.red }} {{ color_scheme.settings.accent.green }} {{ color_scheme.settings.accent.blue }};
+    --color-scheme-accent-contrast: {{ color_scheme.settings.accent_contrast.red }} {{ color_scheme.settings.accent_contrast.green }} {{ color_scheme.settings.accent_contrast.blue }};
+    --color-scheme-secondary: {{ color_scheme.settings.secondary.red }} {{ color_scheme.settings.secondary.green }} {{ color_scheme.settings.secondary.blue }};
+  }
+</style>

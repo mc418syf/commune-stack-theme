@@ -1,0 +1,58 @@
+{% assign inventory_variants = product.variants
+  | where: 'inventory_management', 'shopify'
+%}
+
+<div
+  {{ block.shopify_attributes }}
+  class="product-inventory-status-block mt-8 empty:hidden"
+>
+  <div class="no-js:space-y-1">
+    {% for variant in inventory_variants %}
+      <div
+        x-show="currentVariantId === {{ variant.id }}"
+        {% unless variant.id == product.selected_or_first_available_variant.id
+        %}
+          class="no-js:!block"
+          style="display: none;"
+        {% endunless %}
+      >
+        {% unless product.has_only_default_variant %}
+          <span class="hidden no-js:inline">{{ variant.title }}:</span>
+        {% endunless %}
+        {% if variant.inventory_quantity > 0 %}
+          {% if variant.inventory_quantity
+              > block.settings.low_inventory_threshold
+          %}
+            <span>{{ 'products.product.inventory_in_stock' | t }}</span>
+          {% else %}
+            {% if block.settings.show_inventory_quantity %}
+              <span class="text-scheme-accent">
+                {{
+                  'products.product.inventory_low_stock_with_count'
+                  | t: count: variant.inventory_quantity
+                }}
+              </span>
+            {% else %}
+              <span class="text-scheme-accent">
+                {{- 'products.product.inventory_low_stock' | t -}}
+              </span>
+            {% endif %}
+          {% endif %}
+        {% else %}
+          {% if variant.inventory_policy == 'continue' %}
+            <span>
+              {{
+                'products.product.inventory_out_of_stock_continue_selling'
+                | t
+              }}
+            </span>
+          {% else %}
+            <span>
+              {{ 'products.product.inventory_out_of_stock' | t }}
+            </span>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>

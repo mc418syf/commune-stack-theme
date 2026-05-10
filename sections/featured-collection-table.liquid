@@ -1,0 +1,625 @@
+{% liquid
+  assign section_color = section.settings.color_scheme
+  assign collection = section.settings.collection
+  assign products = collection.products
+  assign view_all_text = 'collections.general.view_all' | t
+  assign enable_quick_buy = section.settings.enable_quick_buy
+
+  assign show_media_on_mobile = section.settings.show_media_on_mobile
+  assign desktop_media_display = section.settings.desktop_media_display
+
+  assign column_labels = ''
+  assign asc_labels = ''
+  assign desc_labels = ''
+
+  for block in section.blocks
+    assign asc_label = 'sections.table.sort.a_z' | t
+    assign desc_label = 'sections.table.sort.z_a' | t
+    case block.type
+      when 'title'
+        assign label = 'sections.table.title' | t
+      when 'price'
+        assign label = 'sections.table.price' | t
+        assign asc_label = 'sections.table.sort.low_to_high' | t
+        assign desc_label = 'sections.table.sort.high_to_low' | t
+      when 'vendor'
+        unless block.settings.column_label == blank
+          assign label = block.settings.column_label
+        else
+          assign label = 'sections.table.vendor' | t
+        endunless
+      when 'product_metafield'
+        assign label = block.settings.column_label
+        assign metafield_namespace = block.settings.metafield_key | split: '.' | first
+        assign metafield_key = block.settings.metafield_key | split: '.' | last
+        assign metafield_type = collection.products[0].metafields[metafield_namespace][metafield_key].type
+        case metafield_type
+          when 'number_integer', 'number_decimal', 'volume', 'weight', 'money'
+            assign asc_label = 'sections.table.sort.low_to_high' | t
+            assign desc_label = 'sections.table.sort.high_to_low' | t
+          when 'date', 'date_time'
+            assign asc_label = 'sections.table.sort.old_to_new' | t
+            assign desc_label = 'sections.table.sort.new_to_old' | t
+        endcase
+    endcase
+    if block.settings.metafield_mobile_sort_label != 'automatic' and block.type == 'product_metafield'
+      case block.settings.metafield_mobile_sort_label
+        when 'a-z'
+          assign asc_label = 'sections.table.sort.a_z' | t
+          assign desc_label = 'sections.table.sort.z_a' | t
+        when 'low-high'
+          assign asc_label = 'sections.table.sort.low_to_high' | t
+          assign desc_label = 'sections.table.sort.high_to_low' | t
+        when 'old-new'
+          assign asc_label = 'sections.table.sort.old_to_new' | t
+          assign desc_label = 'sections.table.sort.new_to_old' | t
+      endcase
+    endif
+    assign column_labels = column_labels | append: label | append: '::'
+    assign asc_labels = asc_labels | append: asc_label | append: '::'
+    assign desc_labels = desc_labels | append: desc_label | append: '::'
+  endfor
+
+  assign column_labels = column_labels | split: '::'
+  assign asc_labels = asc_labels | split: '::'
+  assign desc_labels = desc_labels | split: '::'
+%}
+
+<section
+  class="featured-collection border-b-gridline border-gridline-color"
+  data-color-scheme="{{ section_color }}"
+  x-data="{ currentProduct: '' }"
+>
+  {%- liquid
+    if section.settings.title != ''
+      render 'section-title', title: section.settings.title, show_link: section.settings.show_view_all, link_text: view_all_text, link_url: collection.url, section_color: section_color
+    endif
+  -%}
+  <div
+    class="w-full bg-scheme-background text-scheme-text opacity-0 transition-opacity duration-200 no-js:opacity-100 md:table md:border-collapse"
+    x-data="Theme_Table()"
+    :class="
+      {
+        'opacity-100' : initialSortComplete
+      }
+    "
+  >
+    <div class="md:table-header-group">
+      {%- comment -%}
+        Mobile sort
+      {%- endcomment -%}
+      <div class="relative px-4 md:hidden">
+        <div class="ml-auto flex items-center justify-end md:hidden">
+          <button
+            type="button"
+            x-ref="sortToggle"
+            class="flex py-2 hover:text-scheme-accent items-center{% if settings.links_uppercase %} uppercase{% endif %}"
+            x-bind:aria-expanded="sortOpen ? true : 'false'"
+            @click="sortOpen = ! sortOpen"
+            aria-controls="sort"
+          >
+            {{ 'sections.table.sort.title' | t }}:
+            <span class="pl-1" x-text="mobileSortLabel"></span>
+            <span
+              class="rotate ml-1 inline-block h-3 w-3 origin-center transform"
+              :class="{ 'rotate-180' : sortOpen }"
+            >
+              {%- render 'icon-chevron-down' -%}
+            </span>
+          </button>
+          <div
+            id="sort"
+            class="absolute bottom-auto left-0 top-full z-20 w-full border-y-gridline border-gridline-color bg-scheme-background py-section-vertical-spacing text-scheme-text"
+            x-show="sortOpen"
+            x-cloak
+            x-transition:enter="transition ease duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            data-collection-dropdown
+            @focusout="sortOpen = false"
+            @click.outside.prevent="sortOpen = false"
+          >
+            <div
+              class="sort-wrapper flex justify-end px-6 md:px-4"
+            >
+              <div class="js-filter" data-index="sort">
+                <ul class="space-y-1">
+                  {%- for i in (1..column_labels.size) -%}
+                    <li>
+                      <button
+                        type="button"
+                        class="flex w-full items-center justify-start hover:text-scheme-accent"
+                        @click="mobileSort({{ forloop.index0 | json }}, 'asc')"
+                      >
+                        <span
+                          class="mr-2 inline-block h-2 w-2 rounded-full border-gridline border-gridline-color"
+                          :class="{ 'bg-scheme-text' : sortCol === {{ forloop.index0 | json }} && sortOrder === 'asc' }"
+                        ></span>
+                        <span>
+                          {{ column_labels[forloop.index0] }},
+                          {{ asc_labels[forloop.index0] -}}
+                        </span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        class="flex w-full items-center justify-start hover:text-scheme-accent"
+                        @click="mobileSort({{ forloop.index0 | json }}, 'desc')"
+                      >
+                        <span
+                          class="mr-2 inline-block h-2 w-2 rounded-full border-gridline border-gridline-color"
+                          :class="{ 'bg-scheme-text' : sortCol === {{ forloop.index0 | json }} && sortOrder === 'desc' }"
+                        ></span>
+                        <span>
+                          {{ column_labels[forloop.index0] }},
+                          {{ desc_labels[forloop.index0] }}
+                        </span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+                <span class="inline-block" aria-hidden="true">&nbsp;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hidden md:table-row md:px-4" x-ref="tableHeader">
+        {%- comment -%}
+          Desktop sort
+        {%- endcomment -%}
+        {%- for i in (1..column_labels.size) -%}
+          <div
+            data-sort-label="{{ column_labels[forloop.index0] }}"
+            class="text-left md:table-cell md:px-4 md:py-2"
+          >
+            <button
+              class="block hidden w-full text-left md:block {% if forloop.last %}md:text-right{% endif %}"
+              @click="sort({{ forloop.index0 | json }})"
+            >
+              <template x-if="sortCol === {{ forloop.index0 | json }}">
+                <span>
+                  <span x-show="sortOrder === 'asc'">&uarr;</span>
+                  <span x-show="sortOrder === 'desc'">&darr;</span>
+                </span>
+              </template>
+              <span>{{ column_labels[forloop.index0] }}</span>
+            </button>
+          </div>
+        {%- endfor -%}
+        {%- if enable_quick_buy -%}
+          <div
+            class="md:table-cell md:px-4 md:py-2"
+          ></div>
+        {%- endif -%}
+      </div>
+    </div>
+    <div
+      x-ref="tableData"
+      class="md:table-row-group"
+    >
+      {%- for product in products limit: section.settings.product_limit -%}
+        {%- liquid
+          assign sold_out = true
+
+          if product.available
+            assign sold_out = false
+          endif
+
+          assign on_sale = false
+
+          if product.compare_at_price > product.price
+            assign on_sale = true
+          endif
+        -%}
+
+        <a
+          data-table-row
+          href="{{ product.url }}"
+          class="flex gap-4 border-t-gridline border-gridline-color p-2 md:table-row {% if sold_out %} text-scheme-secondary{% endif %}"
+          x-on:mouseenter="currentProduct = '{{ product.handle }}'"
+          x-on:mouseleave="currentProduct = ''"
+          x-on:focus="currentProduct = '{{ product.handle }}'"
+          x-on:blur="currentProduct = ''"
+          {% if enable_quick_buy
+            and product.available
+            and product.has_only_default_variant
+          %}
+            x-data="QuickBuy"
+          {% endif %}
+        >
+          {%- if show_media_on_mobile -%}
+            <div class="w-1/5 shrink-0 md:hidden">
+              {% if product.featured_image != blank %}
+                {%-
+                  render 'image-crop' with
+                  image: product.featured_image,
+                  sizes: '20vw',
+                  ratio: 1
+                -%}
+              {% endif %}
+            </div>
+          {%- endif -%}
+
+          <div class="relative grow md:contents">
+            {%- for block in section.blocks -%}
+              {%- liquid
+                case block.type
+                  when 'title'
+                    assign sort_value = product.title
+                    assign column_value = product.title
+                  when 'price'
+                    assign sort_value = product.price
+                    capture column_value
+                      render 'table-price', product: product, on_sale: on_sale, sold_out: sold_out
+                    endcapture
+                  when 'vendor'
+                    assign sort_value = product.vendor
+                    assign column_value = product.vendor
+                  when 'product_metafield'
+                    assign metafield_namespace = block.settings.metafield_key | split: '.' | first
+                    assign metafield_key = block.settings.metafield_key | split: '.' | last
+                    assign column_value = product.metafields[metafield_namespace][metafield_key].value
+                    case product.metafields[metafield_namespace][metafield_key].type
+                      when 'dimension', 'volume', 'weight', 'rating'
+                        assign sort_value = product.metafields[metafield_namespace][metafield_key].value.value
+                      when 'date', 'date_time'
+                        assign sort_value = product.metafields[metafield_namespace][metafield_key].value | date: '%s'
+                        assign column_value = product.metafields[metafield_namespace][metafield_key].value | time_tag: format: 'month_day_year'
+                      when 'money'
+                        assign sort_value = product.metafields[metafield_namespace][metafield_key].value.amount
+                      else
+                        assign sort_value = product.metafields[metafield_namespace][metafield_key].value
+                    endcase
+                endcase
+              -%}
+
+              <div
+                data-sortable
+                data-index="{{ forloop.index0 }}"
+                data-sort-value="{{ sort_value }}"
+                class="{% unless forloop.first %}mt-1 md:mt-0 {% endunless %}md:table-cell md:px-4 md:py-2 md:align-middle {% if forloop.last %}md:text-right{% endif %}"
+              >
+                {%- if block.type == 'title'
+                  and desktop_media_display == 'title'
+                -%}
+                  <div class="flex items-center justify-start gap-2">
+                    <span class="hidden h-12 w-12 md:inline-block">
+                      {%- liquid
+                        if product.featured_image != blank
+                          render 'image-crop', image: product.featured_image, ratio: 1, sizes: '3rem'
+                        endif
+                      -%}
+                    </span>
+                    {%- if section.settings.show_column_labels_on_mobile -%}
+                      <span class="md:hidden">
+                        {{- column_labels[forloop.index0] }}:
+                        {{ column_value -}}
+                      </span>
+                      <span class="hidden md:inline">{{ column_value }}</span>
+                    {%- else -%}
+                      <span>{{ column_value }}</span>
+                    {%- endif -%}
+                  </div>
+                {%- else -%}
+                  {%- if section.settings.show_column_labels_on_mobile -%}
+                    <span class="md:hidden">
+                      {{- column_labels[forloop.index0] }}: {{ column_value -}}
+                    </span>
+                    <span class="hidden md:inline">{{ column_value }}</span>
+                  {%- else -%}
+                    <span>{{ column_value }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+            {% endfor %}
+
+            {%- if enable_quick_buy -%}
+              <div
+                class="mt-5 whitespace-nowrap text-left md:mt-0 md:table-cell md:w-[1%] md:px-4 md:py-2 md:text-right md:align-middle"
+              >
+                {%- render 'quick-buy-icon',
+                  product: product,
+                  style: section.settings.quick_buy_button_style
+                -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </a>
+      {%- else -%}
+        {%- for i in (1..6) -%}
+          <a
+            data-table-row
+            class="block space-y-1 border-t-gridline border-gridline-color p-2 md:table-row {% if sold_out %} text-scheme-secondary{% endif %}"
+          >
+            {%- for block in section.blocks -%}
+              {%- liquid
+                case block.type
+                  when 'title'
+                    assign sort_value = 'homepage.onboarding.product_title' | t
+                    assign column_value = 'homepage.onboarding.product_title' | t
+                  when 'price'
+                    assign sort_value = 1999
+                    assign column_value = 1999 | money_with_currency
+                  when 'vendor'
+                    assign sort_value = 'sections.table.vendor' | t
+                    assign column_value = 'sections.table.vendor' | t
+                  when 'vendor'
+                    assign sort_value = 'sections.table.vendor' | t
+                    assign column_value = 'sections.table.vendor' | t
+                  when 'product_metafield'
+                    assign sort_value = 'Metafield value'
+                    assign column_value = 'Metafield value'
+                endcase
+              -%}
+              <div
+                data-index="{{ forloop.index0 }}"
+                data-sort-value="{{ sort_value }}"
+                class="md:table-cell md:px-4 md:py-2 {% if forloop.last %}md:text-right{% endif %}"
+              >
+                {%- if section.settings.show_column_labels_on_mobile -%}
+                  <span class="md:hidden">
+                    {{- column_labels[forloop.index0] }}: {{ column_value -}}
+                  </span>
+                  <span class="hidden md:inline">{{ column_value }}</span>
+                {%- else -%}
+                  {{ column_value }}
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </a>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if desktop_media_display == 'hover' -%}
+    {%- for product in collection.products
+      limit: section.settings.product_limit
+    -%}
+      {%- if product.featured_image != blank -%}
+        <div
+          style="display: none;"
+          class="pointer-events-none fixed inset-0 z-60 hidden md:block"
+          x-show="currentProduct == '{{ product.handle }}'"
+          x-cloak
+          x-transition.opacity
+        >
+          <div class="flex h-full w-full items-center justify-center">
+            <div class="max-h-full max-w-[33vw]">
+              {% render 'image',
+                image: product.featured_image,
+                sizes: 'calc(100vw / 3)',
+                no_placeholder: true
+              %}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- render 'view-all',
+    title: section.settings.title,
+    show_link: section.settings.show_view_all,
+    link_text: view_all_text,
+    link_url: collection.url,
+    section_color: section.settings.color_scheme
+  -%}
+</section>
+
+{% unless request.design_mode %}
+  <script src="{{ 'table.js' | asset_url }}" type="module"></script>
+{% endunless %}
+
+{% if enable_quick_buy %}
+  {% unless request.design_mode %}
+    <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'product.js' | asset_url }}" type="module"></script>
+    {% if settings.quick_buy_variant_picker_option_style == 'drop_down' %}
+      <script
+        src="{{ 'variant-drop-down.js' | asset_url }}"
+        type="module"
+      ></script>
+    {% endif %}
+  {% endunless %}
+
+  {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Featured collection table",
+  "max_blocks": 5,
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured collection table"
+    },
+    {
+      "id": "collection",
+      "type": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "label": "Product limit",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_column_labels_on_mobile",
+      "label": "Show column labels on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show “View all” link",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Product media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_media_on_mobile",
+      "label": "Show on mobile"
+    },
+    {
+      "type": "select",
+      "id": "desktop_media_display",
+      "label": "Desktop media display",
+      "options": [
+        {
+          "value": "hover",
+          "label": "Hover"
+        },
+        {
+          "value": "title",
+          "label": "Title block"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "hover"
+    },
+    {
+      "type": "header",
+      "content": "Quick buy"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_buy",
+      "label": "Enable quick buy"
+    },
+    {
+      "type": "select",
+      "id": "quick_buy_button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "text",
+          "label": "Text"
+        },
+        {
+          "value": "icon",
+          "label": "Icon"
+        }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1,
+      "settings": [
+        {
+          "id": "column_label",
+          "type": "text",
+          "label": "Column label",
+          "info": "Leave blank to use default"
+        }
+      ]
+    },
+    {
+      "type": "product_metafield",
+      "name": "Product Metafield",
+      "settings": [
+        {
+          "id": "column_label",
+          "type": "text",
+          "label": "Column label",
+          "default": "Metafield title"
+        },
+        {
+          "id": "metafield_key",
+          "type": "text",
+          "label": "Metafield namespace and key",
+          "info": "For example, “custom.my_label”. [Learn more](https://help.switchthemes.co/baseline/guides/metafields-in-tables.html)"
+        },
+        {
+          "type": "select",
+          "id": "metafield_mobile_sort_label",
+          "label": "Sort label on mobile",
+          "options": [
+            {
+              "value": "automatic",
+              "label": "Automatic"
+            },
+            {
+              "value": "a-z",
+              "label": "A-Z"
+            },
+            {
+              "value": "low-high",
+              "label": "Low to high"
+            },
+            {
+              "value": "old-new",
+              "label": "Old to new"
+            }
+          ],
+          "default": "automatic"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured collection table",
+      "blocks": [
+        {
+          "type": "title"
+        },
+        {
+          "type": "price"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,315 @@
+{%- liquid
+  assign option_style_setting = option_style
+-%}
+
+<div
+  {% if block %}
+    {{- block.shopify_attributes -}}
+  {% endif %}
+>
+  {% unless product.has_only_default_variant %}
+    {% for option in product.options_with_values %}
+      {% liquid
+        if settings.enable_color_swatches
+          assign is_color = false
+
+          assign swatch_trigger = 'products.product.color_swatch_trigger' | t | downcase
+
+          assign option_downcase = option.name | downcase
+
+          if option_downcase contains swatch_trigger
+            assign is_color = true
+          elsif swatch_trigger == 'color' and option_downcase contains 'colour'
+            assign is_color = true
+          endif
+        endif
+
+        assign swatches_count = option.values | map: 'swatch' | compact | size
+
+        if is_color or swatches_count > 0
+          assign option_style = 'buttons'
+        else
+          assign option_style = option_style_setting
+        endif
+
+        unless hide_option_labels
+          assign label_class = 'block'
+        else
+          assign label_class = 'sr-only'
+        endunless
+      %}
+
+      <fieldset class="product-variant-picker-block mt-8  no-js:hidden">
+        {%- if option_style == 'drop_down' -%}
+          <label
+            class="{{ label_class }}"
+            for="Option{{ option.position }}"
+          >
+            {{ option.name }}:
+          </label>
+        {%- else -%}
+          <legend class="{{ label_class }}">
+            {{ option.name }}:
+            {% if is_color or swatches_count > 0 -%}
+              <span x-text="option{{ forloop.index }}"></span>
+            {%- endif %}
+          </legend>
+        {%- endif -%}
+        {%- case option_style -%}
+          {%- when 'radio' -%}
+            <div class="mt-2">
+              {% for value in option.values %}
+                <div class="relative{% if hide_sold_out_variants %} [&:has(.sold-out)]:hidden{% endif %}{% if hide_unavailable_variants %} [&:has(.unavailable)]:hidden{% endif %}">
+                  <input
+                    class="custom-input peer absolute left-0 top-0 h-full w-full cursor-pointer opacity-0"
+                    @keydown="lockOptionChangeHandler()"
+                    @change="optionChange($el)"
+                    @keyup="unlockOptionChangeHandler($el)"
+                    type="radio"
+                    id="Option{{ option.position }}-{{ value | escape }}"
+                    name="options[{{ option.name }}]"
+                    value="{{ value | escape }}"
+                    {% if option.selected_value == value %}
+                      checked
+                    {% endif %}
+                    data-single-option-selector
+                    data-position="{{ option.position }}"
+                  >
+                  <label
+                    class="flex items-center py-1 peer-[:not(.sold-out,.unavailable)]:cursor-pointer peer-[.sold-out]:text-scheme-secondary peer-[.unavailable]:text-scheme-secondary peer-[.sold-out]:line-through peer-[.unavailable]:line-through peer-checked:[&>span]:bg-scheme-text"
+                    for="Option{{ option.position }}-{{ value | escape }}"
+                  >
+                    <span
+                      class="mr-1 inline-block h-2 w-2 rounded-full border-checkbox border-scheme-text bg-scheme-text/0"
+                    ></span>
+                    {{ value }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          {%- when 'text_underline' -%}
+            <div class="-mx-1 mt-2 flex flex-wrap items-center justify-start">
+              {% for value in option.values %}
+                <div class="label-only-input relative{% if hide_sold_out_variants %} [&:has(.sold-out)]:hidden{% endif %}{% if hide_unavailable_variants %} [&:has(.unavailable)]:hidden{% endif %}">
+                  <input
+                    class="peer absolute left-0 top-0 h-full w-full cursor-pointer opacity-0"
+                    @keydown="lockOptionChangeHandler()"
+                    @change="optionChange($el)"
+                    @keyup="unlockOptionChangeHandler($el)"
+                    type="radio"
+                    id="Option{{ option.position }}-{{ value | escape }}"
+                    name="options[{{ option.name }}]"
+                    value="{{ value | escape }}"
+                    {% if option.selected_value == value %}
+                      checked
+                    {% endif %}
+                    data-single-option-selector
+                    data-position="{{ option.position }}"
+                  >
+                  <label
+                    class="block p-1 peer-[:not(.sold-out,.unavailable)]:cursor-pointer peer-[.sold-out]:text-scheme-secondary peer-[.unavailable]:text-scheme-secondary peer-[.sold-out]:line-through peer-[.unavailable]:line-through peer-checked:[&>span]:border-b-text peer-checked:[&>span]:border-scheme-text"
+                    for="Option{{ option.position }}-{{ value | escape }}"
+                  >
+                    <span>
+                      {{- value -}}
+                    </span>
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          {%- when 'buttons' -%}
+            <div class="mt-2 flex flex-wrap items-center justify-start{% unless is_color or swatches_count > 0 %} -mx-1{% else %} -mx-[calc(theme(spacing.2)_-_1px)]{% endunless %}">
+              {% for value in option.values %}
+                <div class="label-only-input relative px-1{% if hide_sold_out_variants %} [&:has(.sold-out)]:hidden{% endif %}{% if hide_unavailable_variants %} [&:has(.unavailable)]:hidden{% endif %}">
+                  <input
+                    class="peer absolute left-0 top-0 h-full w-full cursor-pointer opacity-0"
+                    @keydown="lockOptionChangeHandler()"
+                    @change="optionChange($el)"
+                    @keyup="unlockOptionChangeHandler($el)"
+                    type="radio"
+                    id="Section-{{ section.id }}-Option{{ option.position }}-{{ value | escape }}"
+                    name="options[{{ option.name }}]"
+                    value="{{ value | escape }}"
+                    {% if option.selected_value == value %}
+                      checked
+                    {% endif %}
+                    data-single-option-selector
+                    data-position="{{ option.position }}"
+                  >
+                  <label
+                    class="
+                      relative select-none block{% unless is_color or swatches_count > 0 %} p-2 min-w-9{% else %} p-[2px]{% endunless %} cursor-pointer rounded-button border-text border-transparent text-center peer-checked:border-scheme-text peer-[.sold-out]:line-through
+                      peer-[.unavailable]:line-through {% if is_color or swatches_count > 0 %}
+                      peer-[:not(.sold-out,.unavailable)]:[&>span:first-of-type]:hidden{% endif %}
+                    "
+                    for="Section-{{ section.id }}-Option{{ option.position }}-{{ value | escape }}"
+                    title="{{ option.value }}"
+                  >
+                    {%- if swatches_count > 0 -%}
+                      {%- liquid
+                        assign swatch = value.swatch
+                        assign swatch_image = swatch.image
+                        assign swatch_color = swatch.color
+                      -%}
+                      <span
+                        class="absolute inset-0 z-10 h-full w-full bg-scheme-background/25"
+                      >
+                        <span
+                          class="absolute bottom-0 left-0 top-1/2 z-10 h-[var(--text-border-width)] w-full -translate-y-1/2 -rotate-45 transform bg-scheme-text"
+                        ></span>
+                      </span>
+                      <span
+                        class="block h-6 w-6 rounded-button bg-cover bg-no-repeat"
+                        style="background-position: {{ swatch_image.presentation.focal_point | default: 'center' }};{% if swatch_image != blank %} background-image: url({{ swatch_image | image_url: width: 160 }});{% else %}{% endif %}{% if swatch_color != blank %} background-color: rgb({{ swatch_color.rgb }});{% endif %}"
+                      ></span>
+                    {%- elsif is_color -%}
+                      {%- liquid
+                        assign color_image_url = value | handle | append: '.' | append: 'png' | file_img_url: '110x' | prepend: 'https:'
+                        assign color_swatch_fallback = value | split: ' ' | last | handle
+                      -%}
+                      <span
+                        class="absolute inset-0 z-10 h-full w-full bg-scheme-background/25"
+                      >
+                        <span
+                          class="absolute bottom-0 left-0 top-1/2 z-10 h-[var(--text-border-width)] w-full -translate-y-1/2 -rotate-45 transform bg-scheme-text"
+                        ></span>
+                      </span>
+                      <span
+                        class="block h-6 w-6 rounded-button bg-full"
+                        style="background-image: url({{ color_image_url }}); background-color: {{ color_swatch_fallback }};"
+                      ></span>
+                    {%- endif -%}
+                    <span
+                      {% if is_color or swatches_count > 0 %}
+                        class="sr-only"
+                      {% endif %}
+                    >
+                      {{- value -}}
+                    </span>
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          {%- when 'drop_down' -%}
+            <div
+              x-data="VariantDropDown"
+              @keyup.escape.prevent.stop="close($refs.button)"
+              @focusin.window="if (! $root.contains($event.target)) { close() }"
+              x-id="['option-dropdown-{{ product.id }}-{{ option.position }}']"
+              class="relative select-none"
+              @click.away="close($refs.button)"
+            >
+              <button
+                x-ref="button"
+                type="button"
+                @click="toggle"
+                :aria-expanded="expanded"
+                :aria-controls="$id('option-dropdown-{{ product.id }}-{{ option.position }}')"
+                class="mt-2 flex cursor-pointer items-center gap-2 border-b-text border-scheme-text py-1"
+                @click.away="$refs.panel.contains($event.target) ? close($refs.button) : close()"
+              >
+                <div
+                  class="bg-scheme-background text-scheme-text"
+                  :class="{ 'text-scheme-secondary line-through' : !currentVariant || currentVariant && !currentVariant.available }"
+                  x-text="option{{ option.position }}"
+                >
+                  {{ option.name }}
+                </div>
+                <div class="ml-auto flex w-fit">
+                  <span
+                    class="my-auto h-4 w-4"
+                    :class="{ 'rotate-180' : expanded }"
+                  >
+                    {%- render 'icon-chevron-down' -%}
+                  </span>
+                </div>
+              </button>
+              <div
+                x-ref="panel"
+                :id="$id('option-dropdown-{{ product.id }}-{{ option.position }}')"
+                class="absolute bottom-auto left-0 right-0 top-full z-10 mt-0.5 flex max-h-[40vh] overflow-y-auto border-text border-scheme-text bg-scheme-text sm:-left-[--text-border-width] sm:right-auto sm:top-auto"
+                style="display: none;"
+              >
+                <div
+                  class="flex w-full min-w-[theme(spacing.16)] flex-col gap-[--text-border-width] sm:w-auto"
+                  role="listbox"
+                  @keydown.right.prevent.stop="$focus.wrap().next()"
+                  @keydown.down.prevent.stop="$focus.wrap().next()"
+                  @keydown.left.prevent.stop="$focus.wrap().previous()"
+                  @keydown.up.prevent.stop="$focus.wrap().previous()"
+                >
+                  {% for value in option.values %}
+                    <button
+                      @click="optionChange($el)"
+                      data-single-option-selector
+                      data-position="{{ option.position }}"
+                      type="button"
+                      role="option"
+                      value="{{ value | escape }}"
+                      data-single-option-selector
+                      data-position="{{ option.position }}"
+                      :aria-selected="option{{ option.position }} === $el.value ? 'true' : null"
+                      class="
+                        variant-dropdown-button break-word block bg-scheme-background px-4 py-2
+                        text-left
+                        text-scheme-text
+                        hover:text-scheme-accent
+                        focus-visible:text-scheme-accent
+                        aria-selected:text-scheme-accent
+                        coarse-pointer:min-h-[44px]
+                        coarse-pointer:min-w-[44px]
+                        {% if hide_sold_out_variants %}
+                          [&.sold-out]:hidden
+                        {% endif %}
+                        [&.sold-out]:text-scheme-secondary
+                        [&.sold-out]:line-through
+                        [&.sold-out]:hover:text-scheme-accent
+                        [&.sold-out]:focus:text-scheme-accent
+                        [&.sold-out]:aria-selected:text-scheme-accent
+                        {% if hide_unavailable_variants %}
+                          [&.unavailable]:hidden
+                        {% endif %}
+                        [&.unavailable]:text-scheme-secondary
+                        [&.unavailable]:line-through
+                        [&.unavailable]:hover:text-scheme-accent
+                        [&.unavailable]:focus:text-scheme-accent
+                        [&.unavailable]:aria-selected:text-scheme-accent
+                      "
+                    >
+                      {{ value }}
+                    </button>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+        {% endcase %}
+      </fieldset>
+    {% endfor %}
+  {% endunless %}
+</div>
+
+{% if hide_sold_out_variants and product.selected_variant.available == false %}
+  <div
+    x-data
+    x-init="$watch('currentVariant', (value) => { if (value.available) $root.remove() })"
+  >
+    <style>
+      .\[\&\.sold-out\]\:hidden.sold-out {
+        display: block;
+      }
+
+      .\[\&\:has\(\.sold-out\)\]\:hidden:has(.sold-out) {
+        display: block;
+      }
+    </style>
+  </div>
+{% endif %}
+
+{% unless request.design_mode %}
+  {% if option_style == 'drop_down' %}
+    <script
+      src="{{ 'variant-drop-down.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% endif %}
+{% endunless %}

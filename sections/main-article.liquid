@@ -1,0 +1,501 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign indent_image = section.settings.indent_image
+  assign show_author = section.settings.show_author
+  assign show_date = section.settings.show_date
+  assign show_tags = section.settings.show_tags
+  assign ratio = section.settings.crop | plus: 0
+  assign image_width_desktop = section.settings.image_width_desktop
+  assign content_width = section.settings.content_width
+  assign center_content = section.settings.center_content
+  assign show_next_previous_links = section.settings.show_next_previous_links
+
+  assign is_centering_content = false
+
+  if center_content == true and image_width_desktop == 'full'
+    assign is_centering_content = true
+  endif
+
+  if article.tags.size > 0 and show_tags
+    assign show_tags_and_tags_present = true
+  endif
+
+  assign content_grid_class = 'lg:col-span-12'
+  assign sidebar_grid_class = ''
+
+  case image_width_desktop
+    when 'full'
+      assign show_sidebar = false
+      assign content_grid_class = 'lg:col-span-12'
+      assign sidebar_grid_class = ''
+
+      if indent_image
+        assign desktop_sizes = 'calc(100vw - (4rem * 2))'
+      else
+        assign desktop_sizes = '100vw'
+      endif
+    when 'one_half'
+      assign show_sidebar = true
+      assign content_grid_class = 'lg:col-span-6'
+      assign sidebar_grid_class = 'lg:col-span-6'
+
+      assign desktop_sizes = '50vw'
+    when 'one_third'
+      assign show_sidebar = true
+      assign content_grid_class = 'lg:col-span-8'
+      assign sidebar_grid_class = 'lg:col-span-4'
+
+      assign desktop_sizes = 'calc(100vw / 3)'
+  endcase
+
+  assign sizes = '(min-width: 1024px) ' | append: desktop_sizes | append: ', 100vw'
+
+  if comment.status == 'pending'
+    assign number_of_comments = article.comments_count | plus: 1
+  else
+    assign number_of_comments = article.comments_count
+  endif
+
+  assign preload = false
+  assign loading = 'lazy'
+
+  if section.index == 1
+    assign preload = true
+  endif
+
+  if section.index <= 3
+    assign loading = 'eager'
+  endif
+-%}
+
+{%- if show_tags_and_tags_present -%}
+  {%- capture post_tags -%}
+    <ul class="m-0 -mx-1 p-0" aria-label="{{ 'blogs.article.tags' | t }}">
+      {% for tag in article.tags %}
+        <li class="inline-block px-1">
+          <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="article__grid-tag">#{{ tag }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- capture post_meta -%}
+<div class="py-4 lg:flex">
+  {%- if show_author -%}
+    <p>{{ 'blogs.article.by_author' | t: author: article.author }}</p>
+  {%- endif -%}
+  {%- if show_date and show_author -%}
+    <span class="hidden lg:mx-2 lg:inline-block">&#183;</span>
+  {%- endif -%}
+  {%- if show_date -%}
+    <p class="mt-1 lg:mt-0">
+      {{ article.published_at | time_tag: format: 'month_day_year' }}
+    </p>
+  {%- endif -%}
+</div>
+{%- endcapture -%}
+
+{% if show_next_previous_links %}
+  {% if blog.next_article or blog.previous_article %}
+    {% liquid
+      if image_width_desktop == 'full' and center_content == false
+        assign show_sidebar = true
+        assign content_grid_class = 'lg:col-span-9'
+        assign sidebar_grid_class = 'lg:col-span-3'
+      endif
+    %}
+    {% capture next_prev_links %}
+    <div class="bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-right text-base text-scheme-text">
+      <ul class="flex items-center">
+        <li class="mr-auto w-28 justify-between text-left">
+          {% if blog.next_article %}
+            <a class="theme-link theme-link--back inline-flex items-center justify-center hover:text-scheme-accent" href="{{ blog.next_article }}" title="{{ 'blogs.article.newer_post' | t }}">
+              {{ 'blogs.article.newer_post' | t }}
+            </a>
+          {% endif %}
+        </li>
+        <li class="ml-auto w-28 justify-between text-right">
+          {% if blog.previous_article %}
+            <a class="theme-link inline-flex items-center justify-center hover:text-scheme-accent" href="{{ blog.previous_article }}" title="{{ 'blogs.article.older_post' | t }}">
+              {{ 'blogs.article.older_post' | t }}
+            </a>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  {% endcapture %}
+  {% endif %}
+{% endif %}
+
+<article
+  class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="grid grid-cols-1 gap-gutter bg-gridline-color lg:grid-cols-12">
+    {%- if article.image != blank -%}
+      <div class="full-h relative lg:col-span-12 bg-scheme-background{% unless settings.fill_image_to_border_edge %} p-2 lg:p-4{% endunless %}{% unless image_width_desktop == 'full' %} lg:hidden{% endunless %}">
+        <div class="relative{% if indent_image %} p-8 lg:p-16{% endif %}">
+          {% render 'image-crop',
+            image: article.image,
+            sizes: sizes,
+            ratio: ratio,
+            preload: preload,
+            loading: loading
+          %}
+        </div>
+      </div>
+    {%- endif -%}
+
+    <div class="bg-scheme-background text-scheme-text {{ content_grid_class }}">
+      <div
+        {% if is_centering_content %}
+          class="lg:flex lg:justify-center"
+        {% endif %}
+      >
+        <div class="px-section-horizontal-spacing  py-section-vertical-spacing{% if is_centering_content %} {{ content_width }}{% else %} lg:max-w-4xl{% endif %}">
+          <h1 class="font-heading break-word text-heading-feature">
+            {{ article.title }}
+          </h1>
+          {%- if show_author or show_date %}
+            {{ post_meta }}
+          {% endif %}
+          <div class="rte mt-4" x-data="RTE">
+            {{ article.content }}
+          </div>
+          {%- if article.tags.size > 0 and show_tags -%}
+            <div class="mt-4">
+              {{ post_tags }}
+            </div>
+          {%- endif -%}
+
+          {%- liquid
+            if section.settings.show_share_buttons
+              assign share_permalink = shop.url | append: article.url
+              assign share_title = article.title | url_param_escape
+
+              if article.image
+                assign share_image = article.image | image_url: width: 1024, height: 1024
+              endif
+
+              render 'social-sharing', share_title: share_title, share_permalink: share_permalink, share_image: share_image, section_color: section_color
+            endif
+          -%}
+        </div>
+      </div>
+      {% if show_next_previous_links %}
+        {% if blog.next_article or blog.previous_article %}
+          <div class="border-t-gridline border-gridline-color{% if is_centering_content == false %} lg:hidden{% endif %}">
+            {{ next_prev_links }}
+          </div>
+        {% endif %}
+      {% endif %}
+      {% if blog.comments_enabled? %}
+        {% assign anchor = '#Comments-' | append: article.id %}
+        {% if number_of_comments > 0 %}
+          <div
+            id="comments"
+          >
+            <div
+              id="{{ anchor | replace: '#', '' }}"
+              class="border-t-gridline border-gridline-color px-section-horizontal-spacing py-section-vertical-spacing"
+            >
+              <h3 class="font-heading text-heading-secondary">
+                {{
+                  'blogs.comments.comments_with_count'
+                  | t: count: number_of_comments
+                }}
+              </h3>
+              {% paginate article.comments by 5 %}
+                <div class="mt-4">
+                  <ul class="comments space-y-2 lg:space-y-4">
+                    {% if comment.status == 'pending' %}
+                      <li id="{{ comment.id }}" class="comment">
+                        {% render 'comment', comment: comment %}
+                      </li>
+                    {% endif %}
+                    {% for comment in article.comments %}
+                      <li id="{{ comment.id }}" class="comment">
+                        {% render 'comment', comment: comment %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                  {%- if paginate.pages > 1 -%}
+                    {% render 'pagination-comments',
+                      paginate: paginate,
+                      section_color: section_color,
+                      anchor: anchor
+                    %}
+                  {%- endif -%}
+                </div>
+              {% endpaginate %}
+            </div>
+          </div>
+        {% endif %}
+        <div class="border-t-gridline border-gridline-color px-section-horizontal-spacing py-section-vertical-spacing">
+          {% form 'new_comment', article %}
+            {%- liquid
+              assign formId = 'CommentForm'
+              assign post_message = 'blogs.comments.success'
+
+              if blog.moderated? and comment.status == 'pending'
+                assign post_message = 'blogs.comments.success_moderated'
+              elsif comment.status == 'unapproved' or comment.status == 'spam'
+                assign post_message = 'blogs.comments.unapproved'
+              endif
+
+              render 'form-status', form: form, form_id: formId, success_message: post_message, section_color: section_color
+            -%}
+            <h3 class="font-heading text-heading-secondary">
+              {{ 'blogs.comments.title' | t }}
+            </h3>
+            <label for="CommentAuthor" class="mt-4 block">
+              {{ 'blogs.comments.name' | t }}
+            </label>
+            <input
+              type="text"
+              name="comment[author]"
+              id="CommentAuthor"
+              class="w-full border-b-text border-current bg-transparent py-1 {% if form.errors contains 'author' %}border-gridline-color{% endif %}"
+              value="{{ form.author }}"
+              autocapitalize="words"
+            >
+            <label for="CommentEmail" class="mt-4 block">
+              {{ 'blogs.comments.email' | t }}
+            </label>
+            <input
+              type="email"
+              name="comment[email]"
+              id="CommentEmail"
+              class="w-full border-b-text border-current bg-transparent py-1 {% if form.errors contains 'email' %}border-gridline-color{% endif %}"
+              value="{{ form.email }}"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+            >
+            <label for="CommentBody" class="mt-4 block">
+              {{ 'blogs.comments.message' | t }}
+            </label>
+            <textarea
+              name="comment[body]"
+              id="CommentBody"
+              class="mt-1 block w-full border-text border-current bg-transparent p-2 text-sm {% if form.errors contains 'body' %}border-gridline-color{% endif %}"
+            >
+            {{- form.body -}}
+          </textarea>
+            {% if blog.moderated? %}
+              <p>{{ 'blogs.comments.moderated' | t }}</p>
+            {% endif %}
+            <input
+              type="submit"
+              class="theme-button mt-4 block w-full lg:w-2/3"
+              value="{{ 'blogs.comments.post' | t }}{% if settings.buttons_show_arrow %}&nbsp;&rarr;{% endif %}"
+            >
+          {% endform %}
+        </div>
+      {% endif %}
+    </div>
+    {% if show_sidebar %}
+      <div class="hidden bg-scheme-background text-scheme-text lg:block {{ sidebar_grid_class }}">
+        {%- if article.image != blank and image_width_desktop != 'full' -%}
+          <div class="hidden lg:block{% if show_author or show_date or show_tags_and_tags_present %} border-b-gridline border-gridline-color{% endif %} full-h relative bg-scheme-background{% unless settings.fill_image_to_border_edge %} p-2 lg:p-4{% endunless %} lg:-mb-gridline">
+            <div class="relative{% if indent_image %} p-8 lg:p-16{% endif %}">
+              {%
+                render 'image-crop' with
+                image: article.image,
+                ratio: ratio,
+                sizes: sizes,
+                crop: section.settings.crop
+              %}
+            </div>
+          </div>
+        {%- endif -%}
+        {% if show_next_previous_links and is_centering_content == false %}
+          {% if blog.next_article or blog.previous_article %}
+            {{ next_prev_links }}
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</article>
+
+{%- if section.settings.override_header_footer_color_scheme -%}
+  {%- render 'header-footer-color-scheme-override',
+    section_color: section_color
+  -%}
+{%- endif -%}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "articleBody": {{ article.content | strip_html | json }},
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": {{ request.origin | append: page.url | json }}
+    },
+    "headline": {{ article.title | json }},
+    {% if article.excerpt != blank %}
+      "description": {{ article.excerpt | strip_html | json }},
+    {% endif %}
+    {% if article.image %}
+      "image": [
+        {{ article | image_url: width: 1920 | prepend: "https:" | json }}
+      ],
+    {% endif %}
+    "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+    "dateCreated": {{ article.created_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+    "author": {
+      "@type": "Person",
+      "name": {{ article.author | json }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }}
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Blog post",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Show date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": "Show social media sharing buttons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show tags",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_next_previous_links",
+      "label": "Show links to next / previous articles",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "select",
+      "id": "crop",
+      "label": "Crop image",
+      "options": [
+        {
+          "value": "0",
+          "label": "No crop"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "2.39",
+          "label": "Super wide"
+        },
+        {
+          "value": "4.0",
+          "label": "Letterbox"
+        }
+      ],
+      "default": "2.39"
+    },
+    {
+      "type": "select",
+      "id": "image_width_desktop",
+      "label": "Image width on desktop",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full"
+        },
+        {
+          "value": "one_half",
+          "label": "One half"
+        },
+        {
+          "value": "one_third",
+          "label": "One third"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "checkbox",
+      "id": "indent_image",
+      "label": "Indent image",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Center content",
+      "info": "This will only apply when “Image width on desktop” setting is set to “Full.”"
+    },
+    {
+      "type": "checkbox",
+      "id": "center_content",
+      "label": "Center content",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "Desktop content width",
+      "options": [
+        {
+          "value": "lg:w-1/2",
+          "label": "One half"
+        },
+        {
+          "value": "lg:w-2/3",
+          "label": "Two thirds"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_header_footer_color_scheme",
+      "label": "Use this color scheme for header and footer",
+      "info": "This will only apply to the blog post template",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

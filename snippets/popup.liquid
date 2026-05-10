@@ -1,0 +1,38 @@
+<div x-data>
+  <template x-teleport="body">
+    <div
+      x-show="$store.modals.popup.open"
+      @keydown.escape.prevent.stop="$store.modals.close('popup')"
+      @click="$store.modals.close('popup')"
+      class="fixed inset-0 z-110 p-8 lg:p-24"
+      data-color-scheme="{{ settings.modal_color_scheme | default: 'scheme3' }}"
+      id="modals-popup"
+      @popup-is-open.window="setTimeout(() => { $focus.first() }, 120)"
+    >
+      <div
+        x-show="$store.modals.popup.open"
+        class="fixed inset-0 bg-transparent"
+      >
+        <!-- Overlay -->
+      </div>
+      <div
+        x-show="$store.modals.popup.open"
+        class="flex h-full w-full"
+      >
+        <div
+          @click.stop
+          x-show="$store.modals.popup.open"
+          x-trap.noscroll.inert="$store.modals.popup.open"
+          class="relative m-auto max-h-full w-full max-w-2xl overflow-y-auto border-gridline border-gridline-color bg-scheme-background text-scheme-text"
+          id="popup-slot"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="getModalLabel('popup', $el)"
+          tabindex="-1"
+        >
+          <!-- Modal content is teleported here -->
+        </div>
+      </div>
+    </div>
+  </template>
+</div>

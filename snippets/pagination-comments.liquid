@@ -1,0 +1,62 @@
+<div
+  class="bg-scheme-background pb-theme-double  pt-theme text-sm text-scheme-text md:text-base"
+  data-color-scheme="{{ section_color }}"
+>
+  <ul class="pagination flex items-center">
+    <li
+      class="mr-auto w-28 text-left md:w-1/3"
+      {% unless paginate.previous.is_link %}
+        aria-hidden="true"
+      {% endunless %}
+    >
+      {% if paginate.previous.is_link %}
+        <a
+          class="theme-link theme-link--back hover:text-scheme-accent"
+          href="{{ paginate.previous.url }}{{ anchor }}"
+        >
+          {{- 'general.pagination.previous' | t -}}
+        </a>
+      {% endif %}
+    </li>
+    {%- for part in paginate.parts -%}
+      {%- if part.is_link -%}
+        <li>
+          <a
+            class="inline-block border-b-text border-transparent px-2 py-1"
+            href="{{ part.url }}{{ anchor }}"
+          >
+            <span class="sr-only">page</span> {{ part.title }}
+          </a>
+        </li>
+      {%- else -%}
+        {%- if part.title == paginate.current_page -%}
+          <li
+            class="active inline-block border-b-text border-scheme-text px-2 py-1"
+            aria-current="page"
+          >
+            <span class="sr-only">page</span> {{ part.title }}
+          </li>
+        {%- else -%}
+          <li class="inline-block border-b-text border-transparent px-2 py-1">
+            <span class="sr-only">page</span> {{ part.title }}
+          </li>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    <li
+      class="ml-auto w-28 text-right md:w-1/3"
+      {% unless paginate.next.is_link %}
+        aria-hidden="true"
+      {% endunless %}
+    >
+      {% if paginate.next.is_link %}
+        <a
+          class="theme-link hover:text-scheme-accent"
+          href="{{ paginate.next.url }}{{ anchor }}"
+        >
+          {{- 'general.pagination.next' | t -}}
+        </a>
+      {% endif %}
+    </li>
+  </ul>
+</div>

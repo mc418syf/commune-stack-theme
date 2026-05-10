@@ -1,0 +1,13 @@
+{%- unless recommendations.performed -%}
+  {% capture section_url %}{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ block.settings.product_list_limit }}&intent=complementary{% endcapture %}
+  <div
+    class="complementary-products-block {% if block.settings.heading_text_style == 'body' %}complementary-products-block--font-body {% endif %}mt-8"
+    x-data
+    x-html="
+      $fetchedFragment(
+        '{{ section_url }}',
+        '.complementary-products-block'
+      )
+    "
+  ></div>
+{%- endunless -%}

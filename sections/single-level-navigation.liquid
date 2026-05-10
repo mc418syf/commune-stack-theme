@@ -1,0 +1,100 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign menu = section.settings.menu
+  assign text_align = section.settings.text_alignment
+-%}
+
+<section
+  class="relative border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  x-data="{ currentLink: '', showOverflowIndicator: false }"
+  data-color-scheme="{{ section_color }}"
+>
+  <div
+    x-show="showOverflowIndicator"
+    x-transition.opacity.duration.150ms
+    class="pointer-events-none absolute bottom-0 right-0 top-0 w-8 bg-gradient-to-r from-scheme-background/0 via-scheme-background/75 to-scheme-background lg:hidden"
+    aria-hidden="true"
+    role="presentation"
+    style="display: none;"
+  ></div>
+  <div class="overflow-x-auto px-section-horizontal-spacing py-section-vertical-spacing-half">
+    <nav role="navigation" aria-label="{{ linklists[menu].title }}">
+      <ul class="flex lg:flex-wrap {{ text_align }} -mx-4 whitespace-nowrap">
+        {%- for link in linklists[menu].links -%}
+          <li
+            class="inline-block px-4 lg:px-8"
+            {% if forloop.last %}
+              x-intersect:enter.threshold.75="showOverflowIndicator = false"
+              x-intersect:leave.threshold.75="showOverflowIndicator = true"
+            {% endif %}
+          >
+            <a
+              {% if link.active %}
+                aria-current="page"
+              {% endif %}
+              class="block py-section-vertical-spacing-half hover:text-scheme-accent"
+              href="{{ link.url }}"
+            >
+              {{- link.title -}}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Single level navigation",
+  "disabled_on": {
+    "groups": [
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu",
+      "info": "This menu won't show dropdown items"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "lg:justify-start",
+          "label": "Left"
+        },
+        {
+          "value": "lg:justify-center",
+          "label": "Center"
+        },
+        {
+          "value": "lg:justify-end",
+          "label": "Right"
+        }
+      ],
+      "default": "lg:justify-center"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Single level navigation"
+    }
+  ]
+}
+{% endschema %}

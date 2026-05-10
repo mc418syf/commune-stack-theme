@@ -1,0 +1,24 @@
+{%- liquid
+  if block.settings.show_locations == 'in_stock_only'
+    assign section_id = 'location-inventory-in-stock-only'
+  else
+    assign section_id = 'location-inventory'
+  endif
+-%}
+
+<div
+  {{ block.shopify_attributes }}
+  class="product-location-inventory-status-block mt-8 empty:hidden"
+>
+  <template x-if="currentVariant && currentVariantAvailable">
+    <div
+      x-html="
+        $fetchedFragment(
+          `{{ routes.root_url }}variants/${currentVariantId}/?section_id={{ section_id }}`,
+          '.location-inventory',
+          'opacity-50'
+        )
+      "
+    ></div>
+  </template>
+</div>

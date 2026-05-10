@@ -1,0 +1,366 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign collection = section.settings.collection
+  assign product_limit = section.settings.product_limit
+  assign show_view_all = section.settings.show_view_all
+  assign enable_quick_buy = section.settings.enable_quick_buy
+  assign quick_buy_button_classes = section.settings.quick_buy_button_style
+  assign view_all_text = 'collections.general.view_all' | t
+  assign mobile_product_tile_width = section.settings.mobile_product_tile_width
+  assign desktop_product_tile_width = section.settings.desktop_product_tile_width
+
+  if section.settings.image_crop != 'none'
+    assign force_crop = true
+  endif
+
+  assign sizes = '(min-width: 1024px) ' | append: desktop_product_tile_width | append: 'vw'
+
+  case mobile_product_tile_width
+    when '60'
+      assign sizes = sizes | append: ', 60vw'
+      assign lazy_loading_limit = 2
+    when '80'
+      assign sizes = sizes | append: ', 80vw'
+      assign lazy_loading_limit = 2
+    when '100'
+      assign sizes = sizes | append: ', 100vw'
+      assign lazy_loading_limit = 1
+  endcase
+
+  capture view_all_button_underneath
+    render 'view-all', title: section.settings.title, show_link: show_view_all, link_text: view_all_text, link_url: collection.url, section_color: section_color, no_border: true, no_padding: true, center_vertically: true
+  endcapture
+
+  if view_all_button_underneath != blank
+    assign has_view_all_button_underneath = true
+  else
+    assign has_view_all_button_underneath = false
+  endif
+-%}
+
+<section
+  class="featured-collection border-b-gridline border-gridline-color"
+  data-color-scheme="{{ section_color }}"
+  style="--mobile-slide-width: {{ mobile_product_tile_width }}%; --desktop-slide-width: {{ desktop_product_tile_width }}%;"
+>
+  {% liquid
+    if section.settings.title != ''
+      render 'section-title', title: section.settings.title, show_link: show_view_all, link_text: view_all_text, link_url: collection.url, section_color: section_color
+    endif
+  %}
+  <div class="bg-scheme-background pb-theme-double">
+    <div
+      x-data="
+        Theme_Slideshow({
+          autoplay: false,
+          autoplayInterval: false,
+          gap: 'var(--gridline-width)',
+          mode: 'carousel',
+          onlyIfNeeded: true,
+        })
+      "
+      class="splide"
+    >
+      <div class="splide__track bg-gridline-color no-js:[.splide:not(.is-active)_&]:visible [.splide:not(.is-active,_.is-initialized)_&]:invisible">
+        <ul class="splide__list no-js:gap-gridline no-js:overflow-x-auto [.splide:not(.is-active)_&]:!flex [.splide:not(.is-active)_&]:gap-gridline">
+          {%- for product in collection.products limit: product_limit -%}
+            {%- liquid
+              assign loading = 'lazy'
+
+              if section.index <= 3 and forloop.index <= lazy_loading_limit
+                assign loading = 'eager'
+              endif
+            -%}
+            <li
+              class="splide__slide w-[var(--mobile-slide-width)] border-b-gridline border-gridline-color bg-scheme-background no-js:!block lg:w-[var(--desktop-slide-width)]"
+            >
+              {% if section.settings.product_tile_type == 'text_overlay' %}
+                {%- render 'product-tile-text-overlay',
+                  product: product,
+                  sizes: sizes,
+                  loading: loading,
+                  section_color: section_color,
+                  force_crop: force_crop,
+                  force_crop_ratio: section.settings.image_crop
+                -%}
+              {% else %}
+                {%- render 'product-tile-standard',
+                  product: product,
+                  sizes: sizes,
+                  loading: loading,
+                  section_color: section_color,
+                  force_crop: force_crop,
+                  force_crop_ratio: section.settings.image_crop,
+                  enable_quick_buy: enable_quick_buy,
+                  quick_buy_button_classes: quick_buy_button_classes
+                -%}
+              {% endif %}
+            </li>
+          {%- else -%}
+            {% for i in (1..product_limit) %}
+              <li
+                class="splide__slide w-[var(--mobile-slide-width)] border-b-gridline border-gridline-color bg-scheme-background lg:w-[var(--desktop-slide-width)]"
+              >
+                <a href="#" class="block">
+                  {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                  <div class="border-b-gridline border-gridline-color {% unless settings.fill_image_to_border_edge %}}p-2 lg:p-4{% endunless %}">
+                    <div>
+                      {{
+                        'product-'
+                        | append: current
+                        | placeholder_svg_tag: 'text-scheme-placeholder-foreground bg-scheme-placeholder-background fill-current'
+                      }}
+                    </div>
+                  </div>
+                  <div class="flex justify-between p-4">
+                    <p class="w-3/4">
+                      {{ 'homepage.onboarding.product_title' | t }}
+                    </p>
+                    <p>
+                      {% if settings.currency_code_enabled == true -%}
+                        {{- 1999 | money_with_currency -}}
+                      {%- else -%}
+                        {{- 1999 | money -}}
+                      {%- endif %}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            {%- endfor -%}
+          {%- endfor -%}
+          {% if collection and collection.products %}
+            <li
+              style="--mobile-placeholder-width: calc(100% - (({{ collection.products_count }} * {{ mobile_product_tile_width }}%) - ({{ collection.products_count | minus: 1 }} * var(--gridline-width)))); --desktop-placeholder-width: calc(100% - (({{ collection.products_count }} * {{ desktop_product_tile_width }}%) - ({{ collection.products_count | minus: 1 }} * var(--gridline-width))));"
+              class="w-[--mobile-placeholder-width] border-b-gridline border-gridline-color bg-scheme-background lg:w-[--desktop-placeholder-width]"
+              aria-hidden="true"
+              role="presentation"
+            ></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div
+        class="mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-x-2 gap-y-0 no-js:hidden lg:mx-4"
+        x-data="
+          {
+            paginationIsWrapped: false,
+            checkIfWrapped() {
+              this.paginationIsWrapped = hasWrappedChildren(this.$refs.pagination)
+            }
+          }
+        "
+        x-init="checkIfWrapped"
+        @resize.window.debounce.250="checkIfWrapped"
+      >
+        <ul x-ref="pagination" class="splide__pagination"></ul>
+        {% if has_view_all_button_underneath %}
+          <div class="col-span-2 row-start-2 -mx-1 mt-theme empty:hidden lg:-mx-4">
+            {{ view_all_button_underneath }}
+          </div>
+        {% endif %}
+        <div
+          class="splide__arrows col-end-last flex items-center justify-end gap-1 text-scheme-text [.splide:not(.is-active)_&]:pointer-events-none [.splide:not(.is-active)_&]:invisible"
+          :class="{ 'items-start pt-0.5' : paginationIsWrapped, 'items-center' : !paginationIsWrapped }"
+        >
+          <button class="splide__arrow splide__arrow--prev w-8">
+            <span class="sr-only">
+              {{- 'sections.slideshow.previous_slide' | t -}}
+            </span>
+            <span class="block">
+              {% render 'icon-arrow-left' %}
+            </span>
+          </button>
+          <button class="splide__arrow splide__arrow--next w-8">
+            <span class="sr-only">
+              {{- 'sections.slideshow.next_slide' | t -}}
+            </span>
+            <span class="block">
+              {% render 'icon-arrow-right' %}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% unless request.design_mode %}
+  <script src="{{ 'splide.bundle.min.js' | asset_url }}" type="module"></script>
+  <script src="{{ 'slideshows.js' | asset_url }}" type="module"></script>
+{% endunless %}
+
+{{ 'modules-slideshow.bundle.css' | asset_url | stylesheet_tag }}
+
+{% if enable_quick_buy and section.settings.product_tile_type == 'standard' %}
+  {% unless request.design_mode %}
+    <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'quick-buy.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'product.js' | asset_url }}" type="module"></script>
+    {% if settings.quick_buy_variant_picker_option_style == 'drop_down' %}
+      <script
+        src="{{ 'variant-drop-down.js' | asset_url }}"
+        type="module"
+      ></script>
+    {% endif %}
+  {% endunless %}
+
+  {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Collection carousel",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured collection"
+    },
+    {
+      "id": "collection",
+      "type": "collection",
+      "label": "Collection"
+    },
+    {
+      "id": "product_tile_type",
+      "type": "select",
+      "label": "Product tile type",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "text_overlay",
+          "label": "Text overlay"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "label": "Product limit",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show “View all” link",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Product tiles"
+    },
+    {
+      "type": "select",
+      "id": "image_crop",
+      "label": "Image crop",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "mobile_product_tile_width",
+      "label": "Mobile width",
+      "options": [
+        {
+          "value": "60",
+          "label": "60%"
+        },
+        {
+          "value": "80",
+          "label": "80%"
+        },
+        {
+          "value": "100",
+          "label": "100%"
+        }
+      ],
+      "default": "80"
+    },
+    {
+      "type": "range",
+      "id": "desktop_product_tile_width",
+      "label": "Desktop width",
+      "min": 20,
+      "max": 40,
+      "step": 2,
+      "default": 22,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Quick buy"
+    },
+    {
+      "type": "paragraph",
+      "content": "Only supported when product tile type is set to \"Standard\"."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_buy",
+      "label": "Enable quick buy"
+    },
+    {
+      "type": "select",
+      "id": "quick_buy_button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "theme-button",
+          "label": "Primary"
+        },
+        {
+          "value": "theme-button--secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "theme-button"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection carousel"
+    }
+  ]
+}
+{% endschema %}

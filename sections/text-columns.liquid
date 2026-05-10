@@ -1,0 +1,128 @@
+{%- assign section_color = section.settings.color_scheme -%}
+
+<section
+  class="overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+    <div class="gap-8 {{ section.settings.desktop_columns }} space-y-2 {{ section.settings.text_alignment }} text-base {{ section.settings.desktop_text_size }}">
+      {% if section.settings.title != '' %}
+        <h2 class="font-heading text-heading-standard">
+          {{ section.settings.title }}
+        </h2>
+      {% endif %}
+      <div class="rte {{ section.settings.desktop_text_size }}">
+        {{ section.settings.text }}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Text columns",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p><p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p><p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Columns on desktop",
+      "options": [
+        {
+          "value": "lg:columns-2",
+          "label": "2"
+        },
+        {
+          "value": "lg:columns-3",
+          "label": "3"
+        },
+        {
+          "value": "lg:columns-4",
+          "label": "4"
+        }
+      ],
+      "default": "lg:columns-3"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-left"
+    },
+    {
+      "type": "select",
+      "id": "desktop_text_size",
+      "label": "Desktop text size",
+      "options": [
+        {
+          "value": "lg:text-sm",
+          "label": "S"
+        },
+        {
+          "value": "lg:text-base",
+          "label": "M"
+        },
+        {
+          "value": "lg:text-lg",
+          "label": "L"
+        },
+        {
+          "value": "lg:text-xl",
+          "label": "XL"
+        },
+        {
+          "value": "lg:text-2xl",
+          "label": "2XL"
+        }
+      ],
+      "default": "lg:text-base"
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text columns"
+    }
+  ]
+}
+{% endschema %}

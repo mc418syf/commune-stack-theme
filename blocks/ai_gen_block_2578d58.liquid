@@ -1,0 +1,594 @@
+{% doc %}
+  @prompt
+    a product carousel with thin bat shape progress sliding bar. ability to adjust gap between each product from 0 -20px. align the text margin/ padding with rest of the theme., remove arrow sliding bar, only leave the progression sliding bar. ability to change margin and padding for mobile. , ability to change mobile view of product of 1.5 or 2 products view. ability to change the progression bar gap, ability to adjust product title padding and product image size, ability to show price or not show, ability to add more product per view for both desktop and mobile, ability to keep the original image size without crop, ability to adjust left margin for product title, ability to select multiple product instead of collection, can you only leave one product selection drop down but allow multiselect?
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-carousel-{{ ai_gen_id }} {
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    display: block;
+    position: relative;
+    padding: {{ block.settings.mobile_padding_top }}px {{ block.settings.mobile_padding_horizontal }}px {{ block.settings.mobile_padding_bottom }}px;
+    margin: {{ block.settings.mobile_margin_top }}px 0 {{ block.settings.mobile_margin_bottom }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-product-carousel-{{ ai_gen_id }} {
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  .ai-product-carousel__wrapper-{{ ai_gen_id }} {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ai-product-carousel__track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.product_gap }}px;
+    transition: transform 0.5s ease;
+    will-change: transform;
+  }
+
+  .ai-product-carousel__item-{{ ai_gen_id }} {
+    flex: 0 0 calc((100% - ({{ block.settings.products_per_view | minus: 1 }} * {{ block.settings.product_gap }}px)) / {{ block.settings.products_per_view }});
+    min-width: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-product-carousel__item-{{ ai_gen_id }} {
+      flex: 0 0 calc((100% - ({{ block.settings.mobile_products_per_view | minus: 1 }} * {{ block.settings.product_gap }}px)) / {{ block.settings.mobile_products_per_view }});
+    }
+  }
+
+  .ai-product-carousel__product-{{ ai_gen_id }} {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .ai-product-carousel__image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    {% if block.settings.preserve_image_ratio %}
+      overflow: hidden;
+      background-color: #f4f4f4;
+      margin-bottom: {{ block.settings.image_bottom_spacing }}px;
+    {% else %}
+      padding-bottom: {{ block.settings.image_aspect_ratio }}%;
+      overflow: hidden;
+      background-color: #f4f4f4;
+      margin-bottom: {{ block.settings.image_bottom_spacing }}px;
+    {% endif %}
+  }
+
+  .ai-product-carousel__image-{{ ai_gen_id }} {
+    {% if block.settings.preserve_image_ratio %}
+      width: 100%;
+      height: auto;
+      display: block;
+    {% else %}
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    {% endif %}
+  }
+
+  .ai-product-carousel__placeholder-{{ ai_gen_id }} {
+    {% if block.settings.preserve_image_ratio %}
+      width: 100%;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f4f4f4;
+    {% else %}
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    {% endif %}
+  }
+
+  .ai-product-carousel__placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-product-carousel__meta-{{ ai_gen_id }} {
+    padding: {{ block.settings.title_padding_top }}px {{ block.settings.title_padding_horizontal }}px {{ block.settings.title_padding_bottom }}px;
+    margin-left: {{ block.settings.title_margin_left }}px;
+  }
+
+  .ai-product-carousel__title-{{ ai_gen_id }} {
+    font-size: 14px;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+    {% if settings.product_grid_uppercase %}
+      text-transform: uppercase;
+    {% endif %}
+  }
+
+  .ai-product-carousel__vendor-{{ ai_gen_id }} {
+    font-size: 12px;
+    margin: 0 0 4px 0;
+    opacity: 0.7;
+  }
+
+  .ai-product-carousel__price-{{ ai_gen_id }} {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .ai-product-carousel__controls-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: {{ block.settings.progress_bar_top_gap }}px;
+  }
+
+  .ai-product-carousel__progress-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .ai-product-carousel__progress-bat-{{ ai_gen_id }} {
+    width: 100%;
+    height: 8px;
+    position: relative;
+  }
+
+  .ai-product-carousel__progress-bat-bg-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    fill: #e0e0e0;
+  }
+
+  .ai-product-carousel__progress-bat-fill-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    fill: {{ block.settings.progress_color }};
+    transition: width 0.5s ease;
+  }
+
+  .ai-product-carousel__empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 14px;
+  }
+{% endstyle %}
+
+<product-carousel-{{ ai_gen_id }} class="ai-product-carousel-{{ ai_gen_id }}" {{ block.shopify_attributes }} data-mobile-view="{{ block.settings.mobile_products_per_view }}">
+  {% assign products = block.settings.products %}
+  
+  {% if products.count > 0 %}
+    <div class="ai-product-carousel__wrapper-{{ ai_gen_id }}">
+      <div class="ai-product-carousel__track-{{ ai_gen_id }}" data-track>
+        {% for product in products %}
+          <div class="ai-product-carousel__item-{{ ai_gen_id }}">
+            <a href="{{ product.url }}" class="ai-product-carousel__product-{{ ai_gen_id }}">
+              <div class="ai-product-carousel__image-wrapper-{{ ai_gen_id }}">
+                {% if product.featured_image %}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 600 }}"
+                    alt="{{ product.featured_image.alt | escape }}"
+                    class="ai-product-carousel__image-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="600"
+                    height="600"
+                  >
+                {% else %}
+                  <div class="ai-product-carousel__placeholder-{{ ai_gen_id }}">
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="ai-product-carousel__meta-{{ ai_gen_id }}">
+                {% if block.settings.show_vendor and product.vendor != blank %}
+                  <p class="ai-product-carousel__vendor-{{ ai_gen_id }}">{{ product.vendor }}</p>
+                {% endif %}
+                <h3 class="ai-product-carousel__title-{{ ai_gen_id }}">{{ product.title }}</h3>
+                {% if block.settings.show_price %}
+                  <p class="ai-product-carousel__price-{{ ai_gen_id }}">{{ product.price | money }}</p>
+                {% endif %}
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ai-product-carousel__controls-{{ ai_gen_id }}">
+      <div class="ai-product-carousel__progress-wrapper-{{ ai_gen_id }}">
+        <div class="ai-product-carousel__progress-bat-{{ ai_gen_id }}">
+          <svg class="ai-product-carousel__progress-bat-bg-{{ ai_gen_id }}" viewBox="0 0 200 8" preserveAspectRatio="none">
+            <path d="M0,4 Q10,0 20,4 Q30,8 40,4 Q50,0 60,4 Q70,8 80,4 Q90,0 100,4 Q110,8 120,4 Q130,0 140,4 Q150,8 160,4 Q170,0 180,4 Q190,8 200,4 L200,8 L0,8 Z"/>
+          </svg>
+          <svg class="ai-product-carousel__progress-bat-fill-{{ ai_gen_id }}" viewBox="0 0 200 8" preserveAspectRatio="none" data-progress-fill>
+            <path d="M0,4 Q10,0 20,4 Q30,8 40,4 Q50,0 60,4 Q70,8 80,4 Q90,0 100,4 Q110,8 120,4 Q130,0 140,4 Q150,8 160,4 Q170,0 180,4 Q190,8 200,4 L200,8 L0,8 Z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="ai-product-carousel__empty-state-{{ ai_gen_id }}">
+      Next, select products to display in the carousel
+    </div>
+  {% endif %}
+</product-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ProductCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.productsPerView = {{ block.settings.products_per_view }};
+        this.mobileProductsPerView = {{ block.settings.mobile_products_per_view }};
+        this.isMobile = window.innerWidth < 750;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('[data-track]');
+        this.progressFill = this.querySelector('[data-progress-fill]');
+
+        if (!this.track) return;
+
+        this.items = Array.from(this.track.children);
+        this.totalItems = this.items.length;
+
+        this.setupEventListeners();
+        this.updateCarousel();
+
+        window.addEventListener('resize', () => {
+          const wasMobile = this.isMobile;
+          this.isMobile = window.innerWidth < 750;
+          if (wasMobile !== this.isMobile) {
+            this.currentIndex = 0;
+            this.updateCarousel();
+          }
+        });
+      }
+
+      setupEventListeners() {
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        this.track.addEventListener('touchstart', (e) => {
+          startX = e.touches[0].clientX;
+          isDragging = true;
+        });
+
+        this.track.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          currentX = e.touches[0].clientX;
+        });
+
+        this.track.addEventListener('touchend', () => {
+          if (!isDragging) return;
+          const diff = startX - currentX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+              this.next();
+            } else {
+              this.prev();
+            }
+          }
+          isDragging = false;
+        });
+
+        this.track.addEventListener('mousedown', (e) => {
+          startX = e.clientX;
+          isDragging = true;
+          e.preventDefault();
+        });
+
+        this.track.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          currentX = e.clientX;
+        });
+
+        this.track.addEventListener('mouseup', () => {
+          if (!isDragging) return;
+          const diff = startX - currentX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+              this.next();
+            } else {
+              this.prev();
+            }
+          }
+          isDragging = false;
+        });
+
+        this.track.addEventListener('mouseleave', () => {
+          isDragging = false;
+        });
+      }
+
+      prev() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+          this.updateCarousel();
+        }
+      }
+
+      next() {
+        const itemsPerView = this.isMobile ? this.mobileProductsPerView : this.productsPerView;
+        const maxIndex = Math.max(0, this.totalItems - itemsPerView);
+        if (this.currentIndex < maxIndex) {
+          this.currentIndex++;
+          this.updateCarousel();
+        }
+      }
+
+      updateCarousel() {
+        const itemsPerView = this.isMobile ? this.mobileProductsPerView : this.productsPerView;
+        const gap = {{ block.settings.product_gap }};
+        const itemWidth = this.items[0].offsetWidth;
+        const offset = this.currentIndex * (itemWidth + gap);
+
+        this.track.style.transform = `translateX(-${offset}px)`;
+
+        const maxIndex = Math.max(0, this.totalItems - itemsPerView);
+        const progress = maxIndex > 0 ? (this.currentIndex / maxIndex) * 100 : 100;
+        this.progressFill.style.width = `${progress}%`;
+      }
+    }
+
+    customElements.define('product-carousel-{{ ai_gen_id }}', ProductCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product carousel",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "products_per_view",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Products per view (desktop)",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "mobile_products_per_view",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Products per view (mobile)",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "product_gap",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between products",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Product image"
+    },
+    {
+      "type": "checkbox",
+      "id": "preserve_image_ratio",
+      "label": "Preserve original image ratio",
+      "default": false,
+      "info": "When enabled, images will maintain their original aspect ratio without cropping"
+    },
+    {
+      "type": "range",
+      "id": "image_aspect_ratio",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "label": "Image aspect ratio",
+      "default": 100,
+      "info": "Only applies when preserve original ratio is disabled. 100% = square, 150% = portrait, 75% = landscape"
+    },
+    {
+      "type": "range",
+      "id": "image_bottom_spacing",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom spacing",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Product title"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_left",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Left margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "title_padding_top",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "title_padding_bottom",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "title_padding_horizontal",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Horizontal padding",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Mobile spacing"
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_horizontal",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Horizontal padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_margin_top",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Top margin",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_margin_bottom",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom margin",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Product information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Progress bar"
+    },
+    {
+      "type": "range",
+      "id": "progress_bar_top_gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Top gap",
+      "default": 25
+    },
+    {
+      "type": "color",
+      "id": "progress_color",
+      "label": "Progress color",
+      "default": "#202020"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product carousel"
+    }
+  ]
+}
+{% endschema %}

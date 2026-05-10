@@ -1,0 +1,55 @@
+{%- liquid
+  assign menu_style = layout | split: 'menu_' | last
+  assign counter = 0
+
+  if menu_style == 'center' or menu_style == 'below'
+    assign list_classes = 'justify-center -ml-4'
+    assign item_classes = 'ml-4'
+  elsif menu_style == 'left'
+    assign list_classes = 'justify-start'
+    assign item_classes = 'mr-4'
+  elsif menu_style == 'right'
+    assign list_classes = 'justify-end'
+    assign item_classes = 'ml-4'
+  endif
+
+  assign link_all = section.settings.show_all_navigation_links
+  assign dropdown_text_align = section.settings.dropdown_text_align
+  case dropdown_text_align
+    when 'text-left'
+      assign single_level_menu_flex_justify = 'justify-start'
+    when 'text-center'
+      assign single_level_menu_flex_justify = 'justify-center'
+    when 'text-right'
+      assign single_level_menu_flex_justify = 'justify-end'
+  endcase
+-%}
+
+{%- unless layout contains 'spread' -%}
+<ul class="menu flex flex-wrap items-stretch self-stretch {{ list_classes }} mt-[11px]">
+{%- endunless -%}
+{%- for link in linklists[section.settings.menu].links -%}
+  <li class="menu-item relative {{ item_classes }} {% if link.links != blank %}has-dropdown{% endif %}">
+    <a href="{{ link.url }}" class="inline-block py-1 px-3 {% if settings.header_uppercase %}uppercase{% endif %}">
+      {{- link.title -}}
+    </a>
+    {% if link.links != blank %}
+ <ul class="submenu absolute top-full left-0 z-20 hidden bg-scheme-background text-scheme-text shadow-lg min-w-[200px]">
+        {% for child_link in link.links %}
+          <li class="border-b border-gridline-color last:border-b-0">
+            <a href="{{ child_link.url }}" class="block px-4 py-2 hover:bg-gridline-color">{{ child_link.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </li>
+{%- endfor -%}
+{%- unless layout contains 'spread' -%}
+  </ul>
+{%- endunless -%}
+
+<style>
+  .menu-item:hover > .submenu {
+    display: block;
+  }
+</style>

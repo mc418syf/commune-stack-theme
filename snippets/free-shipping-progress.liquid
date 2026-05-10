@@ -1,0 +1,62 @@
+{%- liquid
+  comment
+    Threshold
+  endcomment
+
+  for threshold_rule in localization.market.metafields.switch.free_shipping_threshold.value
+    unless threshold_rule contains ':'
+      assign market_threshold = threshold_rule | strip
+    else
+      assign country_code = threshold_rule | split: ':' | first | strip
+
+      if localization.country.iso_code == country_code
+        assign country_threshold = threshold_rule | split: ':' | last | strip
+        break
+      endif
+    endunless
+  endfor
+
+  unless country_threshold == blank and market_threshold == blank
+    assign threshold = country_threshold | default: market_threshold | times: 100
+  else
+    assign threshold = settings.free_shipping_threshold | times: 100
+  endunless
+
+  comment
+    Subtotal and percentage
+  endcomment
+
+  assign subtotal = cart.items_subtotal_price
+
+  if subtotal < threshold
+    assign percentage = subtotal | times: 1.00 | divided_by: threshold | times: 100
+  else
+    assign percentage = 100
+  endif
+-%}
+
+{%- if cart.item_count > 0 and threshold != 0 and threshold != blank -%}
+  <div
+    class="mx-auto max-w-lg px-section-horizontal-spacing pt-theme-double text-center"
+  >
+    <div>
+      {% if subtotal < threshold %}
+        {% assign amount = threshold | minus: subtotal | money %}
+        {{ 'free_shipping_progress.not_achieved_html' | t: amount: amount }}
+      {% else %}
+        {{ 'free_shipping_progress.achieved' | t }}
+      {% endif %}
+    </div>
+
+    <div class="mx-auto mt-theme max-w-sm">
+      <div
+        class="h-[max(var(--gridline-width),_0.125rem)] w-full bg-scheme-text/25"
+      >
+        <div
+          class="h-full bg-scheme-text transition-[width] duration-75 ease-in"
+          style="width: {{ percentage }}%;"
+        ></div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}

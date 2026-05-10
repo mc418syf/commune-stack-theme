@@ -1,0 +1,454 @@
+{%- liquid
+  assign first_block_cols = section.settings.first_block_width | plus: 0
+  assign second_block_cols = 12 | minus: first_block_cols
+  assign sizes = '(min-width: 1024px) calc(100vw / 12 * [COLS]), 100vw'
+
+  assign first_block_media_crop = section.settings.first_block_media_crop | plus: 0.0
+  assign second_block_media_style = section.settings.second_block_media_style
+  if second_block_media_style == 'fit'
+    assign second_block_contain = true
+  else
+    assign second_block_contain = false
+  endif
+
+  if section.blocks.size == 1
+    assign first_block_cols = 12
+  endif
+-%}
+<section class="grid grid-flow-row-dense grid-cols-1 gap-gutter overflow-hidden border-b-gridline border-gridline-color bg-gridline-color lg:grid-cols-12">
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign block_color = block.settings.color_scheme
+      assign link = block.settings.link
+      assign caption = block.settings.caption
+      assign content_position = block.settings.content_position
+      assign text_align = block.settings.text_align
+      assign text_color = block.settings.text_color
+      assign indent = block.settings.indent
+
+      capture block_cols
+        cycle first_block_cols, second_block_cols
+      endcapture
+
+      assign sizes = sizes | replace: '[COLS]', block_cols
+    -%}
+    <div
+      class="relative overflow-hidden bg-scheme-background lg:col-span-var"
+      style="--col-span: {{ block_cols }};"
+      data-color-scheme="{{ block_color }}"
+    >
+      <div class="block h-full w-full {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% endunless %} {% if indent %}p-8 lg:p-16{% endif %}">
+        {% capture output %}
+          {%- case block.type -%}
+            {%- when 'image' -%}
+              {%- assign image = block.settings.image -%}
+              <div class="relative flex min-h-full items-center justify-center {% if image == blank %} flex items-center justify-center{% endif %}">
+                {% comment %}theme-check-disable LiquidTag{% endcomment %}
+                {% if image != blank %}
+                  {% if forloop.index == 1 %}
+                    {%- liquid
+                    if section.index == 1
+                      assign preload = true
+                    else
+                      assign preload = false
+                    endif
+
+                    render 'image-crop', image: image, ratio: first_block_media_crop, sizes: sizes, preload: preload
+                  -%}
+
+                  {%- else -%}
+                    <div class="block w-full lg:hidden">
+                      {% render 'image', image: image, sizes: sizes %}
+                    </div>
+                    <div class="hidden lg:block lg:h-full lg:w-full">
+                      {% render 'image-fit',
+                        image: image,
+                        sizes: sizes,
+                        contain: second_block_contain
+                      %}
+                    </div>
+                  {%- endif -%}
+                {% else %}
+                  {% if forloop.index == 1 %}
+                    {%- liquid
+                      if first_block_media_crop == 0
+                        assign ratio = 1.33
+                      else
+                        assign ratio = first_block_media_crop
+                      endif
+                    -%}
+                    {% render 'image-crop-placeholder' with
+                      ratio: ratio,
+                    %}
+                  {%- else -%}
+                    <div class="block w-full lg:hidden">
+                      {% render 'image-crop-placeholder' with
+                        ratio: ratio,
+                      %}
+                    </div>
+                    <div class="hidden lg:block lg:h-full lg:w-full">
+                      {{
+                        'image'
+                        | placeholder_svg_tag: 'absolute inset-0 w-full h-full bg-scheme-placeholder-background text-scheme-placeholder-foreground fill-current'
+                      }}
+                    </div>
+                  {%- endif -%}
+                {% endif %}
+              </div>
+              {% comment %}theme-check-enable LiquidTag{% endcomment %}
+            {%- when 'video' -%}
+              <div class="relative flex min-h-full items-center justify-center">
+              {%- liquid
+                assign video = block.settings.video
+                assign mode = block.settings.mode
+                assign fill = false
+                if forloop.index == 1
+                  assign ratio = first_block_media_crop
+                  if first_block_media_crop == 0
+                    assign ratio = video.aspect_ratio | default: 1.33
+                  endif
+                else
+                  if second_block_contain
+                    assign ratio = video.aspect_ratio | default: 1.33
+                  else
+                    assign ratio = video.aspect_ratio | default: 1.33
+                    assign fill = true
+                    assign fill_only_on_desktop = true
+                  endif
+                endif
+              -%}
+                <div class="w-full">
+                {%- render 'video',
+                  video: video,
+                  mode: mode,
+                  container_id: section.id,
+                  ratio: ratio,
+                  fill: fill,
+                  fill_only_on_desktop: fill_only_on_desktop
+                -%}
+                </div>
+              </div>
+          {%- endcase -%}
+
+          {% if caption != blank %}
+          <div class="absolute bottom-0 left-0 right-0 top-0 z-10 flex px-section-horizontal-spacing py-4 {{ content_position }} {{ text_align }}">
+            <div class="text-scheme-text {% unless settings.fill_image_to_border_edge %}p-2 lg:p-4{% endunless %}" data-color-scheme="{{ text_color }}">
+              <div class="rte text-base">
+                {{ caption }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% endcapture %}
+
+        {% if link != blank %}
+          <a class="block h-full w-full" href="{{ link }}">
+            {{ output }}
+          </a>
+        {% else %}
+          {{ output }}
+        {% endif %}
+      </div>
+    </div>
+  {%- endfor -%}
+</section>
+
+{% schema %}
+{
+  "name": "Media split",
+  "max_blocks": 2,
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Desktop layout"
+    },
+    {
+      "type": "select",
+      "id": "first_block_width",
+      "label": "Width of first block",
+      "default": "6",
+      "options": [
+        {
+          "value": "4",
+          "label": "One third"
+        },
+        {
+          "value": "5",
+          "label": "Two fifths"
+        },
+        {
+          "value": "6",
+          "label": "One half"
+        },
+        {
+          "value": "7",
+          "label": "Three fifths"
+        },
+        {
+          "value": "8",
+          "label": "Two thirds"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "first_block_media_crop",
+      "label": "First block media crop",
+      "options": [
+        {
+          "value": "0",
+          "label": "No crop"
+        },
+        {
+          "value": "1.3",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "second_block_media_style",
+      "label": "Second block media style",
+      "options": [
+        {
+          "value": "fill",
+          "label": "Fill space"
+        },
+        {
+          "value": "fit",
+          "label": "Preserve aspect ratio"
+        }
+      ],
+      "default": "fill"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "2000 x 2000px .jpg recommended"
+        },
+        {
+          "type": "checkbox",
+          "id": "indent",
+          "label": "Indent image",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "justify-start items-start text-left",
+              "label": "Top left"
+            },
+            {
+              "value": "justify-center items-start text-center",
+              "label": "Top center"
+            },
+            {
+              "value": "justify-end items-start text-right",
+              "label": "Top right"
+            },
+            {
+              "value": "justify-start items-center text-left",
+              "label": "Left"
+            },
+            {
+              "value": "justify-center items-center text-center",
+              "label": "Center"
+            },
+            {
+              "value": "justify-end items-center text-right",
+              "label": "Right"
+            },
+            {
+              "value": "justify-start items-end text-left",
+              "label": "Bottom left"
+            },
+            {
+              "value": "justify-center items-end text-center",
+              "label": "Bottom center"
+            },
+            {
+              "value": "justify-end items-end text-right",
+              "label": "Bottom right"
+            }
+          ],
+          "default": "justify-center items-center text-center"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Color scheme",
+          "default": "scheme1"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "select",
+          "id": "mode",
+          "label": "Mode",
+          "options": [
+            {
+              "value": "preview",
+              "label": "Preview"
+            },
+            {
+              "value": "autoplay",
+              "label": "Autoplay"
+            }
+          ],
+          "default": "preview",
+          "info": "Autoplay will not play sound or show controls."
+        },
+        {
+          "type": "checkbox",
+          "id": "indent",
+          "label": "Indent video",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "justify-start items-start text-left",
+              "label": "Top left"
+            },
+            {
+              "value": "justify-center items-start text-center",
+              "label": "Top center"
+            },
+            {
+              "value": "justify-end items-start text-right",
+              "label": "Top right"
+            },
+            {
+              "value": "justify-start items-center text-left",
+              "label": "Left"
+            },
+            {
+              "value": "justify-center items-center text-center",
+              "label": "Center"
+            },
+            {
+              "value": "justify-end items-center text-right",
+              "label": "Right"
+            },
+            {
+              "value": "justify-start items-end text-left",
+              "label": "Bottom left"
+            },
+            {
+              "value": "justify-center items-end text-center",
+              "label": "Bottom center"
+            },
+            {
+              "value": "justify-end items-end text-right",
+              "label": "Bottom right"
+            }
+          ],
+          "default": "justify-center items-center text-center"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Color scheme",
+          "default": "scheme1"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video split",
+      "blocks": [
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        }
+      ]
+    },
+    {
+      "name": "Image split",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    },
+    {
+      "name": "Video and image split",
+      "blocks": [
+        {
+          "type": "video"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,243 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign display = section.settings.display
+  assign paragraph_separator = section.settings.paragraph_separator
+  assign text_align = section.settings.text_alignment
+  assign show_image_on_hover = section.settings.show_image_on_hover
+  assign superscript = section.settings.superscript
+
+  case display
+    when 'paragraph'
+      assign list_class = 'inline'
+    when 'list_mobile_paragraph_desktop'
+      assign list_class = 'lg:inline'
+  endcase
+-%}
+
+<section
+  class="featured-navigation border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  x-data="{ currentLink: '' }"
+  data-color-scheme="{{ section_color }}"
+>
+  <div class="px-section-horizontal-spacing py-section-vertical-spacing">
+    <div
+      class="{% render 'type-scale-classes', mobile_text_scale: section.settings.mobile_text_scale, desktop_text_scale: section.settings.desktop_text_scale %} {{ text_align }} w-full"
+    >
+      <ul class="space-y-1">
+        {%- for product in section.settings.product_list -%}
+          {%- liquid
+            assign image = blank
+            if show_image_on_hover
+              assign image = product.featured_image
+            endif
+          -%}
+          {%- if section.settings.show_index_as_superscript -%}
+            {%- capture superscript_content -%}<sup class="pr-1">{{ forloop.index }}</sup>{%- endcapture -%}
+          {%- endif -%}
+          <li class="{{ list_class }}">
+            <a
+              href="{{ product.url }}"
+              class="font-heading break-word relative hover:text-scheme-accent"
+              x-on:mouseenter="currentLink = '{{ product.handle }}'"
+              x-on:mouseleave="currentLink = ''"
+              x-on:focus="currentLink = '{{ product.handle }}'"
+              x-on:blur="currentLink = ''"
+            >
+              {%- if section.settings.show_index_as_superscript -%}
+                {{- superscript_content -}}
+              {%- endif -%}
+              <span class="hover:underline">{{ product.title }}</span>
+            </a>
+            {%- if paragraph_separator != 'none'
+              and display != 'list'
+              and forloop.last == false
+            -%}
+              <span class="{%- if display == 'list_mobile_paragraph_desktop' -%}hidden lg:inline{%- endif -%}">
+                {%- if paragraph_separator == 'hyphen' -%}-{%- endif -%}
+                {%- if paragraph_separator == 'emdash' -%}&mdash;{%- endif -%}
+                {%- if paragraph_separator == 'dot' -%}&middot;{%- endif -%}
+                {%- if paragraph_separator == 'bullet' -%}&bull;{%- endif -%}
+              </span>
+            {%- endif -%}
+            {%- liquid
+              if image != blank
+                render 'hover-link-image', image: image, handle: product.handle, modal: true
+              endif
+            -%}
+          </li>
+        {% else %}
+          {%- for i in (1..5) -%}
+            {%- if superscript != 'none' -%}
+              {%- capture superscript_content -%}<sup class="{%- if superscript == 'index' %}pr-1{%- else -%}pl-1{%- endif -%}">{%- if superscript == 'index' %}{{ forloop.index }}{%- endif -%}{%- if superscript == 'product_count' %}{% cycle '3', '12', '11', '8', '6' -%}{%- endif -%}</sup>{%- endcapture -%}
+            {%- endif -%}
+            <li class="{{ list_class }}">
+              <a
+                class="font-heading break-word relative hover:text-scheme-accent"
+                href="#"
+                x-on:mouseenter="currentLink = 'placeholder'"
+                x-on:mouseleave="currentLink = ''"
+                x-on:focus="currentLink = 'placeholder'"
+                x-on:blur="currentLink = ''"
+              >
+                {% if superscript == 'index' -%}
+                  {{- superscript_content -}}
+                {%- endif -%}
+                <span class="hover:underline">
+                  {{- 'homepage.onboarding.product' | t -}}
+                </span>
+                {%- if superscript == 'product_count' -%}
+                  {{- superscript_content -}}
+                {%- endif %}
+              </a>
+              {%- if paragraph_separator != 'none'
+                and display != 'list'
+                and forloop.last == false
+              -%}
+                <span class="{%- if display == 'list_mobile_paragraph_desktop' -%}hidden lg:inline{%- endif -%}">
+                  {%- if paragraph_separator == 'hyphen' -%}-{%- endif -%}
+                  {%- if paragraph_separator == 'emdash' -%}&mdash;{%- endif -%}
+                  {%- if paragraph_separator == 'dot' -%}&middot;{%- endif -%}
+                  {%- if paragraph_separator == 'bullet' -%}&bull;{%- endif -%}
+                </span>
+              {%- endif -%}
+              {%- render 'hover-link-image-placeholder', modal: true -%}
+            </li>
+          {%- endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured product links",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Products"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_scale",
+      "min": -2,
+      "max": 4,
+      "step": 1,
+      "label": "Mobile font size scale",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_scale",
+      "min": -2,
+      "max": 9,
+      "step": 1,
+      "label": "Desktop font size scale",
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "display",
+      "label": "Display",
+      "options": [
+        {
+          "value": "list",
+          "label": "List"
+        },
+        {
+          "value": "paragraph",
+          "label": "Paragraph"
+        },
+        {
+          "value": "list_mobile_paragraph_desktop",
+          "label": "List mobile, paragraph desktop"
+        }
+      ],
+      "default": "list"
+    },
+    {
+      "type": "select",
+      "id": "paragraph_separator",
+      "label": "Paragraph word separator",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "hyphen",
+          "label": "Hyphen"
+        },
+        {
+          "value": "emdash",
+          "label": "Emdash"
+        },
+        {
+          "value": "dot",
+          "label": "Dot"
+        },
+        {
+          "value": "bullet",
+          "label": "Bullet"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_index_as_superscript",
+      "label": "Show index as superscript",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ],
+      "default": "text-left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_on_hover",
+      "label": "Show product image on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured product links"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,214 @@
+/**
+ * Range control
+ *
+ * Big thanks to:
+ * https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/
+ *
+ * and:
+ * https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/
+ */
+
+.range-control {
+  --indicator-background: rgb(var(--color-scheme-text) / 0.2);
+  --indicator-foreground: rgb(var(--color-scheme-text));
+
+  --track-height: var(--text-border-width, 0px);
+  --track-border-radius: 0px;
+
+  --thumb-height: calc(0.5rem + 1px);
+  --thumb-width: calc(0.5rem + 1px);
+
+  --center-thumb-width: calc((var(--thumb-width) * 2.25) + 1px);
+  --center-thumb-height: calc((var(--track-height) * 1.5) + 1px);
+
+  --thumb-border-width: 0px;
+
+  --thumb-border: var(--thumb-border-width) solid
+    rgb(var(--color-scheme-background));
+  --thumb-border-radius: 100%;
+
+  --thumb-height-with-border: calc(
+    var(--thumb-height) + (var(--thumb-border-width) * 2)
+  );
+
+  --thumb-width-with-border: calc(
+    var(--thumb-width) + (var(--thumb-border-width) * 2)
+  );
+
+  --center-thumb-height-with-border: calc(
+    var(--center-thumb-height) + (var(--thumb-border-width) * 2)
+  );
+
+  --center-thumb-width-with-border: calc(
+    var(--center-thumb-width) + (var(--thumb-border-width) * 2)
+  );
+
+  --visual-range-start: calc(
+    var(--range-start) + (var(--thumb-border-width) / 2)
+  );
+  --visual-range-end: calc(var(--range-end) - (var(--thumb-border-width) / 2));
+
+  --visual-range: calc(var(--range) - (var(--thumb-border-width)));
+
+  display: grid;
+}
+
+@media (pointer: coarse) {
+  .range-control {
+    --thumb-height: calc(0.8rem + 1px);
+    --thumb-width: calc(0.8rem + 1px);
+
+    --center-thumb-width: calc((var(--thumb-width) * 2.25) + 1px);
+    --center-thumb-height: calc((var(--track-height) * 1.75) + 1px);
+  }
+}
+
+.range-control > * {
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
+
+input[type='range'].range-control__edge,
+input[type='range'].range-control__center {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: none;
+  height: var(--track-height);
+}
+
+/* WebKit / Blink styles */
+
+input[type='range'].range-control__edge::-webkit-slider-runnable-track,
+input[type='range'].range-control__center::-webkit-slider-runnable-track {
+  background-color: transparent;
+  border-radius: var(--track-border-radius);
+  height: var(--track-height);
+
+  pointer-events: none;
+}
+
+input[type='range'].range-control__edge::-webkit-slider-thumb,
+input[type='range'].range-control__center::-webkit-slider-thumb {
+  /* Resets */
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: calc(
+    (var(--track-height) / 2) - (var(--thumb-height-with-border) / 2)
+  );
+  pointer-events: auto;
+
+  border: var(--thumb-border);
+  border-radius: var(--thumb-border-radius);
+  background-color: rgb(var(--color-scheme-text));
+  height: var(--thumb-height-with-border);
+  width: var(--thumb-width-with-border);
+  box-shadow: none;
+}
+
+input[type='range'].range-control__edge:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+input[type='range'].range-control__edge:focus::-webkit-slider-thumb {
+  outline: 2px solid rgb(var(--color-scheme-accent));
+  outline-offset: 0.125rem;
+  border-radius: 100%;
+  box-shadow: none;
+}
+
+input[type='range'].range-control__center:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+input[type='range'].range-control__center::-webkit-slider-thumb {
+  border: none;
+  box-shadow: 0 0 0 calc(var(--thumb-width) / 8)
+    rgb(var(--color-scheme-background));
+  border-radius: calc(var(--thumb-width) / 8);
+  background-color: rgb(var(--color-scheme-text));
+  margin-top: calc(
+    (var(--track-height) / 2) - ((var(--center-thumb-height)) / 2)
+  );
+  width: var(--center-thumb-width);
+  height: var(--center-thumb-height);
+  cursor: grab;
+  z-index: 10;
+}
+
+input[type='range'].range-control__center.grabbing::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+input[type='range'].range-control__center:focus::-webkit-slider-thumb {
+  background-color: rgb(var(--color-scheme-accent));
+}
+
+/* Firefox styles */
+
+input[type='range'].range-control__edge::-moz-range-track,
+input[type='range'].range-control__center::-moz-range-track {
+  background-color: transparent;
+  border-radius: var(--track-border-radius);
+  height: var(--track-height);
+  pointer-events: none;
+}
+
+input[type='range'].range-control__edge::-moz-range-thumb,
+input[type='range'].range-control__center::-moz-range-thumb {
+  /* Firefox-specific resets */
+  border: var(--thumb-border);
+  border-radius: var(--thumb-border-radius);
+  pointer-events: auto;
+
+  background-color: rgb(var(--color-scheme-text));
+  height: var(--thumb-height);
+  width: var(--thumb-width);
+}
+
+input[type='range'].range-control__edge:focus::-moz-range-thumb {
+  outline: 2px solid rgb(var(--color-scheme-accent));
+  outline-offset: 0.125rem;
+}
+
+.range-control__indicator {
+  align-self: center;
+  height: var(--track-height);
+  border-radius: var(--track-border-radius);
+  background: linear-gradient(
+    to right,
+    var(--indicator-background),
+    var(--indicator-background) var(--visual-range-start),
+    var(--indicator-foreground) var(--visual-range-start),
+    var(--indicator-foreground) var(--visual-range-end),
+    var(--indicator-background) var(--visual-range-end)
+  );
+  z-index: 1;
+}
+
+input[type='range'].range-control__center::-moz-range-thumb {
+  border: none;
+  box-shadow: 0 0 0 calc(var(--thumb-width) / 8)
+    rgb(var(--color-scheme-background));
+  border-radius: calc(var(--thumb-width) / 8);
+  background-color: rgb(var(--color-scheme-text));
+  width: var(--center-thumb-width);
+  height: var(--center-thumb-height);
+  cursor: grab;
+}
+
+input[type='range'].range-control__center.grabbing::-moz-range-thumb {
+  cursor: grabbing;
+  /*   transform: scale(1.1); */
+}
+
+input[type='range'].range-control__center:focus::-moz-range-thumb {
+  background-color: rgb(var(--color-scheme-accent));
+}
+
+input[type='range'].range-control__center:focus ~ .range-control__indicator {
+  --indicator-foreground: rgb(var(--color-scheme-accent));
+}

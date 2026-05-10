@@ -1,0 +1,16 @@
+{%- assign pick_up_availabilities = product_variant.store_availabilities
+  | where: 'pick_up_enabled', true
+-%}
+
+<div class="location-inventory empty:hidden">
+  <ul class="space-y-2 empty:hidden">
+    {% for availability in pick_up_availabilities %}
+      {% if availability.available %}
+        <li>
+          {{ availability.location.name }}:
+          {{ 'products.product.in_stock' | t }}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</div>

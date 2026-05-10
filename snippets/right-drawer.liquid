@@ -1,0 +1,31 @@
+<aside aria-labelledby="right-drawer-slot" x-data>
+  <template x-teleport="body">
+    <div
+      x-show="$store.modals.rightDrawer.open"
+      @keydown.escape.prevent.stop="$store.modals.close('rightDrawer')"
+      @click="$store.modals.close('rightDrawer')"
+      class="fixed inset-0 z-110"
+      data-color-scheme="{{ settings.modal_color_scheme | default: 'scheme3' }}"
+      id="modals-rightDrawer"
+      @right-drawer-is-open.window="setTimeout(() => { $focus.first() }, 120)"
+    >
+      <div
+        @click.stop
+        x-show="$store.modals.rightDrawer.open"
+        x-transition:enter="duration-300 motion-reduce:duration-0 outline-0"
+        x-transition:enter-start="translate-x-full"
+        x-transition:leave="duration-300 motion-reduce:duration-0 outline-0"
+        x-transition:leave-end="translate-x-full"
+        x-trap.noscroll.inert="$store.modals.rightDrawer.open"
+        class="ml-auto h-full w-11/12 max-w-md transform overflow-y-auto border-l-gridline border-gridline-color bg-scheme-background  text-scheme-text"
+        id="right-drawer-slot"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="getModalLabel('rightDrawer', $el)"
+        tabindex="-1"
+      >
+        <!-- Modal content is teleported here -->
+      </div>
+    </div>
+  </template>
+</aside>
