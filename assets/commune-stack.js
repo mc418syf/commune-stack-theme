@@ -22,7 +22,7 @@ function communeStackPDP(btn) {
       url:       btn.dataset.url,
       size:      ''
     });
-    btn.querySelector('span').textContent = 'View Stack & Book Appointment';
+    btn.querySelector('span').textContent = 'BOOK A TRY-ON';
   }
   window.dispatchEvent(new CustomEvent('open-stack'));
 }
