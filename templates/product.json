@@ -94,8 +94,8 @@
       "settings": {
         "desktop_media_width": "three-fifths",
         "desktop_media_position": "left",
-        "two_media_per_row": false,
-        "first_media_full_width": false,
+        "two_media_per_row": true,
+        "first_media_full_width": true,
         "variant_media_behavior": "scroll",
         "always_show_product_featured_media_first": true,
         "single_variant_mode": true,
