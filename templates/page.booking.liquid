@@ -500,18 +500,19 @@ function CommuneBookingPage() {
           stackText = 'Items to view:\n' + stack.map(item =>
             `- ${item.title}${item.vendor ? ' by ' + item.vendor : ''} — ${item.price}\n  ${window.location.origin}${item.url}`
           ).join('\n');
-        } else {
-          stackText = 'General browsing visit — no items stacked yet.';
         }
       } catch (e) {}
-
-      const url = CALENDLY_URL + (stackText ? '&a2=' + encodeURIComponent(stackText) : '');
 
       const tryInit = () => {
         if (window.Calendly && window.Calendly.initInlineWidget) {
           window.Calendly.initInlineWidget({
-            url: url,
+            url: CALENDLY_URL,
             parentElement: el,
+            prefill: {
+              customAnswers: {
+                a2: stackText
+              }
+            }
           });
           this.calendlyInited = true;
         } else {
