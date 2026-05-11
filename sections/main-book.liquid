@@ -36,8 +36,8 @@
       <div class="mb-8 border-l-2 border-scheme-text pl-4">
         <p class="mb-1 text-xs uppercase tracking-widest text-scheme-secondary">Location</p>
         <p class="text-sm leading-relaxed">
-          <strong class="font-medium">Commune237 Montréal</strong><br>
-          {{ section.settings.address | default: '237 Rue Saint-Paul O, Vieux-Montréal' }}<br>
+          <strong class="font-medium">Commune </strong><br>
+          {{ section.settings.address | default: '237 Keefer Street, Vancouverl' }}<br>
           <span class="text-scheme-secondary">{{ section.settings.hours | default: 'Tue–Sat, 11am–6pm, by appointment' }}</span>
         </p>
       </div>
@@ -181,7 +181,7 @@ function CommuneBookPage() {
       "type": "text",
       "id": "address",
       "label": "Showroom address",
-      "default": "237 Rue Saint-Paul O, Vieux-Montréal"
+      "default": "237 Keefer Street, Vancouver"
     },
     {
       "type": "text",
