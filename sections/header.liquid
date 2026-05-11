@@ -343,11 +343,10 @@
 
           {% comment %} Stack nav button — desktop {% endcomment %}
           <div class="flex items-stretch whitespace-nowrap" x-data>
-            <button
-              type="button"
+            <a
+              href="/pages/book"
               class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
-              @click.prevent="$dispatch('open-stack')"
-              aria-label="Open stack"
+              aria-label="Your stack"
             >
               {%- if show_icons -%}
                 <div class="relative my-auto align-middle">
@@ -368,7 +367,7 @@
                   Stack (<span x-text="$store.stack.count">0</span>)
                 </span>
               {%- endif -%}
-            </button>
+            </a>
           </div>
 
           <div class="flex items-stretch whitespace-nowrap">
@@ -438,11 +437,10 @@
           {% endif %}
           {% comment %} Stack button — mobile {% endcomment %}
           <div class="whitespace-nowrap lg:ml-4" x-data>
-            <button
-              type="button"
+            <a
+              href="/pages/book"
               class="inline-flex items-center {{ item_spacing }}"
-              @click.prevent="$dispatch('open-stack')"
-              aria-label="Open stack"
+              aria-label="Your stack"
             >
               <div class="relative my-auto align-middle">
                 <span
@@ -456,7 +454,7 @@
                 </svg>
                 <span class="sr-only">Stack</span>
               </div>
-            </button>
+            </a>
           </div>
 
           <div class="whitespace-nowrap lg:ml-4">
