@@ -1,222 +1,142 @@
-{% comment %}
+{%- comment -%}
   Commune237 — /pages/booking
-  Two tabs: Book a Fitting (Calendly + stack prefill) | Sell with Us (Make.com + Uploadcare)
-  Design: sharp 1px borders, grid-gap dividers, uppercase labels, theme CSS vars.
-{% endcomment %}
-
-{% style %}
-  [x-cloak] { display: none !important; }
-
-  /* Grid-gap divider technique: gap:1px on colored bg creates 1px rule between cells */
-  .bk-grid { display: grid; gap: 1px; background: rgba(var(--color-scheme-text) / 0.12); }
-
-  /* Remove browser default input/textarea/select chrome */
-  .bk-field { width: 100%; border: none; outline: none; background: transparent;
-    padding: 4px 16px 14px; font-size: 13px; font-family: inherit;
-    color: rgb(var(--color-scheme-text)); box-sizing: border-box; }
-  .bk-field::placeholder { color: rgba(var(--color-scheme-text) / 0.3); }
-  select.bk-field { appearance: none; cursor: pointer; }
-
-  .bk-label { display: block; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: rgba(var(--color-scheme-text) / 0.5); padding: 12px 16px 4px; }
-
-  .bk-cell { background: rgb(var(--color-scheme-background)); }
-  .bk-cell-pad { background: rgb(var(--color-scheme-background)); padding: 20px 24px; }
-
-  .bk-tab { padding: 16px 24px; border: none; cursor: pointer; font-size: 10px;
-    letter-spacing: 0.18em; text-transform: uppercase; font-family: inherit;
-    transition: background 0.15s, color 0.15s; text-align: center; width: 100%; }
-  .bk-tab-active { background: rgb(var(--color-scheme-text)); color: rgb(var(--color-scheme-background)); }
-  .bk-tab-inactive { background: rgb(var(--color-scheme-background)); color: rgb(var(--color-scheme-text)); }
-
-  /* Booking two-column grid (desktop) */
-  @media (min-width: 1024px) {
-    .bk-visit-grid { grid-template-columns: 1fr 480px; align-items: start; }
-  }
-
-  /* Stack item row */
-  .bk-stack-row { display: grid; grid-template-columns: 72px 1fr auto;
-    gap: 16px; align-items: start; }
-
-  /* Section headers with border-bottom inside a grid cell */
-  .bk-section-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: rgba(var(--color-scheme-text) / 0.45); margin: 0; }
-
-  /* Photo preview */
-  .bk-photo-thumb { position: relative; width: 68px; height: 68px;
-    border: 1px solid rgba(var(--color-scheme-text) / 0.15); flex-shrink: 0; }
-  .bk-photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .bk-photo-remove { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65);
-    border: none; color: #fff; width: 18px; height: 18px; cursor: pointer;
-    font-size: 13px; line-height: 1; display: flex; align-items: center;
-    justify-content: center; padding: 0; }
-
-  /* Submit button */
-  .bk-submit { width: 100%; padding: 16px; font-size: 11px; letter-spacing: 0.18em;
-    text-transform: uppercase; font-family: inherit; cursor: pointer; border: none;
-    background: rgb(var(--color-scheme-text)); color: rgb(var(--color-scheme-background));
-    transition: opacity 0.15s; }
-  .bk-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* Add-more dashed button */
-  .bk-add-dashed { width: 100%; padding: 14px; background: rgb(var(--color-scheme-background));
-    border: 1px dashed rgba(var(--color-scheme-text) / 0.22); font-size: 10px;
-    letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
-    color: rgba(var(--color-scheme-text) / 0.5); font-family: inherit; }
-  .bk-add-dashed:hover { border-color: rgba(var(--color-scheme-text) / 0.55);
-    color: rgb(var(--color-scheme-text)); }
-
-  /* Add more pieces link */
-  .bk-add-more { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.25); padding-bottom: 2px;
-    color: rgba(var(--color-scheme-text) / 0.55); text-decoration: none;
-    display: inline-block; transition: color 0.15s, border-color 0.15s; }
-  .bk-add-more:hover { color: rgb(var(--color-scheme-text));
-    border-bottom-color: rgba(var(--color-scheme-text) / 0.6); }
-
-  /* Remove × button */
-  .bk-remove { background: none; border: none; cursor: pointer; font-size: 18px;
-    line-height: 1; color: rgba(var(--color-scheme-text) / 0.3); padding: 0;
-    transition: color 0.15s; flex-shrink: 0; }
-  .bk-remove:hover { color: rgb(var(--color-scheme-text)); }
-
-  /* Showroom strip */
-  .bk-showroom-strip { border-left: 2px solid rgb(var(--color-scheme-text));
-    padding: 12px 16px; background: rgba(var(--color-scheme-text) / 0.03); }
-{% endstyle %}
+  Tab A: Book a Fitting  — stack items + Calendly (initInlineWidget, a2 prefill)
+  Tab B: Sell with Us    — Make.com webhook + Uploadcare photo uploads
+  Styled with the same Broadcast theme tokens as cart-items / cart-footer.
+{%- endcomment -%}
 
 <div
-  class="color-scheme"
+  class="color-scheme min-h-screen"
   data-color-scheme="default"
   x-data="CommuneBookingPage()"
   x-init="init()"
-  x-cloak
 >
 
   {%- comment -%} ── Page header ── {%- endcomment -%}
-  <div style="border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12); padding: 48px 40px 40px; text-align: center;">
-    <p style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 12px;">Commune237 · Montréal Showroom</p>
-    <h1 style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; margin: 0;">
-      Book a Showroom Visit
-    </h1>
+  <div class="border-b-gridline border-gridline-color px-section-horizontal-spacing py-12 text-center lg:py-16">
+    <p class="mb-3 text-xs uppercase tracking-widest text-scheme-secondary">Commune237 · Montréal</p>
+    <h1 class="font-heading text-heading-standard">Book a Showroom Visit</h1>
   </div>
 
   {%- comment -%} ── Tab bar ── {%- endcomment -%}
-  <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
+  <div class="grid grid-cols-2 border-b-gridline border-gridline-color">
     <button
       type="button"
-      class="bk-tab"
-      :class="tab === 'visit' ? 'bk-tab-active' : 'bk-tab-inactive'"
       @click="tab = 'visit'; $nextTick(() => initCalendly())"
-    >
-      Book a Fitting
-    </button>
+      class="border-r-gridline border-gridline-color px-section-horizontal-spacing py-5 text-left text-xs uppercase tracking-widest transition-colors"
+      :class="tab === 'visit'
+        ? 'bg-scheme-text text-scheme-background'
+        : 'text-scheme-secondary hover:text-scheme-text'"
+    >Book a Fitting</button>
     <button
       type="button"
-      class="bk-tab"
-      :class="tab === 'sell' ? 'bk-tab-active' : 'bk-tab-inactive'"
       @click="tab = 'sell'"
-    >
-      Sell with Us
-    </button>
+      class="px-section-horizontal-spacing py-5 text-left text-xs uppercase tracking-widest transition-colors"
+      :class="tab === 'sell'
+        ? 'bg-scheme-text text-scheme-background'
+        : 'text-scheme-secondary hover:text-scheme-text'"
+    >Sell with Us</button>
   </div>
 
 
   {%- comment -%} ══════════════════════════════════════
        TAB A — Book a Fitting
   ══════════════════════════════════════ {%- endcomment -%}
-  <div x-show="tab === 'visit'" style="display: none;">
-
-    {%- comment -%} Two-column: stack left | calendly right {%- endcomment -%}
-    <div class="bk-grid bk-visit-grid">
+  <div x-show="tab === 'visit'" style="display:none;">
+    <div class="lg:grid lg:grid-cols-[1fr_480px]">
 
       {%- comment -%} LEFT — Stack items {%- endcomment -%}
-      <div class="bk-cell" style="padding: 40px;">
+      <div class="border-b-gridline border-gridline-color px-section-horizontal-spacing py-12 lg:border-b-0 lg:border-r-gridline lg:py-16">
 
-        <p style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 6px;">Your Stack</p>
-        <h2 style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin: 0 0 28px; line-height: 1.2;">
+        <p class="mb-2 text-xs uppercase tracking-widest text-scheme-secondary">Your Stack</p>
+        <h2 class="mb-8 font-heading" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 300; line-height: 1.15;">
           Pieces to Try On
         </h2>
 
         {%- comment -%} Empty state {%- endcomment -%}
-        <div x-show="$store.stack.items.length === 0" style="padding: 24px 0; display: none;">
-          <p style="font-size: 13px; line-height: 1.65; color: rgba(var(--color-scheme-text) / 0.5); margin: 0 0 20px;">
+        <div x-show="$store.stack.items.length === 0" style="display:none;">
+          <p class="mb-5 text-sm leading-relaxed text-scheme-secondary">
             Your stack is empty. Browse the archive and add pieces you'd like to try on.
           </p>
-          <a href="{{ routes.all_products_collection_url }}" class="bk-add-more">Browse Archive →</a>
-          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(var(--color-scheme-text) / 0.1);">
-            <p style="font-size: 11px; line-height: 1.7; color: rgba(var(--color-scheme-text) / 0.45);">
-              You can still book a general visit — just mention what you're looking for in the Calendly notes field.
+          <a
+            href="{{ routes.all_products_collection_url }}"
+            class="theme-button inline-flex items-center gap-2 px-6 py-3 text-xs uppercase tracking-widest"
+          >
+            Browse Archive
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+              <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </a>
+          <div class="mt-8 border-t-gridline border-gridline-color pt-6">
+            <p class="text-xs leading-relaxed text-scheme-secondary">
+              You can still book a general browsing visit — just mention what you're looking for in Calendly's notes field.
             </p>
           </div>
         </div>
 
         {%- comment -%} Items list {%- endcomment -%}
-        <div x-show="$store.stack.items.length > 0" style="display: none;">
-          <div class="bk-grid" style="margin-bottom: 20px;">
+        <div x-show="$store.stack.items.length > 0" style="display:none;">
+          <div class="divide-y divide-gridline-color border-t-gridline border-gridline-color">
             <template x-for="item in $store.stack.items" :key="item.variantId">
-              <div class="bk-cell bk-stack-row" style="padding: 16px;">
-
-                {%- comment -%} Thumb {%- endcomment -%}
-                <a :href="item.url" style="display: block; width: 72px; height: 96px; overflow: hidden; background: rgba(var(--color-scheme-text) / 0.06); flex-shrink: 0;">
-                  <img
-                    x-show="item.image"
-                    :src="item.image"
-                    :alt="item.title"
-                    style="width: 100%; height: 100%; object-fit: cover; display: block;"
-                  />
+              <div class="flex gap-4 py-5">
+                <a :href="item.url" class="shrink-0">
+                  <div class="commune-stack-thumb bg-scheme-secondary/10">
+                    <img
+                      x-show="item.image"
+                      :src="item.image"
+                      :alt="item.title"
+                      class="h-full w-full object-cover"
+                    />
+                  </div>
                 </a>
-
-                {%- comment -%} Info {%- endcomment -%}
-                <div style="min-width: 0;">
-                  <p style="font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 4px;" x-text="item.vendor"></p>
-                  <p style="font-size: 14px; margin: 0 0 6px; line-height: 1.3;" x-text="item.title"></p>
-                  <p style="font-size: 12px; color: rgba(var(--color-scheme-text) / 0.55); margin: 0;" x-text="item.price"></p>
+                <div class="flex min-w-0 flex-1 flex-col">
+                  <p class="mb-0.5 text-xs uppercase tracking-widest text-scheme-secondary" x-text="item.vendor"></p>
+                  <a :href="item.url" class="mb-1 text-sm leading-snug" x-text="item.title"></a>
+                  <p class="mt-1 text-sm text-scheme-secondary" x-text="item.price"></p>
                 </div>
-
-                {%- comment -%} Remove {%- endcomment -%}
                 <button
                   type="button"
-                  class="bk-remove"
                   @click="$store.stack.remove(item.variantId)"
                   aria-label="Remove from stack"
+                  style="background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0;color:#888;flex-shrink:0;align-self:flex-start;"
+                  onmouseover="this.style.color='currentColor'"
+                  onmouseout="this.style.color='#888'"
                 >×</button>
-
               </div>
             </template>
           </div>
-
-          <a href="{{ routes.all_products_collection_url }}" class="bk-add-more">+ Add more pieces</a>
+          <a
+            href="{{ routes.all_products_collection_url }}"
+            class="mt-6 inline-flex items-center gap-1.5 border-b border-gridline-color pb-0.5 text-xs uppercase tracking-widest text-scheme-secondary hover:border-scheme-text hover:text-scheme-text"
+          >+ Add more pieces</a>
         </div>
       </div>
 
       {%- comment -%} RIGHT — Calendly {%- endcomment -%}
-      <div class="bk-cell" style="padding: 40px;">
-
-        <p style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 6px;">Book Your Visit</p>
-        <h2 style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin: 0 0 8px; line-height: 1.2;">
+      <div class="px-section-horizontal-spacing py-12 lg:py-16">
+        <p class="mb-2 text-xs uppercase tracking-widest text-scheme-secondary">Book Your Visit</p>
+        <h2 class="mb-3 font-heading" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 300; line-height: 1.15;">
           Private Showroom<br>Appointment
         </h2>
-        <p style="font-size: 12px; color: rgba(var(--color-scheme-text) / 0.5); margin: 0 0 24px; line-height: 1.65;">
-          Select a time — our team will confirm within 24 hours.
+        <p class="mb-6 text-sm leading-relaxed text-scheme-secondary">
+          Select a date and time — we'll confirm within 24 hours.
         </p>
 
-        <div class="bk-showroom-strip" style="margin-bottom: 20px;">
-          <p style="font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 6px;">Location</p>
-          <p style="font-size: 12px; line-height: 1.75; margin: 0;">
-            <strong style="font-weight: 500;">Commune237 Montréal</strong><br>
+        <div class="mb-6 border-l-2 border-scheme-text pl-4">
+          <p class="mb-1 text-xs uppercase tracking-widest text-scheme-secondary">Location</p>
+          <p class="text-sm leading-relaxed">
+            <strong class="font-medium">Commune237 Montréal</strong><br>
             237 Keefer Street<br>
-            <span style="color: rgba(var(--color-scheme-text) / 0.5);">Tue–Sat, 11am–6pm, by appointment</span>
+            <span class="text-scheme-secondary">Tue–Sat, 11am–6pm, by appointment</span>
           </p>
         </div>
 
-        <p style="font-size: 11px; color: rgba(var(--color-scheme-text) / 0.4); margin: 0 0 20px;">
-          No payment required. No commitment to purchase.
-        </p>
+        <p class="mb-5 text-xs text-scheme-secondary">No payment required. No commitment to purchase.</p>
 
-        <div id="commune-calendly" style="min-height: 620px;"></div>
-
+        {%- comment -%} Single Calendly embed — initialised by initCalendly() on tab click {%- endcomment -%}
+        <div id="commune-calendly" style="min-height:620px;"></div>
       </div>
+
     </div>
   </div>
 
@@ -224,164 +144,248 @@
   {%- comment -%} ══════════════════════════════════════
        TAB B — Sell with Us
   ══════════════════════════════════════ {%- endcomment -%}
-  <div x-show="tab === 'sell'" style="display: none;">
-    <div style="max-width: 760px; margin: 0 auto; padding: 48px 40px 80px;">
+  <div x-show="tab === 'sell'" style="display:none;">
+    <div class="mx-auto max-w-2xl px-section-horizontal-spacing py-12 lg:py-16">
 
       {%- comment -%} Success state {%- endcomment -%}
-      <div x-show="submitted" style="text-align: center; padding: 80px 0; display: none;">
-        <p style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: 1.8rem; margin: 0 0 16px;">感谢你的提交！</p>
-        <p style="font-size: 13px; color: rgba(var(--color-scheme-text) / 0.55); line-height: 1.75; margin: 0;">
+      <div x-show="submitted" class="py-16 text-center" style="display:none;">
+        <p class="mb-3 font-heading text-2xl font-light">感谢你的提交！</p>
+        <p class="text-sm leading-relaxed text-scheme-secondary">
           We'll be in touch within 3 business days.<br>
           我们会在3个工作日内回复。
         </p>
       </div>
 
       {%- comment -%} Form {%- endcomment -%}
-      <div x-show="!submitted" style="display: none;">
+      <div x-show="!submitted" style="display:none;">
 
-        {%- comment -%} ── Contact ── {%- endcomment -%}
-        <div class="bk-grid" style="margin-bottom: 2px;">
-          <div class="bk-cell-pad">
-            <p class="bk-section-label">Contact</p>
-          </div>
-          <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
-            <div class="bk-cell">
-              <label class="bk-label">Full Name <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
-              <input type="text" x-model="personal.name" placeholder="Jane Smith" class="bk-field" />
+        {%- comment -%} ── Personal info ── {%- endcomment -%}
+        <div class="mb-8">
+          <p class="mb-5 border-b-gridline border-gridline-color pb-3 text-xs uppercase tracking-widest text-scheme-secondary">Contact</p>
+          <div class="flex flex-col gap-5">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="flex flex-col gap-2">
+                <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                  Full Name <span class="text-scheme-accent">*</span>
+                </label>
+                <input
+                  type="text"
+                  x-model="personal.name"
+                  placeholder="Jane Smith"
+                  class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label class="text-xs uppercase tracking-widest text-scheme-secondary">Phone</label>
+                <input
+                  type="tel"
+                  x-model="personal.phone"
+                  placeholder="+1 514…"
+                  class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                />
+              </div>
             </div>
-            <div class="bk-cell">
-              <label class="bk-label">Phone</label>
-              <input type="tel" x-model="personal.phone" placeholder="+1 514…" class="bk-field" />
+            <div class="flex flex-col gap-2">
+              <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                Email <span class="text-scheme-accent">*</span>
+              </label>
+              <input
+                type="email"
+                x-model="personal.email"
+                placeholder="you@example.com"
+                class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+              />
             </div>
-          </div>
-          <div class="bk-cell">
-            <label class="bk-label">Email <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
-            <input type="email" x-model="personal.email" placeholder="you@example.com" class="bk-field" />
           </div>
         </div>
 
         {%- comment -%} ── Item blocks ── {%- endcomment -%}
-        <template x-for="(item, idx) in sellItems" :key="idx">
-          <div class="bk-grid" style="margin-bottom: 2px;">
+        <div class="mb-6">
+          <p class="mb-5 border-b-gridline border-gridline-color pb-3 text-xs uppercase tracking-widest text-scheme-secondary">
+            Items <span class="opacity-50">— up to 3</span>
+          </p>
 
-            {%- comment -%} Item header {%- endcomment -%}
-            <div class="bk-cell" style="padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
-              <p class="bk-section-label" x-text="'Item ' + (idx + 1)"></p>
-              <button
-                type="button"
-                x-show="sellItems.length > 1"
-                @click="removeSellItem(idx)"
-                style="background: none; border: none; border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.3); cursor: pointer; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.5); padding-bottom: 1px; font-family: inherit;"
-              >Remove</button>
-            </div>
+          <template x-for="(item, idx) in sellItems" :key="idx">
+            <div class="mb-6 border-gridline-color border-t-gridline pt-5">
 
-            {%- comment -%} Brand {%- endcomment -%}
-            <div class="bk-cell">
-              <label class="bk-label">Brand <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
-              <input type="text" x-model="item.brand" placeholder="e.g. Comme des Garçons" class="bk-field" />
-            </div>
-
-            {%- comment -%} Category + Condition {%- endcomment -%}
-            <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
-              <div class="bk-cell">
-                <label class="bk-label">Category <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
-                <select x-model="item.category" class="bk-field">
-                  <option value="" disabled selected>Select…</option>
-                  <option value="Tops">上衣 Tops</option>
-                  <option value="Bottoms">裤子 Bottoms</option>
-                  <option value="Skirts">裙子 Skirts</option>
-                  <option value="Outerwear">外套 Outerwear</option>
-                  <option value="Bags">包袋 Bags</option>
-                  <option value="Shoes">鞋履 Shoes</option>
-                  <option value="Accessories">配饰 Accessories</option>
-                </select>
+              <div class="mb-4 flex items-center justify-between">
+                <p class="text-xs uppercase tracking-widest text-scheme-secondary" x-text="'Item ' + (idx + 1)"></p>
+                <button
+                  type="button"
+                  x-show="sellItems.length > 1"
+                  @click="removeSellItem(idx)"
+                  class="text-xs uppercase tracking-widest text-scheme-secondary underline underline-offset-2 hover:text-scheme-text"
+                >Remove</button>
               </div>
-              <div class="bk-cell">
-                <label class="bk-label">Condition <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
-                <select x-model="item.condition" class="bk-field">
-                  <option value="" disabled selected>Select…</option>
-                  <option value="New with tags">全新 New with tags</option>
-                  <option value="Like new">几乎全新 Like new</option>
-                  <option value="Good">良好 Good</option>
-                  <option value="Fair">一般 Fair</option>
-                </select>
-              </div>
-            </div>
 
-            {%- comment -%} Prices {%- endcomment -%}
-            <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
-              <div class="bk-cell">
-                <label class="bk-label">Original Price</label>
-                <input type="text" x-model="item.retail_price" placeholder="e.g. $480" class="bk-field" />
-              </div>
-              <div class="bk-cell">
-                <label class="bk-label">Asking Price</label>
-                <input type="text" x-model="item.asking_price" placeholder="e.g. $220" class="bk-field" />
-              </div>
-            </div>
+              <div class="flex flex-col gap-4">
 
-            {%- comment -%} Notes {%- endcomment -%}
-            <div class="bk-cell">
-              <label class="bk-label">Description / Notes</label>
-              <textarea x-model="item.notes" placeholder="Fabric, size, condition details, any flaws…" rows="3" class="bk-field" style="resize: none;"></textarea>
-            </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                    Brand <span class="text-scheme-accent">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    x-model="item.brand"
+                    placeholder="e.g. Comme des Garçons"
+                    class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                  />
+                </div>
 
-            {%- comment -%} Photos {%- endcomment -%}
-            <div class="bk-cell" style="padding: 16px 24px;">
-              <p class="bk-label" style="padding: 0 0 10px;">Photos <span style="opacity: 0.5;">(up to 5 — jpg, png, heic)</span></p>
-              <div x-show="item.photoPreviewUrls.length > 0" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
-                <template x-for="(url, photoIdx) in item.photoPreviewUrls" :key="photoIdx">
-                  <div class="bk-photo-thumb">
-                    <img :src="url" />
-                    <button type="button" class="bk-photo-remove" @click="removePhoto(idx, photoIdx)">×</button>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                      Category <span class="text-scheme-accent">*</span>
+                    </label>
+                    <div class="relative">
+                      <select
+                        x-model="item.category"
+                        class="w-full appearance-none border-b-text border-scheme-text bg-scheme-background py-2 pr-6 text-sm text-scheme-text focus:outline-none"
+                      >
+                        <option value="" disabled selected>Select…</option>
+                        <option value="Tops">上衣 Tops</option>
+                        <option value="Bottoms">裤子 Bottoms</option>
+                        <option value="Skirts">裙子 Skirts</option>
+                        <option value="Outerwear">外套 Outerwear</option>
+                        <option value="Bags">包袋 Bags</option>
+                        <option value="Shoes">鞋履 Shoes</option>
+                        <option value="Accessories">配饰 Accessories</option>
+                      </select>
+                      <div class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 opacity-50">
+                        {%- render 'icon-chevron-down' -%}
+                      </div>
+                    </div>
                   </div>
-                </template>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                      Condition <span class="text-scheme-accent">*</span>
+                    </label>
+                    <div class="relative">
+                      <select
+                        x-model="item.condition"
+                        class="w-full appearance-none border-b-text border-scheme-text bg-scheme-background py-2 pr-6 text-sm text-scheme-text focus:outline-none"
+                      >
+                        <option value="" disabled selected>Select…</option>
+                        <option value="New with tags">全新 New with tags</option>
+                        <option value="Like new">几乎全新 Like new</option>
+                        <option value="Good">良好 Good</option>
+                        <option value="Fair">一般 Fair</option>
+                      </select>
+                      <div class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 opacity-50">
+                        {%- render 'icon-chevron-down' -%}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">Original Price</label>
+                    <input
+                      type="text"
+                      x-model="item.retail_price"
+                      placeholder="e.g. $480"
+                      class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">Asking Price</label>
+                    <input
+                      type="text"
+                      x-model="item.asking_price"
+                      placeholder="e.g. $220"
+                      class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">Notes / Description</label>
+                  <textarea
+                    x-model="item.notes"
+                    rows="3"
+                    placeholder="Fabric, size, any flaws, styling notes…"
+                    class="resize-none border-gridline-color border-t-gridline bg-scheme-background p-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                  ></textarea>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                    Photos <span class="opacity-50">(up to 5 — jpg, png, heic)</span>
+                  </label>
+                  <div x-show="item.photoPreviewUrls.length > 0" class="flex flex-wrap gap-2">
+                    <template x-for="(url, photoIdx) in item.photoPreviewUrls" :key="photoIdx">
+                      <div class="relative h-20 w-20 border-gridline-color border-t-gridline">
+                        <img :src="url" class="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          @click="removePhoto(idx, photoIdx)"
+                          class="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center bg-black/60 text-white"
+                        >
+                          <svg viewBox="0 0 10 10" fill="none" class="h-2.5 w-2.5">
+                            <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </template>
+                  </div>
+                  <label
+                    x-show="item.photoPreviewUrls.length < 5"
+                    class="flex cursor-pointer items-center gap-2 border-gridline-color border-t-gridline px-3 py-3 text-xs uppercase tracking-widest text-scheme-secondary hover:border-scheme-text hover:text-scheme-text"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    </svg>
+                    <span x-text="item.photoPreviewUrls.length > 0 ? 'Add more photos' : 'Add photos'"></span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/heic,image/heif"
+                      multiple
+                      class="sr-only"
+                      @change="handlePhotoSelect(idx, $event)"
+                    />
+                  </label>
+                </div>
+
               </div>
-              <label x-show="item.photoPreviewUrls.length < 5" style="display: inline-flex; align-items: center; gap: 8px; border: 1px dashed rgba(var(--color-scheme-text) / 0.22); padding: 10px 16px; cursor: pointer; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.5);">
-                +&nbsp;<span x-text="item.photoPreviewUrls.length > 0 ? 'Add more photos' : 'Add photos'"></span>
-                <input type="file" accept="image/jpeg,image/png,image/heic,image/heif" multiple class="sr-only" @change="handlePhotoSelect(idx, $event)" />
-              </label>
             </div>
+          </template>
 
-          </div>
-        </template>
-
-        {%- comment -%} Add item {%- endcomment -%}
-        <button
-          type="button"
-          x-show="sellItems.length < 3"
-          @click="addSellItem()"
-          class="bk-add-dashed"
-          style="margin-bottom: 2px;"
-        >+ Add Another Item</button>
-
-        {%- comment -%} Additional notes {%- endcomment -%}
-        <div class="bk-grid" style="margin-bottom: 28px;">
-          <div class="bk-cell">
-            <label class="bk-label">Additional Notes</label>
-            <textarea x-model="additionalNotes" placeholder="Anything else you'd like us to know…" rows="3" class="bk-field" style="resize: none;"></textarea>
-          </div>
+          <button
+            type="button"
+            x-show="sellItems.length < 3"
+            @click="addSellItem()"
+            class="mt-2 text-xs uppercase tracking-widest text-scheme-secondary underline underline-offset-4 hover:text-scheme-text"
+          >+ Add another item</button>
         </div>
 
-        {%- comment -%} Error {%- endcomment -%}
-        <p
-          x-show="submitError"
-          style="font-size: 12px; color: #b00; margin-bottom: 16px; display: none;"
-        >
-          提交失败，请重试。Something went wrong — please try again.
+        {%- comment -%} ── Additional notes ── {%- endcomment -%}
+        <div class="mb-8 flex flex-col gap-2">
+          <label class="text-xs uppercase tracking-widest text-scheme-secondary">Additional Notes</label>
+          <textarea
+            x-model="additionalNotes"
+            rows="3"
+            placeholder="Anything else you'd like us to know…"
+            class="resize-none border-gridline-color border-t-gridline bg-scheme-background p-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+          ></textarea>
+        </div>
+
+        {%- comment -%} ── Error ── {%- endcomment -%}
+        <p x-show="submitError" class="mb-4 text-sm text-scheme-accent" style="display:none;">
+          提交失败，请重试。 Something went wrong — please try again.
         </p>
 
-        {%- comment -%} Submit {%- endcomment -%}
+        {%- comment -%} ── Submit ── {%- endcomment -%}
         <button
           type="button"
-          class="bk-submit"
           @click="submitSell()"
           :disabled="submitting || !personal.name || !personal.email"
+          :class="(submitting || !personal.name || !personal.email) ? 'opacity-40 cursor-not-allowed' : ''"
+          class="theme-button flex w-full items-center justify-center gap-2 py-3.5 text-sm uppercase tracking-widest"
         >
           <span x-text="submitting ? '提交中… Submitting…' : 'Submit — 提交'"></span>
         </button>
-
-        <p style="font-size: 11px; text-align: center; margin-top: 14px; color: rgba(var(--color-scheme-text) / 0.4); line-height: 1.65;">
+        <p class="mt-4 text-center text-xs leading-relaxed text-scheme-secondary">
           We'll review your submission and follow up within 3 business days.
         </p>
 
@@ -391,7 +395,7 @@
 
 </div>
 
-{%- comment -%} Calendly widget script {%- endcomment -%}
+{%- comment -%} Calendly script — loaded once {%- endcomment -%}
 <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 
 <script>
@@ -400,8 +404,11 @@ const UPLOADCARE_KEY   = 'c17a3b92dc546a6a7692';
 const MAKE_WEBHOOK_URL = 'MAKE_WEBHOOK_URL_HERE';
 
 function defaultSellItem() {
-  return { brand: '', category: '', condition: '', retail_price: '',
-           asking_price: '', notes: '', photos: [], photoPreviewUrls: [] };
+  return {
+    brand: '', category: '', condition: '',
+    retail_price: '', asking_price: '', notes: '',
+    photos: [], photoPreviewUrls: []
+  };
 }
 
 function CommuneBookingPage() {
@@ -417,7 +424,7 @@ function CommuneBookingPage() {
     submitError: false,
 
     init() {
-      // Init Calendly on load since 'visit' is the default tab
+      // Calendly loads after the async script — retry until ready
       this.$nextTick(() => this.initCalendly());
     },
 
@@ -435,13 +442,13 @@ function CommuneBookingPage() {
       if (this.calendlyInited) return;
       const el = document.getElementById('commune-calendly');
       if (!el) return;
-      const text = this.buildStackText();
+      const stackText = this.buildStackText();
       const tryInit = () => {
         if (window.Calendly?.initInlineWidget) {
           window.Calendly.initInlineWidget({
             url: CALENDLY_URL,
             parentElement: el,
-            prefill: { customAnswers: { a2: text } }
+            prefill: { customAnswers: { a2: stackText } }
           });
           this.calendlyInited = true;
         } else {
@@ -451,7 +458,6 @@ function CommuneBookingPage() {
       tryInit();
     },
 
-    // ── Sell with Us ──────────────────────────
     addSellItem() {
       if (this.sellItems.length < 3) this.sellItems.push(defaultSellItem());
     },
@@ -503,7 +509,6 @@ function CommuneBookingPage() {
           notes:        item.notes,
           photos:       await Promise.all(item.photos.map(f => this.uploadPhoto(f)))
         })));
-
         const res = await fetch(MAKE_WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
