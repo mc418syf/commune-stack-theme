@@ -89,13 +89,11 @@
             <button
               type="button"
               @click="$store.stack.remove(item.variantId)"
-              class="h-5 w-5 shrink-0 self-start text-scheme-secondary hover:text-scheme-text"
               aria-label="Remove from stack"
-            >
-              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </button>
+              style="background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0;color:#888;flex-shrink:0;align-self:flex-start;"
+              onmouseover="this.style.color='#000'"
+              onmouseout="this.style.color='#888'"
+            >×</button>
           </div>
         </template>
       </div>
