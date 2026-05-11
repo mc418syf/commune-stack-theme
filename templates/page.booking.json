@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-book",
+      "settings": {
+        "calendly_url": "https://calendly.com/commune237/showroomappointment",
+        "address": "237 Keefer Street",
+        "hours": "Tue–Sat, 11am–6pm, by appointment",
+        "color_scheme": "default"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
