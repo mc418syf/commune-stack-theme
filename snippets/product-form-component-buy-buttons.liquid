@@ -219,35 +219,55 @@
         assign stack_image = product.featured_media | image_url: width: 200
       endif
       assign stack_size = ''
+      assign size_option_key = ''
       for option in product.options_with_values
         assign option_lower = option.name | downcase
         if option_lower contains 'size'
           assign stack_size = product.selected_or_first_available_variant.options[forloop.index0]
+          assign size_option_key = 'option' | append: forloop.index
         endif
       endfor
     -%}
     <div
       class="max-w-2xl mt-3"
-      x-data="{ inStack: false, stackVariantId: '{{ product.selected_or_first_available_variant.id }}' }"
-      x-init="inStack = $store.stack.has(Number(stackVariantId))"
-      @stack-updated.window="inStack = $store.stack.has(Number(stackVariantId))"
-      x-effect="if (currentVariant) { stackVariantId = String(currentVariant.id); inStack = $store.stack.has(currentVariant.id); }"
+      x-data="{
+        inStack: false,
+        variantId: {{ product.selected_or_first_available_variant.id }},
+        variantPrice: {{ product.selected_or_first_available_variant.price }},
+        variantSize: {{ stack_size | json }}
+      }"
+      x-init="
+        inStack = ($store.stack ? $store.stack.has(variantId) : false);
+        const _handler = (e) => {
+          if (!e.detail || !e.detail.variant || e.detail.product.id !== {{ product.id }}) return;
+          const v = e.detail.variant;
+          variantId = v.id;
+          variantPrice = v.price;
+          variantSize = '{{ size_option_key }}' ? (v['{{ size_option_key }}'] || '') : '';
+          inStack = ($store.stack ? $store.stack.has(variantId) : false);
+        };
+        document.addEventListener('theme:variant:change', _handler);
+        $cleanup(() => document.removeEventListener('theme:variant:change', _handler));
+      "
+      @stack-updated.window="inStack = ($store.stack ? $store.stack.has(variantId) : false)"
     >
       <button
         type="button"
         class="theme-button--secondary flex w-full items-center justify-center gap-2 px-1 py-2{% if settings.button_uppercase %} uppercase{% endif %}"
         @click.prevent="
+          if (!$store.stack) return;
           if (!inStack) {
             $store.stack.add({
               id: {{ product.id }},
-              variantId: currentVariant ? currentVariant.id : Number(stackVariantId),
+              variantId: variantId,
               title: {{ product.title | json }},
               vendor: {{ product.vendor | json }},
-              price: currentVariant ? '$' + (currentVariant.price / 100).toFixed(2) : {{ product.price | money | json }},
+              price: '$' + (variantPrice / 100).toFixed(2),
               image: '{{ stack_image }}',
               url: '{{ product.url }}',
-              size: currentVariant ? (currentVariant.option1 || '') : {{ stack_size | json }}
+              size: variantSize
             });
+            inStack = true;
             $dispatch('stack-updated');
           }
           $dispatch('open-stack');
