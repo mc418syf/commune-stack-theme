@@ -337,59 +337,6 @@ PLP product card
           </a>
         {% endif %}
 
-        {% unless sold_out %}
-          {%- liquid
-            assign stack_variant = product.selected_or_first_available_variant
-            assign stack_image = ''
-            if product.featured_media
-              assign stack_image = product.featured_media | image_url: width: 200
-            endif
-            assign stack_size = ''
-            for option in product.options_with_values
-              assign option_lower = option.name | downcase
-              if option_lower contains 'size'
-                assign stack_size = stack_variant.options[forloop.index0]
-              endif
-            endfor
-          -%}
-          <div
-            class="hidden lg:block"
-            x-data="{ inStack: false }"
-            x-init="inStack = $store.stack.has({{ stack_variant.id }})"
-            @stack-updated.window="inStack = $store.stack.has({{ stack_variant.id }})"
-          >
-            <button
-              type="button"
-              class="commune-stack-tile-btn z-40"
-              :data-in-stack="inStack"
-              @click.prevent="
-                if (!inStack) {
-                  $store.stack.add({
-                    id: {{ product.id }},
-                    variantId: {{ stack_variant.id }},
-                    title: {{ product.title | json }},
-                    vendor: {{ product.vendor | json }},
-                    price: {{ stack_variant.price | money | json }},
-                    image: '{{ stack_image }}',
-                    url: '{{ product.url }}',
-                    size: {{ stack_size | json }}
-                  });
-                  $dispatch('stack-updated');
-                  $dispatch('open-stack');
-                } else {
-                  $dispatch('open-stack');
-                }
-              "
-            >
-              <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="0" y="0" width="13" height="2.2" rx="0.4" fill="currentColor"/>
-                <rect x="0" y="3.9" width="13" height="2.2" rx="0.4" fill="currentColor"/>
-                <rect x="0" y="7.8" width="13" height="2.2" rx="0.4" fill="currentColor"/>
-              </svg>
-              <span x-text="inStack ? 'View Stack' : 'Add to Stack'">Add to Stack</span>
-            </button>
-          </div>
-        {% endunless %}
 
       </div>
     </div>

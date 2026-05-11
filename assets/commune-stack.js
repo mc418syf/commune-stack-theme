@@ -6,6 +6,27 @@
 
 const STORAGE_KEY = 'commune_stack';
 
+// Plain JS handler for the PDP "Add to Stack" button — no Alpine scope needed.
+function communeStackPDP(btn) {
+  const store = window.Alpine && window.Alpine.store('stack');
+  if (!store) return;
+  const variantId = Number(btn.dataset.variantId);
+  if (!store.has(variantId)) {
+    store.add({
+      id:        Number(btn.dataset.productId),
+      variantId: variantId,
+      title:     btn.dataset.title,
+      vendor:    btn.dataset.vendor,
+      price:     btn.dataset.price,
+      image:     btn.dataset.image,
+      url:       btn.dataset.url,
+      size:      ''
+    });
+    btn.querySelector('span').textContent = 'View Stack & Book Appointment';
+  }
+  window.dispatchEvent(new CustomEvent('open-stack'));
+}
+
 document.addEventListener('alpine:init', () => {
   Alpine.store('stack', {
     items: [],
