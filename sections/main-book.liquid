@@ -43,7 +43,7 @@
       </div>
 
       <!-- Empty state -->
-      <div x-show="stack.length === 0" class="py-8">
+      <div x-show="$store.stack.items.length === 0" class="py-8">
         <p class="mb-5 text-sm leading-relaxed text-scheme-secondary">
           You haven't added any pieces yet. Browse the archive and use the stack button on any product to save pieces you'd like to try on.
         </p>
@@ -56,11 +56,16 @@
             <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
         </a>
+        <div class="mt-8 border-t-gridline border-gridline-color pt-6">
+          <p class="text-xs leading-relaxed text-scheme-secondary">
+            You can still book a general browsing visit using the calendar. Just let us know what you're looking for in Calendly's notes field.
+          </p>
+        </div>
       </div>
 
-      <!-- Stack items -->
-      <div x-show="stack.length > 0" class="divide-y divide-gridline-color border-t-gridline border-gridline-color">
-        <template x-for="(item, idx) in stack" :key="item.variantId">
+      <!-- Stack items — bound directly to $store.stack.items so remove is instantly reactive -->
+      <div x-show="$store.stack.items.length > 0" class="divide-y divide-gridline-color border-t-gridline border-gridline-color">
+        <template x-for="item in $store.stack.items" :key="item.variantId">
           <div class="flex gap-4 py-5">
             <!-- Thumbnail -->
             <a :href="item.url" class="shrink-0">
@@ -83,32 +88,23 @@
             <!-- Remove -->
             <button
               type="button"
-              @click="$store.stack.remove(item.variantId); stack = $store.stack.items"
-              class="h-5 w-5 shrink-0 self-start text-scheme-secondary hover:text-scheme-text"
+              @click="$store.stack.remove(item.variantId)"
               aria-label="Remove from stack"
-            >
-              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </button>
+              style="background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0;color:#888;flex-shrink:0;align-self:flex-start;"
+              onmouseover="this.style.color='#000'"
+              onmouseout="this.style.color='#888'"
+            >×</button>
           </div>
         </template>
       </div>
 
       <a
-        x-show="stack.length > 0"
+        x-show="$store.stack.items.length > 0"
         href="{{ routes.all_products_collection_url }}"
         class="mt-6 inline-flex items-center gap-1.5 border-b border-gridline-color pb-0.5 text-xs uppercase tracking-widest text-scheme-secondary hover:border-scheme-text hover:text-scheme-text"
       >
         + Add more pieces
       </a>
-
-      <!-- Note when stack empty and Calendly shown -->
-      <div x-show="stack.length === 0" class="mt-8 border-t-gridline border-gridline-color pt-6">
-        <p class="text-xs leading-relaxed text-scheme-secondary">
-          You can still book a general browsing visit using the calendar. Just let us know what you're looking for in Calendly's notes field.
-        </p>
-      </div>
 
     </div>
 
@@ -156,13 +152,7 @@
 
 <script>
 function CommuneBookPage() {
-  return {
-    stack: [],
-    init() {
-      this.stack = this.$store.stack.items;
-      this.$watch('$store.stack.items', (val) => { this.stack = val; });
-    }
-  };
+  return { init() {} };
 }
 </script>
 
