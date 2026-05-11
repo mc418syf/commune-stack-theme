@@ -1,0 +1,530 @@
+{% comment %}
+  Commune237 — /pages/booking
+  Two tabs: Book a Fitting (Calendly + stack prefill) | Sell with Us (Make.com + Uploadcare)
+  Design: sharp 1px borders, grid-gap dividers, uppercase labels, theme CSS vars.
+{% endcomment %}
+
+{% style %}
+  [x-cloak] { display: none !important; }
+
+  /* Grid-gap divider technique: gap:1px on colored bg creates 1px rule between cells */
+  .bk-grid { display: grid; gap: 1px; background: rgba(var(--color-scheme-text) / 0.12); }
+
+  /* Remove browser default input/textarea/select chrome */
+  .bk-field { width: 100%; border: none; outline: none; background: transparent;
+    padding: 4px 16px 14px; font-size: 13px; font-family: inherit;
+    color: rgb(var(--color-scheme-text)); box-sizing: border-box; }
+  .bk-field::placeholder { color: rgba(var(--color-scheme-text) / 0.3); }
+  select.bk-field { appearance: none; cursor: pointer; }
+
+  .bk-label { display: block; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(var(--color-scheme-text) / 0.5); padding: 12px 16px 4px; }
+
+  .bk-cell { background: rgb(var(--color-scheme-background)); }
+  .bk-cell-pad { background: rgb(var(--color-scheme-background)); padding: 20px 24px; }
+
+  .bk-tab { padding: 16px 24px; border: none; cursor: pointer; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase; font-family: inherit;
+    transition: background 0.15s, color 0.15s; text-align: center; width: 100%; }
+  .bk-tab-active { background: rgb(var(--color-scheme-text)); color: rgb(var(--color-scheme-background)); }
+  .bk-tab-inactive { background: rgb(var(--color-scheme-background)); color: rgb(var(--color-scheme-text)); }
+
+  /* Booking two-column grid (desktop) */
+  @media (min-width: 1024px) {
+    .bk-visit-grid { grid-template-columns: 1fr 480px; align-items: start; }
+  }
+
+  /* Stack item row */
+  .bk-stack-row { display: grid; grid-template-columns: 72px 1fr auto;
+    gap: 16px; align-items: start; }
+
+  /* Section headers with border-bottom inside a grid cell */
+  .bk-section-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(var(--color-scheme-text) / 0.45); margin: 0; }
+
+  /* Photo preview */
+  .bk-photo-thumb { position: relative; width: 68px; height: 68px;
+    border: 1px solid rgba(var(--color-scheme-text) / 0.15); flex-shrink: 0; }
+  .bk-photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bk-photo-remove { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65);
+    border: none; color: #fff; width: 18px; height: 18px; cursor: pointer;
+    font-size: 13px; line-height: 1; display: flex; align-items: center;
+    justify-content: center; padding: 0; }
+
+  /* Submit button */
+  .bk-submit { width: 100%; padding: 16px; font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-family: inherit; cursor: pointer; border: none;
+    background: rgb(var(--color-scheme-text)); color: rgb(var(--color-scheme-background));
+    transition: opacity 0.15s; }
+  .bk-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Add-more dashed button */
+  .bk-add-dashed { width: 100%; padding: 14px; background: rgb(var(--color-scheme-background));
+    border: 1px dashed rgba(var(--color-scheme-text) / 0.22); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+    color: rgba(var(--color-scheme-text) / 0.5); font-family: inherit; }
+  .bk-add-dashed:hover { border-color: rgba(var(--color-scheme-text) / 0.55);
+    color: rgb(var(--color-scheme-text)); }
+
+  /* Add more pieces link */
+  .bk-add-more { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.25); padding-bottom: 2px;
+    color: rgba(var(--color-scheme-text) / 0.55); text-decoration: none;
+    display: inline-block; transition: color 0.15s, border-color 0.15s; }
+  .bk-add-more:hover { color: rgb(var(--color-scheme-text));
+    border-bottom-color: rgba(var(--color-scheme-text) / 0.6); }
+
+  /* Remove × button */
+  .bk-remove { background: none; border: none; cursor: pointer; font-size: 18px;
+    line-height: 1; color: rgba(var(--color-scheme-text) / 0.3); padding: 0;
+    transition: color 0.15s; flex-shrink: 0; }
+  .bk-remove:hover { color: rgb(var(--color-scheme-text)); }
+
+  /* Showroom strip */
+  .bk-showroom-strip { border-left: 2px solid rgb(var(--color-scheme-text));
+    padding: 12px 16px; background: rgba(var(--color-scheme-text) / 0.03); }
+{% endstyle %}
+
+<div
+  class="color-scheme"
+  data-color-scheme="default"
+  x-data="CommuneBookingPage()"
+  x-init="init()"
+  x-cloak
+>
+
+  {%- comment -%} ── Page header ── {%- endcomment -%}
+  <div style="border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12); padding: 48px 40px 40px; text-align: center;">
+    <p style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 12px;">Commune237 · Montréal Showroom</p>
+    <h1 style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; margin: 0;">
+      Book a Showroom Visit
+    </h1>
+  </div>
+
+  {%- comment -%} ── Tab bar ── {%- endcomment -%}
+  <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
+    <button
+      type="button"
+      class="bk-tab"
+      :class="tab === 'visit' ? 'bk-tab-active' : 'bk-tab-inactive'"
+      @click="tab = 'visit'; $nextTick(() => initCalendly())"
+    >
+      Book a Fitting
+    </button>
+    <button
+      type="button"
+      class="bk-tab"
+      :class="tab === 'sell' ? 'bk-tab-active' : 'bk-tab-inactive'"
+      @click="tab = 'sell'"
+    >
+      Sell with Us
+    </button>
+  </div>
+
+
+  {%- comment -%} ══════════════════════════════════════
+       TAB A — Book a Fitting
+  ══════════════════════════════════════ {%- endcomment -%}
+  <div x-show="tab === 'visit'" style="display: none;">
+
+    {%- comment -%} Two-column: stack left | calendly right {%- endcomment -%}
+    <div class="bk-grid bk-visit-grid">
+
+      {%- comment -%} LEFT — Stack items {%- endcomment -%}
+      <div class="bk-cell" style="padding: 40px;">
+
+        <p style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 6px;">Your Stack</p>
+        <h2 style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin: 0 0 28px; line-height: 1.2;">
+          Pieces to Try On
+        </h2>
+
+        {%- comment -%} Empty state {%- endcomment -%}
+        <div x-show="$store.stack.items.length === 0" style="padding: 24px 0; display: none;">
+          <p style="font-size: 13px; line-height: 1.65; color: rgba(var(--color-scheme-text) / 0.5); margin: 0 0 20px;">
+            Your stack is empty. Browse the archive and add pieces you'd like to try on.
+          </p>
+          <a href="{{ routes.all_products_collection_url }}" class="bk-add-more">Browse Archive →</a>
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(var(--color-scheme-text) / 0.1);">
+            <p style="font-size: 11px; line-height: 1.7; color: rgba(var(--color-scheme-text) / 0.45);">
+              You can still book a general visit — just mention what you're looking for in the Calendly notes field.
+            </p>
+          </div>
+        </div>
+
+        {%- comment -%} Items list {%- endcomment -%}
+        <div x-show="$store.stack.items.length > 0" style="display: none;">
+          <div class="bk-grid" style="margin-bottom: 20px;">
+            <template x-for="item in $store.stack.items" :key="item.variantId">
+              <div class="bk-cell bk-stack-row" style="padding: 16px;">
+
+                {%- comment -%} Thumb {%- endcomment -%}
+                <a :href="item.url" style="display: block; width: 72px; height: 96px; overflow: hidden; background: rgba(var(--color-scheme-text) / 0.06); flex-shrink: 0;">
+                  <img
+                    x-show="item.image"
+                    :src="item.image"
+                    :alt="item.title"
+                    style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                  />
+                </a>
+
+                {%- comment -%} Info {%- endcomment -%}
+                <div style="min-width: 0;">
+                  <p style="font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 4px;" x-text="item.vendor"></p>
+                  <p style="font-size: 14px; margin: 0 0 6px; line-height: 1.3;" x-text="item.title"></p>
+                  <p style="font-size: 12px; color: rgba(var(--color-scheme-text) / 0.55); margin: 0;" x-text="item.price"></p>
+                </div>
+
+                {%- comment -%} Remove {%- endcomment -%}
+                <button
+                  type="button"
+                  class="bk-remove"
+                  @click="$store.stack.remove(item.variantId)"
+                  aria-label="Remove from stack"
+                >×</button>
+
+              </div>
+            </template>
+          </div>
+
+          <a href="{{ routes.all_products_collection_url }}" class="bk-add-more">+ Add more pieces</a>
+        </div>
+      </div>
+
+      {%- comment -%} RIGHT — Calendly {%- endcomment -%}
+      <div class="bk-cell" style="padding: 40px;">
+
+        <p style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 6px;">Book Your Visit</p>
+        <h2 style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin: 0 0 8px; line-height: 1.2;">
+          Private Showroom<br>Appointment
+        </h2>
+        <p style="font-size: 12px; color: rgba(var(--color-scheme-text) / 0.5); margin: 0 0 24px; line-height: 1.65;">
+          Select a time — our team will confirm within 24 hours.
+        </p>
+
+        <div class="bk-showroom-strip" style="margin-bottom: 20px;">
+          <p style="font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.45); margin: 0 0 6px;">Location</p>
+          <p style="font-size: 12px; line-height: 1.75; margin: 0;">
+            <strong style="font-weight: 500;">Commune237 Montréal</strong><br>
+            237 Keefer Street<br>
+            <span style="color: rgba(var(--color-scheme-text) / 0.5);">Tue–Sat, 11am–6pm, by appointment</span>
+          </p>
+        </div>
+
+        <p style="font-size: 11px; color: rgba(var(--color-scheme-text) / 0.4); margin: 0 0 20px;">
+          No payment required. No commitment to purchase.
+        </p>
+
+        <div id="commune-calendly" style="min-height: 620px;"></div>
+
+      </div>
+    </div>
+  </div>
+
+
+  {%- comment -%} ══════════════════════════════════════
+       TAB B — Sell with Us
+  ══════════════════════════════════════ {%- endcomment -%}
+  <div x-show="tab === 'sell'" style="display: none;">
+    <div style="max-width: 760px; margin: 0 auto; padding: 48px 40px 80px;">
+
+      {%- comment -%} Success state {%- endcomment -%}
+      <div x-show="submitted" style="text-align: center; padding: 80px 0; display: none;">
+        <p style="font-family: var(--font-heading-family, inherit); font-weight: 300; font-size: 1.8rem; margin: 0 0 16px;">感谢你的提交！</p>
+        <p style="font-size: 13px; color: rgba(var(--color-scheme-text) / 0.55); line-height: 1.75; margin: 0;">
+          We'll be in touch within 3 business days.<br>
+          我们会在3个工作日内回复。
+        </p>
+      </div>
+
+      {%- comment -%} Form {%- endcomment -%}
+      <div x-show="!submitted" style="display: none;">
+
+        {%- comment -%} ── Contact ── {%- endcomment -%}
+        <div class="bk-grid" style="margin-bottom: 2px;">
+          <div class="bk-cell-pad">
+            <p class="bk-section-label">Contact</p>
+          </div>
+          <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="bk-cell">
+              <label class="bk-label">Full Name <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
+              <input type="text" x-model="personal.name" placeholder="Jane Smith" class="bk-field" />
+            </div>
+            <div class="bk-cell">
+              <label class="bk-label">Phone</label>
+              <input type="tel" x-model="personal.phone" placeholder="+1 514…" class="bk-field" />
+            </div>
+          </div>
+          <div class="bk-cell">
+            <label class="bk-label">Email <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
+            <input type="email" x-model="personal.email" placeholder="you@example.com" class="bk-field" />
+          </div>
+        </div>
+
+        {%- comment -%} ── Item blocks ── {%- endcomment -%}
+        <template x-for="(item, idx) in sellItems" :key="idx">
+          <div class="bk-grid" style="margin-bottom: 2px;">
+
+            {%- comment -%} Item header {%- endcomment -%}
+            <div class="bk-cell" style="padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
+              <p class="bk-section-label" x-text="'Item ' + (idx + 1)"></p>
+              <button
+                type="button"
+                x-show="sellItems.length > 1"
+                @click="removeSellItem(idx)"
+                style="background: none; border: none; border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.3); cursor: pointer; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.5); padding-bottom: 1px; font-family: inherit;"
+              >Remove</button>
+            </div>
+
+            {%- comment -%} Brand {%- endcomment -%}
+            <div class="bk-cell">
+              <label class="bk-label">Brand <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
+              <input type="text" x-model="item.brand" placeholder="e.g. Comme des Garçons" class="bk-field" />
+            </div>
+
+            {%- comment -%} Category + Condition {%- endcomment -%}
+            <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
+              <div class="bk-cell">
+                <label class="bk-label">Category <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
+                <select x-model="item.category" class="bk-field">
+                  <option value="" disabled selected>Select…</option>
+                  <option value="Tops">上衣 Tops</option>
+                  <option value="Bottoms">裤子 Bottoms</option>
+                  <option value="Skirts">裙子 Skirts</option>
+                  <option value="Outerwear">外套 Outerwear</option>
+                  <option value="Bags">包袋 Bags</option>
+                  <option value="Shoes">鞋履 Shoes</option>
+                  <option value="Accessories">配饰 Accessories</option>
+                </select>
+              </div>
+              <div class="bk-cell">
+                <label class="bk-label">Condition <span style="color: rgba(var(--color-scheme-text) / 0.4);">*</span></label>
+                <select x-model="item.condition" class="bk-field">
+                  <option value="" disabled selected>Select…</option>
+                  <option value="New with tags">全新 New with tags</option>
+                  <option value="Like new">几乎全新 Like new</option>
+                  <option value="Good">良好 Good</option>
+                  <option value="Fair">一般 Fair</option>
+                </select>
+              </div>
+            </div>
+
+            {%- comment -%} Prices {%- endcomment -%}
+            <div class="bk-grid" style="grid-template-columns: 1fr 1fr;">
+              <div class="bk-cell">
+                <label class="bk-label">Original Price</label>
+                <input type="text" x-model="item.retail_price" placeholder="e.g. $480" class="bk-field" />
+              </div>
+              <div class="bk-cell">
+                <label class="bk-label">Asking Price</label>
+                <input type="text" x-model="item.asking_price" placeholder="e.g. $220" class="bk-field" />
+              </div>
+            </div>
+
+            {%- comment -%} Notes {%- endcomment -%}
+            <div class="bk-cell">
+              <label class="bk-label">Description / Notes</label>
+              <textarea x-model="item.notes" placeholder="Fabric, size, condition details, any flaws…" rows="3" class="bk-field" style="resize: none;"></textarea>
+            </div>
+
+            {%- comment -%} Photos {%- endcomment -%}
+            <div class="bk-cell" style="padding: 16px 24px;">
+              <p class="bk-label" style="padding: 0 0 10px;">Photos <span style="opacity: 0.5;">(up to 5 — jpg, png, heic)</span></p>
+              <div x-show="item.photoPreviewUrls.length > 0" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                <template x-for="(url, photoIdx) in item.photoPreviewUrls" :key="photoIdx">
+                  <div class="bk-photo-thumb">
+                    <img :src="url" />
+                    <button type="button" class="bk-photo-remove" @click="removePhoto(idx, photoIdx)">×</button>
+                  </div>
+                </template>
+              </div>
+              <label x-show="item.photoPreviewUrls.length < 5" style="display: inline-flex; align-items: center; gap: 8px; border: 1px dashed rgba(var(--color-scheme-text) / 0.22); padding: 10px 16px; cursor: pointer; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(var(--color-scheme-text) / 0.5);">
+                +&nbsp;<span x-text="item.photoPreviewUrls.length > 0 ? 'Add more photos' : 'Add photos'"></span>
+                <input type="file" accept="image/jpeg,image/png,image/heic,image/heif" multiple class="sr-only" @change="handlePhotoSelect(idx, $event)" />
+              </label>
+            </div>
+
+          </div>
+        </template>
+
+        {%- comment -%} Add item {%- endcomment -%}
+        <button
+          type="button"
+          x-show="sellItems.length < 3"
+          @click="addSellItem()"
+          class="bk-add-dashed"
+          style="margin-bottom: 2px;"
+        >+ Add Another Item</button>
+
+        {%- comment -%} Additional notes {%- endcomment -%}
+        <div class="bk-grid" style="margin-bottom: 28px;">
+          <div class="bk-cell">
+            <label class="bk-label">Additional Notes</label>
+            <textarea x-model="additionalNotes" placeholder="Anything else you'd like us to know…" rows="3" class="bk-field" style="resize: none;"></textarea>
+          </div>
+        </div>
+
+        {%- comment -%} Error {%- endcomment -%}
+        <p
+          x-show="submitError"
+          style="font-size: 12px; color: #b00; margin-bottom: 16px; display: none;"
+        >
+          提交失败，请重试。Something went wrong — please try again.
+        </p>
+
+        {%- comment -%} Submit {%- endcomment -%}
+        <button
+          type="button"
+          class="bk-submit"
+          @click="submitSell()"
+          :disabled="submitting || !personal.name || !personal.email"
+        >
+          <span x-text="submitting ? '提交中… Submitting…' : 'Submit — 提交'"></span>
+        </button>
+
+        <p style="font-size: 11px; text-align: center; margin-top: 14px; color: rgba(var(--color-scheme-text) / 0.4); line-height: 1.65;">
+          We'll review your submission and follow up within 3 business days.
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{%- comment -%} Calendly widget script {%- endcomment -%}
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+<script>
+const CALENDLY_URL     = 'https://calendly.com/commune237/showroomappointment';
+const UPLOADCARE_KEY   = 'c17a3b92dc546a6a7692';
+const MAKE_WEBHOOK_URL = 'MAKE_WEBHOOK_URL_HERE';
+
+function defaultSellItem() {
+  return { brand: '', category: '', condition: '', retail_price: '',
+           asking_price: '', notes: '', photos: [], photoPreviewUrls: [] };
+}
+
+function CommuneBookingPage() {
+  return {
+    tab: 'visit',
+    calendlyInited: false,
+
+    personal: { name: '', email: '', phone: '' },
+    sellItems: [defaultSellItem()],
+    additionalNotes: '',
+    submitting: false,
+    submitted: false,
+    submitError: false,
+
+    init() {
+      // Init Calendly on load since 'visit' is the default tab
+      this.$nextTick(() => this.initCalendly());
+    },
+
+    buildStackText() {
+      try {
+        const items = JSON.parse(localStorage.getItem('commune_stack') || '[]');
+        if (!items.length) return '';
+        return 'Items to try:\n' + items.map(i =>
+          `- ${i.title}${i.vendor ? ' by ' + i.vendor : ''} — ${i.price}`
+        ).join('\n');
+      } catch { return ''; }
+    },
+
+    initCalendly() {
+      if (this.calendlyInited) return;
+      const el = document.getElementById('commune-calendly');
+      if (!el) return;
+      const text = this.buildStackText();
+      const tryInit = () => {
+        if (window.Calendly?.initInlineWidget) {
+          window.Calendly.initInlineWidget({
+            url: CALENDLY_URL,
+            parentElement: el,
+            prefill: { customAnswers: { a2: text } }
+          });
+          this.calendlyInited = true;
+        } else {
+          setTimeout(tryInit, 200);
+        }
+      };
+      tryInit();
+    },
+
+    // ── Sell with Us ──────────────────────────
+    addSellItem() {
+      if (this.sellItems.length < 3) this.sellItems.push(defaultSellItem());
+    },
+
+    removeSellItem(idx) {
+      if (this.sellItems.length > 1) {
+        this.sellItems[idx].photoPreviewUrls.forEach(u => URL.revokeObjectURL(u));
+        this.sellItems.splice(idx, 1);
+      }
+    },
+
+    handlePhotoSelect(idx, event) {
+      const files = Array.from(event.target.files);
+      const remaining = 5 - this.sellItems[idx].photoPreviewUrls.length;
+      files.slice(0, remaining).forEach(file => {
+        this.sellItems[idx].photos.push(file);
+        this.sellItems[idx].photoPreviewUrls.push(URL.createObjectURL(file));
+      });
+      event.target.value = '';
+    },
+
+    removePhoto(itemIdx, photoIdx) {
+      URL.revokeObjectURL(this.sellItems[itemIdx].photoPreviewUrls[photoIdx]);
+      this.sellItems[itemIdx].photos.splice(photoIdx, 1);
+      this.sellItems[itemIdx].photoPreviewUrls.splice(photoIdx, 1);
+    },
+
+    async uploadPhoto(file) {
+      const fd = new FormData();
+      fd.append('UPLOADCARE_PUB_KEY', UPLOADCARE_KEY);
+      fd.append('UPLOADCARE_STORE', 'auto');
+      fd.append('file', file);
+      const res = await fetch('https://upload.uploadcare.com/base/', { method: 'POST', body: fd });
+      if (!res.ok) throw new Error('upload failed');
+      const { file: uuid } = await res.json();
+      return `https://ucarecdn.com/${uuid}/`;
+    },
+
+    async submitSell() {
+      this.submitting = true;
+      this.submitError = false;
+      try {
+        const items = await Promise.all(this.sellItems.map(async item => ({
+          brand:        item.brand,
+          category:     item.category,
+          condition:    item.condition,
+          retail_price: item.retail_price,
+          asking_price: item.asking_price,
+          notes:        item.notes,
+          photos:       await Promise.all(item.photos.map(f => this.uploadPhoto(f)))
+        })));
+
+        const res = await fetch(MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:             this.personal.name,
+            email:            this.personal.email,
+            phone:            this.personal.phone,
+            items,
+            additional_notes: this.additionalNotes,
+            submitted_at:     new Date().toISOString()
+          })
+        });
+        if (!res.ok) throw new Error('webhook error');
+        this.submitted = true;
+      } catch (e) {
+        console.error(e);
+        this.submitError = true;
+      } finally {
+        this.submitting = false;
+      }
+    }
+  };
+}
+</script>
