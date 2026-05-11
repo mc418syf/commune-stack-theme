@@ -1,0 +1,594 @@
+{% comment %}
+  Commune237 — /pages/booking
+  Two options: Book a Visit (Calendly) / Sell with Us (consignment form → Make.com webhook)
+  Replace UPLOADCARE_PUBLIC_KEY_HERE with your key from uploadcare.com (free account)
+  Replace MAKE_WEBHOOK_URL_HERE with your Make.com webhook URL when ready
+{% endcomment %}
+
+<div
+  class="color-scheme min-h-screen"
+  data-color-scheme="default"
+  x-data="CommuneBookingPage()"
+  x-init="init()"
+>
+
+  {%- comment -%} ── Page header ── {%- endcomment -%}
+  <div class="border-b border-current/10 px-section-horizontal-spacing py-12 text-center lg:py-16">
+    <p class="mb-3 text-xs uppercase tracking-widest text-scheme-secondary">Commune237 Montréal</p>
+    <h1
+      class="mb-3 font-normal"
+      style="font-family: var(--font-heading-family, serif); font-weight: 300; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1;"
+    >
+      Work With Us
+    </h1>
+    <p class="mx-auto max-w-md text-sm leading-relaxed text-scheme-secondary">
+      Book a private showroom visit, or consign pieces from your wardrobe.
+    </p>
+  </div>
+
+  {%- comment -%} ── Two option cards ── {%- endcomment -%}
+  <div class="grid lg:grid-cols-2">
+
+    {%- comment -%} Option A — Book a Visit {%- endcomment -%}
+    <button
+      type="button"
+      class="group flex flex-col gap-4 border-b border-current/10 px-section-horizontal-spacing py-10 text-left transition-colors lg:border-b-0 lg:border-r"
+      :class="activeOption === 'visit' ? 'bg-scheme-text text-scheme-background' : 'hover:bg-scheme-text/5'"
+      @click="setOption('visit')"
+    >
+      <div class="flex w-full items-start justify-between gap-4">
+        <div>
+          <p
+            class="mb-2 text-xs uppercase tracking-widest"
+            :class="activeOption === 'visit' ? 'opacity-60' : 'text-scheme-secondary'"
+          >Option A</p>
+          <h2
+            class="mb-3 font-normal"
+            style="font-family: var(--font-heading-family, serif); font-weight: 300; font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15;"
+          >
+            Book a Visit
+          </h2>
+          <p class="max-w-sm text-sm leading-relaxed" :class="activeOption === 'visit' ? 'opacity-70' : 'text-scheme-secondary'">
+            Visit our showroom in Vieux-Montréal. Browse the full archive, try pieces on, take your time — no pressure.
+          </p>
+        </div>
+        <span
+          class="mt-1 shrink-0 text-2xl transition-transform duration-300"
+          :class="activeOption === 'visit' ? 'rotate-45' : ''"
+        >+</span>
+      </div>
+      <p
+        class="text-xs uppercase tracking-widest underline underline-offset-4"
+        :class="activeOption === 'visit' ? 'opacity-70' : 'text-scheme-secondary'"
+      >
+        <span x-text="activeOption === 'visit' ? 'Close' : 'Select a time →'"></span>
+      </p>
+    </button>
+
+    {%- comment -%} Option B — Sell with Us {%- endcomment -%}
+    <button
+      type="button"
+      class="group flex flex-col gap-4 border-b border-current/10 px-section-horizontal-spacing py-10 text-left transition-colors"
+      :class="activeOption === 'sell' ? 'bg-scheme-text text-scheme-background' : 'hover:bg-scheme-text/5'"
+      @click="setOption('sell')"
+    >
+      <div class="flex w-full items-start justify-between gap-4">
+        <div>
+          <p
+            class="mb-2 text-xs uppercase tracking-widest"
+            :class="activeOption === 'sell' ? 'opacity-60' : 'text-scheme-secondary'"
+          >Option B</p>
+          <h2
+            class="mb-3 font-normal"
+            style="font-family: var(--font-heading-family, serif); font-weight: 300; font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15;"
+          >
+            Sell with Us
+          </h2>
+          <p class="max-w-sm text-sm leading-relaxed" :class="activeOption === 'sell' ? 'opacity-70' : 'text-scheme-secondary'">
+            Consign pieces from your wardrobe. We curate, photograph, and sell them through the archive — you earn a percentage of the sale.
+          </p>
+        </div>
+        <span
+          class="mt-1 shrink-0 text-2xl transition-transform duration-300"
+          :class="activeOption === 'sell' ? 'rotate-45' : ''"
+        >+</span>
+      </div>
+      <p
+        class="text-xs uppercase tracking-widest underline underline-offset-4"
+        :class="activeOption === 'sell' ? 'opacity-70' : 'text-scheme-secondary'"
+      >
+        <span x-text="activeOption === 'sell' ? 'Close' : 'Submit items →'"></span>
+      </p>
+    </button>
+  </div>
+
+  {%- comment -%} ══════════════════════════════════════
+       SECTION A — Calendly embed
+  ══════════════════════════════════════ {%- endcomment -%}
+  <div
+    x-show="activeOption === 'visit'"
+    x-transition:enter="transition ease duration-300"
+    x-transition:enter-start="opacity-0 -translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    style="display: none;"
+    class="border-b border-current/10"
+  >
+    <div class="px-section-horizontal-spacing py-8 lg:py-10">
+      <p class="mb-1 text-xs uppercase tracking-widest text-scheme-secondary">Showroom</p>
+      <p class="text-sm leading-relaxed">
+        <strong class="font-medium">237 Rue Saint-Paul O, Vieux-Montréal</strong>
+        <span class="ml-2 text-scheme-secondary">Tue–Sat, 11am–6pm, by appointment</span>
+      </p>
+    </div>
+    <div
+      class="calendly-inline-widget w-full"
+      id="commune-calendly"
+      data-url="https://calendly.com/d/cxs6-ftd-gzq?hide_event_type_title=1&hide_gdpr_banner=1"
+      style="min-height: 700px;"
+    ></div>
+  </div>
+
+  {%- comment -%} ══════════════════════════════════════
+       SECTION B — Sell with Us form
+  ══════════════════════════════════════ {%- endcomment -%}
+  <div
+    x-show="activeOption === 'sell'"
+    x-transition:enter="transition ease duration-300"
+    x-transition:enter-start="opacity-0 -translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    style="display: none;"
+    class="border-b border-current/10"
+  >
+    <div class="mx-auto max-w-2xl px-section-horizontal-spacing py-12 lg:py-16">
+
+      {%- comment -%} Success state {%- endcomment -%}
+      <div x-show="submitted" class="py-12 text-center" style="display: none;">
+        <p class="mb-2 text-lg" style="font-family: var(--font-heading-family, serif);">感谢你的提交！</p>
+        <p class="text-sm leading-relaxed text-scheme-secondary">
+          我们会在3个工作日内回复。<br>
+          Thank you! We'll be in touch within 3 business days.
+        </p>
+      </div>
+
+      {%- comment -%} Form {%- endcomment -%}
+      <div x-show="!submitted" style="display: none;">
+
+        {%- comment -%} ── Personal info ── {%- endcomment -%}
+        <div class="mb-10">
+          <p class="mb-6 border-b border-current/10 pb-3 text-xs uppercase tracking-widest text-scheme-secondary">Personal Info</p>
+          <div class="flex flex-col gap-5">
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="sell-name">
+                  Full Name <span class="text-scheme-accent">*</span>
+                </label>
+                <input
+                  id="sell-name"
+                  type="text"
+                  x-model="personal.name"
+                  required
+                  class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                  placeholder="Jane Smith"
+                />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="sell-phone">
+                  Phone <span class="text-scheme-secondary/50">(optional)</span>
+                </label>
+                <input
+                  id="sell-phone"
+                  type="tel"
+                  x-model="personal.phone"
+                  class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                  placeholder="+1 514 000 0000"
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="sell-email">
+                Email <span class="text-scheme-accent">*</span>
+              </label>
+              <input
+                id="sell-email"
+                type="email"
+                x-model="personal.email"
+                required
+                class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                placeholder="you@example.com"
+              />
+            </div>
+
+          </div>
+        </div>
+
+        {%- comment -%} ── Item blocks ── {%- endcomment -%}
+        <div class="mb-6">
+          <p class="mb-6 border-b border-current/10 pb-3 text-xs uppercase tracking-widest text-scheme-secondary">
+            Items <span class="opacity-50">— up to 3</span>
+          </p>
+
+          <template x-for="(item, idx) in items" :key="idx">
+            <div class="mb-8 border border-current/10 p-5 sm:p-6">
+
+              {%- comment -%} Item header {%- endcomment -%}
+              <div class="mb-5 flex items-center justify-between">
+                <p class="text-xs uppercase tracking-widest text-scheme-secondary" x-text="'Item ' + (idx + 1)"></p>
+                <button
+                  type="button"
+                  x-show="items.length > 1"
+                  @click="removeItem(idx)"
+                  class="text-xs uppercase tracking-widest text-scheme-secondary underline underline-offset-2 hover:text-scheme-text"
+                >Remove</button>
+              </div>
+
+              <div class="flex flex-col gap-4">
+
+                {%- comment -%} Brand {%- endcomment -%}
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                    Brand <span class="text-scheme-accent">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    x-model="item.brand"
+                    required
+                    class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                    placeholder="e.g. Comme des Garçons"
+                  />
+                </div>
+
+                {%- comment -%} Category + Condition {%- endcomment -%}
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                      Category <span class="text-scheme-accent">*</span>
+                    </label>
+                    <div class="relative">
+                      <select
+                        x-model="item.category"
+                        required
+                        class="w-full appearance-none border border-gridline-color bg-transparent px-3 py-2.5 pr-8 text-sm text-scheme-text focus:border-scheme-text focus:outline-none"
+                      >
+                        <option value="" disabled selected>Select…</option>
+                        <option value="Tops">上衣 Tops</option>
+                        <option value="Bottoms">裤子 Bottoms</option>
+                        <option value="Skirts">裙子 Skirts</option>
+                        <option value="Outerwear">外套 Outerwear</option>
+                        <option value="Bags">包袋 Bags</option>
+                        <option value="Shoes">鞋履 Shoes</option>
+                        <option value="Accessories">配饰 Accessories</option>
+                      </select>
+                      <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-60">
+                        {%- render 'icon-chevron-down' -%}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                      Condition <span class="text-scheme-accent">*</span>
+                    </label>
+                    <div class="relative">
+                      <select
+                        x-model="item.condition"
+                        required
+                        class="w-full appearance-none border border-gridline-color bg-transparent px-3 py-2.5 pr-8 text-sm text-scheme-text focus:border-scheme-text focus:outline-none"
+                      >
+                        <option value="" disabled selected>Select…</option>
+                        <option value="New with tags">全新 New with tags</option>
+                        <option value="Like new">几乎全新 Like new</option>
+                        <option value="Good">良好 Good</option>
+                        <option value="Fair">一般 Fair</option>
+                      </select>
+                      <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-60">
+                        {%- render 'icon-chevron-down' -%}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {%- comment -%} Retail + Asking price {%- endcomment -%}
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                      Original Retail Price <span class="opacity-50">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      x-model="item.retail_price"
+                      class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                      placeholder="e.g. $480"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                      Asking Price <span class="opacity-50">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      x-model="item.asking_price"
+                      class="border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                      placeholder="e.g. $220"
+                    />
+                  </div>
+                </div>
+
+                {%- comment -%} Notes {%- endcomment -%}
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                    Notes / Description
+                  </label>
+                  <textarea
+                    x-model="item.notes"
+                    rows="3"
+                    class="resize-none border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+                    placeholder="Fabric, size, any flaws, styling notes…"
+                  ></textarea>
+                </div>
+
+                {%- comment -%} Photos {%- endcomment -%}
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
+                    Photos <span class="opacity-50">(up to 5 — jpg, png, heic)</span>
+                  </label>
+
+                  {%- comment -%} Preview grid {%- endcomment -%}
+                  <div
+                    x-show="item.photoPreviewUrls.length > 0"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template x-for="(url, photoIdx) in item.photoPreviewUrls" :key="photoIdx">
+                      <div class="relative h-20 w-20 border border-gridline-color">
+                        <img :src="url" class="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          @click="removePhoto(idx, photoIdx)"
+                          class="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center bg-black/60 text-white"
+                          aria-label="Remove photo"
+                        >
+                          <svg viewBox="0 0 10 10" fill="none" class="h-2.5 w-2.5">
+                            <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </template>
+                  </div>
+
+                  {%- comment -%} Upload button {%- endcomment -%}
+                  <label
+                    x-show="item.photoPreviewUrls.length < 5"
+                    class="flex cursor-pointer items-center gap-2 border border-dashed border-gridline-color px-4 py-3 text-xs uppercase tracking-widest text-scheme-secondary transition-colors hover:border-scheme-text hover:text-scheme-text"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    </svg>
+                    <span x-text="item.photoPreviewUrls.length > 0 ? 'Add more photos' : 'Add photos'"></span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/heic,image/heif"
+                      multiple
+                      class="sr-only"
+                      @change="handlePhotoSelect(idx, $event)"
+                    />
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </template>
+
+          {%- comment -%} Add item button {%- endcomment -%}
+          <button
+            type="button"
+            x-show="items.length < 3"
+            @click="addItem()"
+            class="text-xs uppercase tracking-widest text-scheme-secondary underline underline-offset-4 hover:text-scheme-text"
+          >
+            + Add another item
+          </button>
+        </div>
+
+        {%- comment -%} ── Additional notes ── {%- endcomment -%}
+        <div class="mb-8 flex flex-col gap-1.5">
+          <label class="text-xs uppercase tracking-widest text-scheme-secondary" for="sell-notes">
+            Additional Notes <span class="opacity-50">(optional)</span>
+          </label>
+          <textarea
+            id="sell-notes"
+            x-model="additionalNotes"
+            rows="3"
+            class="resize-none border border-gridline-color bg-transparent px-3 py-2.5 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:border-scheme-text focus:outline-none"
+            placeholder="Anything else you'd like us to know…"
+          ></textarea>
+        </div>
+
+        {%- comment -%} Error message {%- endcomment -%}
+        <p
+          x-show="submitError"
+          class="mb-4 text-sm text-scheme-accent"
+          style="display: none;"
+        >
+          提交失败，请重试或发邮件给我们。<br>
+          Something went wrong — please try again.
+        </p>
+
+        {%- comment -%} Submit {%- endcomment -%}
+        <button
+          type="button"
+          @click="submit()"
+          :disabled="submitting || !personal.name || !personal.email"
+          :class="(submitting || !personal.name || !personal.email) ? 'opacity-40 cursor-not-allowed' : ''"
+          class="theme-button flex w-full items-center justify-center gap-3 py-3.5 text-sm uppercase tracking-widest"
+        >
+          <span x-text="submitting ? '提交中… Submitting…' : 'Submit — 提交'"></span>
+          <svg x-show="!submitting" width="14" height="10" viewBox="0 0 14 10" fill="none">
+            <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <p class="mt-4 text-center text-xs leading-relaxed text-scheme-secondary">
+          We'll review your submission and follow up within 3 business days.
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{%- comment -%} Calendly script — loads once, async {%- endcomment -%}
+<script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+<script>
+const UPLOADCARE_PUBLIC_KEY = 'UPLOADCARE_PUBLIC_KEY_HERE';
+const MAKE_WEBHOOK_URL = 'MAKE_WEBHOOK_URL_HERE';
+const CALENDLY_URL = 'https://calendly.com/d/cxs6-ftd-gzq?hide_event_type_title=1&hide_gdpr_banner=1';
+
+function defaultItem() {
+  return {
+    brand: '',
+    category: '',
+    condition: '',
+    retail_price: '',
+    asking_price: '',
+    notes: '',
+    photos: [],
+    photoPreviewUrls: []
+  };
+}
+
+function CommuneBookingPage() {
+  return {
+    activeOption: null,
+    calendlyInited: false,
+
+    personal: { name: '', email: '', phone: '' },
+    items: [defaultItem()],
+    additionalNotes: '',
+
+    submitting: false,
+    submitted: false,
+    submitError: false,
+
+    init() {},
+
+    setOption(opt) {
+      this.activeOption = this.activeOption === opt ? null : opt;
+      if (this.activeOption === 'visit') {
+        this.$nextTick(() => this.initCalendly());
+      }
+    },
+
+    initCalendly() {
+      if (this.calendlyInited) return;
+      const el = document.getElementById('commune-calendly');
+      if (!el) return;
+
+      const tryInit = () => {
+        if (window.Calendly && window.Calendly.initInlineWidget) {
+          window.Calendly.initInlineWidget({
+            url: CALENDLY_URL,
+            parentElement: el,
+          });
+          this.calendlyInited = true;
+        } else {
+          setTimeout(tryInit, 200);
+        }
+      };
+      tryInit();
+    },
+
+    addItem() {
+      if (this.items.length < 3) this.items.push(defaultItem());
+    },
+
+    removeItem(idx) {
+      if (this.items.length > 1) {
+        this.items[idx].photoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+        this.items.splice(idx, 1);
+      }
+    },
+
+    handlePhotoSelect(idx, event) {
+      const files = Array.from(event.target.files);
+      const remaining = 5 - this.items[idx].photoPreviewUrls.length;
+      files.slice(0, remaining).forEach(file => {
+        this.items[idx].photos.push(file);
+        this.items[idx].photoPreviewUrls.push(URL.createObjectURL(file));
+      });
+      event.target.value = '';
+    },
+
+    removePhoto(itemIdx, photoIdx) {
+      URL.revokeObjectURL(this.items[itemIdx].photoPreviewUrls[photoIdx]);
+      this.items[itemIdx].photos.splice(photoIdx, 1);
+      this.items[itemIdx].photoPreviewUrls.splice(photoIdx, 1);
+    },
+
+    async uploadPhoto(file) {
+      const fd = new FormData();
+      fd.append('UPLOADCARE_PUB_KEY', UPLOADCARE_PUBLIC_KEY);
+      fd.append('UPLOADCARE_STORE', 'auto');
+      fd.append('file', file);
+      const res = await fetch('https://upload.uploadcare.com/base/', { method: 'POST', body: fd });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      return 'https://ucarecdn.com/' + data.file + '/';
+    },
+
+    async submit() {
+      this.submitting = true;
+      this.submitError = false;
+
+      try {
+        const itemsPayload = await Promise.all(
+          this.items.map(async item => {
+            const photoUrls = await Promise.all(item.photos.map(f => this.uploadPhoto(f)));
+            return {
+              brand: item.brand,
+              category: item.category,
+              condition: item.condition,
+              retail_price: item.retail_price,
+              asking_price: item.asking_price,
+              notes: item.notes,
+              photos: photoUrls
+            };
+          })
+        );
+
+        const payload = {
+          name: this.personal.name,
+          email: this.personal.email,
+          phone: this.personal.phone,
+          items: itemsPayload,
+          additional_notes: this.additionalNotes,
+          submitted_at: new Date().toISOString()
+        };
+
+        const res = await fetch(MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Webhook error');
+        this.submitted = true;
+
+      } catch (e) {
+        console.error(e);
+        this.submitError = true;
+      } finally {
+        this.submitting = false;
+      }
+    }
+  };
+}
+</script>
