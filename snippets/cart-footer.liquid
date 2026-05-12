@@ -37,35 +37,23 @@
       </div>
     {% endif %}
     <div class="mt-4 text-center{% if template == 'cart' %} md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9{% endif %}">
-      <dl class="grid grid-cols-2 text-right">
+      <dl class="grid grid-cols-2">
         {%- for discount_application in cart.cart_level_discount_applications -%}
-          <dt class="text-scheme-accent">
+          <dt class="text-left text-scheme-accent">
             <span class="sr-only">{{- 'customer.order.discount' | t }}:</span
             ><span>{{- discount_application.title -}}</span>
           </dt>
-          <dd class="text-scheme-accent">
+          <dd class="text-right text-scheme-accent">
             -{{ discount_application.total_allocated_amount | money }}
           </dd>
         {%- endfor -%}
-        <dt>{{ 'cart.general.subtotal' | t }}</dt>
-        <dd>{{ cart.total_price | money_with_currency }}</dd>
+        <dt class="text-left">Bag Total</dt>
+        <dd class="text-right">{{ cart.total_price | money_with_currency }}</dd>
+        <dt class="text-left">Shipping Estimate</dt>
+        <dd class="text-right">Calculated at Checkout</dd>
+        <dt class="text-left font-bold">Order Total</dt>
+        <dd class="text-right font-bold">{{ cart.total_price | money_with_currency }}</dd>
       </dl>
-
-      {%- capture taxes_shipping_checkout -%}
-      {%- if shop.taxes_included and shop.shipping_policy.body != blank -%}
-        {{ 'cart.general.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
-      {%- elsif shop.taxes_included -%}
-        {{ 'cart.general.taxes_included_but_shipping_at_checkout' | t }}
-      {%- elsif shop.shipping_policy.body != blank -%}
-        {{ 'cart.general.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
-      {%- else -%}
-        {{ 'cart.general.taxes_and_shipping_at_checkout' | t }}
-      {%- endif -%}
-    {%- endcapture -%}
-
-      <p class="has-theme-links mt-4 text-right">
-        {{ taxes_shipping_checkout }}
-      </p>
 
       <div class="{% if template == 'cart' %}no-js:lg:grid no-js:lg:grid-cols-2 no-js:lg:gap-2{% endif %} mt-4 w-full items-center justify-between">
         <button
