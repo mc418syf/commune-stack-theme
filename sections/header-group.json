@@ -1,1 +1,65 @@
-{"type":"header","name":"Header","sections":{"announcement_bar_xrhnBA":{"type":"announcement-bar","disabled":true,"name":"Announcement bar","settings":{"home_page_only":true,"hide_on_mobile":false,"display":"scrolling-text","text":"RSVP FOR COMMUNE@LEISURE CENTER POP UP","link":"https:\/\/www.eventbrite.ca\/e\/commune-leisure-centre-event-presentation-tickets-1983514948606?","speed":40,"direction":"reverse","repeat_text":true,"separator":"&middot;","separator_repeats":3,"spacing_between_repeated_separators":"&emsp13;","color_scheme":""}},"header":{"type":"header","custom_css":[".menu {position: relative; top: 9px;}"," \/* 全站：移除 header 底边框与阴影 *\/header,.site-header,.menu-item {font-size: 13px;}"],"settings":{"logo_max_width":130,"logo_max_width_mobile":150,"menu":"main-menu","layout":"logo_left_menu_right","header_vertical_spacing":"py-2","show_search":true,"sticky_header":true,"show_icons":true,"show_all_navigation_links":true,"dropdown_heading_font":"font-body","dropdown_text_align":"text-right","dropdown_style":"grid_with_border","show_locale_selector":false,"show_country_selector":false,"color_scheme":"scheme5","overlay_homepage":true,"overlay_text_color_scheme":"scheme5"}}},"order":["announcement_bar_xrhnBA","header"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "announcement_bar_xrhnBA": {
+      "type": "announcement-bar",
+      "disabled": true,
+      "name": "Announcement bar",
+      "settings": {
+        "home_page_only": true,
+        "hide_on_mobile": false,
+        "display": "scrolling-text",
+        "text": "RSVP FOR COMMUNE@LEISURE CENTER POP UP",
+        "link": "https://www.eventbrite.ca/e/commune-leisure-centre-event-presentation-tickets-1983514948606?",
+        "speed": 40,
+        "direction": "reverse",
+        "repeat_text": true,
+        "separator": "&middot;",
+        "separator_repeats": 3,
+        "spacing_between_repeated_separators": "&emsp13;",
+        "color_scheme": ""
+      }
+    },
+    "header": {
+      "type": "header",
+      "custom_css": [
+        ".menu {position: relative; top: 9px;}",
+        " /* 全站：移除 header 底边框与阴影 */header,.site-header,.menu-item {font-size: 13px;}"
+      ],
+      "settings": {
+        "logo_max_width": 130,
+        "logo_max_width_mobile": 150,
+        "menu": "main-menu",
+        "layout": "logo_left_menu_right",
+        "header_vertical_spacing": "py-2",
+        "show_search": true,
+        "sticky_header": true,
+        "show_icons": true,
+        "show_stack_button": false,
+        "show_all_navigation_links": true,
+        "dropdown_heading_font": "font-body",
+        "dropdown_text_align": "text-right",
+        "dropdown_style": "grid_with_border",
+        "show_locale_selector": false,
+        "show_country_selector": false,
+        "color_scheme": "scheme5",
+        "overlay_homepage": true,
+        "overlay_text_color_scheme": "scheme5"
+      }
+    }
+  },
+  "order": [
+    "announcement_bar_xrhnBA",
+    "header"
+  ]
+}
