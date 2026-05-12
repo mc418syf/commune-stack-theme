@@ -33,14 +33,14 @@
     "header": {
       "type": "header",
       "custom_css": [
-        ".menu {position: relative; top: 9px;}",
-        " /* 全站：移除 header 底边框与阴影 */header,.site-header,.menu-item {font-size: 13px;}"
+        ".site-header,.menu-item {font-size: 13px;}"
       ],
       "settings": {
         "logo_max_width": 130,
         "logo_max_width_mobile": 150,
         "menu": "main-menu",
         "layout": "logo_left_menu_right",
+        "mobile_layout": "logo_left",
         "header_vertical_spacing": "py-2",
         "show_search": true,
         "sticky_header": true,

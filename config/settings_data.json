@@ -10,7 +10,7 @@
 {
   "current": {
     "logo": "shopify://shop_images/5_pt.png",
-    "color_border": "#2b2b2b",
+    "color_border": "#202020",
     "modal_color_scheme": "scheme1",
     "selected_text_background_color": "accent",
     "base_font_size": 13,
