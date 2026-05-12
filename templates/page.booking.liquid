@@ -2,7 +2,9 @@
   Commune237 — /pages/booking
   Tab A: Book a Fitting  — stack items + Calendly (initInlineWidget, a2 prefill)
   Tab B: Sell with Us    — Make.com webhook + Uploadcare photo uploads
-  Styled with the same Broadcast theme tokens as cart-items / cart-footer.
+  Design tokens: font-heading (uppercase, -0.05em tracking, lh 0.9), text-xs/sm/base,
+  border-b-text (1px) for inputs, inline 12%-opacity hairlines for dividers,
+  theme-button (pill, transparent bg, text border + arrow).
 {%- endcomment -%}
 
 <div
@@ -13,28 +15,30 @@
 >
 
   {%- comment -%} ── Page header ── {%- endcomment -%}
-  <div class="border-b-gridline border-gridline-color px-section-horizontal-spacing py-12 text-center lg:py-16">
-    <p class="mb-3 text-xs uppercase tracking-widest text-scheme-secondary">Commune237 · Montréal</p>
+  <div
+    class="px-section-horizontal-spacing py-10 text-center lg:py-14"
+    style="border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12);"
+  >
+    <p class="mb-2 text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.2em;">Commune237 · Montréal</p>
     <h1 class="font-heading text-heading-standard">Book a Showroom Visit</h1>
   </div>
 
   {%- comment -%} ── Tab bar ── {%- endcomment -%}
-  <div class="grid grid-cols-2 border-b-gridline border-gridline-color">
+  <div class="grid grid-cols-2" style="border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12);">
     <button
       type="button"
       @click="tab = 'visit'; $nextTick(() => initCalendly())"
-      class="border-r-gridline border-gridline-color px-section-horizontal-spacing py-5 text-left text-xs uppercase tracking-widest transition-colors"
-      :class="tab === 'visit'
-        ? 'bg-scheme-text text-scheme-background'
-        : 'text-scheme-secondary hover:text-scheme-text'"
+      class="px-section-horizontal-spacing py-4 text-left text-xs uppercase tracking-widest transition-colors duration-150"
+      :class="tab === 'visit' ? 'bg-scheme-text text-scheme-background' : ''"
+      style="border-right: 1px solid rgba(var(--color-scheme-text) / 0.12);"
+      x-bind:style="tab !== 'visit' ? 'opacity: 0.5;' : ''"
     >Book a Fitting</button>
     <button
       type="button"
       @click="tab = 'sell'"
-      class="px-section-horizontal-spacing py-5 text-left text-xs uppercase tracking-widest transition-colors"
-      :class="tab === 'sell'
-        ? 'bg-scheme-text text-scheme-background'
-        : 'text-scheme-secondary hover:text-scheme-text'"
+      class="px-section-horizontal-spacing py-4 text-left text-xs uppercase tracking-widest transition-colors duration-150"
+      :class="tab === 'sell' ? 'bg-scheme-text text-scheme-background' : ''"
+      x-bind:style="tab !== 'sell' ? 'opacity: 0.5;' : ''"
     >Sell with Us</button>
   </div>
 
@@ -46,16 +50,18 @@
     <div class="lg:grid lg:grid-cols-[1fr_480px]">
 
       {%- comment -%} LEFT — Stack items {%- endcomment -%}
-      <div class="border-b-gridline border-gridline-color px-section-horizontal-spacing py-12 lg:border-b-0 lg:border-r-gridline lg:py-16">
+      <div
+        class="px-section-horizontal-spacing py-12 lg:py-16"
+        style="border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12);"
+        x-bind:style="window.innerWidth >= 1024 ? 'border-bottom: none; border-right: 1px solid rgba(var(--color-scheme-text) / 0.12);' : ''"
+      >
 
-        <p class="mb-2 text-xs uppercase tracking-widest text-scheme-secondary">Your Stack</p>
-        <h2 class="mb-8 font-heading" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 300; line-height: 1.15;">
-          Pieces to Try On
-        </h2>
+        <p class="mb-1 text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.2em;">Your Stack</p>
+        <h2 class="mb-8 font-heading text-heading-secondary">Pieces to Try On</h2>
 
         {%- comment -%} Empty state {%- endcomment -%}
         <div x-show="$store.stack.items.length === 0" style="display:none;">
-          <p class="mb-5 text-sm leading-relaxed text-scheme-secondary">
+          <p class="mb-6 text-sm leading-relaxed" style="opacity: 0.55;">
             Your stack is empty. Browse the archive and add pieces you'd like to try on.
           </p>
           <a
@@ -63,24 +69,22 @@
             class="theme-button inline-flex items-center gap-2 px-6 py-3 text-xs uppercase tracking-widest"
           >
             Browse Archive
-            <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-              <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
           </a>
-          <div class="mt-8 border-t-gridline border-gridline-color pt-6">
-            <p class="text-xs leading-relaxed text-scheme-secondary">
-              You can still book a general browsing visit — just mention what you're looking for in Calendly's notes field.
-            </p>
-          </div>
+          <p class="mt-8 pt-6 text-xs leading-relaxed" style="border-top: 1px solid rgba(var(--color-scheme-text) / 0.12); opacity: 0.5;">
+            You can still book a general browsing visit — just mention what you're looking for in Calendly's notes field.
+          </p>
         </div>
 
         {%- comment -%} Items list {%- endcomment -%}
         <div x-show="$store.stack.items.length > 0" style="display:none;">
-          <div class="divide-y divide-gridline-color border-t-gridline border-gridline-color">
+          <div style="border-top: 1px solid rgba(var(--color-scheme-text) / 0.12);">
             <template x-for="item in $store.stack.items" :key="item.variantId">
-              <div class="flex gap-4 py-5">
+              <div
+                class="flex gap-4 py-5"
+                style="border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.08);"
+              >
                 <a :href="item.url" class="shrink-0">
-                  <div class="commune-stack-thumb bg-scheme-secondary/10">
+                  <div class="commune-stack-thumb" style="background: rgba(var(--color-scheme-text) / 0.06);">
                     <img
                       x-show="item.image"
                       :src="item.image"
@@ -89,52 +93,56 @@
                     />
                   </div>
                 </a>
-                <div class="flex min-w-0 flex-1 flex-col">
-                  <p class="mb-0.5 text-xs uppercase tracking-widest text-scheme-secondary" x-text="item.vendor"></p>
-                  <a :href="item.url" class="mb-1 text-sm leading-snug" x-text="item.title"></a>
-                  <p class="mt-1 text-sm text-scheme-secondary" x-text="item.price"></p>
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                  <p class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;" x-text="item.vendor"></p>
+                  <a :href="item.url" class="text-sm leading-snug" x-text="item.title"></a>
+                  <p class="text-xs" style="opacity: 0.55;" x-text="item.price"></p>
                 </div>
                 <button
                   type="button"
                   @click="$store.stack.remove(item.variantId)"
                   aria-label="Remove from stack"
-                  style="background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0;color:#888;flex-shrink:0;align-self:flex-start;"
-                  onmouseover="this.style.color='currentColor'"
-                  onmouseout="this.style.color='#888'"
+                  style="background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0;opacity:0.35;flex-shrink:0;align-self:flex-start;"
+                  onmouseover="this.style.opacity='1'"
+                  onmouseout="this.style.opacity='0.35'"
                 >×</button>
               </div>
             </template>
           </div>
           <a
             href="{{ routes.all_products_collection_url }}"
-            class="mt-6 inline-flex items-center gap-1.5 border-b border-gridline-color pb-0.5 text-xs uppercase tracking-widest text-scheme-secondary hover:border-scheme-text hover:text-scheme-text"
+            class="mt-5 inline-block text-xs uppercase tracking-widest"
+            style="opacity: 0.5; border-bottom: 1px solid currentColor; padding-bottom: 2px;"
+            onmouseover="this.style.opacity='1'"
+            onmouseout="this.style.opacity='0.5'"
           >+ Add more pieces</a>
         </div>
+
       </div>
 
       {%- comment -%} RIGHT — Calendly {%- endcomment -%}
       <div class="px-section-horizontal-spacing py-12 lg:py-16">
-        <p class="mb-2 text-xs uppercase tracking-widest text-scheme-secondary">Book Your Visit</p>
-        <h2 class="mb-3 font-heading" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 300; line-height: 1.15;">
-          Private Showroom<br>Appointment
-        </h2>
-        <p class="mb-6 text-sm leading-relaxed text-scheme-secondary">
+
+        <p class="mb-1 text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.2em;">Book Your Visit</p>
+        <h2 class="mb-6 font-heading text-heading-secondary">Private Showroom<br>Appointment</h2>
+
+        <p class="mb-8 text-sm leading-relaxed" style="opacity: 0.55;">
           Select a date and time — we'll confirm within 24 hours.
         </p>
 
-        <div class="mb-6 border-l-2 border-scheme-text pl-4">
-          <p class="mb-1 text-xs uppercase tracking-widest text-scheme-secondary">Location</p>
+        <div class="mb-6">
+          <p class="mb-2 text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.2em;">Location</p>
           <p class="text-sm leading-relaxed">
-            <strong class="font-medium">Commune237 Montréal</strong><br>
-            237 Keefer Street<br>
-            <span class="text-scheme-secondary">Tue–Sat, 11am–6pm, by appointment</span>
+            237 Keefer Street, Montréal<br>
+            <span style="opacity: 0.55;">Tue–Sat, 11am–6pm, by appointment</span>
           </p>
         </div>
 
-        <p class="mb-5 text-xs text-scheme-secondary">No payment required. No commitment to purchase.</p>
+        <p class="mb-6 text-xs" style="opacity: 0.4;">No payment required. No commitment to purchase.</p>
 
-        {%- comment -%} Single Calendly embed — initialised by initCalendly() on tab click {%- endcomment -%}
-        <div id="commune-calendly" style="min-height:620px;"></div>
+        {%- comment -%} Single Calendly embed — initialised by initCalendly() {%- endcomment -%}
+        <div id="commune-calendly" style="min-height:620px; margin-left: calc(-1 * var(--section-horizontal-spacing)); margin-right: calc(-1 * var(--section-horizontal-spacing));"></div>
+
       </div>
 
     </div>
@@ -149,10 +157,9 @@
 
       {%- comment -%} Success state {%- endcomment -%}
       <div x-show="submitted" class="py-16 text-center" style="display:none;">
-        <p class="mb-3 font-heading text-2xl font-light">感谢你的提交！</p>
-        <p class="text-sm leading-relaxed text-scheme-secondary">
-          We'll be in touch within 3 business days.<br>
-          我们会在3个工作日内回复。
+        <h2 class="mb-4 font-heading text-heading-secondary">Thank you!</h2>
+        <p class="text-sm leading-relaxed" style="opacity: 0.6;">
+          We'll be in touch within 3 business days.
         </p>
       </div>
 
@@ -160,167 +167,185 @@
       <div x-show="!submitted" style="display:none;">
 
         {%- comment -%} ── Personal info ── {%- endcomment -%}
-        <div class="mb-8">
-          <p class="mb-5 border-b-gridline border-gridline-color pb-3 text-xs uppercase tracking-widest text-scheme-secondary">Contact</p>
-          <div class="flex flex-col gap-5">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div class="flex flex-col gap-2">
-                <label class="text-xs uppercase tracking-widest text-scheme-secondary">
-                  Full Name <span class="text-scheme-accent">*</span>
+        <div class="mb-10">
+          <p
+            class="mb-6 pb-3 text-xs uppercase tracking-widest"
+            style="opacity: 0.4; letter-spacing: 0.2em; border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12);"
+          >Contact</p>
+
+          <div class="flex flex-col gap-6">
+            <div class="grid gap-6 sm:grid-cols-2">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">
+                  Full Name <span style="opacity: 0.7;">*</span>
                 </label>
                 <input
                   type="text"
                   x-model="personal.name"
                   placeholder="Jane Smith"
-                  class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                  class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                  style="width: 100%;"
                 />
               </div>
-              <div class="flex flex-col gap-2">
-                <label class="text-xs uppercase tracking-widest text-scheme-secondary">Phone</label>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">Phone</label>
                 <input
                   type="tel"
                   x-model="personal.phone"
                   placeholder="+1 514…"
-                  class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                  class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                  style="width: 100%;"
                 />
               </div>
             </div>
-            <div class="flex flex-col gap-2">
-              <label class="text-xs uppercase tracking-widest text-scheme-secondary">
-                Email <span class="text-scheme-accent">*</span>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">
+                Email <span style="opacity: 0.7;">*</span>
               </label>
               <input
                 type="email"
                 x-model="personal.email"
                 placeholder="you@example.com"
-                class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                style="width: 100%;"
               />
             </div>
           </div>
         </div>
 
         {%- comment -%} ── Item blocks ── {%- endcomment -%}
-        <div class="mb-6">
-          <p class="mb-5 border-b-gridline border-gridline-color pb-3 text-xs uppercase tracking-widest text-scheme-secondary">
-            Items <span class="opacity-50">— up to 3</span>
-          </p>
+        <div class="mb-8">
+          <p
+            class="mb-6 pb-3 text-xs uppercase tracking-widest"
+            style="opacity: 0.4; letter-spacing: 0.2em; border-bottom: 1px solid rgba(var(--color-scheme-text) / 0.12);"
+          >Items <span style="opacity: 0.6;">— up to 3</span></p>
 
           <template x-for="(item, idx) in sellItems" :key="idx">
-            <div class="mb-6 border-gridline-color border-t-gridline pt-5">
+            <div class="mb-8 pt-5" style="border-top: 1px solid rgba(var(--color-scheme-text) / 0.12);">
 
-              <div class="mb-4 flex items-center justify-between">
-                <p class="text-xs uppercase tracking-widest text-scheme-secondary" x-text="'Item ' + (idx + 1)"></p>
+              <div class="mb-5 flex items-center justify-between">
+                <p class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;" x-text="'Item ' + (idx + 1)"></p>
                 <button
                   type="button"
                   x-show="sellItems.length > 1"
                   @click="removeSellItem(idx)"
-                  class="text-xs uppercase tracking-widest text-scheme-secondary underline underline-offset-2 hover:text-scheme-text"
+                  class="text-xs uppercase tracking-widest"
+                  style="background:none;border:none;cursor:pointer;padding:0;opacity:0.45;border-bottom:1px solid currentColor;padding-bottom:1px;"
+                  onmouseover="this.style.opacity='1'"
+                  onmouseout="this.style.opacity='0.45'"
                 >Remove</button>
               </div>
 
-              <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-5">
 
-                <div class="flex flex-col gap-2">
-                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
-                    Brand <span class="text-scheme-accent">*</span>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">
+                    Brand <span style="opacity: 0.7;">*</span>
                   </label>
                   <input
                     type="text"
                     x-model="item.brand"
                     placeholder="e.g. Comme des Garçons"
-                    class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                    class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                    style="width: 100%;"
                   />
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
-                      Category <span class="text-scheme-accent">*</span>
+                <div class="grid gap-5 sm:grid-cols-2">
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">
+                      Category <span style="opacity: 0.7;">*</span>
                     </label>
                     <div class="relative">
                       <select
                         x-model="item.category"
-                        class="w-full appearance-none border-b-text border-scheme-text bg-scheme-background py-2 pr-6 text-sm text-scheme-text focus:outline-none"
+                        class="w-full border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                        style="appearance: none; padding-right: 1.5rem;"
                       >
                         <option value="" disabled selected>Select…</option>
-                        <option value="Tops">上衣 Tops</option>
-                        <option value="Bottoms">裤子 Bottoms</option>
-                        <option value="Skirts">裙子 Skirts</option>
-                        <option value="Outerwear">外套 Outerwear</option>
-                        <option value="Bags">包袋 Bags</option>
-                        <option value="Shoes">鞋履 Shoes</option>
-                        <option value="Accessories">配饰 Accessories</option>
+                        <option value="Tops">Tops</option>
+                        <option value="Bottoms">Bottoms</option>
+                        <option value="Skirts">Skirts</option>
+                        <option value="Outerwear">Outerwear</option>
+                        <option value="Bags">Bags</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Accessories">Accessories</option>
                       </select>
-                      <div class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 opacity-50">
+                      <div class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2" style="opacity: 0.4;">
                         {%- render 'icon-chevron-down' -%}
                       </div>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">
-                      Condition <span class="text-scheme-accent">*</span>
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">
+                      Condition <span style="opacity: 0.7;">*</span>
                     </label>
                     <div class="relative">
                       <select
                         x-model="item.condition"
-                        class="w-full appearance-none border-b-text border-scheme-text bg-scheme-background py-2 pr-6 text-sm text-scheme-text focus:outline-none"
+                        class="w-full border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                        style="appearance: none; padding-right: 1.5rem;"
                       >
                         <option value="" disabled selected>Select…</option>
-                        <option value="New with tags">全新 New with tags</option>
-                        <option value="Like new">几乎全新 Like new</option>
-                        <option value="Good">良好 Good</option>
-                        <option value="Fair">一般 Fair</option>
+                        <option value="New with tags">New with tags</option>
+                        <option value="Like new">Like new</option>
+                        <option value="Good">Good</option>
+                        <option value="Fair">Fair</option>
                       </select>
-                      <div class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 opacity-50">
+                      <div class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2" style="opacity: 0.4;">
                         {%- render 'icon-chevron-down' -%}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">Original Price</label>
+                <div class="grid gap-5 sm:grid-cols-2">
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">Original Price</label>
                     <input
                       type="text"
                       x-model="item.retail_price"
                       placeholder="e.g. $480"
-                      class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                      class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                      style="width: 100%;"
                     />
                   </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs uppercase tracking-widest text-scheme-secondary">Asking Price</label>
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">Asking Price</label>
                     <input
                       type="text"
                       x-model="item.asking_price"
                       placeholder="e.g. $220"
-                      class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                      class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                      style="width: 100%;"
                     />
                   </div>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">Notes / Description</label>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">Notes</label>
                   <textarea
                     x-model="item.notes"
                     rows="3"
-                    placeholder="Fabric, size, any flaws, styling notes…"
-                    class="resize-none border-gridline-color border-t-gridline bg-scheme-background p-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+                    placeholder="Fabric, size, any flaws…"
+                    class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+                    style="width: 100%; resize: none;"
                   ></textarea>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                  <label class="text-xs uppercase tracking-widest text-scheme-secondary">
-                    Photos <span class="opacity-50">(up to 5 — jpg, png, heic)</span>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">
+                    Photos <span style="opacity: 0.6;">(up to 5)</span>
                   </label>
                   <div x-show="item.photoPreviewUrls.length > 0" class="flex flex-wrap gap-2">
                     <template x-for="(url, photoIdx) in item.photoPreviewUrls" :key="photoIdx">
-                      <div class="relative h-20 w-20 border-gridline-color border-t-gridline">
+                      <div class="relative h-20 w-20" style="border: 1px solid rgba(var(--color-scheme-text) / 0.15);">
                         <img :src="url" class="h-full w-full object-cover" />
                         <button
                           type="button"
                           @click="removePhoto(idx, photoIdx)"
-                          class="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center bg-black/60 text-white"
+                          class="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center"
+                          style="background: rgba(0,0,0,0.6); border: none; color: #fff; cursor: pointer;"
                         >
                           <svg viewBox="0 0 10 10" fill="none" class="h-2.5 w-2.5">
                             <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
@@ -331,12 +356,15 @@
                   </div>
                   <label
                     x-show="item.photoPreviewUrls.length < 5"
-                    class="flex cursor-pointer items-center gap-2 border-gridline-color border-t-gridline px-3 py-3 text-xs uppercase tracking-widest text-scheme-secondary hover:border-scheme-text hover:text-scheme-text"
+                    class="flex cursor-pointer items-center gap-2 py-3 text-xs uppercase tracking-widest"
+                    style="border: 1px solid rgba(var(--color-scheme-text) / 0.2); padding-left: 12px; opacity: 0.6;"
+                    onmouseover="this.style.opacity='1'; this.style.borderColor='rgba(var(--color-scheme-text) / 0.7)'"
+                    onmouseout="this.style.opacity='0.6'; this.style.borderColor='rgba(var(--color-scheme-text) / 0.2)'"
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                       <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
                     </svg>
-                    <span x-text="item.photoPreviewUrls.length > 0 ? 'Add more photos' : 'Add photos'"></span>
+                    <span x-text="item.photoPreviewUrls.length > 0 ? 'Add more' : 'Add photos'"></span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/heic,image/heif"
@@ -355,24 +383,28 @@
             type="button"
             x-show="sellItems.length < 3"
             @click="addSellItem()"
-            class="mt-2 text-xs uppercase tracking-widest text-scheme-secondary underline underline-offset-4 hover:text-scheme-text"
+            class="mt-1 text-xs uppercase tracking-widest"
+            style="background:none;border:none;cursor:pointer;padding:0;opacity:0.5;border-bottom:1px solid currentColor;padding-bottom:1px;"
+            onmouseover="this.style.opacity='1'"
+            onmouseout="this.style.opacity='0.5'"
           >+ Add another item</button>
         </div>
 
         {%- comment -%} ── Additional notes ── {%- endcomment -%}
-        <div class="mb-8 flex flex-col gap-2">
-          <label class="text-xs uppercase tracking-widest text-scheme-secondary">Additional Notes</label>
+        <div class="mb-8 flex flex-col gap-1.5">
+          <label class="text-xs uppercase tracking-widest" style="opacity: 0.4; letter-spacing: 0.16em;">Additional Notes</label>
           <textarea
             x-model="additionalNotes"
             rows="3"
             placeholder="Anything else you'd like us to know…"
-            class="resize-none border-gridline-color border-t-gridline bg-scheme-background p-2 text-sm text-scheme-text placeholder-scheme-secondary/50 focus:outline-none"
+            class="border-b-text border-scheme-text bg-scheme-background py-2 text-sm focus:outline-none"
+            style="width: 100%; resize: none;"
           ></textarea>
         </div>
 
         {%- comment -%} ── Error ── {%- endcomment -%}
-        <p x-show="submitError" class="mb-4 text-sm text-scheme-accent" style="display:none;">
-          提交失败，请重试。 Something went wrong — please try again.
+        <p x-show="submitError" class="mb-4 text-sm" style="display:none; opacity: 0.7;">
+          Something went wrong — please try again.
         </p>
 
         {%- comment -%} ── Submit ── {%- endcomment -%}
@@ -380,12 +412,12 @@
           type="button"
           @click="submitSell()"
           :disabled="submitting || !personal.name || !personal.email"
-          :class="(submitting || !personal.name || !personal.email) ? 'opacity-40 cursor-not-allowed' : ''"
-          class="theme-button flex w-full items-center justify-center gap-2 py-3.5 text-sm uppercase tracking-widest"
+          class="theme-button flex w-full items-center justify-center gap-2 py-4 text-xs uppercase tracking-widest"
+          x-bind:style="(submitting || !personal.name || !personal.email) ? 'opacity: 0.4; cursor: not-allowed;' : ''"
         >
-          <span x-text="submitting ? '提交中… Submitting…' : 'Submit — 提交'"></span>
+          <span x-text="submitting ? 'Submitting…' : 'Submit'"></span>
         </button>
-        <p class="mt-4 text-center text-xs leading-relaxed text-scheme-secondary">
+        <p class="mt-4 text-center text-xs leading-relaxed" style="opacity: 0.4;">
           We'll review your submission and follow up within 3 business days.
         </p>
 
@@ -424,7 +456,6 @@ function CommuneBookingPage() {
     submitError: false,
 
     init() {
-      // Calendly loads after the async script — retry until ready
       this.$nextTick(() => this.initCalendly());
     },
 
