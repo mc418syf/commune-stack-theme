@@ -37,6 +37,7 @@
 
   assign item_spacing = section.settings.header_vertical_spacing
   assign show_stack_button = section.settings.show_stack_button
+  assign mobile_layout = section.settings.mobile_layout
 -%}
 
 {%- capture header_logo -%}
@@ -255,7 +256,7 @@
       aria-label="{{ 'general.accessibility.primary' | t }}"
     >
       {%- comment -%} Single flat flex row: logo | menu (flex-1) | actions — all items-center {%- endcomment -%}
-      <div class="px-section-horizontal-spacing" style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="px-section-horizontal-spacing" style="display:flex; align-items:stretch; justify-content:space-between;">
 
         {%- comment -%} LEFT — logo (+ menu if left layout) {%- endcomment -%}
         <div style="display:flex; flex-shrink:0; align-items:center;">
@@ -352,25 +353,24 @@
       class="{% unless layout contains 'menu_drawer' %}lg:hidden{% endunless %}{% if settings.header_uppercase %} uppercase{% endif %}"
     >
       <div class="flex items-center justify-between px-section-horizontal-spacing lg:relative">
-        <div class="flex gap-2 items-center{% if layout contains 'logo_center' %} flex-grow w-1/3{% endif %}">
-          {% if layout contains 'logo_left' %}
+        <div class="flex gap-2 items-center{% if mobile_layout == 'logo_center' %} flex-grow w-1/3{% endif %}">
+          {% if mobile_layout == 'logo_left' %}
             {{ header_menu_toggle }}
             <div>
               {{ header_logo }}
             </div>
-          {% endif %}
-          {% if layout contains 'logo_center' %}
+          {% elsif mobile_layout == 'logo_center' %}
             {{ header_menu_toggle }}
           {% endif %}
         </div>
 
-        {% if layout contains 'logo_center' %}
+        {% if mobile_layout == 'logo_center' %}
           <div class="shrink-0 justify-center text-center">
             {{ header_logo }}
           </div>
         {% endif %}
 
-        <div class="flex justify-end gap-2 text-right{% if layout contains 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
+        <div class="flex justify-end gap-2 text-right{% if mobile_layout == 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
           {% if layout contains 'menu_drawer' %}
             {%- if show_localization -%}
               <div class="my-auto hidden shrink-0 lg:block">
@@ -746,6 +746,22 @@
         }
       ],
       "label": "Desktop layout"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        {
+          "value": "logo_left",
+          "label": "Logo left"
+        },
+        {
+          "value": "logo_center",
+          "label": "Logo centered"
+        }
+      ],
+      "default": "logo_left"
     },
     {
       "type": "select",
