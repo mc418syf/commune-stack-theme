@@ -36,6 +36,7 @@
   endif
 
   assign item_spacing = section.settings.header_vertical_spacing
+  assign show_stack_button = section.settings.show_stack_button
 -%}
 
 {%- capture header_logo -%}
@@ -342,6 +343,7 @@
           {% endif %}
 
           {% comment %} Stack nav button — desktop {% endcomment %}
+          {% if show_stack_button %}
           <div class="flex items-stretch whitespace-nowrap" x-data>
             <a
               href="/pages/booking"
@@ -369,6 +371,7 @@
               {%- endif -%}
             </a>
           </div>
+          {% endif %}
 
           <div class="flex items-stretch whitespace-nowrap">
             {{ header_cart }}
@@ -436,6 +439,7 @@
             </div>
           {% endif %}
           {% comment %} Stack button — mobile {% endcomment %}
+          {% if show_stack_button %}
           <div class="whitespace-nowrap lg:ml-4" x-data>
             <a
               href="/pages/booking"
@@ -456,6 +460,7 @@
               </div>
             </a>
           </div>
+          {% endif %}
 
           <div class="whitespace-nowrap lg:ml-4">
             {{ header_cart }}
@@ -816,6 +821,13 @@
       "id": "show_icons",
       "label": "Show icons",
       "info": "Show icons for menu, search,account and cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stack_button",
+      "label": "Show stack button",
+      "default": true,
+      "info": "Displays the stack icon in the header. Turn off to hide the showroom booking feature."
     },
     {
       "type": "header",
