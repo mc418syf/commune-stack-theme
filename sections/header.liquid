@@ -158,7 +158,7 @@
 {%- capture header_cart %}
   <a
     href="{{ routes.cart_url }}"
-    class="inline-flex {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
+    class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
     {% if settings.cart_type == 'drawer' and template != 'cart' %}
       data-cart-drawer-toggle
       :aria-expanded="$store.modals.rightDrawer.contents === 'cart'"
@@ -254,129 +254,83 @@
       class="relative hidden{% if settings.header_uppercase %} uppercase{% endif %}{% unless layout contains 'menu_drawer' %} lg:block{% endunless %}"
       aria-label="{{ 'general.accessibility.primary' | t }}"
     >
-      <div class="flex items-stretch px-section-horizontal-spacing justify-between{% if layout contains 'spread' %} flex-wrap {% endif %}">
-        <div class="flex items-stretch{% if layout contains 'center' %} flex-grow w-1/3{% endif %}">
+      {%- comment -%} Single flat flex row: logo | menu (flex-1) | actions — all items-center {%- endcomment -%}
+      <div class="flex items-center justify-between px-section-horizontal-spacing">
+
+        {%- comment -%} LEFT — logo (+ menu if left layout) {%- endcomment -%}
+        <div class="flex shrink-0 items-center mr-6">
           {% if layout contains 'logo_left' %}
-            <div class="flex{% unless layout contains 'spread' %} mr-6{% endunless %}">
-              {{ header_logo }}
-            </div>
+            {{ header_logo }}
           {% endif %}
           {% if layout contains 'menu_left' %}
-            {{ header_menu }}
+            <div class="ml-6">{{ header_menu }}</div>
           {% endif %}
         </div>
 
-        {% if layout contains 'menu_spread' %}
-          {{ header_menu }}
-        {% elsif layout contains 'center' %}
-          <div class="{% unless layout contains 'logo_center' %}lg:w-3/4 {% endunless %}flex items-stretch justify-end text-center">
-            {% if layout contains 'logo_center' %}
-              {{ header_logo }}
-            {% endif %}
-            {% if layout contains 'menu_center' %}
-              {{ header_menu }}
-            {% endif %}
+        {%- comment -%} CENTER — menu / logo-center {%- endcomment -%}
+        {% if layout contains 'menu_spread' or layout contains 'menu_center' %}
+          <div class="flex flex-1 items-center justify-center">
+            {% if layout contains 'logo_center' %}{{ header_logo }}{% endif %}
+            {{ header_menu }}
           </div>
+        {% elsif layout contains 'menu_right' %}
+          <div class="flex flex-1 items-center justify-end">
+            {{ header_menu }}
+          </div>
+        {% else %}
+          <div class="flex-1"></div>
         {% endif %}
 
-        {%- if shop.customer_accounts_enabled
-          and layout == 'logo_left_menu_spread'
-          and show_icons == false
-        -%}
-          <div class="{% unless layout contains 'spread' %}ml-4 flex items-stretch {% endunless %}whitespace-nowrap">
-            {{ customer_accounts }}
-          </div>
-        {%- endif -%}
+        {%- comment -%} RIGHT — localization · accounts · search · stack · cart {%- endcomment -%}
+        <div class="flex shrink-0 items-center gap-x-4">
+          {%- if show_localization -%}
+            {{ localization_form }}
+          {%- endif -%}
 
-        {% if section.settings.show_search
-          and layout == 'logo_left_menu_spread'
-          and show_icons == false
-        %}
-          <div class="{% unless layout contains 'spread' %}ml-4 flex items-stretch {% endunless %}whitespace-nowrap">
+          {%- if shop.customer_accounts_enabled -%}
+            {{ customer_accounts }}
+          {%- endif -%}
+
+          {% if section.settings.show_search %}
             {% render 'header-search',
               layout: layout,
               header_item_spacing: item_spacing,
               section_color: section_color,
               show_icons: show_icons
             %}
-          </div>
-        {%- endif -%}
-
-        <div class="flex items-stretch justify-end gap-x-4 text-right {% if layout contains 'center' %} flex-grow flex-wrap w-1/3{% endif %}">
-          {%- liquid
-            if layout contains 'menu_right'
-              echo header_menu
-            endif
-
-            if show_localization
-              echo '<div class="ml-4 my-auto shrink-0">'
-              echo localization_form
-              echo '</div>'
-            endif
-
-            assign show_extras = false
-
-            if layout != 'logo_left_menu_spread'
-              assign show_extras = true
-            endif
-
-            if layout == 'logo_left_menu_spread' and show_icons
-              assign show_extras = true
-            endif
-          -%}
-
-          {%- if shop.customer_accounts_enabled and show_extras -%}
-            <div class="flex items-stretch whitespace-nowrap">
-              {{ customer_accounts }}
-            </div>
-          {%- endif -%}
-
-          {% if section.settings.show_search and show_extras %}
-            <div class="flex items-stretch whitespace-nowrap">
-              {% render 'header-search',
-                layout: layout,
-                header_item_spacing: item_spacing,
-                section_color: section_color,
-                show_icons: show_icons
-              %}
-            </div>
           {% endif %}
 
-          {% comment %} Stack nav button — desktop {% endcomment %}
           {% if show_stack_button %}
-          <div class="flex items-stretch whitespace-nowrap" x-data>
-            <a
-              href="/pages/booking"
-              class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
-              aria-label="Your stack"
-            >
-              {%- if show_icons -%}
-                <div class="relative my-auto align-middle">
-                  <span
-                    x-show="$store.stack.count > 0"
-                    class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
-                    data-color-scheme="{{ section_color }}"
-                  ></span>
-                  <svg class="inline-block h-6 w-6 fill-current align-top" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                    <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                    <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                  </svg>
-                  <span class="sr-only">Stack (<span x-text="$store.stack.count">0</span>)</span>
-                </div>
-              {%- else -%}
-                <span class="my-auto">
+            <div x-data>
+              <a
+                href="/pages/booking"
+                class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
+                aria-label="Your stack"
+              >
+                {%- if show_icons -%}
+                  <div class="relative">
+                    <span
+                      x-show="$store.stack.count > 0"
+                      class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
+                      data-color-scheme="{{ section_color }}"
+                    ></span>
+                    <svg class="inline-block h-6 w-6 fill-current" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                      <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                      <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                    </svg>
+                    <span class="sr-only">Stack (<span x-text="$store.stack.count">0</span>)</span>
+                  </div>
+                {%- else -%}
                   Stack (<span x-text="$store.stack.count">0</span>)
-                </span>
-              {%- endif -%}
-            </a>
-          </div>
+                {%- endif -%}
+              </a>
+            </div>
           {% endif %}
 
-          <div class="flex items-stretch whitespace-nowrap">
-            {{ header_cart }}
-          </div>
+          {{ header_cart }}
         </div>
+
       </div>
 
       {% if layout contains 'menu_below' %}
