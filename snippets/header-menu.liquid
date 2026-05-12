@@ -22,10 +22,10 @@
   endcase
 -%}
 
-<ul class="menu flex flex-wrap items-center gap-x-1 {{ list_classes }}">
+<ul class="menu {{ list_classes }}" style="display:flex; flex-wrap:wrap; align-items:center; list-style:none; margin:0; padding:0; column-gap:0.25rem;">
   {%- for link in linklists[section.settings.menu].links -%}
-    <li class="menu-item relative {% if link.links != blank %}has-dropdown{% endif %}">
-      <a href="{{ link.url }}" class="inline-flex items-center {{ item_spacing }} px-3{% if settings.header_uppercase %} uppercase{% endif %}">
+    <li class="menu-item relative {% if link.links != blank %}has-dropdown{% endif %}" style="display:flex; align-items:center;">
+      <a href="{{ link.url }}" class="{{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}" style="display:inline-flex; align-items:center; padding-left:0.75rem; padding-right:0.75rem;">
         {{- link.title -}}
       </a>
       {% if link.links != blank %}

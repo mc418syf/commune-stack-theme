@@ -255,34 +255,38 @@
       aria-label="{{ 'general.accessibility.primary' | t }}"
     >
       {%- comment -%} Single flat flex row: logo | menu (flex-1) | actions — all items-center {%- endcomment -%}
-      <div class="flex items-center justify-between px-section-horizontal-spacing">
+      <div class="px-section-horizontal-spacing" style="display:flex; align-items:center; justify-content:space-between;">
 
         {%- comment -%} LEFT — logo (+ menu if left layout) {%- endcomment -%}
-        <div class="flex shrink-0 items-center mr-6">
+        <div style="display:flex; flex-shrink:0; align-items:center;">
           {% if layout contains 'logo_left' %}
             {{ header_logo }}
           {% endif %}
           {% if layout contains 'menu_left' %}
-            <div class="ml-6">{{ header_menu }}</div>
+            <div style="margin-left:1.5rem;">{{ header_menu }}</div>
           {% endif %}
         </div>
 
         {%- comment -%} CENTER — menu / logo-center {%- endcomment -%}
         {% if layout contains 'menu_spread' or layout contains 'menu_center' %}
-          <div class="flex flex-1 items-center justify-center">
+          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:center;">
             {% if layout contains 'logo_center' %}{{ header_logo }}{% endif %}
             {{ header_menu }}
           </div>
         {% elsif layout contains 'menu_right' %}
-          <div class="flex flex-1 items-center justify-end">
+          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:flex-end;">
             {{ header_menu }}
           </div>
+        {% elsif layout contains 'logo_center' %}
+          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:center;">
+            {{ header_logo }}
+          </div>
         {% else %}
-          <div class="flex-1"></div>
+          <div style="flex:1 1 0%;"></div>
         {% endif %}
 
         {%- comment -%} RIGHT — localization · accounts · search · stack · cart {%- endcomment -%}
-        <div class="flex shrink-0 items-center gap-x-4">
+        <div style="display:flex; flex-shrink:0; align-items:center; column-gap:1rem;">
           {%- if show_localization -%}
             {{ localization_form }}
           {%- endif -%}
@@ -334,7 +338,7 @@
       </div>
 
       {% if layout contains 'menu_below' %}
-        <div class="flex items-center justify-center border-t-gridline border-gridline-color px-section-horizontal-spacing">
+        <div class="border-t-gridline border-gridline-color px-section-horizontal-spacing" style="display:flex; align-items:center; justify-content:center;">
           {{ header_menu }}
         </div>
       {% endif %}
