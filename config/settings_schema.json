@@ -476,6 +476,17 @@
         "type": "checkbox",
         "id": "enable_color_swatches_in_filters",
         "label": "Enable color swatches in collection filters"
+      },
+      {
+        "type": "header",
+        "content": "Stack / Showroom booking"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_stack_button_pdp",
+        "label": "Show \"Book a Try-On\" button on product pages",
+        "default": true,
+        "info": "Displays the stack button beneath Add to Cart on every product page. Turn off to hide the showroom booking feature."
       }
     ]
   },
