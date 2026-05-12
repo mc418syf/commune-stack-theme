@@ -26,7 +26,7 @@
 -%}
 
 {%- unless layout contains 'spread' -%}
-<ul class="menu flex flex-wrap items-stretch self-stretch {{ list_classes }} mt-[11px]">
+<ul class="menu flex flex-wrap items-center self-stretch {{ list_classes }}">
 {%- endunless -%}
 {%- for link in linklists[section.settings.menu].links -%}
   <li class="menu-item relative {{ item_classes }} {% if link.links != blank %}has-dropdown{% endif %}">
