@@ -44,7 +44,7 @@
         "header_vertical_spacing": "py-2",
         "show_search": true,
         "sticky_header": true,
-        "show_icons": false,
+        "show_icons": true,
         "show_stack_button": false,
         "show_all_navigation_links": true,
         "dropdown_heading_font": "font-body",
