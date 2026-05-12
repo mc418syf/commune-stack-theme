@@ -47,12 +47,12 @@
             -{{ discount_application.total_allocated_amount | money }}
           </dd>
         {%- endfor -%}
-        <dt class="text-left">Bag Total</dt>
-        <dd class="text-right">{{ cart.total_price | money_with_currency }}</dd>
-        <dt class="text-left">Shipping Estimate</dt>
-        <dd class="text-right">Calculated at Checkout</dd>
-        <dt class="text-left font-bold">Order Total</dt>
-        <dd class="text-right font-bold">{{ cart.total_price | money_with_currency }}</dd>
+        <dt class="text-left py-2">Bag Total</dt>
+        <dd class="text-right py-2">{{ cart.total_price | money_with_currency }}</dd>
+        <dt class="text-left py-2">Shipping Estimate</dt>
+        <dd class="text-right py-2">Calculated at Checkout</dd>
+        <dt class="text-left py-2 font-bold">Order Total</dt>
+        <dd class="text-right py-2 font-bold">{{ cart.total_price | money_with_currency }}</dd>
       </dl>
 
       <div class="{% if template == 'cart' %}no-js:lg:grid no-js:lg:grid-cols-2 no-js:lg:gap-2{% endif %} mt-4 w-full items-center justify-between">
