@@ -1,7 +1,14 @@
 {%- assign section_color = section.settings.color_scheme | default: 'scheme1' -%}
+{%- liquid
+  if settings.button_color == 'transparent_background_text_border'
+    assign cta_button_classes = 'border-text border-scheme-text bg-scheme-text text-scheme-background hover:border-scheme-accent hover:bg-scheme-accent hover:text-scheme-accent-contrast'
+  else
+    assign cta_button_classes = 'border-text border-button bg-button text-button hover:border-button-hover hover:bg-button-hover hover:text-button-hover'
+  endif
+-%}
 
-<section
-  class="bg-scheme-background text-scheme-text border-b-gridline border-gridline-color"
+<div
+  class="bg-scheme-background text-scheme-text"
   data-color-scheme="{{ section_color }}"
   x-data="{
     get items() { return this.$store.tryOnList.items },
@@ -24,144 +31,150 @@
   }"
 >
 
-  {% comment %} ── Header ── {% endcomment %}
-  <div class="pt-theme-double">
-    <div class="lg:grid lg:grid-cols-12 lg:px-4 gap-4 items-end px-2 py-2">
-      <div class="lg:col-span-5">
-        <h1 class="font-heading text-heading-standard">
-          {{ section.settings.title | default: 'Try In-Store' }}
-        </h1>
-      </div>
-      <div class="col-span-2 hidden text-center font-normal lg:block">
-        {{ 'cart.label.price' | t }}
-      </div>
-      <div class="col-span-4 hidden font-normal lg:block">
-        &nbsp;
-      </div>
-    </div>
+  {% comment %} ── Items view ── {% endcomment %}
+  <div x-show="count > 0">
+    <div class="pt-theme-double">
 
-    {% comment %} ── Empty state ── {% endcomment %}
-    <div
-      x-show="count === 0"
-      class="flex flex-col items-center justify-center gap-6 px-section-horizontal-spacing py-24 text-center border-t-gridline border-gridline-color"
-    >
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.2;">
-        <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12 3a2 2 0 0 1 0 4a2 2 0 0 1 0-4M12 7v3L3 19h18L12 10"/>
-      </svg>
-      <p class="text-scheme-secondary" style="max-width:300px; line-height:1.6;">
+      {% comment %} Column headers {% endcomment %}
+      <div class="lg:grid lg:grid-cols-12 lg:px-4 gap-4 items-end px-2 py-2">
+        <div class="lg:col-span-5">
+          <h1 class="font-heading text-heading-standard">
+            {{ section.settings.title | default: 'Try In-Store' }}
+          </h1>
+        </div>
+        <div class="col-span-2 hidden text-center font-normal lg:block">
+          {{ 'cart.label.price' | t }}
+        </div>
+        <div class="col-span-5 hidden lg:block"></div>
+      </div>
+
+      {% comment %} Item rows {% endcomment %}
+      <ul>
+        <template x-for="item in items" :key="item.variantId">
+          <li class="grid grid-cols-10 gap-2 max-lg:auto-rows-max lg:grid-cols-12 lg:gap-4 border-t-gridline border-gridline-color py-2 px-section-horizontal-spacing">
+
+            {% comment %} ── Image ── {% endcomment %}
+            <div class="max-lg:col-span-2 max-lg:row-span-2 col-span-1">
+              <a :href="item.url" class="block">
+                <img
+                  x-show="item.image"
+                  :src="item.image"
+                  :alt="item.title"
+                  style="width:100%; height:auto; object-fit:cover; aspect-ratio:2/3; display:block;"
+                >
+              </a>
+            </div>
+
+            {% comment %} ── Info ── {% endcomment %}
+            <div class="col-span-5 max-lg:row-span-1 lg:col-span-4">
+              <div class="flex">
+                <div>
+                  <a class="inline-block" :href="item.url" x-text="item.title"></a>
+                  <p class="text-sm" x-show="item.vendor" x-text="item.vendor"></p>
+                  <p class="text-sm" x-show="item.variantTitle" x-text="item.variantTitle"></p>
+                  <a
+                    @click.prevent="$store.tryOnList.remove(item.variantId)"
+                    class="hidden lg:block mt-2 cursor-pointer"
+                    href="#"
+                  >
+                    <small>{{ 'cart.general.remove' | t }}</small>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {% comment %} ── Price (desktop) ── {% endcomment %}
+            <div class="text-center max-lg:hidden lg:col-span-2">
+              <span x-text="item.price"></span>
+            </div>
+
+            {% comment %} ── Mobile row 2: price + remove ── {% endcomment %}
+            <div class="col-span-5 max-lg:row-span-1 lg:col-span-5">
+              <div class="flex justify-start items-start lg:hidden">
+                <span x-text="item.price"></span>
+              </div>
+              <a
+                @click.prevent="$store.tryOnList.remove(item.variantId)"
+                class="block lg:hidden mt-2 cursor-pointer"
+                href="#"
+              >
+                <small>{{ 'cart.general.remove' | t }}</small>
+              </a>
+            </div>
+
+            {% comment %} ── Top-right spacer (mobile: remove col position) ── {% endcomment %}
+            <div class="max-lg:col-start-8 max-lg:col-span-3 max-lg:row-start-1 col-span-2 text-right"></div>
+
+          </li>
+        </template>
+      </ul>
+
+    </div>
+  </div>
+
+  {% comment %} ── Empty state ── {% endcomment %}
+  <div
+    x-show="count === 0"
+    class="py-section-vertical-spacing px-section-horizontal-spacing"
+  >
+    <h1 class="font-heading text-heading-standard">
+      {{ section.settings.title | default: 'Try In-Store' }}
+    </h1>
+    <div class="mt-8">
+      <p class="mb-8">
         {{ section.settings.empty_text | default: 'Your try-on list is empty. Browse products and tap Try In-Store to add pieces for your showroom visit.' }}
       </p>
       <a
+        class="theme-link inline-block text-scheme-text hover:text-scheme-accent"
         href="{{ section.settings.empty_cta_url | default: routes.all_products_collection_url }}"
-        class="theme-button px-6 py-3 text-xs tracking-widest uppercase"
       >
-        {{ section.settings.empty_cta_label | default: 'Browse Products' }}
+        {{ section.settings.empty_cta_label | default: 'Continue browsing' }}
       </a>
     </div>
-
-    {% comment %} ── Items list ── {% endcomment %}
-    <ul x-show="count > 0">
-      <template x-for="item in items" :key="item.variantId">
-        <li class="grid grid-cols-10 gap-2 max-lg:auto-rows-max lg:grid-cols-12 lg:gap-4 border-t-gridline border-gridline-color py-2 px-section-horizontal-spacing">
-
-          {% comment %} Thumbnail {% endcomment %}
-          <div class="max-lg:col-span-2 max-lg:row-span-2 col-span-1">
-            <a :href="item.url" class="block">
-              <img
-                x-show="item.image"
-                :src="item.image"
-                :alt="item.title"
-                style="width:100%; height:auto; object-fit:cover; aspect-ratio:3/4;"
-              />
-              <div
-                x-show="!item.image"
-                class="bg-scheme-background"
-                style="aspect-ratio:3/4;"
-              ></div>
-            </a>
-          </div>
-
-          {% comment %} Info {% endcomment %}
-          <div class="col-span-5 max-lg:row-span-1 lg:col-span-4">
-            <div class="flex">
-              <div>
-                <a class="inline-block" :href="item.url" x-text="item.title"></a>
-                <p class="text-sm text-scheme-secondary" x-show="item.vendor" x-text="item.vendor"></p>
-                <p class="text-sm" x-show="item.variantTitle" x-text="item.variantTitle"></p>
-                <p class="text-sm mt-2 lg:hidden" x-text="item.price"></p>
-                <button
-                  type="button"
-                  @click="$store.tryOnList.remove(item.variantId)"
-                  class="hidden lg:block mt-2 text-left"
-                >
-                  <small>{{ 'cart.general.remove' | t }}</small>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {% comment %} Price (desktop) {% endcomment %}
-          <div class="text-center max-lg:hidden lg:col-span-2">
-            <span x-text="item.price"></span>
-          </div>
-
-          {% comment %} Remove (mobile) {% endcomment %}
-          <div class="col-span-4 max-lg:row-span-1 lg:col-span-3 flex items-start justify-end lg:hidden">
-            <button
-              type="button"
-              @click="$store.tryOnList.remove(item.variantId)"
-            >
-              <small>{{ 'cart.general.remove' | t }}</small>
-            </button>
-          </div>
-
-          {% comment %} Spacer (desktop) {% endcomment %}
-          <div class="col-span-2 hidden lg:block"></div>
-
-        </li>
-      </template>
-    </ul>
   </div>
 
   {% comment %} ── Footer ── {% endcomment %}
   <div
     x-show="count > 0"
-    class="border-t-gridline border-gridline-color"
+    class="border-t-gridline border-gridline-color text-scheme-text bg-scheme-background"
   >
-    <div class="lg:flex lg:justify-end px-section-horizontal-spacing py-section-vertical-spacing">
-      <div style="max-width:380px; width:100%;">
-        <p class="text-sm text-scheme-secondary mb-6" style="line-height:1.65;">
+    <div class="md:grid md:grid-cols-12 px-section-horizontal-spacing pb-theme">
+      <div class="mt-4 text-center md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
+
+        <p class="mb-4 text-sm text-left">
           {{ section.settings.footer_note | default: 'Our team will prepare each piece before your visit. No commitment to purchase.' }}
         </p>
 
         <a
           x-bind:href="calendlyUrl"
-          class="theme-button flex w-full items-center justify-center gap-3 px-1 py-3 text-xs tracking-widest uppercase"
+          class="mt-2 w-full cursor-pointer rounded-button p-2 [text-transform:var(--button-text-transform)] after:content-[var(--button-after-content)] lg:mt-0 {{ cta_button_classes }} inline-flex items-center justify-center gap-2"
         >
           {{ section.settings.cta_label | default: 'Book Fitting Appointment' }}
-          <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" style="flex-shrink:0;">
             <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
         </a>
 
-        <button
-          type="button"
-          @click="$store.tryOnList.clear()"
-          class="mt-4 w-full text-center text-xs tracking-widest uppercase text-scheme-secondary"
-          style="background:none; border:none; cursor:pointer; padding:8px 0;"
-        >
-          {{ section.settings.clear_label | default: 'Clear list' }}
-        </button>
+        <div class="mt-4 lg:text-right">
+          <a
+            @click.prevent="$store.tryOnList.clear()"
+            class="theme-link inline-block text-scheme-text hover:text-scheme-accent cursor-pointer"
+            href="#"
+          >
+            <small>{{ section.settings.clear_label | default: 'Clear list' }}</small>
+          </a>
+        </div>
+
       </div>
     </div>
   </div>
 
-</section>
+</div>
 
 {% schema %}
 {
   "name": "Try In-Store list",
-  "tag": "div",
+  "tag": "section",
   "settings": [
     {
       "type": "color_scheme",
@@ -189,7 +202,7 @@
       "type": "text",
       "id": "empty_cta_label",
       "label": "Empty CTA label",
-      "default": "Browse Products"
+      "default": "Continue browsing"
     },
     {
       "type": "url",
