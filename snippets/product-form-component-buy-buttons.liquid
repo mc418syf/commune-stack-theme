@@ -213,8 +213,18 @@
   {% endif %}
 
   {% unless quick_buy %}
-    {% if settings.show_try_on_button_pdp %}
-      {% render 'try-on-button', product: product %}
+    {%- liquid
+      assign show_try_on = false
+      if block and block.settings.show_try_on_button
+        assign show_try_on = true
+      endif
+      assign try_on_label = 'Try In-Store'
+      if block and block.settings.try_on_button_label != blank
+        assign try_on_label = block.settings.try_on_button_label
+      endif
+    -%}
+    {% if show_try_on %}
+      {% render 'try-on-button', product: product, label: try_on_label, block: block %}
     {% endif %}
   {% endunless %}
 </div>

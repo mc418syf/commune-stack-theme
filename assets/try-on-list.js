@@ -32,7 +32,9 @@ function tryOnRefreshButton(btn) {
   const label = btn.querySelector('[data-try-on-label]');
   if (!label) return;
   const inList = store.has(Number(variant.id));
-  label.textContent = inList ? 'Added to Try-On' : 'Try In-Store';
+  label.textContent = inList
+    ? (btn.dataset.labelAdded || 'Added to Try-On')
+    : (btn.dataset.label || 'Try In-Store');
   btn.disabled = inList;
 }
 

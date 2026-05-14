@@ -482,11 +482,8 @@
         "content": "Try In-Store / Showroom booking"
       },
       {
-        "type": "checkbox",
-        "id": "show_try_on_button_pdp",
-        "label": "Show \"Try In-Store\" button on product pages",
-        "default": true,
-        "info": "Displays the Try In-Store button beneath Add to Cart on every product page. Turn off to hide the showroom fitting feature."
+        "type": "paragraph",
+        "content": "The Try In-Store button is controlled per-product-page in the Buy Buttons block of the product template."
       }
     ]
   },

@@ -1,0 +1,228 @@
+{%- assign section_color = section.settings.color_scheme | default: 'scheme1' -%}
+
+<section
+  class="bg-scheme-background text-scheme-text border-b-gridline border-gridline-color"
+  data-color-scheme="{{ section_color }}"
+  x-data="{
+    get items() { return this.$store.tryOnList.items },
+    get count() { return this.$store.tryOnList.count },
+    get calendlyUrl() {
+      const base = 'https://calendly.com/commune237/showroomappointment';
+      const items = this.$store.tryOnList.items;
+      if (items.length === 0) return base;
+      const params = new URLSearchParams();
+      const pieces = items.map(i =>
+        i.variantTitle ? i.title + ' (' + i.variantTitle + ')' : i.title
+      ).join(', ');
+      params.set('a2', pieces);
+      {%- if customer %}
+        params.set('name', {{ customer.first_name | append: ' ' | append: customer.last_name | json }});
+        params.set('email', {{ customer.email | json }});
+      {%- endif %}
+      return base + '?' + params.toString();
+    }
+  }"
+>
+
+  {% comment %} ── Header ── {% endcomment %}
+  <div class="pt-theme-double">
+    <div class="lg:grid lg:grid-cols-12 lg:px-4 gap-4 items-end px-2 py-2">
+      <div class="lg:col-span-5">
+        <h1 class="font-heading text-heading-standard">
+          {{ section.settings.title | default: 'Try In-Store' }}
+        </h1>
+      </div>
+      <div class="col-span-2 hidden text-center font-normal lg:block">
+        {{ 'cart.label.price' | t }}
+      </div>
+      <div class="col-span-4 hidden font-normal lg:block">
+        &nbsp;
+      </div>
+    </div>
+
+    {% comment %} ── Empty state ── {% endcomment %}
+    <div
+      x-show="count === 0"
+      class="flex flex-col items-center justify-center gap-6 px-section-horizontal-spacing py-24 text-center border-t-gridline border-gridline-color"
+    >
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.2;">
+        <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12 3a2 2 0 0 1 0 4a2 2 0 0 1 0-4M12 7v3L3 19h18L12 10"/>
+      </svg>
+      <p class="text-scheme-secondary" style="max-width:300px; line-height:1.6;">
+        {{ section.settings.empty_text | default: 'Your try-on list is empty. Browse products and tap Try In-Store to add pieces for your showroom visit.' }}
+      </p>
+      <a
+        href="{{ section.settings.empty_cta_url | default: routes.all_products_collection_url }}"
+        class="theme-button px-6 py-3 text-xs tracking-widest uppercase"
+      >
+        {{ section.settings.empty_cta_label | default: 'Browse Products' }}
+      </a>
+    </div>
+
+    {% comment %} ── Items list ── {% endcomment %}
+    <ul x-show="count > 0">
+      <template x-for="item in items" :key="item.variantId">
+        <li class="grid grid-cols-10 gap-2 max-lg:auto-rows-max lg:grid-cols-12 lg:gap-4 border-t-gridline border-gridline-color py-2 px-section-horizontal-spacing">
+
+          {% comment %} Thumbnail {% endcomment %}
+          <div class="max-lg:col-span-2 max-lg:row-span-2 col-span-1">
+            <a :href="item.url" class="block">
+              <img
+                x-show="item.image"
+                :src="item.image"
+                :alt="item.title"
+                style="width:100%; height:auto; object-fit:cover; aspect-ratio:3/4;"
+              />
+              <div
+                x-show="!item.image"
+                class="bg-scheme-background"
+                style="aspect-ratio:3/4;"
+              ></div>
+            </a>
+          </div>
+
+          {% comment %} Info {% endcomment %}
+          <div class="col-span-5 max-lg:row-span-1 lg:col-span-4">
+            <div class="flex">
+              <div>
+                <a class="inline-block" :href="item.url" x-text="item.title"></a>
+                <p class="text-sm text-scheme-secondary" x-show="item.vendor" x-text="item.vendor"></p>
+                <p class="text-sm" x-show="item.variantTitle" x-text="item.variantTitle"></p>
+                <p class="text-sm mt-2 lg:hidden" x-text="item.price"></p>
+                <button
+                  type="button"
+                  @click="$store.tryOnList.remove(item.variantId)"
+                  class="hidden lg:block mt-2 text-left"
+                >
+                  <small>{{ 'cart.general.remove' | t }}</small>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {% comment %} Price (desktop) {% endcomment %}
+          <div class="text-center max-lg:hidden lg:col-span-2">
+            <span x-text="item.price"></span>
+          </div>
+
+          {% comment %} Remove (mobile) {% endcomment %}
+          <div class="col-span-4 max-lg:row-span-1 lg:col-span-3 flex items-start justify-end lg:hidden">
+            <button
+              type="button"
+              @click="$store.tryOnList.remove(item.variantId)"
+            >
+              <small>{{ 'cart.general.remove' | t }}</small>
+            </button>
+          </div>
+
+          {% comment %} Spacer (desktop) {% endcomment %}
+          <div class="col-span-2 hidden lg:block"></div>
+
+        </li>
+      </template>
+    </ul>
+  </div>
+
+  {% comment %} ── Footer ── {% endcomment %}
+  <div
+    x-show="count > 0"
+    class="border-t-gridline border-gridline-color"
+  >
+    <div class="lg:flex lg:justify-end px-section-horizontal-spacing py-section-vertical-spacing">
+      <div style="max-width:380px; width:100%;">
+        <p class="text-sm text-scheme-secondary mb-6" style="line-height:1.65;">
+          {{ section.settings.footer_note | default: 'Our team will prepare each piece before your visit. No commitment to purchase.' }}
+        </p>
+
+        <a
+          x-bind:href="calendlyUrl"
+          class="theme-button flex w-full items-center justify-center gap-3 px-1 py-3 text-xs tracking-widest uppercase"
+        >
+          {{ section.settings.cta_label | default: 'Book Fitting Appointment' }}
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+            <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <button
+          type="button"
+          @click="$store.tryOnList.clear()"
+          class="mt-4 w-full text-center text-xs tracking-widest uppercase text-scheme-secondary"
+          style="background:none; border:none; cursor:pointer; padding:8px 0;"
+        >
+          {{ section.settings.clear_label | default: 'Clear list' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+{% schema %}
+{
+  "name": "Try In-Store list",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme1"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page heading",
+      "default": "Try In-Store"
+    },
+    {
+      "type": "header",
+      "content": "Empty state"
+    },
+    {
+      "type": "textarea",
+      "id": "empty_text",
+      "label": "Empty message",
+      "default": "Your try-on list is empty. Browse products and tap Try In-Store to add pieces for your showroom visit."
+    },
+    {
+      "type": "text",
+      "id": "empty_cta_label",
+      "label": "Empty CTA label",
+      "default": "Browse Products"
+    },
+    {
+      "type": "url",
+      "id": "empty_cta_url",
+      "label": "Empty CTA link"
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_note",
+      "label": "Footer note",
+      "default": "Our team will prepare each piece before your visit. No commitment to purchase."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Book appointment label",
+      "default": "Book Fitting Appointment"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear list label",
+      "default": "Clear list"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Try In-Store list"
+    }
+  ]
+}
+{% endschema %}
