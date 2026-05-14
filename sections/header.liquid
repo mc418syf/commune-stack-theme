@@ -36,7 +36,7 @@
   endif
 
   assign item_spacing = section.settings.header_vertical_spacing
-  assign show_stack_button = section.settings.show_stack_button
+  assign show_try_on_button = section.settings.show_try_on_button
   assign mobile_layout = section.settings.mobile_layout
 -%}
 
@@ -286,7 +286,7 @@
           <div style="flex:1 1 0%;"></div>
         {% endif %}
 
-        {%- comment -%} RIGHT — localization · accounts · search · stack · cart {%- endcomment -%}
+        {%- comment -%} RIGHT — localization · accounts · search · try-on · cart {%- endcomment -%}
         <div style="display:flex; flex-shrink:0; align-items:center; column-gap:1rem;">
           {%- if show_localization -%}
             {{ localization_form }}
@@ -305,31 +305,30 @@
             %}
           {% endif %}
 
-          {% if show_stack_button %}
+          {% if show_try_on_button %}
             <div x-data>
-              <a
-                href="/pages/booking"
+              <button
+                type="button"
+                @click="$dispatch('open-try-on')"
                 class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
-                aria-label="Your stack"
+                aria-label="Try In-Store list"
               >
                 {%- if show_icons -%}
-                  <div class="relative">
+                  <div class="relative my-auto align-middle">
                     <span
-                      x-show="$store.stack.count > 0"
+                      x-show="$store.tryOnList.count > 0"
                       class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
                       data-color-scheme="{{ section_color }}"
                     ></span>
-                    <svg class="inline-block h-6 w-6 fill-current" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                      <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                      <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                    </svg>
-                    <span class="sr-only">Stack (<span x-text="$store.stack.count">0</span>)</span>
+                    <span class="inline-block h-6 w-6 fill-current align-top">
+                      {%- render 'icon-hanger' -%}
+                    </span>
+                    <span class="sr-only">Try In-Store (<span x-text="$store.tryOnList.count">0</span>)</span>
                   </div>
                 {%- else -%}
-                  Stack (<span x-text="$store.stack.count">0</span>)
+                  Try In-Store (<span x-text="$store.tryOnList.count">0</span>)
                 {%- endif -%}
-              </a>
+              </button>
             </div>
           {% endif %}
 
@@ -396,27 +395,26 @@
               %}
             </div>
           {% endif %}
-          {% comment %} Stack button — mobile {% endcomment %}
-          {% if show_stack_button %}
+          {% comment %} Try In-Store button — mobile {% endcomment %}
+          {% if show_try_on_button %}
           <div class="whitespace-nowrap lg:ml-4" x-data>
-            <a
-              href="/pages/booking"
+            <button
+              type="button"
+              @click="$dispatch('open-try-on')"
               class="inline-flex items-center {{ item_spacing }}"
-              aria-label="Your stack"
+              aria-label="Try In-Store list"
             >
               <div class="relative my-auto align-middle">
                 <span
-                  x-show="$store.stack.count > 0"
+                  x-show="$store.tryOnList.count > 0"
                   class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
                 ></span>
-                <svg class="inline-block h-6 w-6 fill-current align-top" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                  <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                  <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
-                </svg>
-                <span class="sr-only">Stack</span>
+                <span class="inline-block h-6 w-6 fill-current align-top">
+                  {%- render 'icon-hanger' -%}
+                </span>
+                <span class="sr-only">Try In-Store</span>
               </div>
-            </a>
+            </button>
           </div>
           {% endif %}
 
@@ -798,10 +796,10 @@
     },
     {
       "type": "checkbox",
-      "id": "show_stack_button",
-      "label": "Show stack button",
+      "id": "show_try_on_button",
+      "label": "Show Try In-Store button",
       "default": true,
-      "info": "Displays the stack icon in the header. Turn off to hide the showroom booking feature."
+      "info": "Displays the hanger icon in the header. Turn off to hide the Try In-Store showroom feature."
     },
     {
       "type": "header",

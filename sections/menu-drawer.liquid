@@ -43,9 +43,10 @@
             {%- if link.links != blank -%}
               {%- capture child_link_class -%}inline-block py-1 {% if settings.header_uppercase %}uppercase{% endif %}{%- endcapture -%}
               <button
+                type="button"
                 class="relative block w-full text-left {{ link_class }} ease pr-10 transition font-body{% if settings.header_uppercase %} uppercase{% endif %}"
                 x-bind:aria-expanded="expanded ? true : 'false'"
-                @click="expanded = ! expanded"
+                @click.prevent.stop="expanded = !expanded"
                 aria-controls="accordion{{ counter }}"
               >
                 {{ link.title }}
@@ -78,6 +79,8 @@
                 id="accordion{{ counter }}"
                 class="no-js-focus-container pb-2 pl-4"
                 x-show="expanded"
+                x-bind:hidden="!expanded"
+                x-collapse
                 x-cloak
               >
                 {%- assign counter = counter | plus: 1 -%}
@@ -85,9 +88,10 @@
                   <li x-data="{ expanded: false }" class="no-js-focus-wrapper">
                     {%- if child_link.links != blank -%}
                       <button
+                        type="button"
                         class="relative w-full text-left {{ child_link_class }} pr-10"
                         x-bind:aria-expanded="expanded ? true : 'false'"
-                        @click="expanded = ! expanded"
+                        @click.prevent.stop="expanded = !expanded"
                         aria-controls="accordion{{ counter }}"
                       >
                         {{ child_link.title }}
@@ -120,6 +124,8 @@
                         id="accordion{{ counter }}"
                         class="no-js-focus-container px-2 pb-2 pt-1"
                         x-show="expanded"
+                        x-bind:hidden="!expanded"
+                        x-collapse
                         x-cloak
                       >
                         {%- assign counter = counter | plus: 1 -%}

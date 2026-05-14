@@ -1,13 +1,30 @@
 {% comment %}
-  Commune Stack Drawer — slides in from the right when a product is added to the stack.
-  Triggered by: window.dispatchEvent(new CustomEvent('open-stack'))
+  Try In-Store Drawer
+  Triggered by: window.dispatchEvent(new CustomEvent('open-try-on'))
   Rendered globally via layout/theme.liquid.
 {% endcomment %}
 
 <div
-  x-data="{ open: false }"
-  @open-stack.window="open = true"
-  @keydown.escape.window="open = false"
+  x-data="{
+    open: false,
+    get calendlyUrl() {
+      const base = 'https://calendly.com/commune237/showroomappointment';
+      const items = this.$store.tryOnList.items;
+      if (items.length === 0) return base;
+      const params = new URLSearchParams();
+      const pieces = items.map(i =>
+        i.variantTitle ? i.title + ' (' + i.variantTitle + ')' : i.title
+      ).join(', ');
+      params.set('a2', pieces);
+      {%- if customer %}
+        params.set('name', {{ customer.first_name | append: ' ' | append: customer.last_name | json }});
+        params.set('email', {{ customer.email | json }});
+      {%- endif %}
+      return base + '?' + params.toString();
+    }
+  }"
+  @open-try-on.window="open = true"
+  @keydown.escape.window="if (open) open = false"
 >
 
   {% comment %} Backdrop {% endcomment %}
@@ -34,47 +51,44 @@
     x-transition:leave-end="translate-x-full"
     class="color-scheme"
     data-color-scheme="{{ settings.modal_color_scheme | default: 'default' }}"
-    style="display:none; position:fixed; top:0; right:0; height:100%; width:min(420px,100vw); z-index:9999; display:none; flex-direction:column; overflow:hidden; background:rgb(var(--color-scheme-background)); color:rgb(var(--color-scheme-text)); box-shadow:-4px 0 24px rgba(0,0,0,0.12);"
+    style="display:none; position:fixed; top:0; right:0; height:100%; width:min(420px,100vw); z-index:9999; flex-direction:column; overflow:hidden; background:rgb(var(--color-scheme-background)); color:rgb(var(--color-scheme-text)); box-shadow:-4px 0 24px rgba(0,0,0,0.12);"
     x-bind:style="open ? 'display:flex;' : 'display:none;'"
     role="dialog"
     aria-modal="true"
-    aria-label="Your Stack"
+    aria-label="Try In-Store"
   >
 
     {% comment %} Header {% endcomment %}
     <div style="display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid rgba(var(--color-scheme-text)/0.1); flex-shrink:0;">
       <div>
-        <p style="font-size:15px; font-weight:400; margin:0;">Your Stack</p>
+        <p style="font-size:15px; font-weight:400; margin:0;">Try In-Store</p>
         <p
           style="font-size:11px; margin-top:3px; opacity:0.55;"
-          x-text="$store.stack.count > 0
-            ? $store.stack.count + ' piece' + ($store.stack.count === 1 ? '' : 's') + ' — ready to view'
-            : 'Add pieces to book a showroom viewing'"
+          x-text="$store.tryOnList.count > 0
+            ? $store.tryOnList.count + ' piece' + ($store.tryOnList.count === 1 ? '' : 's') + ' — ready to view at the showroom'
+            : 'Add pieces to book a showroom fitting'"
         ></p>
       </div>
       <button
         type="button"
         @click="open = false"
-        aria-label="Close stack"
+        aria-label="Close try-on list"
         style="background:none; border:none; cursor:pointer; padding:4px; font-size:22px; line-height:1; color:inherit; opacity:0.5;"
         onmouseover="this.style.opacity='1'"
         onmouseout="this.style.opacity='0.5'"
-      >×</button>
+      >&times;</button>
     </div>
 
     {% comment %} Empty state {% endcomment %}
     <div
-      x-show="$store.stack.count === 0"
+      x-show="$store.tryOnList.count === 0"
       style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:48px 24px; text-align:center;"
     >
-      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" style="opacity:0.18;">
-        <rect width="36" height="7" rx="1" fill="currentColor"/>
-        <rect y="10.5" width="36" height="7" rx="1" fill="currentColor"/>
-        <rect y="21" width="36" height="7" rx="1" fill="currentColor"/>
+      <svg width="32" height="28" viewBox="0 0 24 24" fill="none" style="opacity:0.18;" xmlns="http://www.w3.org/2000/svg">
+        <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12 4a2 2 0 1 1 0 4m0-4a2 2 0 1 0 0 4m0-4v4m0 0L3 18h18L12 8Z"/>
       </svg>
-      <p style="font-size:13px; line-height:1.6; opacity:0.55; max-width:220px;">
-        Your stack is empty.<br>
-        Browse the archive and add pieces you'd like to try on.
+      <p style="font-size:13px; line-height:1.6; opacity:0.55; max-width:240px;">
+        No items yet. Browse products and tap <em>Try In-Store</em> to add pieces you'd like to fit at our showroom.
       </p>
       <button
         type="button"
@@ -87,15 +101,15 @@
 
     {% comment %} Items list {% endcomment %}
     <div
-      x-show="$store.stack.count > 0"
+      x-show="$store.tryOnList.count > 0"
       style="flex:1; overflow-y:auto; overscroll-behavior:contain;"
     >
-      <template x-for="item in $store.stack.items" :key="item.variantId">
+      <template x-for="item in $store.tryOnList.items" :key="item.variantId">
         <div style="display:flex; gap:16px; padding:16px 24px; border-bottom:1px solid rgba(var(--color-scheme-text)/0.08); align-items:flex-start;">
 
           {% comment %} Thumbnail {% endcomment %}
           <a :href="item.url" @click="open = false" style="flex-shrink:0; display:block;">
-            <div class="commune-stack-thumb" style="background:rgba(var(--color-scheme-text)/0.06); overflow:hidden;">
+            <div style="width:72px; height:96px; background:rgba(var(--color-scheme-text)/0.06); overflow:hidden; border-radius:2px;">
               <img
                 x-show="item.image"
                 :src="item.image"
@@ -114,18 +128,23 @@
               style="font-size:13px; line-height:1.35; color:inherit; text-decoration:none;"
               x-text="item.title"
             ></a>
+            <p
+              x-show="item.variantTitle"
+              style="font-size:11px; margin:0; opacity:0.55;"
+              x-text="item.variantTitle"
+            ></p>
             <p style="font-size:12px; margin-top:4px; opacity:0.6;" x-text="item.price"></p>
           </div>
 
           {% comment %} Remove {% endcomment %}
           <button
             type="button"
-            @click="$store.stack.remove(item.variantId)"
-            aria-label="Remove from stack"
+            @click="$store.tryOnList.remove(item.variantId)"
+            aria-label="Remove from try-on list"
             style="background:none; border:none; cursor:pointer; font-size:20px; line-height:1; padding:0; color:#888; flex-shrink:0;"
-            onmouseover="this.style.color='#000'"
+            onmouseover="this.style.color='currentColor'"
             onmouseout="this.style.color='#888'"
-          >×</button>
+          >&times;</button>
 
         </div>
       </template>
@@ -133,23 +152,31 @@
 
     {% comment %} Footer {% endcomment %}
     <div
-      x-show="$store.stack.count > 0"
+      x-show="$store.tryOnList.count > 0"
       style="flex-shrink:0; border-top:1px solid rgba(var(--color-scheme-text)/0.1); padding:20px 24px 28px;"
     >
       <p style="font-size:11px; line-height:1.65; opacity:0.55; margin-bottom:16px;">
         Our team will prepare each piece before your visit. No commitment to purchase.
       </p>
       <a
-        href="/pages/booking"
-        @click="open = false"
+        x-bind:href="calendlyUrl"
         class="theme-button"
         style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px 16px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; text-decoration:none; box-sizing:border-box;"
       >
-        Book Appointment
+        Book Fitting Appointment
         <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
           <path d="M9 1L13 5L9 9M1 5H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
         </svg>
       </a>
+      <button
+        type="button"
+        @click="$store.tryOnList.clear()"
+        style="display:block; width:100%; margin-top:12px; background:none; border:none; cursor:pointer; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.45; color:inherit; padding:4px 0;"
+        onmouseover="this.style.opacity='0.8'"
+        onmouseout="this.style.opacity='0.45'"
+      >
+        Clear list
+      </button>
     </div>
 
   </div>

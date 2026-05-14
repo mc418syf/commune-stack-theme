@@ -1,0 +1,32 @@
+{%- liquid
+  assign try_on_variant = product.selected_or_first_available_variant
+  assign try_on_image = ''
+  if product.featured_media
+    assign try_on_image = product.featured_media | image_url: width: 400
+  endif
+-%}
+<div class="max-w-2xl mt-3" x-data>
+  <button
+    type="button"
+    data-try-on-pdp
+    id="try-on-pdp-{{ product.id }}"
+    class="theme-button--secondary flex w-full items-center justify-center gap-2 px-1 py-2{% if settings.button_uppercase %} uppercase{% endif %} disabled:opacity-50 disabled:cursor-default"
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ try_on_variant.id }}"
+    data-variant-title="{{ try_on_variant.title | escape }}"
+    data-variants="{{ product.variants | json | escape }}"
+    data-title="{{ product.title | escape }}"
+    data-vendor="{{ product.vendor | escape }}"
+    data-price-cents="{{ try_on_variant.price }}"
+    data-image="{{ try_on_image }}"
+    data-url="{{ product.url }}"
+    onclick="tryOnPDP(this)"
+    :disabled="$store.tryOnList.has({{ try_on_variant.id }})"
+  >
+    {%- render 'icon-hanger' -%}
+    <span data-try-on-label>Try In-Store</span>
+  </button>
+  <p class="mt-2 text-center text-xs text-scheme-secondary">
+    No commitment to purchase — we'll have your pieces ready.
+  </p>
+</div>

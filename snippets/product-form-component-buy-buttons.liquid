@@ -213,39 +213,8 @@
   {% endif %}
 
   {% unless quick_buy %}
-    {% if settings.show_stack_button_pdp %}
-      {%- liquid
-        assign stack_variant = product.selected_or_first_available_variant
-        assign stack_image = ''
-        if product.featured_media
-          assign stack_image = product.featured_media | image_url: width: 400
-        endif
-      -%}
-      <div class="max-w-2xl mt-3">
-        <button
-          type="button"
-          id="commune-stack-pdp-{{ product.id }}"
-          class="theme-button--secondary flex w-full items-center justify-center gap-2 px-1 py-2{% if settings.button_uppercase %} uppercase{% endif %}"
-          data-product-id="{{ product.id }}"
-          data-variant-id="{{ stack_variant.id }}"
-          data-title="{{ product.title | escape }}"
-          data-vendor="{{ product.vendor | escape }}"
-          data-price="{{ stack_variant.price | money | escape }}"
-          data-image="{{ stack_image }}"
-          data-url="{{ product.url }}"
-          onclick="communeStackPDP(this)"
-        >
-          <svg width="14" height="11" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0" y="0" width="14" height="2.5" rx="0.5" fill="currentColor"/>
-            <rect x="0" y="4.25" width="14" height="2.5" rx="0.5" fill="currentColor"/>
-            <rect x="0" y="8.5" width="14" height="2.5" rx="0.5" fill="currentColor"/>
-          </svg>
-          <span>BOOK A TRY-ON</span>
-        </button>
-        <p class="mt-2 text-center text-xs text-scheme-secondary">
-          No commitment to purchase. <a href="/pages/booking" class="underline underline-offset-2">How it works →</a>
-        </p>
-      </div>
+    {% if settings.show_try_on_button_pdp %}
+      {% render 'try-on-button', product: product %}
     {% endif %}
   {% endunless %}
 </div>
