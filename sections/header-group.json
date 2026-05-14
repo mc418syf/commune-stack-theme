@@ -32,12 +32,10 @@
     },
     "header": {
       "type": "header",
-      "custom_css": [
-        ".site-header,.menu-item {font-size: 13px;}"
-      ],
+      "custom_css": [],
       "settings": {
-        "logo_max_width": 130,
-        "logo_max_width_mobile": 150,
+        "logo_max_width": 110,
+        "logo_max_width_mobile": 140,
         "menu": "main-menu",
         "layout": "logo_left_menu_right",
         "mobile_layout": "logo_left",
