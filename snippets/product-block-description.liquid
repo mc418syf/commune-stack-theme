@@ -1,30 +1,16 @@
 {%- liquid
-  # Split the description into sections by <h2> tags.
-  # Anything before the first <h2> is "intro" content.
-  # Each <h2>...</h2> + following content becomes a tab.
-  # If there are no <h2> tags, the whole description is rendered as a
-  # single "Description" tab.
-  assign normalized = product.description | replace: '<h2 data-mce-fragment="1">', '<h2>'
-  assign parts = normalized | split: '<h2>'
+  # Gather all product_tab blocks from the surrounding section.
+  # The first tab is always the product description (auto-populated).
+  # Additional tabs are merchant-editable via the theme editor.
+  assign description_label = block.settings.description_tab_label | default: 'Description'
 
-  assign intro_html = ''
-  assign tab_count = 0
-  for part in parts
-    unless part == blank
-      if part contains '</h2>'
-        assign tab_count = tab_count | plus: 1
-      else
-        assign intro_html = intro_html | append: part
-      endif
-    endunless
+  assign tab_blocks = ''
+  for b in section.blocks
+    if b.type == 'product_tab'
+      assign tab_blocks = tab_blocks | append: b.id | append: '|'
+    endif
   endfor
 -%}
-
-{%- if intro_html != blank and tab_count > 0 -%}
-  <div x-data="RTE" class="rte mt-8 product-tabs-intro">
-    {{ intro_html }}
-  </div>
-{%- endif -%}
 
 <div
   class="product-tabs mt-8"
@@ -32,99 +18,91 @@
   x-cloak
   {{ block.shopify_attributes }}
 >
-  {% comment %} ── Tab labels (horizontal switcher) ── {% endcomment %}
+  {% comment %} ── Tab labels ── {% endcomment %}
   <ul
-    class="product-tabs__titles flex flex-wrap gap-x-5 gap-y-2 border-b-gridline border-gridline-color pb-2"
+    class="product-tabs__titles flex flex-wrap gap-x-6 gap-y-2 border-b-gridline border-gridline-color pb-2"
     role="tablist"
   >
-    {%- if tab_count == 0 -%}
-      <li>
-        <button
-          type="button"
-          role="tab"
-          aria-selected="true"
-          class="product-tabs__tab product-tabs__tab--active cursor-pointer pb-1 border-b border-transparent"
-        >
-          Description
-        </button>
-      </li>
-    {%- else -%}
-      {%- assign tab_index = 0 -%}
-      {% for part in parts %}
-        {% unless part == blank %}
-          {% if part contains '</h2>' %}
-            {%- assign part_parts = part | split: '</h2>' -%}
-            {%- assign heading_handle = part_parts.first | handle -%}
-            {%- assign idx = tab_index -%}
-            <li>
-              <button
-                type="button"
-                role="tab"
-                @click="active = {{ idx }}"
-                :aria-selected="active === {{ idx }} ? 'true' : 'false'"
-                :class="active === {{ idx }} ? 'product-tabs__tab--active' : ''"
-                class="product-tabs__tab cursor-pointer pb-1 border-b border-transparent"
-                aria-controls="tab-panel-{{ heading_handle }}-{{ idx }}"
-              >
-                {{ part_parts.first | strip_html | strip }}
-              </button>
-            </li>
-            {%- assign tab_index = tab_index | plus: 1 -%}
-          {% endif %}
-        {% endunless %}
-      {% endfor %}
-    {%- endif -%}
+    <li>
+      <button
+        type="button"
+        role="tab"
+        @click="active = 0"
+        :aria-selected="active === 0 ? 'true' : 'false'"
+        :class="active === 0 ? 'product-tabs__tab--active' : ''"
+        class="product-tabs__tab font-heading uppercase tracking-wide cursor-pointer pb-1 border-b border-transparent"
+      >
+        {{ description_label | upcase }}
+      </button>
+    </li>
+    {%- assign tab_index = 1 -%}
+    {% for b in section.blocks %}
+      {% if b.type == 'product_tab' %}
+        {%- assign title = b.settings.tab_title | default: 'Tab' -%}
+        <li>
+          <button
+            type="button"
+            role="tab"
+            @click="active = {{ tab_index }}"
+            :aria-selected="active === {{ tab_index }} ? 'true' : 'false'"
+            :class="active === {{ tab_index }} ? 'product-tabs__tab--active' : ''"
+            class="product-tabs__tab font-heading uppercase tracking-wide cursor-pointer pb-1 border-b border-transparent"
+            {{ b.shopify_attributes }}
+          >
+            {{ title | upcase }}
+          </button>
+        </li>
+        {%- assign tab_index = tab_index | plus: 1 -%}
+      {% endif %}
+    {% endfor %}
   </ul>
 
   {% comment %} ── Tab content panels ── {% endcomment %}
   <div class="product-tabs__content">
-    {%- if tab_count == 0 -%}
-      <div
-        role="tabpanel"
-        x-data="RTE"
-        class="rte py-4"
-      >
-        {{ product.description }}
-      </div>
-    {%- else -%}
-      {%- assign tab_index = 0 -%}
-      {% for part in parts %}
-        {% unless part == blank %}
-          {% if part contains '</h2>' %}
-            {%- assign part_parts = part | split: '</h2>' -%}
-            {%- assign heading_handle = part_parts.first | handle -%}
-            {%- assign idx = tab_index -%}
-            <div
-              role="tabpanel"
-              id="tab-panel-{{ heading_handle }}-{{ idx }}"
-              x-show="active === {{ idx }}"
-              x-data="RTE"
-              class="rte py-4"
-              {% if tab_index != 0 %}style="display: none;"{% endif %}
-            >
-              {{ part_parts.last }}
-            </div>
-            {%- assign tab_index = tab_index | plus: 1 -%}
-          {% endif %}
-        {% endunless %}
-      {% endfor %}
-    {%- endif -%}
+    <div
+      role="tabpanel"
+      x-show="active === 0"
+      x-data="RTE"
+      class="rte py-4"
+    >
+      {{ product.description }}
+    </div>
+    {%- assign tab_index = 1 -%}
+    {% for b in section.blocks %}
+      {% if b.type == 'product_tab' %}
+        <div
+          role="tabpanel"
+          x-show="active === {{ tab_index }}"
+          x-data="RTE"
+          class="rte py-4"
+          style="display: none;"
+        >
+          {{ b.settings.tab_content }}
+        </div>
+        {%- assign tab_index = tab_index | plus: 1 -%}
+      {% endif %}
+    {% endfor %}
   </div>
 </div>
 
-{% comment %} ── Print / no-JS fallback ── {% endcomment %}
+{% comment %} ── No-JS fallback: stack everything ── {% endcomment %}
 <noscript>
-  <div class="rte mt-8">
-    {{ product.description }}
+  <div class="mt-8">
+    <h2 class="font-heading text-base uppercase tracking-wide mt-6 mb-2">{{ description_label | upcase }}</h2>
+    <div class="rte">{{ product.description }}</div>
+    {% for b in section.blocks %}
+      {% if b.type == 'product_tab' %}
+        <h2 class="font-heading text-base uppercase tracking-wide mt-6 mb-2">{{ b.settings.tab_title | upcase }}</h2>
+        <div class="rte">{{ b.settings.tab_content }}</div>
+      {% endif %}
+    {% endfor %}
   </div>
 </noscript>
 
 <style>
   .product-tabs__tab {
-    font-size: 12px;
-    letter-spacing: 0.04em;
     color: var(--color-scheme-text);
-    opacity: 0.55;
+    opacity: 0.5;
     background: none;
     border-left: 0;
     border-right: 0;
@@ -138,29 +116,18 @@
     opacity: 1 !important;
     border-bottom-color: currentColor !important;
   }
-  .product-tabs__content .rte,
-  .product-tabs__content .rte p {
-    font-size: 13px;
-    line-height: 1.65;
-    color: var(--color-scheme-text);
-    opacity: 0.78;
-  }
-  .product-tabs__content .rte p { margin-bottom: 0.6em; }
-  .product-tabs__content .rte p:last-child { margin-bottom: 0; }
 
-  /* Measurement-style tables: clean, no outer border, thin gridlines */
+  /* Measurement-style tables inside any tab — clean, no outer border */
   .product-tabs__content .rte table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 11px;
-    letter-spacing: 0.02em;
     margin-top: 4px;
   }
   .product-tabs__content .rte table td,
   .product-tabs__content .rte table th {
-    padding: 8px 10px 8px 0;
+    padding: 8px 12px 8px 0;
     border: 0;
-    border-bottom: 1px solid var(--color-gridline, #d8d4cd);
+    border-bottom: 1px solid var(--color-gridline, currentColor);
     text-align: left;
     font-weight: 400;
     vertical-align: top;
@@ -172,8 +139,7 @@
   .product-tabs__content .rte table tr:first-child td,
   .product-tabs__content .rte table tr:first-child th {
     text-transform: uppercase;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    opacity: 0.7;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
   }
 </style>

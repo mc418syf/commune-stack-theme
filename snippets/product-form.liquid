@@ -23,11 +23,10 @@
       when 'buy_buttons'
         render 'product-form-component-buy-buttons', block: block, product: product, product_form_id: product_form_id
       when 'description'
-        assign enable_collapsible_tabs = block.settings.enable_collapsible_tabs
-        assign truncate_description = block.settings.truncate_description
-        assign max_words = block.settings.max_words
-
-        render 'product-block-description', block: block, product: product, enable_collapsible_tabs: enable_collapsible_tabs, truncate_description: truncate_description, max_words: max_words
+        render 'product-block-description', block: block, product: product
+      when 'product_tab'
+        # Rendered inside the description block as an additional tab.
+        # Skip standalone rendering.
       when 'text'
         render 'product-block-text', block: block, product: product
       when 'richtext'

@@ -265,11 +265,9 @@
                   echo '</div>'
                 endif
               when 'description'
-                assign enable_collapsible_tabs = block.settings.enable_collapsible_tabs
-                assign truncate_description = block.settings.truncate_description
-                assign max_words = block.settings.max_words
-
-                render 'product-block-description', enable_collapsible_tabs: enable_collapsible_tabs, truncate_description: truncate_description, max_words: max_words
+                render 'product-block-description', block: block, product: product
+              when 'product_tab'
+                # Rendered inside the description block as an additional tab.
               when 'text'
                 render 'product-block-text', block: block
               when 'richtext'
@@ -644,31 +642,33 @@
       "limit": 1,
       "settings": [
         {
-          "type": "checkbox",
-          "id": "enable_collapsible_tabs",
-          "label": "Enable collapsible tabs",
-          "default": false,
-          "info": "Turn your H2 headings into collapsible tabs. Learn more about [this feature](https://support.switchthemes.co/article/207-product-page-accordions)"
+          "type": "paragraph",
+          "content": "The product description renders as the first tab automatically. Add Product tab blocks to create additional tabs."
         },
         {
-          "type": "header",
-          "content": "Truncate description"
+          "type": "text",
+          "id": "description_tab_label",
+          "label": "Description tab label",
+          "default": "Description"
+        }
+      ]
+    },
+    {
+      "type": "product_tab",
+      "name": "Product tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Tab title",
+          "default": "Details",
+          "info": "Displayed in uppercase."
         },
         {
-          "type": "checkbox",
-          "id": "truncate_description",
-          "label": "Truncate description",
-          "default": false,
-          "info": "Suitable for products with variant media and large descriptions. Requires collapsible tabs above to be disabled."
-        },
-        {
-          "type": "range",
-          "id": "max_words",
-          "min": 10,
-          "max": 100,
-          "step": 1,
-          "label": "Maximum words before truncation",
-          "default": 30
+          "type": "richtext",
+          "id": "tab_content",
+          "label": "Tab content",
+          "default": "<p>Add details here. You can use HTML tables for measurements.</p>"
         }
       ]
     },
