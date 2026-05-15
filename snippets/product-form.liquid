@@ -24,9 +24,6 @@
         render 'product-form-component-buy-buttons', block: block, product: product, product_form_id: product_form_id
       when 'description'
         render 'product-block-description', block: block, product: product
-      when 'product_tab'
-        # Rendered inside the description block as an additional tab.
-        # Skip standalone rendering.
       when 'text'
         render 'product-block-text', block: block, product: product
       when 'richtext'

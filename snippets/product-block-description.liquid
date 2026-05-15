@@ -1,27 +1,20 @@
 {%- liquid
-  # Gather all product_tab blocks from the surrounding section.
-  # The first tab is always the product description (auto-populated).
-  # Additional tabs are merchant-editable via the theme editor.
   assign description_label = block.settings.description_tab_label | default: 'Description'
-
-  assign tab_blocks = ''
-  for b in section.blocks
-    if b.type == 'product_tab'
-      assign tab_blocks = tab_blocks | append: b.id | append: '|'
-    endif
-  endfor
+  assign tab_gap = block.settings.tab_gap | default: 20
 -%}
 
 <div
   class="product-tabs mt-8"
   x-data="{ active: 0 }"
   x-cloak
+  style="--tab-gap: {{ tab_gap }}px;"
   {{ block.shopify_attributes }}
 >
   {% comment %} ── Tab labels ── {% endcomment %}
   <ul
-    class="product-tabs__titles flex flex-wrap gap-x-10 gap-y-2 border-b-gridline border-gridline-color pb-2"
+    class="product-tabs__titles flex flex-wrap border-b-gridline border-gridline-color pb-2"
     role="tablist"
+    style="column-gap: var(--tab-gap); row-gap: 0.5rem;"
   >
     <li>
       <button
@@ -35,26 +28,27 @@
         {{ description_label | upcase }}
       </button>
     </li>
-    {%- assign tab_index = 1 -%}
-    {% for b in section.blocks %}
-      {% if b.type == 'product_tab' %}
-        {%- assign title = b.settings.tab_title | default: 'Tab' -%}
+
+    {%- assign tab_idx = 1 -%}
+    {%- for i in (2..6) -%}
+      {%- assign title_key = 'tab_' | append: i | append: '_title' -%}
+      {%- assign title = block.settings[title_key] -%}
+      {%- if title != blank -%}
         <li>
           <button
             type="button"
             role="tab"
-            @click="active = {{ tab_index }}"
-            :aria-selected="active === {{ tab_index }} ? 'true' : 'false'"
-            :class="active === {{ tab_index }} ? 'product-tabs__tab--active' : ''"
+            @click="active = {{ tab_idx }}"
+            :aria-selected="active === {{ tab_idx }} ? 'true' : 'false'"
+            :class="active === {{ tab_idx }} ? 'product-tabs__tab--active' : ''"
             class="product-tabs__tab font-heading uppercase tracking-wide cursor-pointer pb-1 border-b border-transparent"
-            {{ b.shopify_attributes }}
           >
             {{ title | upcase }}
           </button>
         </li>
-        {%- assign tab_index = tab_index | plus: 1 -%}
-      {% endif %}
-    {% endfor %}
+        {%- assign tab_idx = tab_idx | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
   </ul>
 
   {% comment %} ── Tab content panels ── {% endcomment %}
@@ -67,35 +61,43 @@
     >
       {{ product.description }}
     </div>
-    {%- assign tab_index = 1 -%}
-    {% for b in section.blocks %}
-      {% if b.type == 'product_tab' %}
+
+    {%- assign tab_idx = 1 -%}
+    {%- for i in (2..6) -%}
+      {%- assign title_key = 'tab_' | append: i | append: '_title' -%}
+      {%- assign content_key = 'tab_' | append: i | append: '_content' -%}
+      {%- assign title = block.settings[title_key] -%}
+      {%- assign content = block.settings[content_key] -%}
+      {%- if title != blank -%}
         <div
           role="tabpanel"
-          x-show="active === {{ tab_index }}"
+          x-show="active === {{ tab_idx }}"
           x-data="RTE"
           class="rte py-4"
           style="display: none;"
         >
-          {{ b.settings.tab_content }}
+          {{ content }}
         </div>
-        {%- assign tab_index = tab_index | plus: 1 -%}
-      {% endif %}
-    {% endfor %}
+        {%- assign tab_idx = tab_idx | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </div>
 
-{% comment %} ── No-JS fallback: stack everything ── {% endcomment %}
+{% comment %} ── No-JS fallback ── {% endcomment %}
 <noscript>
   <div class="mt-8">
     <h2 class="font-heading text-base uppercase tracking-wide mt-6 mb-2">{{ description_label | upcase }}</h2>
     <div class="rte">{{ product.description }}</div>
-    {% for b in section.blocks %}
-      {% if b.type == 'product_tab' %}
-        <h2 class="font-heading text-base uppercase tracking-wide mt-6 mb-2">{{ b.settings.tab_title | upcase }}</h2>
-        <div class="rte">{{ b.settings.tab_content }}</div>
-      {% endif %}
-    {% endfor %}
+    {%- for i in (2..6) -%}
+      {%- assign title_key = 'tab_' | append: i | append: '_title' -%}
+      {%- assign content_key = 'tab_' | append: i | append: '_content' -%}
+      {%- assign title = block.settings[title_key] -%}
+      {%- if title != blank -%}
+        <h2 class="font-heading text-base uppercase tracking-wide mt-6 mb-2">{{ title | upcase }}</h2>
+        <div class="rte">{{ block.settings[content_key] }}</div>
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </noscript>
 
@@ -117,7 +119,7 @@
     border-bottom-color: currentColor !important;
   }
 
-  /* Measurement-style tables inside any tab — clean, no outer border */
+  /* Measurement-style tables in any tab — clean, no outer border */
   .product-tabs__content .rte table {
     width: 100%;
     border-collapse: collapse;

@@ -266,8 +266,6 @@
                 endif
               when 'description'
                 render 'product-block-description', block: block, product: product
-              when 'product_tab'
-                # Rendered inside the description block as an additional tab.
               when 'text'
                 render 'product-block-text', block: block
               when 'richtext'
@@ -638,38 +636,44 @@
     },
     {
       "type": "description",
-      "name": "Description",
+      "name": "Description & tabs",
       "limit": 1,
       "settings": [
         {
           "type": "paragraph",
-          "content": "The product description renders as the first tab automatically. Add Product tab blocks to create additional tabs."
+          "content": "Tab 1 is always the product description. Add up to 5 extra tabs below. Leave a tab title blank to hide that tab."
         },
         {
           "type": "text",
           "id": "description_tab_label",
-          "label": "Description tab label",
+          "label": "Tab 1 — Description label",
           "default": "Description"
-        }
-      ]
-    },
-    {
-      "type": "product_tab",
-      "name": "Product tab",
-      "settings": [
-        {
-          "type": "text",
-          "id": "tab_title",
-          "label": "Tab title",
-          "default": "Details",
-          "info": "Displayed in uppercase."
         },
         {
-          "type": "richtext",
-          "id": "tab_content",
-          "label": "Tab content",
-          "default": "<p>Add details here. You can use HTML tables for measurements.</p>"
-        }
+          "type": "range",
+          "id": "tab_gap",
+          "label": "Gap between tab titles (px)",
+          "min": 8,
+          "max": 64,
+          "step": 2,
+          "unit": "px",
+          "default": 20
+        },
+        { "type": "header", "content": "Tab 2" },
+        { "type": "text", "id": "tab_2_title", "label": "Title", "default": "Details" },
+        { "type": "richtext", "id": "tab_2_content", "label": "Content" },
+        { "type": "header", "content": "Tab 3" },
+        { "type": "text", "id": "tab_3_title", "label": "Title", "default": "Measurements" },
+        { "type": "richtext", "id": "tab_3_content", "label": "Content" },
+        { "type": "header", "content": "Tab 4" },
+        { "type": "text", "id": "tab_4_title", "label": "Title" },
+        { "type": "richtext", "id": "tab_4_content", "label": "Content" },
+        { "type": "header", "content": "Tab 5" },
+        { "type": "text", "id": "tab_5_title", "label": "Title" },
+        { "type": "richtext", "id": "tab_5_content", "label": "Content" },
+        { "type": "header", "content": "Tab 6" },
+        { "type": "text", "id": "tab_6_title", "label": "Title" },
+        { "type": "richtext", "id": "tab_6_content", "label": "Content" }
       ]
     },
     {
