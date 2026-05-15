@@ -38,7 +38,7 @@
       {% comment %} Column headers {% endcomment %}
       <div class="lg:grid lg:grid-cols-12 lg:px-4 gap-4 items-end px-2 py-2">
         <div class="lg:col-span-5">
-          <h1 class="font-heading text-heading-standard">
+          <h1 class="font-heading text-heading-standard page-title-mobile-bold">
             {{ section.settings.title | default: 'Try In-Store' }}
           </h1>
         </div>
@@ -69,8 +69,8 @@
             <div class="col-span-5 max-lg:row-span-1 lg:col-span-4">
               <div class="flex">
                 <div>
+                  <p class="text-xs uppercase tracking-wide mb-1" x-show="item.vendor" x-text="item.vendor"></p>
                   <a class="inline-block" :href="item.url" x-text="item.title"></a>
-                  <p class="text-sm" x-show="item.vendor" x-text="item.vendor"></p>
                   <p class="text-sm" x-show="item.variantTitle" x-text="item.variantTitle"></p>
                   <a
                     @click.prevent="$store.tryOnList.remove(item.variantId)"
@@ -117,7 +117,7 @@
     x-show="count === 0"
     class="py-section-vertical-spacing px-section-horizontal-spacing"
   >
-    <h1 class="font-heading text-heading-standard">
+    <h1 class="font-heading text-heading-standard page-title-mobile-bold">
       {{ section.settings.title | default: 'Try In-Store' }}
     </h1>
     <div class="mt-8">
@@ -170,6 +170,18 @@
   </div>
 
 </div>
+
+<style>
+  /* Mobile: bigger + bold page title; desktop unchanged */
+  @media (max-width: 1023px) {
+    .page-title-mobile-bold {
+      font-weight: 700 !important;
+      font-size: 2rem !important;
+      line-height: 1.15 !important;
+      letter-spacing: -0.01em;
+    }
+  }
+</style>
 
 {% schema %}
 {

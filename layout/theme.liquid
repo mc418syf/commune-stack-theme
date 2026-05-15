@@ -530,9 +530,8 @@
       {% render 'drawer-cart' %}
     {% endif %}
 
-    {% comment %} Commune Try In-Store — store + drawer {% endcomment %}
+    {% comment %} Commune Try In-Store — store only (no drawer; header links to /pages/try-in-store) {% endcomment %}
     <script src="{{ 'try-on-list.js' | asset_url }}" defer></script>
-    {% render 'try-on-drawer' %}
 
     <script
       src="{{ 'alpine.bundle.js' | asset_url }}"

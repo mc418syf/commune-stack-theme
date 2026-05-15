@@ -307,11 +307,10 @@
 
           {% if show_try_on_button %}
             <div x-data>
-              <button
-                type="button"
-                @click="$dispatch('open-try-on')"
+              <a
+                href="/pages/try-in-store"
                 class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
-                aria-label="Try In-Store list"
+                aria-label="Try In-Store"
               >
                 {%- if show_icons -%}
                   <div class="relative my-auto align-middle">
@@ -328,7 +327,7 @@
                 {%- else -%}
                   Try In-Store (<span x-text="$store.tryOnList.count">0</span>)
                 {%- endif -%}
-              </button>
+              </a>
             </div>
           {% endif %}
 
@@ -398,11 +397,10 @@
           {% comment %} Try In-Store button — mobile {% endcomment %}
           {% if show_try_on_button %}
           <div class="whitespace-nowrap lg:ml-4" x-data>
-            <button
-              type="button"
-              @click="$dispatch('open-try-on')"
+            <a
+              href="/pages/try-in-store"
               class="inline-flex items-center {{ item_spacing }}"
-              aria-label="Try In-Store list"
+              aria-label="Try In-Store"
             >
               <div class="relative my-auto align-middle">
                 <span
@@ -414,7 +412,7 @@
                 </span>
                 <span class="sr-only">Try In-Store</span>
               </div>
-            </button>
+            </a>
           </div>
           {% endif %}
 
