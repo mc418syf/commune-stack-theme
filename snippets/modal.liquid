@@ -4,7 +4,7 @@
       x-show="$store.modals.modal.open"
       @keydown.escape.prevent.stop="$store.modals.close('modal')"
       @click="$store.modals.close('modal')"
-      class="fixed inset-0 z-[200]"
+      class="fixed inset-0 z-110"
       data-color-scheme="{{ settings.modal_color_scheme | default: 'scheme3' }}"
       id="modals-modal"
       @modal-is-open.window="setTimeout(() => { $focus.first() }, 120)"
