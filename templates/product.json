@@ -41,7 +41,9 @@
           "settings": {
             "enable_payment_button": false,
             "show_pickup_availability": false,
-            "show_gift_card_recipient": false
+            "show_gift_card_recipient": false,
+            "show_try_on_button": true,
+            "try_on_button_label": "Try In-Store"
           }
         },
         "description_rWXWew": {
@@ -102,7 +104,7 @@
         "enable_variant_media": false,
         "enable_image_zoom": true,
         "enable_video_looping": false,
-        "max_width_of_content": "w-full",
+        "max_width_of_content": "max-w-xl mx-auto",
         "color_scheme": "",
         "override_header_footer_color_scheme": true
       }

@@ -10,14 +10,14 @@
 {
   "current": {
     "logo": "shopify://shop_images/5_pt.png",
-    "color_border": "#202020",
+    "color_border": "#000000",
     "modal_color_scheme": "scheme1",
     "selected_text_background_color": "accent",
-    "base_font_size": 12,
+    "base_font_size": 13,
     "font_heading": "sans_serif_n4",
     "heading_uppercase": true,
     "heading_underline": false,
-    "heading_letterspacing": -50,
+    "heading_letterspacing": -25,
     "heading_line_height": 0.9,
     "mobile_standard_heading_scale": 0,
     "desktop_standard_heading_scale": 3,
@@ -40,7 +40,7 @@
     "button_color": "transparent_background_text_border",
     "button_style": "rounded",
     "spacing": "none",
-    "fill_image_to_border_edge": false,
+    "fill_image_to_border_edge": true,
     "border_width": 0,
     "enable_color_swatches": true,
     "enable_color_swatches_on_product_tiles": false,
@@ -155,7 +155,7 @@
         "settings": {
           "background": "#000000",
           "text": "#fcfcfc",
-          "accent": "#202020",
+          "accent": "#000000",
           "accent_contrast": "#e9e9e9",
           "secondary": "#fcfcfc"
         }
