@@ -9,6 +9,19 @@
 
     assign sizes = 'calc(min(28rem, 92vw) / 5)'
   endif
+
+  # Section-driven copy & styling (passed from sections/cart-items.liquid).
+  assign resolved_title = page_title | default: 'Review Your Bag'
+  assign show_brand = show_vendor
+  if show_brand == nil
+    assign show_brand = true
+  endif
+  assign brand_above = vendor_above_title
+  if brand_above == nil
+    assign brand_above = true
+  endif
+  assign brand_size = vendor_size_px | default: 11
+  assign title_size = product_title_size_px | default: 14
 %}
 <div
   x-data="CartItems"
@@ -22,8 +35,8 @@
       <div class="pt-theme-double">
         <div class="{% if template == 'cart' %}lg:grid lg:grid-cols-12 lg:px-4 {% endif %}gap-4 items-end px-2 py-2">
           <div class="{% if template == 'cart' %}lg:col-span-5{% endif %}">
-            <h1 class="font-heading text-heading-standard page-title-mobile-bold">
-              {{ 'cart.general.title' | t }}
+            <h1 class="font-heading text-heading-standard">
+              {{ resolved_title }}
             </h1>
           </div>
           {% if template == 'cart' %}
@@ -74,12 +87,15 @@
               >
                 <div class="flex">
                   <div>
-                    {% if item.vendor != blank %}
-                      <p class="text-xs uppercase tracking-wide mb-1">{{ item.vendor }}</p>
+                    {% if show_brand and brand_above and item.vendor != blank %}
+                      <p class="uppercase tracking-wide mb-1" style="font-size: {{ brand_size }}px;">{{ item.vendor }}</p>
                     {% endif %}
-                    <a class="inline-block" href="{{ item.url }}">
+                    <a class="inline-block" href="{{ item.url }}" style="font-size: {{ title_size }}px;">
                       {{- item.product.title -}}
                     </a>
+                    {% if show_brand and brand_above == false and item.vendor != blank %}
+                      <p class="uppercase tracking-wide mt-1" style="font-size: {{ brand_size }}px;">{{ item.vendor }}</p>
+                    {% endif %}
 
                     {% unless item.product.has_only_default_variant %}
                       <p class="text-sm">{{ item.variant.title }}</p>
@@ -261,7 +277,7 @@
   {% else %}
     <div class="py-section-vertical-spacing px-section-horizontal-spacing{% if template == 'cart' %} {% endif %}">
       <h1 class="font-heading text-heading-standard">
-        {{ 'cart.general.title' | t }}
+        {{ resolved_title }}
       </h1>
       {% comment %}
         Cart empty state
@@ -293,15 +309,3 @@
     {{ 'general.accessibility.loading' | t }}
   </p>
 </div>
-
-<style>
-  /* Mobile: bigger + bold page title; desktop unchanged */
-  @media (max-width: 1023px) {
-    .page-title-mobile-bold {
-      font-weight: 700 !important;
-      font-size: 2rem !important;
-      line-height: 1.15 !important;
-      letter-spacing: -0.01em;
-    }
-  }
-</style>

@@ -4,5 +4,67 @@
   class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
   data-color-scheme="{{ section_color }}"
 >
-  {% render 'cart-items' %}
+  {% render 'cart-items',
+    page_title: section.settings.page_title,
+    show_vendor: section.settings.show_vendor,
+    vendor_above_title: section.settings.vendor_above_title,
+    vendor_size_px: section.settings.vendor_size_px,
+    product_title_size_px: section.settings.product_title_size_px
+  %}
 </section>
+
+{% schema %}
+{
+  "name": "Cart items",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page title"
+    },
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page title",
+      "default": "Review Your Bag",
+      "info": "Uses the theme's heading font and size from Theme settings → Typography."
+    },
+    {
+      "type": "header",
+      "content": "Line item — brand & product title"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show brand name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "vendor_above_title",
+      "label": "Show brand above product title",
+      "default": true,
+      "info": "When off, brand appears below the product title."
+    },
+    {
+      "type": "range",
+      "id": "vendor_size_px",
+      "label": "Brand name font size",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "product_title_size_px",
+      "label": "Product title font size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    }
+  ]
+}
+{% endschema %}

@@ -1,4 +1,17 @@
-{%- assign section_color = section.settings.color_scheme | default: 'scheme1' -%}
+{%- liquid
+  assign section_color = section.settings.color_scheme | default: 'scheme1'
+
+  assign show_brand = section.settings.show_vendor
+  if show_brand == nil
+    assign show_brand = true
+  endif
+  assign brand_above = section.settings.vendor_above_title
+  if brand_above == nil
+    assign brand_above = true
+  endif
+  assign brand_size = section.settings.vendor_size_px | default: 11
+  assign title_size = section.settings.product_title_size_px | default: 14
+-%}
 {%- liquid
   if settings.button_color == 'transparent_background_text_border'
     assign cta_button_classes = 'border-text border-scheme-text bg-scheme-text text-scheme-background hover:border-scheme-accent hover:bg-scheme-accent hover:text-scheme-accent-contrast'
@@ -38,7 +51,7 @@
       {% comment %} Column headers {% endcomment %}
       <div class="lg:grid lg:grid-cols-12 lg:px-4 gap-4 items-end px-2 py-2">
         <div class="lg:col-span-5">
-          <h1 class="font-heading text-heading-standard page-title-mobile-bold">
+          <h1 class="font-heading text-heading-standard">
             {{ section.settings.title | default: 'Try In-Store' }}
           </h1>
         </div>
@@ -69,8 +82,13 @@
             <div class="col-span-5 max-lg:row-span-1 lg:col-span-4">
               <div class="flex">
                 <div>
-                  <p class="text-xs uppercase tracking-wide mb-1" x-show="item.vendor" x-text="item.vendor"></p>
-                  <a class="inline-block" :href="item.url" x-text="item.title"></a>
+                  {% if show_brand and brand_above %}
+                    <p class="uppercase tracking-wide mb-1" style="font-size: {{ brand_size }}px;" x-show="item.vendor" x-text="item.vendor"></p>
+                  {% endif %}
+                  <a class="inline-block" :href="item.url" x-text="item.title" style="font-size: {{ title_size }}px;"></a>
+                  {% if show_brand and brand_above == false %}
+                    <p class="uppercase tracking-wide mt-1" style="font-size: {{ brand_size }}px;" x-show="item.vendor" x-text="item.vendor"></p>
+                  {% endif %}
                   <p class="text-sm" x-show="item.variantTitle" x-text="item.variantTitle"></p>
                   <a
                     @click.prevent="$store.tryOnList.remove(item.variantId)"
@@ -117,7 +135,7 @@
     x-show="count === 0"
     class="py-section-vertical-spacing px-section-horizontal-spacing"
   >
-    <h1 class="font-heading text-heading-standard page-title-mobile-bold">
+    <h1 class="font-heading text-heading-standard">
       {{ section.settings.title | default: 'Try In-Store' }}
     </h1>
     <div class="mt-8">
@@ -171,18 +189,6 @@
 
 </div>
 
-<style>
-  /* Mobile: bigger + bold page title; desktop unchanged */
-  @media (max-width: 1023px) {
-    .page-title-mobile-bold {
-      font-weight: 700 !important;
-      font-size: 2rem !important;
-      line-height: 1.15 !important;
-      letter-spacing: -0.01em;
-    }
-  }
-</style>
-
 {% schema %}
 {
   "name": "Try In-Store list",
@@ -198,7 +204,44 @@
       "type": "text",
       "id": "title",
       "label": "Page heading",
-      "default": "Try In-Store"
+      "default": "Try In-Store",
+      "info": "Uses the theme's heading font and size from Theme settings → Typography."
+    },
+    {
+      "type": "header",
+      "content": "Line item — brand & product title"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show brand name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "vendor_above_title",
+      "label": "Show brand above product title",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "vendor_size_px",
+      "label": "Brand name font size",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "product_title_size_px",
+      "label": "Product title font size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
     },
     {
       "type": "header",
