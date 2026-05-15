@@ -49,14 +49,18 @@
         "description_rWXWew": {
           "type": "description",
           "settings": {
-            "description_tab_label": "Description"
-          }
-        },
-        "product_tab_t7wYc4": {
-          "type": "product_tab",
-          "settings": {
-            "tab_title": "Measurement",
-            "tab_content": "<p>{{ product.metafields.custom.measurement | metafield_tag }}</p>"
+            "description_tab_label": "Description",
+            "tab_gap": 20,
+            "tab_2_title": "Measurements",
+            "tab_2_content": "<p>{{ product.metafields.custom.measurement | metafield_tag }}</p>",
+            "tab_3_title": "",
+            "tab_3_content": "",
+            "tab_4_title": "",
+            "tab_4_content": "",
+            "tab_5_title": "",
+            "tab_5_content": "",
+            "tab_6_title": "",
+            "tab_6_content": ""
           }
         },
         "complementary_Gx88yw": {
@@ -80,7 +84,6 @@
         "variant_picker",
         "buy_buttons",
         "description_rWXWew",
-        "product_tab_t7wYc4",
         "complementary_Gx88yw"
       ],
       "custom_css": [

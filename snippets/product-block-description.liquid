@@ -41,7 +41,7 @@
             @click="active = {{ tab_idx }}"
             :aria-selected="active === {{ tab_idx }} ? 'true' : 'false'"
             :class="active === {{ tab_idx }} ? 'product-tabs__tab--active' : ''"
-            class="product-tabs__tab font-heading uppercase tracking-wide cursor-pointer pb-1 border-b border-transparent{% if block.settings.tab_titles_bold %} font-bold{% endif %}"
+            class="product-tabs__tab font-heading uppercase tracking-wide cursor-pointer pb-1 border-b border-transparent"
           >
             {{ title | upcase }}
           </button>
