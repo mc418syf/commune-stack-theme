@@ -232,7 +232,7 @@
 <header-section
   x-data="Theme_Header"
   class="block{% if overlay_header %} absolute top-0 left-0 right-0 z-50{% endif %}"
-  :class="{ 'is-stuck' : isStuck }"
+  :class="{ 'is-stuck' : isStuck, 'invisible pointer-events-none' : $store.modals && $store.modals.modal && $store.modals.modal.open }"
   {% if section.settings.sticky_header %}
     data-sticky="true"
   {% endif %}
