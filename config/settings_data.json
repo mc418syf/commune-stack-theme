@@ -37,7 +37,7 @@
     "links_uppercase": false,
     "links_show_arrow": true,
     "links_show_underline": true,
-    "button_color": "accent_background_text_border",
+    "button_color": "accent_background",
     "button_style": "square",
     "spacing": "none",
     "fill_image_to_border_edge": true,

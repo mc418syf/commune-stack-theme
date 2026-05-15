@@ -51,6 +51,7 @@
           "settings": {
             "description_tab_label": "Description",
             "tab_gap": 20,
+            "tab_titles_bold": true,
             "tab_2_title": "Measurements",
             "tab_2_content": "<p>{{ product.metafields.custom.measurement | metafield_tag }}</p>",
             "tab_3_title": "",
