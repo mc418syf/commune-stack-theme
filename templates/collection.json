@@ -30,7 +30,7 @@
         "quick_buy_button_style": "theme-button--secondary",
         "linklist": "",
         "enable_filtering": true,
-        "enable_sorting": true,
+        "enable_sorting": false,
         "collapse_filters": true,
         "capitalize_filters": true,
         "filters_layout_on_desktop": "sidebar",
