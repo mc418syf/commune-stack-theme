@@ -93,6 +93,8 @@
         "[data-product-media-container] .mx-1.mt-2.grid {margin-top: 0.5rem !important;}"
       ],
       "settings": {
+        "mobile_slide_over": true,
+        "mobile_slide_overlap": 60,
         "desktop_media_width": "three-fifths",
         "desktop_media_position": "left",
         "two_media_per_row": true,
@@ -103,7 +105,7 @@
         "enable_variant_media": false,
         "enable_image_zoom": true,
         "enable_video_looping": false,
-        "max_width_of_content": "max-w-xl mx-auto",
+        "max_width_of_content": "max-w-md mx-auto",
         "color_scheme": "",
         "override_header_footer_color_scheme": true
       }
