@@ -409,10 +409,24 @@
         padding-bottom: 0 !important;
         border-bottom: 0 !important;
       }
-      /* The gallery pins to the top of the viewport at its natural height */
+      /* The gallery pins to the top and fills exactly one screen —
+         no empty gap below short images */
       #{{ section.id }} .product-media-container .splide--product {
         position: sticky;
         top: var(--sticky-header-height, 0px);
+        height: calc(100svh - var(--sticky-header-height, 0px));
+      }
+      #{{ section.id }} .product-media-container .splide--product .splide__track,
+      #{{ section.id }} .product-media-container .splide--product .splide__list,
+      #{{ section.id }} .product-media-container .splide--product .splide__slide,
+      #{{ section.id }} .product-media-container .splide--product [data-product-single-media-wrapper] {
+        height: 100%;
+      }
+      /* Image fills the frame edge-to-edge */
+      #{{ section.id }} .product-media-container .splide--product [data-product-single-media-wrapper] img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
       /* The product details rise up and cover the pinned image */
       #{{ section.id }} .product-content-container {
