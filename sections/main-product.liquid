@@ -318,7 +318,7 @@
       {% assign first_3d_model = models | first %}
       {% if product.media.size > 1 %}
         <div
-          class="mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 opacity-0 no-js:hidden lg:hidden"
+          class="product-mobile-pagination mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 opacity-0 no-js:hidden lg:hidden"
           x-data="
             {
               paginationIsWrapped: false,
@@ -402,13 +402,13 @@
   <style>
     /* === Mobile image slide-over (komune-style) ===
        Image is shown at a true 3:4 ratio (height = 133.333vw at full
-       width). The runway = image height + slide distance, and the
-       details panel is pulled up by exactly the slide distance so it
-       sits flush against the bottom of the image — no gap. */
+       width). Below it sits the progression bar (a fixed 3rem strip).
+       The details panel is pulled up by the slide distance and lands
+       flush below the progression bar — no gap. */
     @media (max-width: 1023px) {
       #{{ section.id }} .product-media-container {
         position: relative;
-        height: calc(133.333vw + {{ slide_distance }}vh);
+        height: calc(133.333vw + 3rem + {{ slide_distance }}vh);
         padding-bottom: 0 !important;
         border-bottom: 0 !important;
       }
@@ -428,24 +428,18 @@
         object-fit: cover;
         display: block;
       }
-      /* Details panel rises and covers the image, flush to its bottom */
+      /* Progression bar — fixed-height strip kept visible below image */
+      #{{ section.id }} .product-media-container .product-mobile-pagination {
+        height: 2.5rem;
+        align-items: center;
+      }
+      /* Details panel rises and covers the image; square corners */
       #{{ section.id }} .product-content-container {
         position: relative;
         z-index: 2;
         margin-top: -{{ slide_distance }}vh;
-        border-radius: 14px 14px 0 0;
+        border-radius: 0;
         box-shadow: 0 -16px 40px rgba(14, 14, 14, 0.1);
-      }
-      /* Grab-handle hint at the top of the rising panel */
-      #{{ section.id }} .product-content-container::before {
-        content: '';
-        display: block;
-        width: 40px;
-        height: 4px;
-        border-radius: 2px;
-        background: var(--color-gridline, currentColor);
-        opacity: 0.6;
-        margin: 16px auto 0;
       }
     }
   </style>
