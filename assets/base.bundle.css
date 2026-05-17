@@ -5792,8 +5792,8 @@ html.no-js .splide:not(.is-active) .no-js\:\[\.splide\:not\(\.is-active\)_\&\]\:
 
 @media (min-width: 1024px) {
   .filters-wrapper {
-    background: rgba(255, 255, 255, 0.85) !important;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08) !important;
+    background: transparent !important;
+    box-shadow: none !important;
     border: none !important;
   }
 }
