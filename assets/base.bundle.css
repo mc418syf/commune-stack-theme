@@ -5863,3 +5863,13 @@ details.accordion,
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
   }
 }
+
+/* === Sold-out product card: grey the whole card === */
+.product-card--sold-out {
+  opacity: 0.5;
+  filter: grayscale(1);
+  transition: opacity 0.2s ease;
+}
+.product-card--sold-out:hover {
+  opacity: 0.7;
+}

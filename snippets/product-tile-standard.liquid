@@ -121,7 +121,7 @@ PLP product card
 -%}
 
 <div
-  class="group relative flex h-full flex-col text-center hover:text-scheme-accent"
+  class="group relative flex h-full flex-col text-center hover:text-scheme-accent{% if sold_out %} product-card--sold-out{% endif %}"
   {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}
     x-data="{ currentSwatchVariantId: '{{ product.selected_or_first_available_variant.id }}', productUrl: '{{ product.url }}' }"
   {% endif %}
