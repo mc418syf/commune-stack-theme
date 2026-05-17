@@ -80,7 +80,7 @@
           {%- endif -%}
           <ul
             id="predictive-search-results-list"
-            class="grid grid-cols-1 gap-gutter bg-gridline-color lg:grid-cols-4"
+            class="grid grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-5"
             role="listbox"
             aria-labelledby="predictive-search-products"
           >
@@ -102,7 +102,7 @@
                     sizes: product_sizes,
                     loading: 'eager',
                     section_color: 'scheme1',
-                    products_per_row_mobile: 1
+                    products_per_row_mobile: 2
                   -%}
                 {% else %}
                   {%- render 'product-tile-standard',
@@ -110,13 +110,13 @@
                     sizes: product_sizes,
                     loading: 'eager',
                     section_color: 'scheme1',
-                    products_per_row_mobile: 1
+                    products_per_row_mobile: 2
                   -%}
                 {% endif %}
               </li>
             {%- endfor -%}
-            {%- assign items_on_last_row = counter | modulo: 4 -%}
-            {%- assign placeholder_width = 4 | minus: items_on_last_row -%}
+            {%- assign items_on_last_row = counter | modulo: 5 -%}
+            {%- assign placeholder_width = 5 | minus: items_on_last_row -%}
             {%- if items_on_last_row != 0 -%}
               <li
                 style="--placeholder-width: {{ placeholder_width }};"
