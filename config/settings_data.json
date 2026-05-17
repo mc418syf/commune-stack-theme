@@ -40,7 +40,7 @@
     "button_color": "accent_background",
     "button_style": "rounded",
     "spacing": "none",
-    "fill_image_to_border_edge": true,
+    "fill_image_to_border_edge": false,
     "border_width": 0,
     "enable_color_swatches": true,
     "enable_color_swatches_on_product_tiles": false,
