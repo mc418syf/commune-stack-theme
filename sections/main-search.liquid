@@ -162,21 +162,24 @@
               endif
             endfor
 
+            assign products_per_row = section.settings.grid | default: 3
+            assign products_grid_class = 'lg:grid-cols-' | append: products_per_row
+
             if has_article_results or has_page_results
               assign desktop_col_span = 'lg:col-span-9'
 
-              assign product_sizes = '(min-width: 1024px) calc(((100vw / 12) * 9 )/ 3), 100vw'
+              assign product_sizes = '(min-width: 1024px) calc(((100vw / 12) * 9 )/ ' | append: products_per_row | append: '), 100vw'
               assign article_sizes = '4rem'
             else
               assign desktop_col_span = 'lg:col-span-12'
 
-              assign product_sizes = '(min-width: 1024px) calc(100vw / 3), 100vw'
+              assign product_sizes = '(min-width: 1024px) calc(100vw / ' | append: products_per_row | append: '), 100vw'
             endif
           %}
 
           <div class="{{ desktop_col_span }} bg-scheme-background text-scheme-text{% unless has_product_results %} max-lg:hidden{% endunless %}">
             {% if has_product_results %}
-              <ul class="grid h-full grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-3">
+              <ul class="grid h-full grid-cols-2 gap-gutter bg-gridline-color {{ products_grid_class }}">
                 {% assign counter = 0 %}
                 {% for item in search.results %}
                   {% if item.object_type == 'product' %}
@@ -214,8 +217,8 @@
                     </li>
                   {% endif %}
                 {% endfor %}
-                {%- assign items_on_last_row = counter | modulo: 3 -%}
-                {%- assign placeholder_width = 3 | minus: items_on_last_row -%}
+                {%- assign items_on_last_row = counter | modulo: products_per_row -%}
+                {%- assign placeholder_width = products_per_row | minus: items_on_last_row -%}
                 {%- if items_on_last_row != 0 -%}
                   <li
                     style="--placeholder-width: {{ placeholder_width }};"
@@ -431,6 +434,16 @@
         }
       ],
       "default": "standard"
+    },
+    {
+      "type": "range",
+      "id": "grid",
+      "label": "Products per row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "info": "Desktop layout. Mobile always shows 2 per row."
     }
   ]
 }
