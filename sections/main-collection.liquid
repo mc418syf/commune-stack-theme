@@ -357,7 +357,7 @@
           </form>
         {% endif %}
 
-        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}" style="border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
           {%- liquid
             if filters_layout_on_desktop == 'drop_down'
               assign toggle_container_class = 'block md:hidden'
