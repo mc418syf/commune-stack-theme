@@ -57,7 +57,7 @@
     "quick_buy_variant_picker_option_style": "text_underline",
     "enable_breadcrumbs": false,
     "breadcrumb_separator": "bullet",
-    "predictive_search_enabled": true,
+    "predictive_search_enabled": false,
     "search_collections": false,
     "search_articles": false,
     "search_pages": false,
