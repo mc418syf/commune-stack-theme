@@ -5880,6 +5880,16 @@ details.accordion,
 .filter-checkbox:checked + label {
   color: rgb(var(--color-scheme-text)) !important;
 }
+/* Always-visible circle indicator before each filter value */
+.filter-checkbox + label > span:first-child {
+  width: 0.6rem !important;
+  height: 0.6rem !important;
+  border: 1px solid currentColor !important;
+  border-radius: 9999px !important;
+  background-color: transparent !important;
+  flex-shrink: 0;
+}
+/* Filled circle when the value is selected */
 .filter-checkbox:checked + label > span:first-child {
   background-color: currentColor !important;
 }
