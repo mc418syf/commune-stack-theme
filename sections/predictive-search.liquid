@@ -16,7 +16,7 @@
       assign base_font_class = base_font_class | append: ' uppercase'
     endif
 
-    assign product_sizes = '(min-width: 1024px) calc(100vw / 4), 50vw'
+    assign product_sizes = '(min-width: 1024px) calc(100vw / 5), 50vw'
 
     assign article_sizes = '4rem'
   -%}
@@ -74,7 +74,7 @@
           </div>
           <ul
             id="predictive-search-results-list"
-            class="grid w-full grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-4"
+            class="grid w-full grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-5"
             role="listbox"
             aria-labelledby="predictive-search-products"
           >
@@ -111,8 +111,8 @@
                 {% endif %}
               </li>
             {%- endfor -%}
-            {%- assign items_on_last_row = counter | modulo: 4 -%}
-            {%- assign placeholder_width = 4 | minus: items_on_last_row -%}
+            {%- assign items_on_last_row = counter | modulo: 5 -%}
+            {%- assign placeholder_width = 5 | minus: items_on_last_row -%}
             {%- if items_on_last_row != 0 -%}
               <li
                 style="--placeholder-width: {{ placeholder_width }};"
