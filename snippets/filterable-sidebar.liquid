@@ -346,7 +346,7 @@
                             >
                             <label
                               for="Filter-sidebar-{{ context }}-{{ filter.label }}-{{ forloop.index }}"
-                              class="cursor-pointer {% if settings.links_uppercase %}uppercase{% elsif section.settings.capitalize_filters %}capitalize{% endif %} flex items-center peer-checked:[&>span:first-child]:bg-current {% if filter_value.count == 0 and filter_value.active == false -%}text-scheme-secondary line-through{%- else -%}hover:text-scheme-accent{%- endif %}"
+                              class="cursor-pointer {% if settings.links_uppercase %}uppercase{% elsif section.settings.capitalize_filters %}capitalize{% endif %} flex items-center peer-checked:[&>span:first-child]:bg-current {% if filter_value.count == 0 and filter_value.active == false -%}text-scheme-secondary line-through{%- else -%}text-scheme-secondary hover:text-scheme-accent{%- endif %}"
                               {% if filter_value.count == 0
                                 and filter_value.active == false
                               -%}

@@ -80,7 +80,10 @@
       </p>
 
       {% if show_sort or show_filters %}
-        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
+        <div
+          class="flex items-center justify-between bg-scheme-background px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}"
+          style="position: sticky; top: var(--sticky-header-height, 56px); z-index: 35;"
+        >
           {%- liquid
             if filters_layout_on_desktop == 'drop_down'
               assign toggle_container_class = 'block md:hidden'
