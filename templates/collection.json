@@ -23,7 +23,7 @@
         "description_position": "under_title",
         "description_color_scheme": "",
         "product_tile_type": "standard",
-        "grid": 3,
+        "grid": 4,
         "rows": 12,
         "grid_mobile": "2",
         "enable_quick_buy": false,
