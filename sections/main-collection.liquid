@@ -383,22 +383,33 @@
         :class="{ 'opacity-10' : loading }"
       >
         {%- if collection.products.size > 0 -%}
-          {%- assign grid_gap = section.settings.product_grid_gap | default: 0 -%}
-          {%- if grid_gap > 0 -%}
+          {%- liquid
+            assign grid_gap = section.settings.product_grid_gap | default: 0
+            assign grid_side_margin = section.settings.product_grid_side_margin | default: 0
+            assign grid_customized = false
+            if grid_gap > 0 or grid_side_margin > 0
+              assign grid_customized = true
+            endif
+          -%}
+          {%- if grid_customized -%}
             <style>
-              /* Adjustable spacing between product cards */
-              #filterable .collection-list { gap: {{ grid_gap }}px; }
-              /* Mobile: also inset the grid from the screen edges */
+              /* Adjustable product grid spacing */
+              #filterable .collection-list {
+                box-sizing: border-box;
+                gap: {{ grid_gap }}px !important;
+                max-width: 100%;
+              }
+              /* Mobile: equal left and right margin around the grid */
               @media (max-width: 1023px) {
                 #filterable .collection-list {
-                  padding-left: {{ grid_gap }}px;
-                  padding-right: {{ grid_gap }}px;
+                  padding-left: {{ grid_side_margin }}px !important;
+                  padding-right: {{ grid_side_margin }}px !important;
                 }
               }
             </style>
           {%- endif -%}
           <ul
-            class="collection-list grid grid-cols-2 {{ desktop_grid_class }} gap-gutter {% if grid_gap > 0 %}bg-scheme-background{% else %}bg-gridline-color{% endif %}{% if filters_layout_on_desktop == 'sidebar' %} border-b-gridline border-gridline-color -mb-gridline{% endif %}"
+            class="collection-list grid grid-cols-2 {{ desktop_grid_class }} gap-gutter {% if grid_customized %}bg-scheme-background{% else %}bg-gridline-color{% endif %}{% if filters_layout_on_desktop == 'sidebar' %} border-b-gridline border-gridline-color -mb-gridline{% endif %}"
           >
             {%- for product in collection.products -%}
               {% liquid
@@ -772,13 +783,24 @@
     {
       "type": "range",
       "id": "product_grid_gap",
-      "label": "Spacing between product cards",
+      "label": "Gap between product cards",
       "min": 0,
       "max": 60,
       "step": 2,
       "unit": "px",
       "default": 0,
-      "info": "Adds breathing room between product cards. 0 keeps the default thin gridline."
+      "info": "Spacing between each product card. 0 keeps the default thin gridline."
+    },
+    {
+      "type": "range",
+      "id": "product_grid_side_margin",
+      "label": "Side margin (mobile)",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "Equal left and right margin around the product grid on mobile."
     },
     {
       "type": "header",
