@@ -33,7 +33,7 @@
     "header_uppercase": true,
     "product_grid_uppercase": true,
     "button_uppercase": true,
-    "buttons_show_arrow": true,
+    "buttons_show_arrow": false,
     "links_uppercase": false,
     "links_show_arrow": true,
     "links_show_underline": true,

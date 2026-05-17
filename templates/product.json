@@ -95,10 +95,10 @@
       "settings": {
         "mobile_slide_over": true,
         "mobile_slide_overlap": 60,
-        "desktop_media_width": "three-fifths",
+        "desktop_media_width": "two-thirds",
         "desktop_media_position": "left",
         "two_media_per_row": true,
-        "first_media_full_width": true,
+        "first_media_full_width": false,
         "variant_media_behavior": "scroll",
         "always_show_product_featured_media_first": true,
         "single_variant_mode": true,
