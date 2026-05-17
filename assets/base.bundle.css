@@ -5893,3 +5893,10 @@ details.accordion,
 .filter-checkbox:checked + label > span:first-child {
   background-color: currentColor !important;
 }
+
+/* Mobile: filter drop-down brand list collapses to one column */
+@media (max-width: 767px) {
+  .filters-wrapper .js-filter ul {
+    columns: 1 !important;
+  }
+}

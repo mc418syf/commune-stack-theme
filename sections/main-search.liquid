@@ -80,18 +80,13 @@
       </p>
 
       {% if show_sort or show_filters %}
-        <div
-          class="flex items-center justify-between bg-scheme-background px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}"
-          style="position: sticky; top: var(--sticky-header-height, 56px); z-index: 35;"
-        >
+        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
           {%- liquid
-            if filters_layout_on_desktop == 'drop_down'
-              assign toggle_container_class = 'block md:hidden'
-            endif
             if show_filters
-              render 'filterable-drawer-toggle', container_classes: toggle_container_class, total_active_values: total_active_values
               if filters_layout_on_desktop == 'drop_down'
-                render 'filterable-filters-drop-down', filters: search.filters, total_active_values: total_active_values, section_color: 'scheme1', clear_url: results_url, container_classes: 'hidden md:block', is_search: true, search_terms: search.terms
+                render 'filterable-filters-drop-down', filters: search.filters, total_active_values: total_active_values, section_color: 'scheme1', clear_url: results_url, container_classes: 'block', is_search: true, search_terms: search.terms
+              else
+                render 'filterable-drawer-toggle', container_classes: 'block md:hidden', total_active_values: total_active_values
               endif
             endif
 

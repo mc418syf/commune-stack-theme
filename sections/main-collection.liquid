@@ -357,18 +357,16 @@
           </form>
         {% endif %}
 
-        <div
-          class="flex items-center justify-between bg-scheme-background px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}"
-          style="position: sticky; top: var(--sticky-header-height, 56px); z-index: 35;"
-        >
+        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
           {%- liquid
-            if filters_layout_on_desktop == 'drop_down'
-              assign toggle_container_class = 'block md:hidden'
-            endif
             if show_filters
-              render 'filterable-drawer-toggle', container_classes: toggle_container_class, total_active_values: total_active_values
               if filters_layout_on_desktop == 'drop_down'
-                render 'filterable-filters-drop-down', filters: collection.filters, total_active_values: total_active_values, section_color: section_color, clear_url: clear_url, container_classes: 'hidden md:block'
+                # Drop-down used at every size: its own toggle + the
+                # panel are anchored to this bar, so bar + expansion
+                # behave as one section.
+                render 'filterable-filters-drop-down', filters: collection.filters, total_active_values: total_active_values, section_color: section_color, clear_url: clear_url, container_classes: 'block'
+              else
+                render 'filterable-drawer-toggle', container_classes: 'block md:hidden', total_active_values: total_active_values
               endif
             endif
 
