@@ -5864,10 +5864,9 @@ details.accordion,
   }
 }
 
-/* === Sold-out product card: grey the whole card === */
+/* === Sold-out product card: faded === */
 .product-card--sold-out {
   opacity: 0.5;
-  filter: grayscale(1);
   transition: opacity 0.2s ease;
 }
 .product-card--sold-out:hover {
