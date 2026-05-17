@@ -391,13 +391,19 @@
               assign grid_customized = true
             endif
           -%}
-          {%- if grid_customized -%}
-            <style>
-              /* Adjustable product grid spacing */
+          <style>
+            /* Product grid box model — keep it symmetric and never wider
+               than the viewport so left/right margins always match */
+            #filterable .collection-list {
+              box-sizing: border-box;
+              width: 100%;
+              max-width: 100%;
+              margin-left: 0;
+              margin-right: 0;
+            }
+            {%- if grid_customized -%}
               #filterable .collection-list {
-                box-sizing: border-box;
                 gap: {{ grid_gap }}px !important;
-                max-width: 100%;
               }
               /* Mobile: equal left and right margin around the grid */
               @media (max-width: 1023px) {
@@ -406,8 +412,8 @@
                   padding-right: {{ grid_side_margin }}px !important;
                 }
               }
-            </style>
-          {%- endif -%}
+            {%- endif -%}
+          </style>
           <ul
             class="collection-list grid grid-cols-2 {{ desktop_grid_class }} gap-gutter {% if grid_customized %}bg-scheme-background{% else %}bg-gridline-color{% endif %}{% if filters_layout_on_desktop == 'sidebar' %} border-b-gridline border-gridline-color -mb-gridline{% endif %}"
           >
