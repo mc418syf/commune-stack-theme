@@ -96,7 +96,8 @@
                     sizes: product_sizes,
                     loading: 'eager',
                     section_color: 'scheme1',
-                    products_per_row_mobile: 2
+                    products_per_row_mobile: 2,
+                    enable_mobile_swipe: true
                   -%}
                 {% else %}
                   {%- render 'product-tile-standard',
@@ -104,7 +105,8 @@
                     sizes: product_sizes,
                     loading: 'eager',
                     section_color: 'scheme1',
-                    products_per_row_mobile: 2
+                    products_per_row_mobile: 2,
+                    enable_mobile_swipe: true
                   -%}
                 {% endif %}
               </li>
@@ -233,13 +235,13 @@
   {%- if results -%}
     <div
       :class="{ 'opacity-0 pointer-events-none' : loading }"
-      class="predictive-search__option relative z-10 py-5 text-center"
+      class="predictive-search__option relative z-10 bg-black text-center text-white"
       id="predictive-search-option-search-keywords"
       role="option"
       :aria-selected="isSelected"
       data-search-option
     >
-      <button class="inline-flex items-center justify-between">
+      <button class="inline-flex w-full items-center justify-center py-5">
         {{- 'general.search.view_all' | t -}}
       </button>
     </div>
