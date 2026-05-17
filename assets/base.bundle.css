@@ -5872,3 +5872,14 @@ details.accordion,
 .product-card--sold-out:hover {
   opacity: 0.7;
 }
+
+/* === Filter values: grey when unselected, black + filled circle when selected === */
+.filter-checkbox + label {
+  color: rgb(var(--color-scheme-secondary)) !important;
+}
+.filter-checkbox:checked + label {
+  color: rgb(var(--color-scheme-text)) !important;
+}
+.filter-checkbox:checked + label > span:first-child {
+  background-color: currentColor !important;
+}
