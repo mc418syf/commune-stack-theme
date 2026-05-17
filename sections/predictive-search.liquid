@@ -16,11 +16,7 @@
       assign base_font_class = base_font_class | append: ' uppercase'
     endif
 
-    if columns
-      assign product_sizes = '(min-width: 1024px) calc(100vw / 4), 100vw'
-    else
-      assign product_sizes = '(min-width: 1024px) calc((100vw / 12 * 9) / 4), 100vw'
-    endif
+    assign product_sizes = '(min-width: 1024px) calc(100vw / 4), 50vw'
 
     assign article_sizes = '4rem'
   -%}
@@ -70,17 +66,15 @@
       {%- endif -%}
 
       {%- if predictive_search.resources.products.size > 0 -%}
-        <div class="{% if columns %}lg:col-span-9{% else %}lg:col-span-12{% endif %} border-gridline-color bg-scheme-background text-scheme-text">
-          {%- if columns -%}
-            <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
-              <h2 class="font-heading text-lg">
-                {{- 'general.search.products' | t -}}
-              </h2>
-            </div>
-          {%- endif -%}
+        <div class="lg:col-span-12 border-gridline-color bg-scheme-background text-scheme-text">
+          <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
+            <h2 class="font-heading text-lg">
+              {{- 'general.search.products' | t -}}
+            </h2>
+          </div>
           <ul
             id="predictive-search-results-list"
-            class="grid grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-5"
+            class="grid grid-cols-2 gap-gutter bg-gridline-color lg:grid-cols-4"
             role="listbox"
             aria-labelledby="predictive-search-products"
           >
@@ -115,8 +109,8 @@
                 {% endif %}
               </li>
             {%- endfor -%}
-            {%- assign items_on_last_row = counter | modulo: 5 -%}
-            {%- assign placeholder_width = 5 | minus: items_on_last_row -%}
+            {%- assign items_on_last_row = counter | modulo: 4 -%}
+            {%- assign placeholder_width = 4 | minus: items_on_last_row -%}
             {%- if items_on_last_row != 0 -%}
               <li
                 style="--placeholder-width: {{ placeholder_width }};"
@@ -130,7 +124,7 @@
       {%- endif -%}
 
       {%- if columns -%}
-        <div class="border-gridline-color bg-scheme-background text-scheme-text lg:col-span-3">
+        <div class="border-gridline-color bg-scheme-background text-scheme-text lg:col-span-12">
           {%- if predictive_search.resources.collections.size > 0 -%}
             <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
               <h2 class="font-heading text-lg">
@@ -233,11 +227,6 @@
         </div>
       {%- endif -%}
 
-      {%- if predictive_search.resources.products.size == 0 and columns -%}
-        <div
-          class="hidden bg-scheme-background text-scheme-text lg:col-span-9 lg:block"
-        ></div>
-      {%- endif -%}
     </div>
   </div>
 
