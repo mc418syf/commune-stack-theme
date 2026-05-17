@@ -373,14 +373,16 @@ PLP product card
         </a>
       {% endif %}
 
-      <div class="{{ title_class }} break-word">
-        {% if settings.product_grid_show_vendor and product.vendor != '' %}
-          <p class="mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
-        {% endif %}
-        <a href="{{ product.url }}" class="inline-block">
-          <p aria-hidden="true" class="{% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
-        </a>
-      </div>
+      {%- unless hide_title -%}
+        <div class="{{ title_class }} break-word">
+          {% if settings.product_grid_show_vendor and product.vendor != '' %}
+            <p class="mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
+          {% endif %}
+          <a href="{{ product.url }}" class="inline-block">
+            <p aria-hidden="true" class="{% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
+          </a>
+        </div>
+      {%- endunless -%}
 
       <div class="{{ price_class }}">
         {% if sold_out %}
