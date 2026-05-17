@@ -66,40 +66,6 @@
         </h1>
       </div>
 
-      <div class="bg-scheme-background px-section-horizontal-spacing py-2 text-scheme-text lg:col-span-12">
-        <form
-          action="{{ routes.search_url }}"
-          method="get"
-          class="input-group search"
-          role="search"
-        >
-          <label for="search-{{ section.id }}" class="hidden">
-            {{- 'general.search.placeholder' | t -}}
-          </label>
-          <div class="flex items-center justify-between">
-            <button
-              class="mr-4 py-2"
-              type="submit"
-            >
-              <span class="mb-1 flex h-6 w-6 items-center">
-                {%- render 'icon-search' -%}
-              </span>
-              <span class="sr-only">{{ 'general.search.submit' | t }}</span>
-            </button>
-            <input
-              autofocus
-              id="search-{{ section.id }}"
-              type="text"
-              name="q"
-              value="{{ search.terms | escape }}"
-              placeholder="{{ 'general.search.placeholder' | t }}"
-              class="font-body block w-full bg-transparent pb-1 placeholder-current"
-              aria-label="{{ 'general.search.placeholder' | t }}"
-              data-search-input
-            >
-          </div>
-        </form>
-      </div>
     </div>
 
     {% if search.performed %}
@@ -114,7 +80,7 @@
       </p>
 
       {% if show_sort or show_filters %}
-        <div class="relative flex items-center justify-between border-t-gridline border-gridline-color px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
+        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
           {%- liquid
             if filters_layout_on_desktop == 'drop_down'
               assign toggle_container_class = 'block md:hidden'
