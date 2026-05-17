@@ -2,26 +2,24 @@
   class="{% unless no_border %}border-t-gridline border-gridline-color {% endunless %}bg-scheme-background px-section-horizontal-spacing pb-theme-double pt-theme text-sm text-scheme-text md:text-base"
   data-color-scheme="{{ section_color }}"
 >
-  <div class="grid grid-cols-3 items-center">
+  <div class="flex items-center justify-center gap-1">
     <!-- Left arrow -->
-    <div class="text-left">
-      {% if paginate.previous.is_link %}
-        <a
-          class="inline-block px-2 py-1 hover:text-scheme-accent border-b-text border-transparent hover:border-scheme-text"
-          href="{{ paginate.previous.url }}"
-          rel="prev"
-          aria-label="{{ 'general.pagination.previous' | t }}"
-        >&larr;</a>
-      {% else %}
-        <span
-          class="inline-block px-2 py-1 opacity-50 select-none"
-          aria-hidden="true"
-        >&larr;</span>
-      {% endif %}
-    </div>
+    {% if paginate.previous.is_link %}
+      <a
+        class="inline-block px-2 py-1 hover:text-scheme-accent border-b-text border-transparent hover:border-scheme-text"
+        href="{{ paginate.previous.url }}"
+        rel="prev"
+        aria-label="{{ 'general.pagination.previous' | t }}"
+      >&larr;</a>
+    {% else %}
+      <span
+        class="inline-block px-2 py-1 opacity-50 select-none"
+        aria-hidden="true"
+      >&larr;</span>
+    {% endif %}
 
-    <!-- Page numbers (centered) -->
-    <ul class="flex items-center justify-center gap-3">
+    <!-- Page numbers -->
+    <ul class="flex items-center justify-center gap-1">
       {%- for part in paginate.parts -%}
         {%- if part.is_link -%}
           <li>
@@ -52,20 +50,18 @@
     </ul>
 
     <!-- Right arrow -->
-    <div class="text-right">
-      {% if paginate.next.is_link %}
-        <a
-          class="inline-block px-2 py-1 hover:text-scheme-accent border-b-text border-transparent hover:border-scheme-text"
-          href="{{ paginate.next.url }}"
-          rel="next"
-          aria-label="{{ 'general.pagination.next' | t }}"
-        >&rarr;</a>
-      {% else %}
-        <span
-          class="inline-block px-2 py-1 opacity-50 select-none"
-          aria-hidden="true"
-        >&rarr;</span>
-      {% endif %}
-    </div>
+    {% if paginate.next.is_link %}
+      <a
+        class="inline-block px-2 py-1 hover:text-scheme-accent border-b-text border-transparent hover:border-scheme-text"
+        href="{{ paginate.next.url }}"
+        rel="next"
+        aria-label="{{ 'general.pagination.next' | t }}"
+      >&rarr;</a>
+    {% else %}
+      <span
+        class="inline-block px-2 py-1 opacity-50 select-none"
+        aria-hidden="true"
+      >&rarr;</span>
+    {% endif %}
   </div>
 </div>
