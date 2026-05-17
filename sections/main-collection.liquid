@@ -384,9 +384,21 @@
       >
         {%- if collection.products.size > 0 -%}
           {%- assign grid_gap = section.settings.product_grid_gap | default: 0 -%}
+          {%- if grid_gap > 0 -%}
+            <style>
+              /* Adjustable spacing between product cards */
+              #filterable .collection-list { gap: {{ grid_gap }}px; }
+              /* Mobile: also inset the grid from the screen edges */
+              @media (max-width: 1023px) {
+                #filterable .collection-list {
+                  padding-left: {{ grid_gap }}px;
+                  padding-right: {{ grid_gap }}px;
+                }
+              }
+            </style>
+          {%- endif -%}
           <ul
             class="collection-list grid grid-cols-2 {{ desktop_grid_class }} gap-gutter {% if grid_gap > 0 %}bg-scheme-background{% else %}bg-gridline-color{% endif %}{% if filters_layout_on_desktop == 'sidebar' %} border-b-gridline border-gridline-color -mb-gridline{% endif %}"
-            {% if grid_gap > 0 %}style="gap: {{ grid_gap }}px;"{% endif %}
           >
             {%- for product in collection.products -%}
               {% liquid
