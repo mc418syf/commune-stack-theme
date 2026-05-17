@@ -394,6 +394,49 @@
   {% endunless %}
 </section>
 
+{%- if section.settings.mobile_slide_over -%}
+  {%- liquid
+    assign runway = section.settings.mobile_slide_runway | default: 175
+    assign overlap = section.settings.mobile_slide_overlap | default: 78
+  -%}
+  <style>
+    /* === Mobile image slide-over (komune-style) === */
+    @media (max-width: 1023px) {
+      /* The media container becomes a tall scroll runway */
+      #{{ section.id }} .product-media-container {
+        position: relative;
+        height: {{ runway }}vh;
+        padding-bottom: 0 !important;
+        border-bottom: 0 !important;
+      }
+      /* The gallery pins to the top of the viewport at its natural height */
+      #{{ section.id }} .product-media-container .splide--product {
+        position: sticky;
+        top: var(--sticky-header-height, 0px);
+      }
+      /* The product details rise up and cover the pinned image */
+      #{{ section.id }} .product-content-container {
+        position: relative;
+        z-index: 2;
+        margin-top: -{{ overlap }}vh;
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 -16px 40px rgba(14, 14, 14, 0.1);
+      }
+      /* Grab-handle hint at the top of the rising panel */
+      #{{ section.id }} .product-content-container::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--color-gridline, currentColor);
+        opacity: 0.6;
+        margin: 16px auto 0;
+      }
+    }
+  </style>
+{%- endif -%}
+
 {% unless request.design_mode %}
   <script src="{{ 'splide.bundle.min.js' | asset_url }}" type="module"></script>
   <script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
@@ -469,6 +512,37 @@
 {
   "name": "Product pages",
   "settings": [
+    {
+      "type": "header",
+      "content": "Mobile image slide-over"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_slide_over",
+      "label": "Enable image slide-over on mobile",
+      "default": true,
+      "info": "On mobile, the product image stays pinned while the product details rise up and cover it as you scroll. Desktop layout is unaffected."
+    },
+    {
+      "type": "range",
+      "id": "mobile_slide_runway",
+      "label": "Image runway (how long the image stays pinned)",
+      "min": 110,
+      "max": 240,
+      "step": 5,
+      "unit": "vh",
+      "default": 175
+    },
+    {
+      "type": "range",
+      "id": "mobile_slide_overlap",
+      "label": "Details overlap (how far the panel rises over the image)",
+      "min": 0,
+      "max": 95,
+      "step": 5,
+      "unit": "vh",
+      "default": 78
+    },
     {
       "type": "select",
       "id": "desktop_media_width",
