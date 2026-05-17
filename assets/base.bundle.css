@@ -5851,3 +5851,15 @@ details.accordion,
   border-top: 1px solid rgb(var(--color-gridline)) !important;
   border-bottom: 1px solid rgb(var(--color-gridline)) !important;
 }
+
+/* === Predictive search product grid: 2 per row mobile, 5 desktop === */
+#predictive-search-results-list {
+  display: grid !important;
+  width: 100% !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+@media (min-width: 1024px) {
+  #predictive-search-results-list {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}

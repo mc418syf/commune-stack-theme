@@ -66,20 +66,6 @@
       {%- endif -%}
 
       {%- if predictive_search.resources.products.size > 0 -%}
-        <style>
-          /* Force the predictive search product grid column count —
-             ID selector + !important so nothing can override it */
-          #predictive-search-results-list {
-            display: grid !important;
-            width: 100% !important;
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          }
-          @media (min-width: 1024px) {
-            #predictive-search-results-list {
-              grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-            }
-          }
-        </style>
         <div class="col-span-full w-full border-gridline-color bg-scheme-background text-scheme-text">
           <div class="border-b-gridline border-gridline-color bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text">
             <h2 class="font-heading text-lg">
