@@ -361,12 +361,13 @@
           {%- liquid
             if show_filters
               if filters_layout_on_desktop == 'drop_down'
-                # Drop-down used at every size: its own toggle + the
-                # panel are anchored to this bar, so bar + expansion
-                # behave as one section.
+                # Drop-down used at every size.
                 render 'filterable-filters-drop-down', filters: collection.filters, total_active_values: total_active_values, section_color: section_color, clear_url: clear_url, container_classes: 'block'
               else
-                render 'filterable-drawer-toggle', container_classes: 'block md:hidden', total_active_values: total_active_values
+                # Sidebar layout: desktop keeps the sidebar column;
+                # mobile uses the inline drop-down so the bar and the
+                # expansion are one scrolling section.
+                render 'filterable-filters-drop-down', filters: collection.filters, total_active_values: total_active_values, section_color: section_color, clear_url: clear_url, container_classes: 'block md:hidden'
               endif
             endif
 

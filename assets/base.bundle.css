@@ -5899,4 +5899,17 @@ details.accordion,
   .filters-wrapper .js-filter ul {
     columns: 1 !important;
   }
+
+  /* Filter expansion is inline (in document flow), not an overlay —
+     so the Filter bar, the expansion and the product grid all scroll
+     together as one section. */
+  #filters-drop-down {
+    position: static !important;
+    width: 100vw !important;
+    margin-left: calc(-1 * var(--section-horizontal-spacing, 1rem)) !important;
+  }
+  /* Keep the Filter toggle from vertically stretching the Sort toggle */
+  #filters-form-filters-drop-down {
+    align-self: flex-start !important;
+  }
 }
