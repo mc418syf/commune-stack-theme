@@ -105,7 +105,7 @@
         "enable_variant_media": false,
         "enable_image_zoom": true,
         "enable_video_looping": false,
-        "max_width_of_content": "max-w-md mx-auto",
+        "max_width_of_content": "w-full",
         "color_scheme": "",
         "override_header_footer_color_scheme": true
       }
