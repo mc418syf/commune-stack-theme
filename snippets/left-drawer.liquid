@@ -11,16 +11,19 @@
 }
 
 /* === Drawer slot ===
-   Opens directly below the sticky header so it never covers it. */
+   Menu opens below the header; filter opens below the header + the
+   Filter bar so neither is covered. --left-drawer-offset is set by
+   the :style binding on the slot. */
 #modals-leftDrawer #left-drawer-slot {
+  --left-drawer-offset: var(--sticky-header-height, 56px);
   background: rgb(var(--color-scheme-background) / 0.4) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border: none !important;
   width: 100vw !important;
   max-width: 100vw !important;
-  margin-top: var(--sticky-header-height, 56px) !important;
-  max-height: calc(100vh - var(--sticky-header-height, 56px)) !important;
+  margin-top: var(--left-drawer-offset) !important;
+  max-height: calc(100vh - var(--left-drawer-offset)) !important;
   overflow-y: auto !important;
   padding-top: 0 !important;
 }
@@ -63,6 +66,7 @@
         x-trap.inert="$store.modals.leftDrawer.open"
         class="w-full transform overflow-y-auto bg-scheme-background text-scheme-text transition-transform"
         id="left-drawer-slot"
+        :style="{ '--left-drawer-offset': $store.modals.leftDrawer.contents === 'filters' ? 'calc(var(--sticky-header-height, 56px) + 44px)' : 'var(--sticky-header-height, 56px)' }"
         role="dialog"
         aria-modal="true"
         :aria-label="getModalLabel('leftDrawer', $el)"
