@@ -442,15 +442,15 @@
         data-filterable-filter-fragment="clear"
       >
         <button
-          class="theme-button theme-button--no-arrow text-left md:hidden"
-          href="{{ clear_url }}"
+          class="theme-button theme-button--no-arrow w-full md:hidden"
           type="button"
           @click.prevent="filtersOpen = false"
+          style="position: sticky; bottom: 0; z-index: 5;"
         >
           {{ 'collections.filters.apply' | t }}
         </button>
         {% if total_active_values > 0 or price_range_not_full_range %}
-          
+          <a
             class="theme-link theme-link--no-arrow mb-2 text-scheme-text hover:text-scheme-accent"
             href="{{ clear_url }}"
             @click.prevent="clearAllFilters"
