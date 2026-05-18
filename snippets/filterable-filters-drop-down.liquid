@@ -441,13 +441,6 @@
         class="mt-8 flex flex-col items-start gap-5"
         data-filterable-filter-fragment="clear"
       >
-        <button
-          class="filter-apply-button theme-button w-full md:hidden"
-          type="button"
-          @click.prevent="filtersOpen = false"
-        >
-          {{ 'collections.filters.apply' | t }}
-        </button>
         {% if total_active_values > 0 or price_range_not_full_range %}
           <a
             class="theme-link theme-link--no-arrow mb-2 text-scheme-text hover:text-scheme-accent"
@@ -465,6 +458,15 @@
         {% endif %}
       </div>
     </div>
+    {% comment %} Apply button — direct child of the panel so it stays
+       sticky across the whole filter and releases past it {% endcomment %}
+    <button
+      class="filter-apply-button theme-button w-full md:hidden"
+      type="button"
+      @click.prevent="filtersOpen = false"
+    >
+      {{ 'collections.filters.apply' | t }}
+    </button>
   </div>
   {%- if is_search -%}
     <input type="hidden" name="q" value="{{ search_terms | escape }}">

@@ -5911,20 +5911,17 @@ details.accordion,
     background: rgb(var(--color-scheme-background)) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    padding-bottom: 5rem !important;
   }
   /* Keep the Filter toggle from vertically stretching the Sort toggle */
   #filters-form-filters-drop-down {
     align-self: flex-start !important;
   }
-  /* Apply button fixed to the bottom of the screen while the filter
-     is open (the button is inside the x-show panel, so it hides when
-     the filter is closed). */
+  /* Apply button sticks to the bottom of the screen WHILE the filter
+     panel is in view, then scrolls away with the panel once you
+     scroll down into the product grid. */
   .filter-apply-button {
-    position: fixed !important;
+    position: sticky !important;
     bottom: 0;
-    left: 0;
-    right: 0;
     width: 100% !important;
     z-index: 40;
     margin: 0 !important;
