@@ -5800,9 +5800,9 @@ html.no-js .splide:not(.is-active) .no-js\:\[\.splide\:not\(\.is-active\)_\&\]\:
 
 /* === Frosted glass sort dropdown === */
 #sort-drop-down {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  background: rgb(var(--color-scheme-background) / 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   border: none !important;
 }
 /* === Remove Filter button border === */
@@ -5814,9 +5814,9 @@ html.no-js .splide:not(.is-active) .no-js\:\[\.splide\:not\(\.is-active\)_\&\]\:
 }
 /* === Match filter bar to dropdown === */
 #filter-drop-down{
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  background: rgb(var(--color-scheme-background) / 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   border: none !important;
 }
 /* === Remove gap between collapsible tabs === */
