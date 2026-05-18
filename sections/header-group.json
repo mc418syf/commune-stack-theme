@@ -40,7 +40,7 @@
         "layout": "logo_left_menu_right",
         "mobile_layout": "logo_left",
         "header_vertical_spacing": "py-2",
-        "show_search": false,
+        "show_search": true,
         "sticky_header": true,
         "show_icons": false,
         "show_try_on_button": true,
