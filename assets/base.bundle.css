@@ -5927,8 +5927,3 @@ details.accordion,
     margin: 0 !important;
   }
 }
-/* === font-bold wins over font-heading default weight === */
-.font-heading.font-bold,
-.font-bold.font-heading {
-  font-weight: 550 !important;
-}
