@@ -8,11 +8,6 @@
   assign heading_font = settings.font_heading
   assign heading_font_weight = heading_font.weight
   assign heading_font_style = heading_font.style
-
-  # Theme-editor override for heading font weight
-  if settings.heading_font_weight_override and settings.heading_font_weight_override != 'default'
-    assign heading_font_weight = settings.heading_font_weight_override
-  endif
 -%}
 {% comment %} theme-check-disable AssetPreload {% endcomment %}
 {% comment %}
