@@ -10,7 +10,8 @@
   z-index: 110 !important;
 }
 
-/* === Drawer slot === */
+/* === Drawer slot ===
+   Opens directly below the sticky header so it never covers it. */
 #modals-leftDrawer #left-drawer-slot {
   background: rgba(255, 255, 255, 0.4) !important;
   backdrop-filter: blur(14px) !important;
@@ -18,9 +19,10 @@
   border: none !important;
   width: 100vw !important;
   max-width: 100vw !important;
-  max-height: calc(60vh + var(--sticky-header-height, 56px)) !important;
+  margin-top: var(--sticky-header-height, 56px) !important;
+  max-height: calc(100vh - var(--sticky-header-height, 56px)) !important;
   overflow-y: auto !important;
-  padding-top: var(--sticky-header-height, 56px) !important;
+  padding-top: 0 !important;
 }
 
 /* === Remove all divider lines === */
