@@ -15,6 +15,7 @@
     "selected_text_background_color": "accent",
     "base_font_size": 13,
     "font_heading": "sans_serif_n4",
+    "heading_font_weight_override": "500",
     "heading_uppercase": true,
     "heading_underline": false,
     "heading_letterspacing": -25,
