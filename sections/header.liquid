@@ -36,8 +36,7 @@
   endif
 
   assign item_spacing = section.settings.header_vertical_spacing
-  assign show_try_on_button = section.settings.show_try_on_button
-  assign mobile_layout = section.settings.mobile_layout
+  assign show_stack_button = section.settings.show_stack_button
 -%}
 
 {%- capture header_logo -%}
@@ -144,11 +143,7 @@
   >
     {%- if show_icons -%}
       <span class="sr-only">{{ 'layout.navigation.menu' | t }}</span>
-      <span
-        class="header-menu-toggle-icon inline-block h-6 w-6 align-middle"
-        style="transition: transform 0.3s ease;"
-        :style="{ transform: ($store.modals.leftDrawer.open && $store.modals.leftDrawer.contents === 'sidebar') ? 'rotate(45deg)' : 'rotate(0deg)' }"
-      >
+      <span class="header-menu-toggle-icon inline-block h-6 w-6 align-middle">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <line x1="3" y1="9" x2="21" y2="9"/>
           <line x1="3" y1="15" x2="21" y2="15"/>
@@ -163,7 +158,7 @@
 {%- capture header_cart %}
   <a
     href="{{ routes.cart_url }}"
-    class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
+    class="inline-flex {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
     {% if settings.cart_type == 'drawer' and template != 'cart' %}
       data-cart-drawer-toggle
       :aria-expanded="$store.modals.rightDrawer.contents === 'cart'"
@@ -236,7 +231,7 @@
 <header-section
   x-data="Theme_Header"
   class="block{% if overlay_header %} absolute top-0 left-0 right-0 z-50{% endif %}"
-  :class="{ 'is-stuck' : isStuck, 'invisible pointer-events-none' : $store.modals && $store.modals.modal && $store.modals.modal.open }"
+  :class="{ 'is-stuck' : isStuck }"
   {% if section.settings.sticky_header %}
     data-sticky="true"
   {% endif %}
@@ -259,89 +254,133 @@
       class="relative hidden{% if settings.header_uppercase %} uppercase{% endif %}{% unless layout contains 'menu_drawer' %} lg:block{% endunless %}"
       aria-label="{{ 'general.accessibility.primary' | t }}"
     >
-      {%- comment -%} Single flat flex row: logo | menu (flex-1) | actions — all items-center {%- endcomment -%}
-      <div class="px-section-horizontal-spacing" style="display:flex; align-items:stretch; justify-content:space-between;">
-
-        {%- comment -%} LEFT — logo (+ menu if left layout) {%- endcomment -%}
-        <div style="display:flex; flex-shrink:0; align-items:center;">
+      <div class="flex items-stretch px-section-horizontal-spacing justify-between{% if layout contains 'spread' %} flex-wrap {% endif %}">
+        <div class="flex items-stretch{% if layout contains 'center' %} flex-grow w-1/3{% endif %}">
           {% if layout contains 'logo_left' %}
-            {{ header_logo }}
+            <div class="flex{% unless layout contains 'spread' %} mr-6{% endunless %}">
+              {{ header_logo }}
+            </div>
           {% endif %}
           {% if layout contains 'menu_left' %}
-            <div style="margin-left:1.5rem;">{{ header_menu }}</div>
+            {{ header_menu }}
           {% endif %}
         </div>
 
-        {%- comment -%} CENTER — menu / logo-center {%- endcomment -%}
-        {% if layout contains 'menu_spread' or layout contains 'menu_center' %}
-          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:center;">
-            {% if layout contains 'logo_center' %}{{ header_logo }}{% endif %}
-            {{ header_menu }}
+        {% if layout contains 'menu_spread' %}
+          {{ header_menu }}
+        {% elsif layout contains 'center' %}
+          <div class="{% unless layout contains 'logo_center' %}{% endunless %}flex items-stretch justify-end text-center">
+            {% if layout contains 'logo_center' %}
+              {{ header_logo }}
+            {% endif %}
+            {% if layout contains 'menu_center' %}
+              {{ header_menu }}
+            {% endif %}
           </div>
-        {% elsif layout contains 'menu_right' %}
-          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:flex-end;">
-            {{ header_menu }}
-          </div>
-        {% elsif layout contains 'logo_center' %}
-          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:center;">
-            {{ header_logo }}
-          </div>
-        {% else %}
-          <div style="flex:1 1 0%;"></div>
         {% endif %}
 
-        {%- comment -%} RIGHT — localization · accounts · search · try-on · cart {%- endcomment -%}
-        <div style="display:flex; flex-shrink:0; align-items:center; column-gap:1rem;">
-          {%- if show_localization -%}
-            {{ localization_form }}
-          {%- endif -%}
-
-          {%- if shop.customer_accounts_enabled -%}
+        {%- if shop.customer_accounts_enabled
+          and layout == 'logo_left_menu_spread'
+          and show_icons == false
+        -%}
+          <div class="{% unless layout contains 'spread' %}ml-4 flex items-stretch {% endunless %}whitespace-nowrap">
             {{ customer_accounts }}
-          {%- endif -%}
+          </div>
+        {%- endif -%}
 
-          {% if section.settings.show_search %}
+        {% if section.settings.show_search
+          and layout == 'logo_left_menu_spread'
+          and show_icons == false
+        %}
+          <div class="{% unless layout contains 'spread' %}ml-4 flex items-stretch {% endunless %}whitespace-nowrap">
             {% render 'header-search',
               layout: layout,
               header_item_spacing: item_spacing,
               section_color: section_color,
               show_icons: show_icons
             %}
-          {% endif %}
+          </div>
+        {%- endif -%}
 
-          {% if show_try_on_button %}
-            <div x-data>
-              <a
-                href="/pages/try-in-store"
-                class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
-                aria-label="Try In-Store"
-              >
-                {%- if show_icons -%}
-                  <div class="relative my-auto align-middle">
-                    <span
-                      x-show="$store.tryOnList.count > 0"
-                      class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
-                      data-color-scheme="{{ section_color }}"
-                    ></span>
-                    <span class="inline-block h-6 w-6 fill-current align-top">
-                      {%- render 'icon-hanger' -%}
-                    </span>
-                    <span class="sr-only">Try In-Store (<span x-text="$store.tryOnList.count">0</span>)</span>
-                  </div>
-                {%- else -%}
-                  Try In-Store (<span x-text="$store.tryOnList.count">0</span>)
-                {%- endif -%}
-              </a>
+        <div class="flex items-stretch justify-end gap-x-4 text-right {% if layout contains 'center' %} flex-grow flex-wrap w-1/3{% endif %}">
+          {%- liquid
+            if layout contains 'menu_right'
+              echo header_menu
+            endif
+
+            if show_localization
+              echo '<div class="ml-4 my-auto shrink-0">'
+              echo localization_form
+              echo '</div>'
+            endif
+
+            assign show_extras = false
+
+            if layout != 'logo_left_menu_spread'
+              assign show_extras = true
+            endif
+
+            if layout == 'logo_left_menu_spread' and show_icons
+              assign show_extras = true
+            endif
+          -%}
+
+          {%- if shop.customer_accounts_enabled and show_extras -%}
+            <div class="flex items-stretch whitespace-nowrap">
+              {{ customer_accounts }}
+            </div>
+          {%- endif -%}
+
+          {% if section.settings.show_search and show_extras %}
+            <div class="flex items-stretch whitespace-nowrap">
+              {% render 'header-search',
+                layout: layout,
+                header_item_spacing: item_spacing,
+                section_color: section_color,
+                show_icons: show_icons
+              %}
             </div>
           {% endif %}
 
-          {{ header_cart }}
-        </div>
+          {% comment %} Stack nav button — desktop {% endcomment %}
+          {% if show_stack_button %}
+          <div class="flex items-stretch whitespace-nowrap" x-data>
+            <a
+              href="/pages/booking"
+              class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}{% if layout contains 'spread' %} h-full{% endif %}"
+              aria-label="Your stack"
+            >
+              {%- if show_icons -%}
+                <div class="relative my-auto align-middle">
+                  <span
+                    x-show="$store.stack.count > 0"
+                    class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
+                    data-color-scheme="{{ section_color }}"
+                  ></span>
+                  <svg class="inline-block h-6 w-6 fill-current align-top" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                    <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                    <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                  </svg>
+                  <span class="sr-only">Stack (<span x-text="$store.stack.count">0</span>)</span>
+                </div>
+              {%- else -%}
+                <span class="my-auto">
+                  Stack (<span x-text="$store.stack.count">0</span>)
+                </span>
+              {%- endif -%}
+            </a>
+          </div>
+          {% endif %}
 
+          <div class="flex items-stretch whitespace-nowrap">
+            {{ header_cart }}
+          </div>
+        </div>
       </div>
 
       {% if layout contains 'menu_below' %}
-        <div class="border-t-gridline border-gridline-color px-section-horizontal-spacing" style="display:flex; align-items:center; justify-content:center;">
+        <div class="flex items-center justify-center border-t-gridline border-gridline-color px-section-horizontal-spacing">
           {{ header_menu }}
         </div>
       {% endif %}
@@ -355,24 +394,25 @@
       class="{% unless layout contains 'menu_drawer' %}lg:hidden{% endunless %}{% if settings.header_uppercase %} uppercase{% endif %}"
     >
       <div class="flex items-center justify-between px-section-horizontal-spacing lg:relative">
-        <div class="flex gap-2 items-center{% if mobile_layout == 'logo_center' %} flex-grow w-1/3{% endif %}">
-          {% if mobile_layout == 'logo_left' %}
+        <div class="flex gap-2 items-center{% if layout contains 'logo_center' %} flex-grow w-1/3{% endif %}">
+          {% if layout contains 'logo_left' %}
             {{ header_menu_toggle }}
             <div>
               {{ header_logo }}
             </div>
-          {% elsif mobile_layout == 'logo_center' %}
+          {% endif %}
+          {% if layout contains 'logo_center' %}
             {{ header_menu_toggle }}
           {% endif %}
         </div>
 
-        {% if mobile_layout == 'logo_center' %}
+        {% if layout contains 'logo_center' %}
           <div class="shrink-0 justify-center text-center">
             {{ header_logo }}
           </div>
         {% endif %}
 
-        <div class="flex justify-end gap-2 text-right{% if mobile_layout == 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
+        <div class="flex justify-end gap-2 text-right{% if layout contains 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
           {% if layout contains 'menu_drawer' %}
             {%- if show_localization -%}
               <div class="my-auto hidden shrink-0 lg:block">
@@ -398,23 +438,25 @@
               %}
             </div>
           {% endif %}
-          {% comment %} Try In-Store button — mobile {% endcomment %}
-          {% if show_try_on_button %}
+          {% comment %} Stack button — mobile {% endcomment %}
+          {% if show_stack_button %}
           <div class="whitespace-nowrap lg:ml-4" x-data>
             <a
-              href="/pages/try-in-store"
+              href="/pages/booking"
               class="inline-flex items-center {{ item_spacing }}"
-              aria-label="Try In-Store"
+              aria-label="Your stack"
             >
               <div class="relative my-auto align-middle">
                 <span
-                  x-show="$store.tryOnList.count > 0"
+                  x-show="$store.stack.count > 0"
                   class="absolute right-0 top-1 h-2 w-2 rounded-full bg-scheme-accent"
                 ></span>
-                <span class="inline-block h-6 w-6 fill-current align-top">
-                  {%- render 'icon-hanger' -%}
-                </span>
-                <span class="sr-only">Try In-Store</span>
+                <svg class="inline-block h-6 w-6 fill-current align-top" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="4" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                  <rect x="3" y="10.25" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                  <rect x="3" y="16.5" width="18" height="3.5" rx="0.6" fill="currentColor"/>
+                </svg>
+                <span class="sr-only">Stack</span>
               </div>
             </a>
           </div>
@@ -471,7 +513,7 @@
     #shopify-section-{{ section.id }} {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 120;
     }
     #shopify-section-{{ section.id }} nav {
       position: relative;
@@ -506,10 +548,27 @@
   /* === Frosted glass header === */
   #shopify-section-{{ section.id }} header {
     position: relative;
-    background: rgb(var(--color-scheme-background) / 0.4) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+    background: transparent !important;
     border-bottom: none !important;
+    transition: background 0.7s cubic-bezier(0.16,1,0.3,1),
+                backdrop-filter 0.7s cubic-bezier(0.16,1,0.3,1),
+                -webkit-backdrop-filter 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  #shopify-section-{{ section.id }} header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.00) 100%
+    );
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
   }
 
   /* === Remove gridlines === */
@@ -544,28 +603,38 @@
     border: none !important;
   }
 
+  /* === Drawer open header === */
+  #shopify-section-{{ section.id }} header.drawer-open-header {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  #shopify-section-{{ section.id }} header.drawer-open-header::before {
+    display: none !important;
+  }
+
 /* === Frosted glass search bar === */
   #shopify-section-{{ section.id }} [x-ref="searchComponent"] {
-    background: rgb(var(--color-scheme-background) / 0.4) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
     border: none !important;
     top: 0 !important;
     padding-top: calc(var(--sticky-header-height, 56px) + 0.5rem) !important;
   }
   /* === Frosted glass search results === */
 #shopify-section-{{ section.id }} [x-ref="searchComponent"] {
-  background: rgb(var(--color-scheme-background) / 0.4) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
   border: none !important;
 }
 
 /* === Frosted glass predictive results === */
 #shopify-section-{{ section.id }} .predictive-search-results > div {
-  background: rgb(var(--color-scheme-background) / 0.4) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
   border: none !important;
 }
 
@@ -722,22 +791,6 @@
     },
     {
       "type": "select",
-      "id": "mobile_layout",
-      "label": "Mobile layout",
-      "options": [
-        {
-          "value": "logo_left",
-          "label": "Logo left"
-        },
-        {
-          "value": "logo_center",
-          "label": "Logo centered"
-        }
-      ],
-      "default": "logo_left"
-    },
-    {
-      "type": "select",
       "id": "header_vertical_spacing",
       "label": "Vertical spacing",
       "options": [
@@ -771,10 +824,10 @@
     },
     {
       "type": "checkbox",
-      "id": "show_try_on_button",
-      "label": "Show Try In-Store button",
+      "id": "show_stack_button",
+      "label": "Show stack button",
       "default": true,
-      "info": "Displays the hanger icon in the header. Turn off to hide the Try In-Store showroom feature."
+      "info": "Displays the stack icon in the header. Turn off to hide the showroom booking feature."
     },
     {
       "type": "header",
