@@ -145,8 +145,9 @@
     {%- if show_icons -%}
       <span class="sr-only">{{ 'layout.navigation.menu' | t }}</span>
       <span
-        class="header-menu-toggle-icon inline-block h-6 w-6 align-middle transition-transform duration-300"
-        :class="{ 'rotate-90': $store.modals.leftDrawer.open && $store.modals.leftDrawer.contents === 'sidebar' }"
+        class="header-menu-toggle-icon inline-block h-6 w-6 align-middle"
+        style="transition: transform 0.3s ease;"
+        :style="{ transform: ($store.modals.leftDrawer.open && $store.modals.leftDrawer.contents === 'sidebar') ? 'rotate(45deg)' : 'rotate(0deg)' }"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <line x1="3" y1="9" x2="21" y2="9"/>
