@@ -163,7 +163,8 @@
 {%- capture header_cart %}
   <a
     href="{{ routes.cart_url }}"
-    class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
+    class="inline-flex items-center {{ item_spacing }}"
+    aria-label="{{ 'layout.cart.title' | t }}"
     {% if settings.cart_type == 'drawer' and template != 'cart' %}
       data-cart-drawer-toggle
       :aria-expanded="$store.modals.rightDrawer.contents === 'cart'"
@@ -171,41 +172,12 @@
       @keydown.space="$store.modals.open('cart')"
     {% endif %}
   >
-    {%- if show_icons -%}
-      <div class="relative my-auto align-middle">
-        <span
-          x-show="$store.cartCount.count > 0"
-          class="absolute rounded-full bg-scheme-accent"
-          style="right:-2px;top:0;width:6px;height:6px;"
-          data-color-scheme="{{ section_color }}"
-        ></span>
-        <span class="inline-block h-6 w-6 fill-current align-top">
-          {%- liquid
-            case settings.cart_icon
-              when 'basket'
-                render 'icon-basket'
-              when 'bag'
-                render 'icon-bag'
-              when 'cart'
-                render 'icon-cart'
-            endcase
-          -%}
-        </span>
-        <span class="sr-only" x-text="$store.cartCount.countWithText()">
-          {% if cart.item_count == 1 %}
-            {{- 'cart.popup.cart_count.one' | t: count: cart.item_count -}}
-          {% else %}
-            {{- 'cart.popup.cart_count.other' | t: count: cart.item_count -}}
-          {% endif %}
-        </span>
-      </div>
-    {%- else -%}
-      <span class="my-auto">
-        {{- 'layout.cart.title' | t }} (<span x-text="$store.cartCount.count">
-          {{- cart.item_count -}}</span
-        >)</span
-      >
-    {%- endif -%}
+    <span
+      class="inline-flex items-center justify-center text-sm leading-none"
+      style="background: rgb(var(--color-scheme-text)); color: rgb(var(--color-scheme-background)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
+      x-text="$store.cartCount.count"
+    >{{ cart.item_count }}</span>
+    <span class="sr-only">{{ 'layout.cart.title' | t }}</span>
   </a>
 {%- endcapture -%}
 
@@ -314,25 +286,15 @@
             <div x-data>
               <a
                 href="/pages/try-in-store"
-                class="inline-flex items-center {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
+                class="inline-flex items-center {{ item_spacing }}"
                 aria-label="Try In-Store"
               >
-                {%- if show_icons -%}
-                  <div class="relative my-auto align-middle">
-                    <span
-                      x-show="$store.tryOnList.count > 0"
-                      class="absolute rounded-full bg-scheme-accent"
-                      style="right:-2px;top:0;width:6px;height:6px;"
-                      data-color-scheme="{{ section_color }}"
-                    ></span>
-                    <span class="inline-block h-6 w-6 fill-current align-top">
-                      {%- render 'icon-hanger' -%}
-                    </span>
-                    <span class="sr-only">Try In-Store (<span x-text="$store.tryOnList.count">0</span>)</span>
-                  </div>
-                {%- else -%}
-                  Try In-Store (<span x-text="$store.tryOnList.count">0</span>)
-                {%- endif -%}
+                <span
+                  class="inline-flex items-center justify-center text-sm leading-none"
+                  style="background: rgb(var(--color-scheme-accent)); color: rgb(var(--color-scheme-background)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
+                  x-text="$store.tryOnList.count"
+                >0</span>
+                <span class="sr-only">Try In-Store</span>
               </a>
             </div>
           {% endif %}
@@ -411,17 +373,12 @@
               class="inline-flex items-center {{ item_spacing }}"
               aria-label="Try In-Store"
             >
-              <div class="relative my-auto align-middle">
-                <span
-                  x-show="$store.tryOnList.count > 0"
-                  class="absolute rounded-full bg-scheme-accent"
-                  style="right:-2px;top:0;width:6px;height:6px;"
-                ></span>
-                <span class="inline-block h-6 w-6 fill-current align-top">
-                  {%- render 'icon-hanger' -%}
-                </span>
-                <span class="sr-only">Try In-Store</span>
-              </div>
+              <span
+                class="inline-flex items-center justify-center text-sm leading-none"
+                style="background: rgb(var(--color-scheme-accent)); color: rgb(var(--color-scheme-background)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
+                x-text="$store.tryOnList.count"
+              >0</span>
+              <span class="sr-only">Try In-Store</span>
             </a>
           </div>
           {% endif %}
@@ -494,7 +451,8 @@
     }
   }
 
-  /* === Mobile centered logo === */
+  /* === Mobile centered logo (only for the logo-center mobile layout) === */
+  {% if section.settings.mobile_layout == 'logo_center' %}
   @media (max-width: 1023px) {
     #shopify-section-{{ section.id }} a.header-logo-mobile-centered {
       position: absolute;
@@ -508,6 +466,7 @@
       max-width: calc(var(--logo-max-width) * 0.9);
     }
   }
+  {% endif %}
 
   /* === Frosted glass header === */
   #shopify-section-{{ section.id }} header {
