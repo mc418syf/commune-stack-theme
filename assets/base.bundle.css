@@ -5930,5 +5930,5 @@ details.accordion,
 /* === font-bold wins over font-heading default weight === */
 .font-heading.font-bold,
 .font-bold.font-heading {
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
