@@ -26,7 +26,7 @@
         "grid": 4,
         "rows": 12,
         "grid_mobile": "2",
-        "product_grid_gap": 10,
+        "product_grid_gap": 6,
         "product_grid_side_margin": 0,
         "enable_quick_buy": false,
         "quick_buy_button_style": "theme-button--secondary",
