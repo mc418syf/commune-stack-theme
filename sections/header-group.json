@@ -34,7 +34,7 @@
       "type": "header",
       "custom_css": [],
       "settings": {
-        "logo_max_width": 130,
+        "logo_max_width": 120,
         "logo_max_width_mobile": 110,
         "menu": "main-menu",
         "layout": "logo_left_menu_right",
