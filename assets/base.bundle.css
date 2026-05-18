@@ -5902,14 +5902,31 @@ details.accordion,
 
   /* Filter expansion is inline (in document flow), not an overlay —
      so the Filter bar, the expansion and the product grid all scroll
-     together as one section. */
+     together as one section. Solid background, no backdrop-filter
+     (a backdrop-filter would also trap the fixed Apply button). */
   #filters-drop-down {
     position: static !important;
     width: 100vw !important;
     margin-left: calc(-1 * var(--section-horizontal-spacing, 1rem)) !important;
+    background: rgb(var(--color-scheme-background)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-bottom: 5rem !important;
   }
   /* Keep the Filter toggle from vertically stretching the Sort toggle */
   #filters-form-filters-drop-down {
     align-self: flex-start !important;
+  }
+  /* Apply button fixed to the bottom of the screen while the filter
+     is open (the button is inside the x-show panel, so it hides when
+     the filter is closed). */
+  .filter-apply-button {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    z-index: 40;
+    margin: 0 !important;
   }
 }
