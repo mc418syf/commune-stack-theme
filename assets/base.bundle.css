@@ -5550,10 +5550,8 @@ html.no-js .splide:not(.is-active) .no-js\:\[\.splide\:not\(\.is-active\)_\&\]\:
 }
 
 .menu-item a {
-  display: block;
-  padding: 10px 15px;
   text-decoration: none;
-  color: #333;
+  color: inherit;
 }
 
 /* Dropdown styles */
