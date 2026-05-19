@@ -33,9 +33,9 @@
         "linklist": "",
         "enable_filtering": true,
         "enable_sorting": false,
-        "collapse_filters": true,
+        "collapse_filters": false,
         "capitalize_filters": true,
-        "filters_layout_on_desktop": "sidebar",
+        "filters_layout_on_desktop": "drop_down",
         "color_scheme": "",
         "override_header_footer_color_scheme": false
       }
