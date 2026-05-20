@@ -87,6 +87,7 @@
             alt="{{ logo.alt | default: shop.name }}"
             {% if overlay_header_with_sticky
               and section.settings.overlay_logo != blank
+              and section.settings.enable_logo_scroll_swap
             %}
               x-show="isStuck"
             {% endif %}
@@ -115,7 +116,9 @@
             {% else %}
               sizes="{{ logo_max_width_mobile }}px"
             {% endif %}
-            {% if overlay_header_with_sticky %}
+            {% if overlay_header_with_sticky
+              and section.settings.enable_logo_scroll_swap
+            %}
               x-show="!isStuck"
             {% endif %}
           >
@@ -871,6 +874,13 @@
       "type": "image_picker",
       "id": "overlay_logo",
       "label": "Overlay logo image"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_logo_scroll_swap",
+      "label": "Swap/hide logo on scroll",
+      "default": true,
+      "info": "On overlay homepages, hides the main logo at the top and shows it once you scroll. Turn off to keep the logo on screen the whole time (recommended when the logo sits on the left)."
     }
   ]
 }
