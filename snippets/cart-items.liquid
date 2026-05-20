@@ -11,7 +11,7 @@
   endif
 
   # Section-driven copy & styling (passed from sections/cart-items.liquid).
-  assign resolved_title = page_title | default: 'Review Your Bag'
+  assign resolved_title = page_title | default: 'Cart'
   assign show_brand = show_vendor
   if show_brand == nil
     assign show_brand = true
