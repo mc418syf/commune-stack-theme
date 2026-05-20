@@ -39,7 +39,7 @@
         "menu"
       ],
       "custom_css": [
-        ".block {margin-top: 20px;}"
+        ".grid{margin-top: 15px;}"
       ],
       "settings": {
         "show_payment_icons": false,
