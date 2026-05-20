@@ -94,7 +94,7 @@
           >
         {% endunless %}
 
-        {% if overlay_header and section.settings.overlay_logo != blank %}
+        {% if overlay_header and section.settings.overlay_logo != blank and section.settings.enable_logo_scroll_swap %}
           {% assign overlay_logo = section.settings.overlay_logo %}
           <img
             src="{{ overlay_logo | image_url: width: logo_max_width }}"
@@ -879,8 +879,8 @@
       "type": "checkbox",
       "id": "enable_logo_scroll_swap",
       "label": "Swap/hide logo on scroll",
-      "default": true,
-      "info": "On overlay homepages, hides the main logo at the top and shows it once you scroll. Turn off to keep the logo on screen the whole time (recommended when the logo sits on the left)."
+      "default": false,
+      "info": "On overlay homepages, hides the main logo at the top and shows it once you scroll, swapping with the Overlay logo. Off by default — the logo stays on screen the whole time (recommended when the logo sits on the left)."
     }
   ]
 }
