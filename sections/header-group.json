@@ -46,13 +46,14 @@
         "show_try_on_button": true,
         "show_all_navigation_links": true,
         "dropdown_heading_font": "font-body",
-        "dropdown_text_align": "text-left",
+        "dropdown_text_align": "text-center",
         "dropdown_style": "columns",
         "show_locale_selector": false,
         "show_country_selector": false,
         "color_scheme": "scheme1",
         "overlay_homepage": true,
-        "overlay_text_color_scheme": "scheme5"
+        "overlay_text_color_scheme": "scheme5",
+        "enable_logo_scroll_swap": false
       }
     }
   },
