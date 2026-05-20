@@ -26,6 +26,7 @@
     },
     "image_with_text_overlay_yYaW8G": {
       "type": "image-with-text-overlay",
+      "custom_css": [],
       "name": "Image with text overlay",
       "settings": {
         "image": "shopify://shop_images/Commune_22.04.12-5.jpg",
@@ -38,7 +39,7 @@
         "text": "",
         "content_position": "justify-center items-end text-center",
         "content_width_desktop": "lg:w-2/3",
-        "color_scheme": "scheme5",
+        "color_scheme": "scheme1",
         "scheme_text_color_only": false,
         "cta_link": "shopify://collections/all",
         "cta_text": "SHOP ALL",
@@ -52,21 +53,21 @@
           "type": "link",
           "settings": {
             "link": "https://calendly.com/commune237/showroomappointment",
-            "text": "VISIT OUR SHOWROOM"
+            "text": "Visit our showroom"
           }
         },
         "link_97mmxb": {
           "type": "link",
           "settings": {
             "link": "https://calendly.com/commune237/showroomappointment",
-            "text": "|"
+            "text": "at"
           }
         },
         "link_NPL7Nd": {
           "type": "link",
           "settings": {
             "link": "shopify://collections/all",
-            "text": "268-237 KEEFER"
+            "text": "237 Keefer St, Unit 268"
           }
         }
       },
@@ -74,6 +75,9 @@
         "link_FgQa6y",
         "link_97mmxb",
         "link_NPL7Nd"
+      ],
+      "custom_css": [
+        ".w-full{margin-top:10px; margin-bottom: 10px;}"
       ],
       "name": "Featured custom links",
       "settings": {
