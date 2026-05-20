@@ -173,8 +173,9 @@
     {% endif %}
   >
     <span
+      x-show="$store.cartCount.count > 0"
       class="inline-flex items-center justify-center text-sm leading-none"
-      style="background: #D8D4CD; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
+      style="background: #D8D4CD; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;{% if cart.item_count == 0 %} display: none;{% endif %}"
       x-text="$store.cartCount.count"
     >{{ cart.item_count }}</span>
     <span class="sr-only">{{ 'layout.cart.title' | t }}</span>
@@ -290,10 +291,11 @@
                 aria-label="Try In-Store"
               >
                 <span
+                  x-show="$store.tryOnList.count > 0"
                   class="inline-flex items-center justify-center text-sm leading-none"
                   style="background: rgb(var(--color-scheme-accent)); color: rgb(var(--color-scheme-background)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
                   x-text="$store.tryOnList.count"
-                >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;document.currentScript.previousElementSibling.textContent=n;}catch(e){}})();</script>
+                >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;var el=document.currentScript.previousElementSibling;el.textContent=n;if(n===0){el.style.display='none';}}catch(e){}})();</script>
                 <span class="sr-only">Try In-Store</span>
               </a>
             </div>
@@ -374,10 +376,11 @@
               aria-label="Try In-Store"
             >
               <span
+                x-show="$store.tryOnList.count > 0"
                 class="inline-flex items-center justify-center text-sm leading-none"
                 style="background: rgb(var(--color-scheme-accent)); color: rgb(var(--color-scheme-background)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
                 x-text="$store.tryOnList.count"
-              >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;document.currentScript.previousElementSibling.textContent=n;}catch(e){}})();</script>
+              >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;var el=document.currentScript.previousElementSibling;el.textContent=n;if(n===0){el.style.display='none';}}catch(e){}})();</script>
               <span class="sr-only">Try In-Store</span>
             </a>
           </div>
