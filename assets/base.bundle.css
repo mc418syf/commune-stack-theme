@@ -5925,3 +5925,12 @@ details.accordion,
     margin: 0 !important;
   }
 }
+
+/* === Remove arrow icons from theme buttons and links === */
+.theme-button::after,
+.theme-button--secondary::after,
+.theme-link:not(.theme-link--back):not(.theme-link--no-arrow)::after,
+.theme-link--back:not(.theme-link--no-arrow)::before,
+.has-theme-links a[href]:not(.theme-link--back):not(.theme-link--no-arrow)::after {
+  content: none !important;
+}
