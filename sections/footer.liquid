@@ -36,15 +36,6 @@
   data-color-scheme="{{ section_color }}"
   data-theme-footer
 >
-  {% if section.settings.show_newsletter %}
-    {% render 'newsletter',
-      section_color: section.settings.newsletter_color_scheme,
-      text_size_class: 'text-base',
-      section_title: section.settings.newsletter_section_title,
-      subheading: section.settings.newsletter_subheading,
-      section_id: section.id
-    %}
-  {% endif %}
   {% if section.blocks.size > 0 %}
     <div class="border-b-gridline border-gridline-color">
       <div
@@ -147,6 +138,16 @@
         {%- endfor -%}
       </div>
     </div>
+  {% endif %}
+
+  {% if section.settings.show_newsletter %}
+    {% render 'newsletter',
+      section_color: section.settings.newsletter_color_scheme,
+      text_size_class: 'text-base',
+      section_title: section.settings.newsletter_section_title,
+      subheading: section.settings.newsletter_subheading,
+      section_id: section.id
+    %}
   {% endif %}
 
   <div>
