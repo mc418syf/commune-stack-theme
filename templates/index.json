@@ -1,1 +1,150 @@
-{"sections":{"featured-navigation":{"type":"featured-navigation","disabled":true,"settings":{"menu":"","mobile_text_scale":3,"desktop_text_scale":9,"display":"paragraph","paragraph_separator":"emdash","superscript":"product_count","text_alignment":"text-left","show_image_on_hover":true,"color_scheme":""}},"image_with_text_overlay_yYaW8G":{"type":"image-with-text-overlay","name":"Image with text overlay","settings":{"image":"shopify:\/\/shop_images\/commune_March_2026.jpg","image_mobile":"shopify:\/\/shop_images\/commune_March_2026.jpg","indent_image":false,"indent_image_mobile":true,"height":"natural","title":"","heading_size":"text-heading-feature","text":"","content_position":"justify-center items-center text-center","content_width_desktop":"lg:w-2\/3","color_scheme":"scheme1","scheme_text_color_only":false,"cta_link":"shopify:\/\/collections\/all","cta_text":"","cta_style":"button"}},"featured_custom_links_FQDUX4":{"type":"featured-custom-links","blocks":{"link_FgQa6y":{"type":"link","settings":{"link":"https:\/\/calendly.com\/commune237\/showroomappointment","text":"VISIT OUR SHOWROOM"}},"link_97mmxb":{"type":"link","settings":{"link":"https:\/\/calendly.com\/commune237\/showroomappointment","text":"> > >"}}},"block_order":["link_FgQa6y","link_97mmxb"],"name":"Featured custom links","settings":{"mobile_text_scale":2,"desktop_text_scale":6,"display":"list","paragraph_separator":"none","show_index_as_superscript":false,"text_alignment":"text-left","color_scheme":""}},"17705185213dda64bf":{"type":"_blocks","blocks":{"ai_gen_block_4dd9ff8_H8bYqC":{"type":"ai_gen_block_4dd9ff8","name":"Product Scroll","settings":{"products":["aw04-bondaged-trench-coat-1","pre-fall-09-asymmetrical-neoprene-jacket","aw07-knit-nylon-skirt","aw02-boot-cut-trousers","aw08-lambskin-leather-jacket","aw14-cold-_duck-arse-balloon-trench-coat-1","ss95-shoeprint-embossed-shirt"],"desktop_products_per_view":4,"mobile_products_per_view":"2.5","product_gap":2,"maintain_aspect_ratio":true,"product_image_height":400,"show_vendor":true,"vendor_uppercase":true,"vendor_font_size":11,"title_uppercase":true,"title_font_size":11,"title_left_margin":6,"desktop_title_padding_top":6,"desktop_title_padding_right":0,"desktop_title_padding_bottom":0,"desktop_title_padding_left":0,"mobile_title_padding_top":6,"mobile_title_padding_right":0,"mobile_title_padding_bottom":0,"mobile_title_padding_left":0,"show_price":false,"progress_bar_gap":4,"progress_bar_width":50,"progress_bar_bg_color":"#e0e0e0","progress_bar_color":"#202020","vendor_color":"#202020","title_color":"#202020","price_color":"#202020"},"blocks":{}}},"block_order":["ai_gen_block_4dd9ff8_H8bYqC"],"custom_css":[],"settings":{}}},"order":["featured-navigation","image_with_text_overlay_yYaW8G","featured_custom_links_FQDUX4","17705185213dda64bf"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "featured-navigation": {
+      "type": "featured-navigation",
+      "disabled": true,
+      "settings": {
+        "menu": "",
+        "mobile_text_scale": 3,
+        "desktop_text_scale": 9,
+        "display": "paragraph",
+        "paragraph_separator": "emdash",
+        "superscript": "product_count",
+        "text_alignment": "text-left",
+        "show_image_on_hover": true,
+        "color_scheme": ""
+      }
+    },
+    "image_with_text_overlay_yYaW8G": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "image": "shopify://shop_images/Commune_22.04.12-5.jpg",
+        "image_mobile": "shopify://shop_images/Commune_22.04.12-6.jpg",
+        "indent_image": true,
+        "indent_image_mobile": false,
+        "height": "full_screen",
+        "title": "",
+        "heading_size": "text-heading-feature",
+        "text": "",
+        "content_position": "justify-center items-end text-center",
+        "content_width_desktop": "lg:w-2/3",
+        "color_scheme": "scheme5",
+        "scheme_text_color_only": false,
+        "cta_link": "shopify://collections/all",
+        "cta_text": "SHOP ALL",
+        "cta_style": "link"
+      }
+    },
+    "featured_custom_links_FQDUX4": {
+      "type": "featured-custom-links",
+      "blocks": {
+        "link_FgQa6y": {
+          "type": "link",
+          "settings": {
+            "link": "https://calendly.com/commune237/showroomappointment",
+            "text": "VISIT OUR SHOWROOM"
+          }
+        },
+        "link_97mmxb": {
+          "type": "link",
+          "settings": {
+            "link": "https://calendly.com/commune237/showroomappointment",
+            "text": "----->"
+          }
+        },
+        "link_NPL7Nd": {
+          "type": "link",
+          "settings": {
+            "link": "shopify://collections/all",
+            "text": "268-237 KEEFER"
+          }
+        }
+      },
+      "block_order": [
+        "link_FgQa6y",
+        "link_97mmxb",
+        "link_NPL7Nd"
+      ],
+      "name": "Featured custom links",
+      "settings": {
+        "mobile_text_scale": 2,
+        "desktop_text_scale": 6,
+        "display": "list",
+        "paragraph_separator": "none",
+        "show_index_as_superscript": false,
+        "text_alignment": "text-left",
+        "color_scheme": ""
+      }
+    },
+    "17705185213dda64bf": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_4dd9ff8_H8bYqC": {
+          "type": "ai_gen_block_4dd9ff8",
+          "name": "Product Scroll",
+          "settings": {
+            "products": [
+              "aw04-bondaged-trench-coat-1",
+              "pre-fall-09-asymmetrical-neoprene-jacket",
+              "aw07-knit-nylon-skirt",
+              "aw02-boot-cut-trousers",
+              "aw08-lambskin-leather-jacket",
+              "aw14-cold-_duck-arse-balloon-trench-coat-1",
+              "ss95-shoeprint-embossed-shirt"
+            ],
+            "desktop_products_per_view": 4,
+            "mobile_products_per_view": "2.5",
+            "product_gap": 2,
+            "maintain_aspect_ratio": true,
+            "product_image_height": 400,
+            "show_vendor": true,
+            "vendor_uppercase": true,
+            "vendor_font_size": 11,
+            "title_uppercase": true,
+            "title_font_size": 11,
+            "title_left_margin": 6,
+            "desktop_title_padding_top": 6,
+            "desktop_title_padding_right": 0,
+            "desktop_title_padding_bottom": 0,
+            "desktop_title_padding_left": 0,
+            "mobile_title_padding_top": 6,
+            "mobile_title_padding_right": 0,
+            "mobile_title_padding_bottom": 0,
+            "mobile_title_padding_left": 0,
+            "show_price": false,
+            "progress_bar_gap": 4,
+            "progress_bar_width": 50,
+            "progress_bar_bg_color": "#e0e0e0",
+            "progress_bar_color": "#202020",
+            "vendor_color": "#202020",
+            "title_color": "#202020",
+            "price_color": "#202020"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_4dd9ff8_H8bYqC"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {}
+    }
+  },
+  "order": [
+    "featured-navigation",
+    "image_with_text_overlay_yYaW8G",
+    "featured_custom_links_FQDUX4",
+    "17705185213dda64bf"
+  ]
+}
