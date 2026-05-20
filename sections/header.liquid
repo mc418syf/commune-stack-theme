@@ -531,14 +531,14 @@
     border: none !important;
   }
 
-/* === Frosted glass search bar === */
+/* === Frosted glass search bar — opens below the header === */
   #shopify-section-{{ section.id }} [x-ref="searchComponent"] {
     background: rgb(var(--color-scheme-background) / 0.4) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     border: none !important;
-    top: 0 !important;
-    padding-top: calc(var(--sticky-header-height, 56px) + 0.5rem) !important;
+    top: var(--sticky-header-height, 56px) !important;
+    padding-top: 0.5rem !important;
   }
   /* === Frosted glass search results === */
 #shopify-section-{{ section.id }} [x-ref="searchComponent"] {
