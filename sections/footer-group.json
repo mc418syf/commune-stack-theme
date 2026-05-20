@@ -38,7 +38,9 @@
       "block_order": [
         "menu"
       ],
-      "custom_css": [],
+      "custom_css": [
+        ".block {margin-top: 20px;}"
+      ],
       "settings": {
         "show_payment_icons": false,
         "show_locale_selector": false,
