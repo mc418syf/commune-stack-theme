@@ -51,8 +51,8 @@
         "show_locale_selector": false,
         "show_country_selector": false,
         "color_scheme": "scheme1",
-        "overlay_homepage": true,
-        "overlay_text_color_scheme": "scheme5",
+        "overlay_homepage": false,
+        "overlay_text_color_scheme": "scheme1",
         "enable_logo_scroll_swap": false
       }
     }
