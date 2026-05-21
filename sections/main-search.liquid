@@ -143,7 +143,7 @@
 
           <div class="{{ desktop_col_span }} bg-scheme-background text-scheme-text{% unless has_product_results %} max-lg:hidden{% endunless %}">
             {% if has_product_results %}
-              <ul class="grid h-full grid-cols-2 gap-gutter bg-gridline-color {{ products_grid_class }}">
+              <ul class="grid h-full grid-cols-2 gap-gutter bg-scheme-background {{ products_grid_class }}" style="gap: 6px;">
                 {% assign counter = 0 %}
                 {% for item in search.results %}
                   {% if item.object_type == 'product' %}
