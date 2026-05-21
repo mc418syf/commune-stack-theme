@@ -29,14 +29,27 @@
     {{ block.shopify_attributes }}
   {% endif %}
 >
-  <span class="sr-only">
-    {{- 'products.product.regular_price' | t -}}
-  </span>
+  {% comment %}— Sold out: hide price, show label instead —{% endcomment %}
   <span
-    x-html="formatMoney(currentPrice)"
-    :class="{ 'text-scheme-accent': currentVariant && product.compare_at_price_max && currentVariant.compare_at_price > currentVariant.price, 'invisible': !currentVariant }"
+    x-show="currentVariant && !currentVariant.available"
+    style="{% unless current_variant.available == false %}display:none;{% endunless %}"
   >
-    {{ current_variant.price | money }}
+    {{- 'products.product.sold_out' | t -}}
+  </span>
+
+  <span
+    x-show="!currentVariant || currentVariant.available"
+    style="{% if current_variant.available == false %}display:none;{% endif %}"
+  >
+    <span class="sr-only">
+      {{- 'products.product.regular_price' | t -}}
+    </span>
+    <span
+      x-html="formatMoney(currentPrice)"
+      :class="{ 'text-scheme-accent': currentVariant && product.compare_at_price_max && currentVariant.compare_at_price > currentVariant.price, 'invisible': !currentVariant }"
+    >
+      {{ current_variant.price | money }}
+    </span>
   </span>
 
   {% if product.compare_at_price_max > product.price %}
