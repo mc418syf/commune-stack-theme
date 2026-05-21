@@ -510,9 +510,6 @@
     }
   },
   "platform_customizations": {
-    "custom_css": [
-      "/* Force 2 per row on mobile */@media screen and (max-width: 749px) {.template-search .grid--2-col-mobile .grid__item {flex: 0 0 50% !important; max-width: 50% !important; }}",
-      " /* Force 4 per row on desktop */@media screen and (min-width: 750px) {.template-search .grid--4-col-desktop .grid__item {flex: 0 0 25% !important; max-width: 25% !important; }}"
-    ]
+    "custom_css": []
   }
 }
