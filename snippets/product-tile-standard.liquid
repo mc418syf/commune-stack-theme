@@ -386,20 +386,16 @@ PLP product card
             <s class="block lg:inline">
               <span class="sr-only">{{- 'products.product.regular_price' | t -}}</span>
               {%- if settings.currency_code_enabled == true -%}
-                {{- product.compare_at_price | money_with_currency -}}
+                {{- product.compare_at_price | money_without_trailing_zeros -}}
               {%- else -%}
-                {{- product.compare_at_price | money -}}
+                {{- product.compare_at_price | money_without_trailing_zeros -}}
               {%- endif -%}
             </s>
           {% endif %}
           {% if on_sale %}
             {% if product.price_varies %}
               {% liquid
-                if settings.currency_code_enabled == true
-                  assign sale_price = product.price | money_with_currency
-                else
-                  assign sale_price = product.price | money
-                endif
+                assign sale_price = product.price | money_without_trailing_zeros
               %}
               <span class="text-scheme-accent">
                 <span class="sr-only">{{- 'products.product.sale_price' | t -}}</span><br>
@@ -409,22 +405,18 @@ PLP product card
               <span class="text-scheme-accent">
                 <span class="sr-only">{{- 'products.product.sale_price' | t -}}</span>
                 {%- if settings.currency_code_enabled == true -%}
-                  {{- product.price | money_with_currency -}}
+                  {{- product.price | money_without_trailing_zeros -}}
                 {%- else -%}
-                  {{- product.price | money -}}
+                  {{- product.price | money_without_trailing_zeros -}}
                 {%- endif -%}
               </span>
             {% endif %}
           {% else %}
             {% if product.price_varies %}
-              {%- if settings.currency_code_enabled == true -%}
-                {%- assign price = product.price | money_with_currency -%}
-              {%- else -%}
-                {%- assign price = product.price | money -%}
-              {%- endif -%}
+              {%- assign price = product.price | money_without_trailing_zeros -%}
               <span>{{ 'products.product.from_lowest_price_html' | t: lowest_price: price -}}</span>
             {% else %}
-              <span>{%- if settings.currency_code_enabled == true -%}{{- product.price | money_with_currency -}}{%- else -%}{{- product.price | money -}}{%- endif -%}</span>
+              <span>{%- if settings.currency_code_enabled == true -%}{{- product.price | money_without_trailing_zeros -}}{%- else -%}{{- product.price | money_without_trailing_zeros -}}{%- endif -%}</span>
             {% endif %}
           {% endif %}
         {% endif %}
@@ -434,9 +426,9 @@ PLP product card
           <p class="{% if sold_out %}text-scheme-secondary line-through{% endif %} text-xs">
             <span data-unit-price>
               {%- if settings.currency_code_enabled == true -%}
-                {{- unit_price_variant.unit_price | money_with_currency -}}
+                {{- unit_price_variant.unit_price | money_without_trailing_zeros -}}
               {%- else -%}
-                {{- unit_price_variant.unit_price | money -}}
+                {{- unit_price_variant.unit_price | money_without_trailing_zeros -}}
               {%- endif -%}
             </span>
             <span>/</span>

@@ -74,7 +74,7 @@ function tryOnPDP(btn) {
   });
 
   tryOnRefreshButton(btn);
-  window.dispatchEvent(new CustomEvent('open-try-on'));
+  window.location.href = '/pages/try-in-store';
 }
 
 // Refresh button state when variant selection changes

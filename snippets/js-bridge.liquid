@@ -47,8 +47,8 @@
       cart_update_url: {{ routes.cart_update_url | json }},
       cart_clear_url: {{ routes.cart_clear_url | json }},
     },
-    moneyFormat: {{ shop.money_format | json }},
-    moneyWithCurrencyFormat: {{ shop.money_with_currency_format | json }},
+    moneyFormat: {{ shop.money_format | replace: 'amount}}', 'amount_no_decimals}}' | replace: 'amount_with_comma_separator}}', 'amount_no_decimals_with_comma_separator}}' | json }},
+    moneyWithCurrencyFormat: {{ shop.money_with_currency_format | replace: 'amount}}', 'amount_no_decimals}}' | replace: 'amount_with_comma_separator}}', 'amount_no_decimals_with_comma_separator}}' | json }},
     get defaultMoneyFormat() {
       return {% if settings.currency_code_enabled == true %}this.moneyWithCurrencyFormat{% else %}this.moneyFormat{% endif %};
     },

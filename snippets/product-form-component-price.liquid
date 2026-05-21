@@ -48,7 +48,7 @@
       x-html="formatMoney(currentPrice)"
       :class="{ 'text-scheme-accent': currentVariant && product.compare_at_price_max && currentVariant.compare_at_price > currentVariant.price, 'invisible': !currentVariant }"
     >
-      {{ current_variant.price | money }}
+      {{ current_variant.price | money_without_trailing_zeros }}
     </span>
   </span>
 
@@ -62,7 +62,7 @@
           x-html="formatMoney(currentVariant.compare_at_price)"
         >
           {% if current_variant.compare_at_price > current_variant.price %}
-            {{ current_variant.compare_at_price | money }}
+            {{ current_variant.compare_at_price | money_without_trailing_zeros }}
           {% endif %}
         </s>
       </span>
@@ -75,7 +75,7 @@
         {{- 'products.product.unit_price_label' | t -}}
       </span>
       <span x-html="formatMoney(currentVariant.unit_price)">
-        {{- current_variant.unit_price | money -}}
+        {{- current_variant.unit_price | money_without_trailing_zeros -}}
       </span>
       <span aria-hidden="true"> / </span>
       <span class="sr-only">
