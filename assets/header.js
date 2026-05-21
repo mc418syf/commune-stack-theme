@@ -1,5 +1,5 @@
 document.addEventListener('alpine:init', () => {
-  Alpine.data('Theme_Header', () => ({
+  /* Alpine.data('Theme_Header', () => ({
     isStuck: false,
     overlayHeaderWithSticky: null,
     overlayTextColor: null,
@@ -13,7 +13,7 @@ document.addEventListener('alpine:init', () => {
       }
       */
     },
-    setUpOverlayWithSticky() {
+   /* setUpOverlayWithSticky() {
       const positionerEl = document.createElement('div');
       positionerEl.id = 'sticky-positioner';
 
@@ -54,3 +54,4 @@ document.addEventListener('alpine:init', () => {
     },
   }));
 });
+*/
