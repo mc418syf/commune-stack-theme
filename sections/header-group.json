@@ -32,7 +32,9 @@
     },
     "header": {
       "type": "header",
-      "custom_css": [],
+      "custom_css": [
+        ".contents{font-size:12px;}"
+      ],
       "settings": {
         "logo_max_width": 120,
         "logo_max_width_mobile": 110,
