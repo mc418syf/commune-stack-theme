@@ -161,17 +161,17 @@
                     <span class="sr-only">
                       {{- 'cart.label.discounted_price' | t -}}
                     </span>
-                    {{ item.price | money_without_trailing_zeros }}
+                    {{ item.price | money }}
                     <span class="sr-only">
                       {{- 'cart.label.original_price' | t -}}
                     </span>
-                    <s>{{ item.original_price | money_without_trailing_zeros }}</s>
+                    <s>{{ item.original_price | money }}</s>
                   {% else %}
-                    {{ item.price | money_without_trailing_zeros }}
+                    {{ item.price | money }}
                   {% endif %}
                   {%- if item.unit_price_measurement -%}
                     <div class="text-xs">
-                      {{ item.unit_price | money_without_trailing_zeros }} /&nbsp;
+                      {{ item.unit_price | money }} /&nbsp;
                       {%- if item.unit_price_measurement.reference_value != 1
                       -%}
                         {{- item.unit_price_measurement.reference_value -}}
@@ -239,14 +239,14 @@
               >
                 <div>
                   {%- if item.original_line_price != item.final_line_price -%}
-                    <del class="">{{ item.original_line_price | money_without_trailing_zeros }}</del>
-                    <span class="">{{ item.final_line_price | money_without_trailing_zeros }}</span>
+                    <del class="">{{ item.original_line_price | money }}</del>
+                    <span class="">{{ item.final_line_price | money }}</span>
                   {%- else -%}
-                    <span>{{ item.original_line_price | money_without_trailing_zeros }}</span>
+                    <span>{{ item.original_line_price | money }}</span>
                   {%- endif -%}
                   {%- if item.unit_price_measurement -%}
                     <div class="text-xs">
-                      {{ item.unit_price | money_without_trailing_zeros }} /&nbsp;
+                      {{ item.unit_price | money }} /&nbsp;
                       {%- if item.unit_price_measurement.reference_value != 1
                       -%}
                         {{- item.unit_price_measurement.reference_value -}}
@@ -264,7 +264,7 @@
                         <li class="order-discount__item">
                           {{ discount_allocation.discount_application.title -}}
                           {%- if discount_allocation.amount > 0 %}
-                            -{{ discount_allocation.amount | money_without_trailing_zeros -}}
+                            -{{ discount_allocation.amount | money -}}
                           {%- endif %}
                         </li>
                       {%- endfor -%}

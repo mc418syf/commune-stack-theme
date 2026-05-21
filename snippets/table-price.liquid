@@ -7,9 +7,9 @@
         {{- 'products.product.regular_price' | t -}}
       </span>
       {%- if settings.currency_code_enabled == true -%}
-        {{- product.compare_at_price | money_without_trailing_zeros -}}
+        {{- product.compare_at_price | money_with_currency -}}
       {%- else -%}
-        {{- product.compare_at_price | money_without_trailing_zeros -}}
+        {{- product.compare_at_price | money -}}
       {%- endif -%}
     </s>
   {% endif %}
@@ -19,7 +19,7 @@
         if settings.currency_code_enabled == true
           assign sale_price = product.price | money_with_currency
         else
-          assign sale_price = product.price | money_without_trailing_zeros
+          assign sale_price = product.price | money
         endif
       %}
 
@@ -35,9 +35,9 @@
           {{- 'products.product.sale_price' | t -}}
         </span>
         {%- if settings.currency_code_enabled == true -%}
-          {{- product.price | money_without_trailing_zeros -}}
+          {{- product.price | money_with_currency -}}
         {%- else -%}
-          {{- product.price | money_without_trailing_zeros -}}
+          {{- product.price | money -}}
         {%- endif -%}
       </span>
     {% endif %}
@@ -57,9 +57,9 @@
     {% else %}
       <span>
         {%- if settings.currency_code_enabled == true -%}
-          {{- product.price | money_without_trailing_zeros -}}
+          {{- product.price | money_with_currency -}}
         {%- else -%}
-          {{- product.price | money_without_trailing_zeros -}}
+          {{- product.price | money -}}
         {%- endif -%}
       </span>
     {% endif %}

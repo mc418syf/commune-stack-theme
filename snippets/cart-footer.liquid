@@ -45,7 +45,7 @@
             ><span>{{- discount_application.title -}}</span>
           </dt>
           <dd class="text-right text-scheme-accent">
-            -{{ discount_application.total_allocated_amount | money_without_trailing_zeros }}
+            -{{ discount_application.total_allocated_amount | money }}
           </dd>
         {%- endfor -%}
         <dt class="text-left py-2">Bag Total</dt>
