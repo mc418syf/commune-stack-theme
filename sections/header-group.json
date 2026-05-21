@@ -33,7 +33,7 @@
     "header": {
       "type": "header",
       "custom_css": [
-        ".contents{font-size:12px;}"
+        ".clamp{font-size:12px;}"
       ],
       "settings": {
         "logo_max_width": 120,
