@@ -85,9 +85,11 @@
               sizes="{{ logo_max_width_mobile }}px"
             {% endif %}
             alt="{{ logo.alt | default: shop.name }}"
+            {% comment %}DISABLED: scroll logo swap{% endcomment %}
             {% if overlay_header_with_sticky
               and section.settings.overlay_logo != blank
               and section.settings.enable_logo_scroll_swap
+              and false
             %}
               x-show="isStuck"
             {% endif %}
@@ -116,8 +118,10 @@
             {% else %}
               sizes="{{ logo_max_width_mobile }}px"
             {% endif %}
+            {% comment %}DISABLED: scroll logo swap{% endcomment %}
             {% if overlay_header_with_sticky
               and section.settings.enable_logo_scroll_swap
+              and false
             %}
               x-show="!isStuck"
             {% endif %}
