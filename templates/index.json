@@ -85,7 +85,7 @@
         "mobile_text_scale": 1,
         "desktop_text_scale": 4,
         "display": "paragraph",
-        "paragraph_separator": "none",
+        "paragraph_separator": "hyphen",
         "show_index_as_superscript": false,
         "text_alignment": "text-left",
         "color_scheme": "scheme1"
