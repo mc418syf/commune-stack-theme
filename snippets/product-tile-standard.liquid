@@ -152,13 +152,7 @@ PLP product card
     <div class="w-full {% unless settings.fill_image_to_border_edge %}pt-2 lg:pt-4 {% if reduce_gutter %}px-1 lg:px-section-horizontal-spacing{% else %}px-section-horizontal-spacing {% endif %}{% else %}border-b-gridline border-gridline-color pb-0{% endunless %}">
       <div class="relative z-0">
 
-        {%- if sold_out -%}
-          <div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-            <span class="font-heading uppercase tracking-wide text-white">
-              {{- 'products.product.sold_out' | t -}}
-            </span>
-          </div>
-        {%- endif -%}
+        {% comment %}REMOVED: sold out overlay text on product image{% endcomment %}
 
         {%- comment -%} MOBILE: swipeable gallery (overlay dots) {%- endcomment -%}
         {% if enable_mobile_swipe %}
