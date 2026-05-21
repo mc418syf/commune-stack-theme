@@ -51,39 +51,40 @@
       "blocks": {
         "link_FgQa6y": {
           "type": "link",
+          "disabled": true,
           "settings": {
             "link": "https://calendly.com/commune237/showroomappointment",
             "text": "Visit our showroom"
-          }
-        },
-        "link_97mmxb": {
-          "type": "link",
-          "settings": {
-            "link": "https://calendly.com/commune237/showroomappointment",
-            "text": "at"
           }
         },
         "link_NPL7Nd": {
           "type": "link",
           "settings": {
             "link": "https://calendly.com/commune237/showroomappointment",
-            "text": "237 Keefer St, Unit 268"
+            "text": "237 Keefer St"
+          }
+        },
+        "link_97mmxb": {
+          "type": "link",
+          "settings": {
+            "link": "https://calendly.com/commune237/showroomappointment",
+            "text": "Unit 268"
           }
         }
       },
       "block_order": [
         "link_FgQa6y",
-        "link_97mmxb",
-        "link_NPL7Nd"
+        "link_NPL7Nd",
+        "link_97mmxb"
       ],
       "custom_css": [
-        ".w-full {margin-top: 10px; margin-bottom: 10px;}"
+        ".w-full {margin-top: 10px;}"
       ],
       "name": "Featured custom links",
       "settings": {
-        "mobile_text_scale": 2,
-        "desktop_text_scale": 5,
-        "display": "list",
+        "mobile_text_scale": 1,
+        "desktop_text_scale": 4,
+        "display": "paragraph",
         "paragraph_separator": "none",
         "show_index_as_superscript": false,
         "text_alignment": "text-left",
