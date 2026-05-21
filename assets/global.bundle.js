@@ -27,6 +27,7 @@ function formatMoney(cents, format) {
   function formatWithDelimiters(number) {
     let precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
     let thousands = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
+    let decimal = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '.';
     if (isNaN(number) || number == null) {
       return 0;
     }
