@@ -61,9 +61,7 @@
           assign logo_max_width_2x = section.settings.logo_max_width | times: 2
           assign logo_max_width_3x = section.settings.logo_max_width | times: 3
         %}
-        {%- unless overlay_header_without_sticky
-          and section.settings.overlay_logo != blank
-        -%}
+        {% comment %}DISABLED scroll logo swap: main logo always renders{% endcomment %}
           <img
             src="{{ logo | image_url: width: logo_max_width }}"
             srcset="
@@ -85,48 +83,8 @@
               sizes="{{ logo_max_width_mobile }}px"
             {% endif %}
             alt="{{ logo.alt | default: shop.name }}"
-            {% comment %}DISABLED: scroll logo swap{% endcomment %}
-            {% if overlay_header_with_sticky
-              and section.settings.overlay_logo != blank
-              and section.settings.enable_logo_scroll_swap
-              and false
-            %}
-              x-show="isStuck"
-            {% endif %}
           >
-        {% endunless %}
-
-        {% if overlay_header and section.settings.overlay_logo != blank and section.settings.enable_logo_scroll_swap %}
-          {% assign overlay_logo = section.settings.overlay_logo %}
-          <img
-            src="{{ overlay_logo | image_url: width: logo_max_width }}"
-            srcset="
-              {%- if logo_max_width != logo_max_width_mobile -%}
-                {{- overlay_logo | image_url: width: logo_max_width_mobile }} {{ logo_max_width_mobile }}w,
-                {{- overlay_logo | image_url: width: logo_max_width_mobile_2x }} {{ logo_max_width_mobile_2x }}w,
-                {{- overlay_logo | image_url: width: logo_max_width_mobile_3x }} {{ logo_max_width_mobile_3x }}w,
-              {%- endif -%}
-              {{- overlay_logo | image_url: width: logo_max_width }} {{ logo_max_width }}w,
-              {{- overlay_logo | image_url: width: logo_max_width_2x }} {{ logo_max_width_2x }}w,
-              {{- overlay_logo | image_url: width: logo_max_width_3x }} {{ logo_max_width_3x }}w
-            "
-            width="{{ overlay_logo.width }}"
-            height="{{ overlay_logo.height }}"
-            loading="eager"
-            {% if logo_max_width != logo_max_width_mobile %}
-              sizes="(min-width: 1024px) {{ logo_max_width }}px, {{ logo_max_width_mobile }}px"
-            {% else %}
-              sizes="{{ logo_max_width_mobile }}px"
-            {% endif %}
-            {% comment %}DISABLED: scroll logo swap{% endcomment %}
-            {% if overlay_header_with_sticky
-              and section.settings.enable_logo_scroll_swap
-              and false
-            %}
-              x-show="!isStuck"
-            {% endif %}
-          >
-        {% endif %}
+        {% comment %}DISABLED: overlay logo swap block removed{% endcomment %}
       </div>
     {% else %}
       {{ shop.name }}
