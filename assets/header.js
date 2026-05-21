@@ -7,9 +7,11 @@ document.addEventListener('alpine:init', () => {
       this.overlayHeaderWithSticky =
         this.$root.dataset.overlayHeaderWithSticky === 'true';
 
+      /* DISABLED: scroll logo swap
       if (this.overlayHeaderWithSticky) {
         this.setUpOverlayWithSticky();
       }
+      */
     },
     setUpOverlayWithSticky() {
       const positionerEl = document.createElement('div');
