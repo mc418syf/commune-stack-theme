@@ -28,7 +28,7 @@
     "font_body": "sans_serif_n4",
     "base_line_height": 1.3,
     "body_copy_uppercase": false,
-    "section_title_font": "font-heading",
+    "section_title_font": "font-body",
     "section_title_align": "left",
     "header_uppercase": true,
     "product_grid_uppercase": true,
