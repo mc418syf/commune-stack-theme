@@ -175,26 +175,11 @@
       @keydown.space="$store.modals.open('cart')"
     {% endif %}
   >
-    {%- comment -%} Icon when cart is empty {%- endcomment -%}
-    <span
-      class="inline-block h-6 w-6 fill-current align-top"
-      style="{% if cart.item_count > 0 %}display: none;{% endif %}"
-      x-show="$store.cartCount.count == 0"
-    >
-      {%- case settings.cart_icon -%}
-        {%- when 'basket' -%}{%- render 'icon-basket' -%}
-        {%- when 'bag' -%}{%- render 'icon-bag' -%}
-        {%- when 'cart' -%}{%- render 'icon-cart' -%}
-        {%- else -%}{%- render 'icon-bag' -%}
-      {%- endcase -%}
-    </span>
-    {%- comment -%} Count block when cart has items {%- endcomment -%}
     <span
       class="inline-flex items-center justify-center text-sm leading-none"
-      style="background: #DBDBDB; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;{% if cart.item_count == 0 %} display: none;{% endif %}"
-      x-show="$store.cartCount.count > 0"
+      style="background: #DBDBDB; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
       x-text="$store.cartCount.count"
-    >{% if cart.item_count > 0 %}{{ cart.item_count }}{% endif %}</span>
+    >{{ cart.item_count }}</span>
     <span class="sr-only">{{ 'layout.cart.title' | t }}</span>
   </a>
 {%- endcapture -%}
@@ -307,20 +292,11 @@
                 class="inline-flex items-center {{ item_spacing }}"
                 aria-label="Try In-Store"
               >
-                {%- comment -%} Icon when try-on list is empty {%- endcomment -%}
                 <span
-                  data-tryon-icon
-                  class="inline-block h-6 w-6 fill-current align-top"
-                  x-show="$store.tryOnList.count == 0"
-                >{%- render 'icon-hanger' -%}</span>
-                {%- comment -%} Count block when items added {%- endcomment -%}
-                <span
-                  data-tryon-count
                   class="inline-flex items-center justify-center text-sm leading-none"
-                  style="background: #B0B0B0; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem; display: none;"
-                  x-show="$store.tryOnList.count > 0"
+                  style="background: #B0B0B0; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
                   x-text="$store.tryOnList.count"
-                ></span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;var block=document.currentScript.previousElementSibling;var icon=block.previousElementSibling;if(n>0){block.textContent=n;block.style.display='';icon.style.display='none';}else{block.style.display='none';icon.style.display='';}}catch(e){}})();</script>
+                >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;document.currentScript.previousElementSibling.textContent=n;}catch(e){}})();</script>
                 <span class="sr-only">Try In-Store</span>
               </a>
             </div>
@@ -400,20 +376,11 @@
               class="inline-flex items-center {{ item_spacing }}"
               aria-label="Try In-Store"
             >
-              {%- comment -%} Icon when try-on list is empty {%- endcomment -%}
               <span
-                data-tryon-icon
-                class="inline-block h-6 w-6 fill-current align-top"
-                x-show="$store.tryOnList.count == 0"
-              >{%- render 'icon-hanger' -%}</span>
-              {%- comment -%} Count block when items added {%- endcomment -%}
-              <span
-                data-tryon-count
                 class="inline-flex items-center justify-center text-sm leading-none"
-                style="background: #B0B0B0; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem; display: none;"
-                x-show="$store.tryOnList.count > 0"
+                style="background: #B0B0B0; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
                 x-text="$store.tryOnList.count"
-              ></span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;var block=document.currentScript.previousElementSibling;var icon=block.previousElementSibling;if(n>0){block.textContent=n;block.style.display='';icon.style.display='none';}else{block.style.display='none';icon.style.display='';}}catch(e){}})();</script>
+              >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;document.currentScript.previousElementSibling.textContent=n;}catch(e){}})();</script>
               <span class="sr-only">Try In-Store</span>
             </a>
           </div>
