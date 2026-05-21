@@ -30,9 +30,9 @@
       "name": "Image with text overlay",
       "settings": {
         "image": "shopify://shop_images/IMG_9742-desktop.jpg",
-        "image_mobile": "shopify://shop_images/IMG_9742-Edit.png",
+        "image_mobile": "shopify://shop_images/IMG_9742-desktop.jpg",
         "indent_image": false,
-        "indent_image_mobile": false,
+        "indent_image_mobile": true,
         "height": "natural",
         "title": "",
         "heading_size": "text-heading-feature",
