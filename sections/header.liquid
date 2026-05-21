@@ -4,15 +4,10 @@
   assign overlay_text_color_scheme = section.settings.overlay_text_color_scheme
   assign show_icons = section.settings.show_icons
 
-  if section.settings.overlay_homepage and template.name == 'index'
-    assign overlay_header = true
-
-    if section.settings.sticky_header
-      assign overlay_header_with_sticky = true
-    else
-      assign overlay_header_without_sticky = true
-    endif
-  endif
+  {% comment %}DISABLED: overlay header / scroll logo swap — forced off{% endcomment %}
+  assign overlay_header = false
+  assign overlay_header_with_sticky = false
+  assign overlay_header_without_sticky = false
 
   assign drop_down_flex_alignment = 'justify-center'
 
