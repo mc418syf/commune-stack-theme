@@ -61,21 +61,13 @@
           "type": "link",
           "settings": {
             "link": "https://calendly.com/commune237/showroomappointment",
-            "text": "237 Keefer St"
-          }
-        },
-        "link_97mmxb": {
-          "type": "link",
-          "settings": {
-            "link": "https://calendly.com/commune237/showroomappointment",
-            "text": "Unit 268"
+            "text": "237 Keefer St - by appointment only"
           }
         }
       },
       "block_order": [
         "link_FgQa6y",
-        "link_NPL7Nd",
-        "link_97mmxb"
+        "link_NPL7Nd"
       ],
       "custom_css": [
         ".w-full {margin-top: 10px;}"
