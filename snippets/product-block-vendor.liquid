@@ -26,6 +26,8 @@
     {{ block.shopify_attributes }}
     class="product-vendor-block relative z-10 mt-4 text-base text-scheme-secondary"
   >
-    {{ product.vendor | link_to_vendor }}
+    <a class="mt-4 text-base text-scheme-secondary" href="/collections/{{ product.vendor | handleize }}">
+      {{- product.vendor -}}
+    </a>
   </p>
 {%- endif -%}

@@ -85,7 +85,7 @@
 
               {% if data_letter == l %}
                 <div class="brand-item">
-                  <a href="/collections/vendors?q={{ vendor | url_encode }}" class="brand-link" style="color: {{ settings.brand_color }}">
+                  <a href="/collections/{{ vendor | handleize }}" class="brand-link" style="color: {{ settings.brand_color }}">
                     <span class="brand-name">{{ vendor }}</span>
                     {% if settings.show_brand_images %}
                       <div class="brand-image" aria-hidden="true">
