@@ -2,40 +2,47 @@
 {
   "name": "Brand List",
   "settings": [
+    { "type": "header", "content": "Brand List Section Settings" },
+    { "type": "text", "id": "section_title", "label": "Section Title", "default": "Our Brands" },
+    { "type": "color", "id": "brand_color", "label": "Brand Text Color", "default": "rgb(0,0,0)" },
+    { "type": "checkbox", "id": "show_brand_images", "label": "Show Brand Logos", "default": false }
+  ],
+  "blocks": [
     {
-      "type": "header",
-      "content": "Brand List Section Settings"
-    },
-    {
-      "type": "text",
-      "id": "section_title",
-      "label": "Section Title",
-      "default": "Our Brands"
-    },
-    {
-      "type": "color",
-      "id": "brand_color",
-      "label": "Brand Text Color",
-      "default": "rgb(0,0,0)"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_brand_images",
-      "label": "Show Brand Logos",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "hide_sold_out_brands",
-      "label": "Hide brands with no products in stock",
-      "default": true
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        {
+          "type": "text",
+          "id": "vendor",
+          "label": "Brand name",
+          "default": "Brand Name",
+          "info": "Used for A-Z grouping and the default link (/collections/[handle])."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Custom link (optional)",
+          "info": "Leave blank to link to /collections/[brand-name-handle]"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Brand logo (optional)"
+        }
+      ]
     }
   ],
-  "blocks": [],
+  "max_blocks": 200,
   "presets": [
     {
       "name": "Default",
-      "category": "Custom"
+      "category": "Custom",
+      "blocks": [
+        { "type": "brand" },
+        { "type": "brand" },
+        { "type": "brand" }
+      ]
     }
   ]
 }
@@ -44,62 +51,49 @@
 <section class="brand-list-wrapper">
   <h1 class="brand-section-title">{{ settings.section_title }}</h1>
 
-  {% assign vendors = shop.vendors | sort %}
   {% assign alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
 
   {%- comment -%}
-  Build a lookup of vendors that currently have at least one available
-  (in-stock) product: "||Vendor A||Vendor B||...". Only computed when
-  hide_sold_out_brands is on, since it costs a pass over the catalog
-  (capped at 250 products via paginate).
+  Liquid's sort filter can't sort blocks by a nested settings property,
+  so build "vendorName||blockIndex" strings, sort those (sorts by name
+  first), then look each block back up by index when rendering.
   {%- endcomment -%}
-  {% assign available_vendors = "" %}
-  {% if settings.hide_sold_out_brands %}
-    {% assign available_vendors = "||" %}
-    {% paginate collections.all.products by 250 %}
-      {% for product in collections.all.products %}
-        {% if product.available %}
-          {% assign needle = "||" | append: product.vendor | append: "||" %}
-          {% unless available_vendors contains needle %}
-            {% assign available_vendors = available_vendors | append: product.vendor | append: "||" %}
-          {% endunless %}
+  {% assign combined = "" %}
+  {% for block in section.blocks %}
+    {% if block.type == "brand" %}
+      {% assign vendor_name = block.settings.vendor | strip %}
+      {% if vendor_name != blank %}
+        {% assign entry = vendor_name | append: "||" | append: forloop.index0 %}
+        {% if combined == "" %}
+          {% assign combined = entry %}
+        {% else %}
+          {% assign combined = combined | append: ",," | append: entry %}
         {% endif %}
-      {% endfor %}
-    {% endpaginate %}
-  {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% assign sorted_entries = combined | split: ",," | sort %}
 
   {%- comment -%}
   先计算有哪些首字母（去重、排序），非 A-Z 皆归入 '#'
-  只统计仍有库存的品牌（若开启了 hide_sold_out_brands）
   {%- endcomment -%}
   {% assign letters = "" %}
-  {% for vendor in vendors %}
-    {% assign trimmed = vendor | strip %}
-    {% if trimmed != blank %}
-      {% assign vendor_in_stock = true %}
-      {% if settings.hide_sold_out_brands %}
-        {% assign needle = "||" | append: trimmed | append: "||" %}
-        {% assign vendor_in_stock = false %}
-        {% if available_vendors contains needle %}
-          {% assign vendor_in_stock = true %}
-        {% endif %}
-      {% endif %}
-      {% if vendor_in_stock %}
-        {% assign first = trimmed | slice: 0, 1 | upcase %}
-        {% if alpha contains first %}
-          {% assign letter = first %}
-        {% else %}
-          {% assign letter = "#" %}
-        {% endif %}
-        {% unless letters contains letter %}
-          {% if letters == "" %}
-            {% assign letters = letter %}
-          {% else %}
-            {% assign letters = letters | append: "," | append: letter %}
-          {% endif %}
-        {% endunless %}
-      {% endif %}
+  {% for entry in sorted_entries %}
+    {% assign parts = entry | split: "||" %}
+    {% assign vendor_name = parts[0] %}
+    {% assign first = vendor_name | slice: 0, 1 | upcase %}
+    {% if alpha contains first %}
+      {% assign letter = first %}
+    {% else %}
+      {% assign letter = "#" %}
     {% endif %}
+    {% unless letters contains letter %}
+      {% if letters == "" %}
+        {% assign letters = letter %}
+      {% else %}
+        {% assign letters = letters | append: "," | append: letter %}
+      {% endif %}
+    {% endunless %}
   {% endfor %}
   {% assign letters_array = letters | split: "," | sort %}
 
@@ -111,39 +105,34 @@
 
         <!-- 右侧：该组品牌，两列 -->
         <div class="group-grid">
-          {% for vendor in vendors %}
-            {% assign trimmed = vendor | strip %}
-            {% if trimmed != blank %}
-              {% assign vendor_in_stock = true %}
-              {% if settings.hide_sold_out_brands %}
-                {% assign needle = "||" | append: trimmed | append: "||" %}
-                {% assign vendor_in_stock = false %}
-                {% if available_vendors contains needle %}
-                  {% assign vendor_in_stock = true %}
-                {% endif %}
-              {% endif %}
+          {% for entry in sorted_entries %}
+            {% assign parts = entry | split: "||" %}
+            {% assign vendor_name = parts[0] %}
+            {% assign block_index = parts[1] | plus: 0 %}
+            {% assign block = section.blocks[block_index] %}
 
-              {% if vendor_in_stock %}
-                {% assign first = trimmed | slice: 0, 1 | upcase %}
-                {% if alpha contains first %}
-                  {% assign data_letter = first %}
-                {% else %}
-                  {% assign data_letter = "#" %}
-                {% endif %}
+            {% assign first = vendor_name | slice: 0, 1 | upcase %}
+            {% if alpha contains first %}
+              {% assign data_letter = first %}
+            {% else %}
+              {% assign data_letter = "#" %}
+            {% endif %}
 
-                {% if data_letter == l %}
-                  <div class="brand-item">
-                    <a href="/collections/{{ vendor | handleize }}" class="brand-link" style="color: {{ settings.brand_color }}">
-                      <span class="brand-name">{{ vendor }}</span>
-                      {% if settings.show_brand_images %}
-                        <div class="brand-image" aria-hidden="true">
-                          <img src="{{ 'vendor_logos/' | append: vendor | append: '.jpg' | asset_url }}" alt="{{ vendor }} logo" loading="lazy">
-                        </div>
-                      {% endif %}
-                    </a>
-                  </div>
-                {% endif %}
+            {% if data_letter == l %}
+              {% assign brand_url = "/collections/" | append: vendor_name | handleize %}
+              {% if block.settings.link != blank %}
+                {% assign brand_url = block.settings.link %}
               {% endif %}
+              <div class="brand-item" {{ block.shopify_attributes }}>
+                <a href="{{ brand_url }}" class="brand-link" style="color: {{ settings.brand_color }}">
+                  <span class="brand-name">{{ vendor_name }}</span>
+                  {% if settings.show_brand_images and block.settings.image %}
+                    <div class="brand-image" aria-hidden="true">
+                      <img src="{{ block.settings.image | image_url: width: 200 }}" alt="{{ vendor_name }} logo" loading="lazy">
+                    </div>
+                  {% endif %}
+                </a>
+              </div>
             {% endif %}
           {% endfor %}
         </div>
