@@ -31,9 +31,9 @@
       "settings": {
         "image": "shopify://shop_images/IMG_9742-desktop.jpg",
         "image_mobile": "shopify://shop_images/IMG_9742-desktop.jpg",
-        "indent_image": false,
+        "indent_image": true,
         "indent_image_mobile": true,
-        "height": "natural",
+        "height": "full_screen",
         "title": "",
         "heading_size": "text-heading-feature",
         "text": "",
