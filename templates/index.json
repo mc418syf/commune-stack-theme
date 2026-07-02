@@ -70,7 +70,7 @@
         "link_NPL7Nd"
       ],
       "custom_css": [
-        ".w-full {margin-top: 10px;}"
+        ".w-full {margin-top: 20px;}"
       ],
       "name": "Featured custom links",
       "settings": {
