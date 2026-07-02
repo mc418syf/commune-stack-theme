@@ -1256,27 +1256,27 @@ shopify-payment-terms{
   }
 
 .rte h1{
-  font-size: var(--font-size-2xl);
+  font-size: var(--feature-heading-size);
   line-height: var(--base-line-height);
 }
 
 @media (min-width: 1024px){
 
   .rte h1{
-    font-size: var(--font-size-5xl);
+    font-size: var(--feature-heading-size);
     line-height: var(--heading-line-height);
   }
 }
 
 .rte h2{
-  font-size: var(--font-size-2xl);
+  font-size: var(--secondary-heading-size);
   line-height: var(--base-line-height);
 }
 
 @media (min-width: 1024px){
 
   .rte h2{
-    font-size: var(--font-size-3xl);
+    font-size: var(--secondary-heading-size);
     line-height: var(--heading-line-height);
   }
 }
