@@ -156,7 +156,7 @@
       "scheme-081fef8a-58e3-46c7-9014-d2d217513151": {
         "settings": {
           "background": "#ebebeb",
-          "text": "#ebebeb",
+          "text": "#333333",
           "accent": "#333333",
           "accent_contrast": "#ebebeb",
           "secondary": "#fcfcfc"
