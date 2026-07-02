@@ -23,6 +23,12 @@
       "id": "show_brand_images",
       "label": "Show Brand Logos",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_sold_out_brands",
+      "label": "Hide brands with no products in stock",
+      "default": true
     }
   ],
   "blocks": [],
@@ -42,25 +48,57 @@
   {% assign alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
 
   {%- comment -%}
+  Build a lookup of vendors that currently have at least one available
+  (in-stock) product: "||Vendor A||Vendor B||...". Only computed when
+  hide_sold_out_brands is on, since it costs a pass over the catalog
+  (capped at 250 products via paginate).
+  {%- endcomment -%}
+  {% assign available_vendors = "" %}
+  {% if settings.hide_sold_out_brands %}
+    {% assign available_vendors = "||" %}
+    {% paginate collections.all.products by 250 %}
+      {% for product in collections.all.products %}
+        {% if product.available %}
+          {% assign needle = "||" | append: product.vendor | append: "||" %}
+          {% unless available_vendors contains needle %}
+            {% assign available_vendors = available_vendors | append: product.vendor | append: "||" %}
+          {% endunless %}
+        {% endif %}
+      {% endfor %}
+    {% endpaginate %}
+  {% endif %}
+
+  {%- comment -%}
   先计算有哪些首字母（去重、排序），非 A-Z 皆归入 '#'
+  只统计仍有库存的品牌（若开启了 hide_sold_out_brands）
   {%- endcomment -%}
   {% assign letters = "" %}
   {% for vendor in vendors %}
     {% assign trimmed = vendor | strip %}
     {% if trimmed != blank %}
-      {% assign first = trimmed | slice: 0, 1 | upcase %}
-      {% if alpha contains first %}
-        {% assign letter = first %}
-      {% else %}
-        {% assign letter = "#" %}
-      {% endif %}
-      {% unless letters contains letter %}
-        {% if letters == "" %}
-          {% assign letters = letter %}
-        {% else %}
-          {% assign letters = letters | append: "," | append: letter %}
+      {% assign vendor_in_stock = true %}
+      {% if settings.hide_sold_out_brands %}
+        {% assign needle = "||" | append: trimmed | append: "||" %}
+        {% assign vendor_in_stock = false %}
+        {% if available_vendors contains needle %}
+          {% assign vendor_in_stock = true %}
         {% endif %}
-      {% endunless %}
+      {% endif %}
+      {% if vendor_in_stock %}
+        {% assign first = trimmed | slice: 0, 1 | upcase %}
+        {% if alpha contains first %}
+          {% assign letter = first %}
+        {% else %}
+          {% assign letter = "#" %}
+        {% endif %}
+        {% unless letters contains letter %}
+          {% if letters == "" %}
+            {% assign letters = letter %}
+          {% else %}
+            {% assign letters = letters | append: "," | append: letter %}
+          {% endif %}
+        {% endunless %}
+      {% endif %}
     {% endif %}
   {% endfor %}
   {% assign letters_array = letters | split: "," | sort %}
@@ -76,24 +114,35 @@
           {% for vendor in vendors %}
             {% assign trimmed = vendor | strip %}
             {% if trimmed != blank %}
-              {% assign first = trimmed | slice: 0, 1 | upcase %}
-              {% if alpha contains first %}
-                {% assign data_letter = first %}
-              {% else %}
-                {% assign data_letter = "#" %}
+              {% assign vendor_in_stock = true %}
+              {% if settings.hide_sold_out_brands %}
+                {% assign needle = "||" | append: trimmed | append: "||" %}
+                {% assign vendor_in_stock = false %}
+                {% if available_vendors contains needle %}
+                  {% assign vendor_in_stock = true %}
+                {% endif %}
               {% endif %}
 
-              {% if data_letter == l %}
-                <div class="brand-item">
-                  <a href="/collections/{{ vendor | handleize }}" class="brand-link" style="color: {{ settings.brand_color }}">
-                    <span class="brand-name">{{ vendor }}</span>
-                    {% if settings.show_brand_images %}
-                      <div class="brand-image" aria-hidden="true">
-                        <img src="{{ 'vendor_logos/' | append: vendor | append: '.jpg' | asset_url }}" alt="{{ vendor }} logo" loading="lazy">
-                      </div>
-                    {% endif %}
-                  </a>
-                </div>
+              {% if vendor_in_stock %}
+                {% assign first = trimmed | slice: 0, 1 | upcase %}
+                {% if alpha contains first %}
+                  {% assign data_letter = first %}
+                {% else %}
+                  {% assign data_letter = "#" %}
+                {% endif %}
+
+                {% if data_letter == l %}
+                  <div class="brand-item">
+                    <a href="/collections/{{ vendor | handleize }}" class="brand-link" style="color: {{ settings.brand_color }}">
+                      <span class="brand-name">{{ vendor }}</span>
+                      {% if settings.show_brand_images %}
+                        <div class="brand-image" aria-hidden="true">
+                          <img src="{{ 'vendor_logos/' | append: vendor | append: '.jpg' | asset_url }}" alt="{{ vendor }} logo" loading="lazy">
+                        </div>
+                      {% endif %}
+                    </a>
+                  </div>
+                {% endif %}
               {% endif %}
             {% endif %}
           {% endfor %}
