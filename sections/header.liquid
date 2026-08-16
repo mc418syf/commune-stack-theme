@@ -151,6 +151,28 @@
   endif
 -%}
 
+{% style %}
+  .commune-desktop-nav-row,
+  .commune-desktop-nav-row > div,
+  .commune-desktop-nav-row .commune-header-actions {
+    align-items: center;
+  }
+
+  .commune-desktop-nav-row .menu,
+  .commune-desktop-nav-row .menu > .menu-item,
+  .commune-desktop-nav-row .menu > .menu-item > a,
+  .commune-desktop-nav-row .commune-header-actions a {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+
+  .commune-desktop-nav-row .menu > .menu-item > a,
+  .commune-desktop-nav-row .commune-header-actions a {
+    min-height: 48px;
+  }
+{% endstyle %}
+
 {% if overlay_header %}
   {% style %}
     #{{ section.id }} {
@@ -194,7 +216,7 @@
       aria-label="{{ 'general.accessibility.primary' | t }}"
     >
       {%- comment -%} Single flat flex row: logo | menu (flex-1) | actions — all items-center {%- endcomment -%}
-      <div class="px-section-horizontal-spacing commune-desktop-nav-row" style="display:flex; align-items:stretch; justify-content:space-between;">
+      <div class="px-section-horizontal-spacing commune-desktop-nav-row" style="display:flex; align-items:center; justify-content:space-between; min-height:48px;">
 
         {%- comment -%} LEFT — logo (+ menu if left layout) {%- endcomment -%}
         <div style="display:flex; flex-shrink:0; align-items:center;">
