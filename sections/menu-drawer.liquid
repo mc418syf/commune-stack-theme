@@ -210,6 +210,17 @@
           </div>
         </form>
       {%- endif -%}
+      {% if section.settings.show_quote_button and section.settings.quote_button_label != blank %}
+        <div class="my-6 px-section-horizontal-spacing">
+          <a
+            class="theme-button inline-flex w-full items-center justify-center py-3 text-sm"
+            href="{{ section.settings.quote_button_link | default: '/pages/booking' }}"
+          >
+            {{ section.settings.quote_button_label }}
+          </a>
+        </div>
+      {% endif %}
+
       {% if section.settings.show_social %}
         {% assign social_style = settings.social_style %}
         <div class="my-8 px-section-horizontal-spacing">
@@ -338,6 +349,27 @@
       "type": "checkbox",
       "id": "show_social",
       "label": "Show social media"
+    },
+    {
+      "type": "header",
+      "content": "Quote button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_button",
+      "label": "Show Get a quote button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quote_button_label",
+      "label": "Button label",
+      "default": "Get a quote"
+    },
+    {
+      "type": "url",
+      "id": "quote_button_link",
+      "label": "Button link"
     },
     {
       "type": "header",

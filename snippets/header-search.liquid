@@ -32,7 +32,7 @@
     x-ref="searchToggle"
     @click.prevent="searchOpen = true"
     @keydown.space.prevent="searchOpen = true"
-    class="inline-flex {{ header_item_spacing }}{% if layout contains 'spread' %} h-full{% endif %}"
+    class="inline-flex {{ header_item_spacing }}{% if layout contains 'spread' %} h-full{% endif %}" style="display:inline-flex; align-items:center; justify-content:center; line-height:1;"
     href="{{ routes.search_url }}"
     :role="`button`"
   >
@@ -42,7 +42,7 @@
         {%- render 'icon-search' -%}
       </span>
     {%- else -%}
-      <span class="my-auto">{{ 'layout.navigation.search' | t }}</span>
+      <span>{{ 'layout.navigation.search' | t }}</span>
     {%- endif -%}
   </a>
 
