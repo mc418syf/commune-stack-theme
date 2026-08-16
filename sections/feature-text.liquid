@@ -20,6 +20,15 @@
     else
       assign desktop_alignment = 'justify-center'
   endcase
+
+  case section.settings.cta_alignment
+    when 'center'
+      assign cta_alignment = 'center'
+    when 'right'
+      assign cta_alignment = 'flex-end'
+    else
+      assign cta_alignment = 'flex-start'
+  endcase
 -%}
 
 <section
@@ -33,27 +42,63 @@
           {{ section.settings.text }}
         </div>
 
-        {%- if section.settings.cta_link != blank
-          and section.settings.cta_text != ''
-        -%}
-          <div class="mt-4 text-0">
-            {%- case section.settings.cta_style -%}
-              {%- when 'link' -%}
-                <a
-                  class="theme-link inline-block text-scheme-text hover:text-scheme-accent"
-                  href="{{ section.settings.cta_link }}"
-                >
-                  {{- section.settings.cta_text -}}
-                </a>
+        {%- liquid
+          assign has_primary_cta = false
+          assign has_secondary_cta = false
 
-              {%- when 'button' -%}
-                <a
-                  href="{{ section.settings.cta_link }}"
-                  class="theme-button inline-block"
-                >
-                  {{- section.settings.cta_text -}}
-                </a>
-            {%- endcase -%}
+          if section.settings.cta_link != blank and section.settings.cta_text != ''
+            assign has_primary_cta = true
+          endif
+
+          if section.settings.cta_2_link != blank and section.settings.cta_2_text != ''
+            assign has_secondary_cta = true
+          endif
+        -%}
+
+        {%- if has_primary_cta or has_secondary_cta -%}
+          <div
+            class="mt-4 text-0"
+            style="display:flex; align-items:center; justify-content:{{ cta_alignment }}; gap:1rem; flex-wrap:wrap;"
+          >
+            {%- if has_primary_cta -%}
+              {%- case section.settings.cta_style -%}
+                {%- when 'link' -%}
+                  <a
+                    class="theme-link inline-flex items-center text-scheme-text hover:text-scheme-accent"
+                    href="{{ section.settings.cta_link }}"
+                  >
+                    {{- section.settings.cta_text -}}
+                  </a>
+
+                {%- when 'button' -%}
+                  <a
+                    href="{{ section.settings.cta_link }}"
+                    class="theme-button inline-flex items-center justify-center"
+                  >
+                    {{- section.settings.cta_text -}}
+                  </a>
+              {%- endcase -%}
+            {%- endif -%}
+
+            {%- if has_secondary_cta -%}
+              {%- case section.settings.cta_2_style -%}
+                {%- when 'link' -%}
+                  <a
+                    class="theme-link inline-flex items-center text-scheme-text hover:text-scheme-accent"
+                    href="{{ section.settings.cta_2_link }}"
+                  >
+                    {{- section.settings.cta_2_text -}}
+                  </a>
+
+                {%- when 'button' -%}
+                  <a
+                    href="{{ section.settings.cta_2_link }}"
+                    class="theme-button inline-flex items-center justify-center"
+                  >
+                    {{- section.settings.cta_2_text -}}
+                  </a>
+              {%- endcase -%}
+            {%- endif -%}
           </div>
         {%- endif -%}
       </div>
@@ -161,6 +206,52 @@
         }
       ],
       "default": "link"
+    },
+    {
+      "type": "url",
+      "id": "cta_2_link",
+      "label": "Second link"
+    },
+    {
+      "type": "text",
+      "id": "cta_2_text",
+      "label": "Second text"
+    },
+    {
+      "type": "select",
+      "id": "cta_2_style",
+      "label": "Second style",
+      "options": [
+        {
+          "value": "link",
+          "label": "Link"
+        },
+        {
+          "value": "button",
+          "label": "Button"
+        }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "select",
+      "id": "cta_alignment",
+      "label": "Button position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
     },
     {
       "type": "header",
