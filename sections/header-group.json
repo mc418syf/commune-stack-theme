@@ -38,7 +38,7 @@
         "logo_max_width_mobile": 110,
         "menu": "main-menu",
         "layout": "logo_left_menu_right",
-        "mobile_layout": "logo_left_menu_right",
+        "mobile_layout": "logo_left",
         "header_vertical_spacing": "py-2",
         "show_search": true,
         "sticky_header": true,
@@ -53,8 +53,7 @@
         "color_scheme": "scheme1",
         "overlay_homepage": true,
         "overlay_text_color_scheme": "scheme1",
-        "enable_logo_scroll_swap": false,
-        "show_cart_button": false
+        "enable_logo_scroll_swap": false
       }
     }
   },

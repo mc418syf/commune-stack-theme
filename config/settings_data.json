@@ -102,10 +102,7 @@
           "show_social": false,
           "show_locale_selector": false,
           "show_country_selector": false,
-          "color_scheme": "",
-          "show_quote_button": true,
-          "quote_button_label": "Get a quote",
-          "quote_button_link": "/pages/booking"
+          "color_scheme": ""
         }
       }
     },
