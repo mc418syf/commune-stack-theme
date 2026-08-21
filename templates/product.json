@@ -112,15 +112,15 @@
     },
     "related-products": {
       "type": "related-products",
-      "disabled": true,
+      "custom_css": [],
       "settings": {
         "heading": "You may also like",
         "product_tile_type": "standard",
         "limit": "4",
         "products_per_row_desktop": "4",
-        "products_per_row_mobile": "1",
+        "products_per_row_mobile": "2",
         "enable_quick_buy": false,
-        "quick_buy_button_style": "theme-button",
+        "quick_buy_button_style": "theme-button--secondary",
         "color_scheme": ""
       }
     }
