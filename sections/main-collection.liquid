@@ -538,7 +538,7 @@
         {%- endif -%}
         {% liquid
           if paginate.pages > 1
-            render 'pagination' with paginate: paginate, section_color: section_color
+            render 'pagination' with paginate, paginate: paginate, section_color: section_color
           endif
         %}
       </div>
@@ -1231,3 +1231,14 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "            render 'pagination' with paginate: paginate, section_color: section_color"
+  to: "            render 'pagination' with paginate, paginate: paginate, section_color:
+    section_color"
+  position: 22913..23008
+{% endcomment %}

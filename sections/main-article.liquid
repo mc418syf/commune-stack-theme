@@ -300,13 +300,7 @@
         {%- if article.image != blank and image_width_desktop != 'full' -%}
           <div class="hidden lg:block{% if show_author or show_date or show_tags_and_tags_present %} border-b-gridline border-gridline-color{% endif %} full-h relative bg-scheme-background{% unless settings.fill_image_to_border_edge %} p-2 lg:p-4{% endunless %} lg:-mb-gridline">
             <div class="relative{% if indent_image %} p-8 lg:p-16{% endif %}">
-              {%
-                render 'image-crop' with
-                image: article.image,
-                ratio: ratio,
-                sizes: sizes,
-                crop: section.settings.crop
-              %}
+              {% render 'image-crop' with image, image: article.image, ratio: ratio, sizes: sizes, crop: section.settings.crop %}
             </div>
           </div>
         {%- endif -%}
@@ -499,3 +493,21 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {%
+                    render 'image-crop' with
+                    image: article.image,
+                    ratio: ratio,
+                    sizes: sizes,
+                    crop: section.settings.crop
+                  %}
+  to: "{% render 'image-crop' with image, image: article.image, ratio: ratio, sizes:
+    sizes, crop: section.settings.crop %}"
+  position: 11796..11911
+{% endcomment %}

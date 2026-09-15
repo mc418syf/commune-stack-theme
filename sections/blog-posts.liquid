@@ -33,9 +33,7 @@
 {%- capture placeholder_image -%}
   <div class="{% if settings.fill_image_to_border_edge %}border-b-gridline border-gridline-color{% else %}p-2 lg:p-4{% endif %}" data-color-scheme="{{ section_color }}">
     <div class="relative h-full w-full">
-      {% render 'image-crop-placeholder' with
-        ratio: ratio,
-      %}
+      {% render 'image-crop-placeholder' with ratio, ratio: ratio %}
     </div>
   </div>
 {%- endcapture -%}
@@ -293,3 +291,16 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'image-crop-placeholder' with
+            ratio: ratio,
+          %}
+  to: "{% render 'image-crop-placeholder' with ratio, ratio: ratio %}"
+  position: 1230..1292
+{% endcomment %}

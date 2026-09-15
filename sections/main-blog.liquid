@@ -304,15 +304,7 @@
                 {%- if article.image != blank -%}
                   <div class="full-h bg-scheme-background {% if settings.fill_image_to_border_edge %}border-b-gridline border-gridline-color{% else %}pt-2 px-section-horizontal-spacing lg:pt-4{% endif %}">
                     <div class="relative">
-                      {%
-                        render 'image-crop' with
-                        image: article.image,
-                        sizes: sizes,
-                        preload: preload,
-                        loading: loading,
-                        ratio: ratio,
-                        crop: section.settings.crop
-                      %}
+                      {% render 'image-crop' with image, image: article.image, sizes: sizes, preload: preload, loading: loading, ratio: ratio, crop: section.settings.crop %}
                     </div>
                   </div>
                 {%- endif -%}
@@ -415,7 +407,7 @@
     {% endcase %}
 
     {% if paginate.pages > 1 %}
-      {% render 'pagination' with paginate: paginate, section_color: section_color %}
+      {% render 'pagination' with paginate, paginate: paginate, section_color: section_color %}
     {% endif %}
   </section>
 {% endpaginate %}
@@ -627,3 +619,28 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {%
+                            render 'image-crop' with
+                            image: article.image,
+                            sizes: sizes,
+                            preload: preload,
+                            loading: loading,
+                            ratio: ratio,
+                            crop: section.settings.crop
+                          %}
+  to: "{% render 'image-crop' with image, image: article.image, sizes: sizes, preload:
+    preload, loading: loading, ratio: ratio, crop: section.settings.crop %}"
+  position: 12700..12851
+- from: "{% render 'pagination' with paginate: paginate, section_color: section_color
+    %}"
+  to: "{% render 'pagination' with paginate, paginate: paginate, section_color: section_color
+    %}"
+  position: 16701..16790
+{% endcomment %}

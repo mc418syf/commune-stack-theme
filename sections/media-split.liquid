@@ -77,14 +77,10 @@
                         assign ratio = first_block_media_crop
                       endif
                     -%}
-                    {% render 'image-crop-placeholder' with
-                      ratio: ratio,
-                    %}
+                    {% render 'image-crop-placeholder' with ratio, ratio: ratio %}
                   {%- else -%}
                     <div class="block w-full lg:hidden">
-                      {% render 'image-crop-placeholder' with
-                        ratio: ratio,
-                      %}
+                      {% render 'image-crop-placeholder' with ratio, ratio: ratio %}
                     </div>
                     <div class="hidden lg:block lg:h-full lg:w-full">
                       {{
@@ -452,3 +448,22 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'image-crop-placeholder' with
+                          ratio: ratio,
+                        %}
+  to: "{% render 'image-crop-placeholder' with ratio, ratio: ratio %}"
+  position: 3336..3398
+- from: |-
+    {% render 'image-crop-placeholder' with
+                            ratio: ratio,
+                          %}
+  to: "{% render 'image-crop-placeholder' with ratio, ratio: ratio %}"
+  position: 3509..3571
+{% endcomment %}

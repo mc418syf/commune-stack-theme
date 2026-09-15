@@ -164,7 +164,7 @@
                         x-show.transition.opacity.duration.200ms="currentSwatchVariantId === '{{ variant.id }}'"
                       >
                         <div class="relative h-full w-full">
-                          {% render 'image-fit', image: variant.image, contain: object_contain_grid, sizes: sizes, loading: 'lazy', extra_classes = '' %}
+                          {% render 'image-fit', image: variant.image, contain: object_contain_grid, sizes: sizes, loading: 'lazy' %}
                         </div>
                       </div>
                     {%- endif -%}
@@ -334,3 +334,15 @@
     </div>
   </div>
 </div>
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% render 'image-fit', image: variant.image, contain: object_contain_grid,
+    sizes: sizes, loading: 'lazy', extra_classes = '' %}"
+  to: "{% render 'image-fit', image: variant.image, contain: object_contain_grid,
+    sizes: sizes, loading: 'lazy' %}"
+  position: 6512..6619
+{% endcomment %}

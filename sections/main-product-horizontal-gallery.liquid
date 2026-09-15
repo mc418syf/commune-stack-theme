@@ -242,7 +242,7 @@
                   render 'product-block-custom-liquid', block: block, product: product
                 when 'share'
                   echo '<div class="mt-8" ' | append: block.shopify_attributes | append: '>'
-                  render 'social-sharing', tag: 'h2', share_title: product.title, share_permalink: product.url, share_image: product, section_color: section_color`
+                  render 'social-sharing', tag: 'h2', share_title: product.title, share_permalink: product.url, share_image: product, section_color: section_color
                   echo '</div>'
                 when 'information_list'
                   render 'product-block-information-list', block: block, product: product
@@ -2262,3 +2262,15 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "                  render 'social-sharing', tag: 'h2', share_title: product.title,
+    share_permalink: product.url, share_image: product, section_color: section_color`"
+  to: "                  render 'social-sharing', tag: 'h2', share_title: product.title,
+    share_permalink: product.url, share_image: product, section_color: section_color"
+  position: 10296..10458
+{% endcomment %}

@@ -235,12 +235,7 @@
           {%- if show_media_on_mobile -%}
             <div class="w-1/5 shrink-0 md:hidden">
               {% if product.featured_image != blank %}
-                {%-
-                  render 'image-crop' with
-                  image: product.featured_image,
-                  sizes: '20vw',
-                  ratio: 1
-                -%}
+                {%- render 'image-crop' with image, image: product.featured_image, sizes: '20vw', ratio: 1 -%}
               {% endif %}
             </div>
           {%- endif -%}
@@ -623,3 +618,20 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {%-
+                      render 'image-crop' with
+                      image: product.featured_image,
+                      sizes: '20vw',
+                      ratio: 1
+                    -%}
+  to: "{%- render 'image-crop' with image, image: product.featured_image, sizes: '20vw',
+    ratio: 1 -%}"
+  position: 9742..9836
+{% endcomment %}
