@@ -551,11 +551,11 @@
 {%- endif -%}
 {% if context == 'drawer' %}
   <div
-    class="sticky bottom-0 mt-auto flex flex-col items-center gap-3 border-t-gridline border-gridline-color bg-scheme-background px-4 py-4 text-scheme-text"
+    class="sticky bottom-0 mt-auto flex items-baseline justify-between gap-5 border-t-gridline border-gridline-color bg-scheme-background px-4 py-4 text-scheme-text"
     data-filterable-filter-fragment="clear"
   >
     <button
-      class="theme-button theme-button--no-arrow w-full text-center"
+      class="theme-button theme-button--no-arrow grow text-center"
       type="button"
       @click.prevent="$store.modals.close('filters')"
     >
@@ -563,7 +563,7 @@
     </button>
     {% if total_active_values > 0 or price_range_not_full_range %}
       <a
-        class="theme-link theme-link--no-arrow text-scheme-text hover:text-scheme-accent"
+        class="theme-link theme-link--no-arrow shrink-0 text-scheme-text hover:text-scheme-accent"
         href="{{ clear_url }}"
         @click.prevent="clearAllFilters"
       >
