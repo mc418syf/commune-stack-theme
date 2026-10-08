@@ -6,7 +6,7 @@
   endif
   assign btn_label = label | default: 'Try In-Store'
 -%}
-<div class="max-w-2xl mt-3" x-data>
+{% unless product.available == false %}<div class="max-w-2xl mt-3" x-data>
   <button
     type="button"
     data-try-on-pdp
@@ -29,4 +29,4 @@
   >
     <span data-try-on-label>{{ btn_label }}</span>
   </button>
-</div>
+</div>{% endunless %}
