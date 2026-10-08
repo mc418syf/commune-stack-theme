@@ -213,7 +213,7 @@
         <div class="{{ text_width_desktop }} bg-scheme-background px-section-horizontal-spacing {% if center_heading %} text-center{% endif %}">
           <div>
             {% unless hide_title %}
-              <h1 class="font-heading text-heading-feature">
+              <h1 class="font-heading text-heading-feature collection-page-title">
                 {{ collection.title }}
               </h1>
             {% endunless %}
@@ -618,6 +618,15 @@
 
   {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
 {% endif %}
+
+{% style %}
+@media (max-width: 1023px) {
+  .collection-page-title {
+    font-weight: 700;
+    font-size: calc(var(--font-body-size, 16px) + 2pt);
+  }
+}
+{% endstyle %}
 
 {% schema %}
 {
