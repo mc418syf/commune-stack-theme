@@ -1,5 +1,11 @@
 <!doctype html>
 <html class="no-js" lang="{{ request.locale.iso_code }}">
+<head>
+  <meta name="msvalidate.01" content="15F6F47A8F18A4B29C4AB5BA88C80F2A" />
+
+  <!-- Other existing meta tags -->
+  {{ content_for_header }}
+</head>
   <head>
     {{ 'brand-list.css' | asset_url | stylesheet_tag }}
     <!-- custom header transparent + hide-logo (paste after base.bundle.css) -->
