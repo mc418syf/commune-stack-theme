@@ -371,10 +371,33 @@
               endif
             endif
 
-            if show_sort
-              render 'filterable-sort-drop-down', sort_options: collection.sort_options, sort_by: sort_by
-            endif
           -%}
+
+          {%- if show_filters -%}
+            {%- assign availability_filter = collection.filters | where: 'param_name', 'filter.v.availability' | first -%}
+            {%- if availability_filter -%}
+              {%- assign in_stock_value = availability_filter.values | where: 'value', '1' | first -%}
+              {%- if in_stock_value -%}
+                <a
+                  href="{% if in_stock_value.active %}{{ in_stock_value.url_to_remove }}{% else %}{{ in_stock_value.url_to_add }}{% endif %}"
+                  class="availability-toggle ml-auto flex items-center gap-2 py-2{% if show_sort %} mr-6{% endif %}{% if settings.links_uppercase %} uppercase{% endif %}"
+                  role="switch"
+                  aria-checked="{{ in_stock_value.active }}"
+                >
+                  <span
+                    class="inline-block rounded-full"
+                    style="width: 10px; height: 10px; background: {% if in_stock_value.active %}rgb(var(--color-scheme-text)){% else %}rgb(var(--color-scheme-text) / 0.25){% endif %};"
+                    aria-hidden="true"
+                  ></span>
+                  <span>Available</span>
+                </a>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if show_sort -%}
+            {%- render 'filterable-sort-drop-down', sort_options: collection.sort_options, sort_by: sort_by -%}
+          {%- endif -%}
         </div>
       {% endif %}
 
