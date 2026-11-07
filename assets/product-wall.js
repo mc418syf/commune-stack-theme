@@ -53,6 +53,16 @@
     let observer;
     let resizer;
 
+    // The header floats over the page (it takes no space), so reserve room for it above the first row.
+    const header = document.querySelector('header[data-theme-header]');
+    const reserve = () => {
+      const h = cfg.reserveHeader === 'true' && header ? header.getBoundingClientRect().height : 0;
+      root.style.setProperty('--wall-header-h', h + 'px');
+    };
+    reserve();
+    const headerWatch = new ResizeObserver(reserve);
+    if (header) headerWatch.observe(header);
+
     const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
     const speedScale = parseFloat(cfg.speed);
     const hideSold = cfg.hideSoldOut === 'true';
@@ -258,6 +268,7 @@
       cancelAnimationFrame(frameId);
       if (observer) observer.disconnect();
       if (resizer) resizer.disconnect();
+      headerWatch.disconnect();
     };
   }
 

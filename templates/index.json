@@ -19,8 +19,14 @@
         "show_price": false,
         "speed": 25,
         "products_per_row": 28,
+        "sizing": "fit_rows",
         "rows_desktop": 3,
         "rows_mobile": 3,
+        "image_height_desktop": 36,
+        "image_height_mobile": 24,
+        "gap_desktop": 10,
+        "gap_mobile": 8,
+        "reserve_header_space": true,
         "color_scheme": "scheme1"
       }
     },

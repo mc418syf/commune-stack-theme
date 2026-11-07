@@ -24,6 +24,8 @@
   data-product-wall
   data-collection="{{ collection_handle }}"
   data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
+  data-sizing="{{ section.settings.sizing }}"
+  data-reserve-header="{{ section.settings.reserve_header_space }}"
   data-per-row="{{ section.settings.products_per_row }}"
   data-hide-sold-out="{{ section.settings.hide_sold_out }}"
   data-show-vendor="{{ section.settings.show_vendor }}"
@@ -31,7 +33,7 @@
   data-show-price="{{ section.settings.show_price }}"
   data-currency="{{ shop.currency }}"
   data-sold-out-text="{{ 'products.product.sold_out' | t | escape }}"
-  style="--wall-rows-desktop: {{ section.settings.rows_desktop }}; --wall-rows-mobile: {{ section.settings.rows_mobile }}; --wall-meta-h: {{ meta_height }}px;"
+  style="--wall-rows-desktop: {{ section.settings.rows_desktop }}; --wall-rows-mobile: {{ section.settings.rows_mobile }}; --wall-h-desktop: {{ section.settings.image_height_desktop }}vh; --wall-h-mobile: {{ section.settings.image_height_mobile }}svh; --wall-gap-desktop: {{ section.settings.gap_desktop }}px; --wall-gap-mobile: {{ section.settings.gap_mobile }}px; --wall-meta-h: {{ meta_height }}px;"
 >
   <div class="product-wall__rows" data-product-wall-rows aria-label="{{ section.settings.collection.title | default: 'All products' | escape }}"></div>
   <noscript>
@@ -111,13 +113,23 @@
       "default": 28
     },
     {
+      "type": "select",
+      "id": "sizing",
+      "label": "Image sizing",
+      "options": [
+        { "value": "fit_rows", "label": "Fit rows to the screen" },
+        { "value": "fixed", "label": "Fixed image height" }
+      ],
+      "default": "fit_rows"
+    },
+    {
       "type": "range",
       "id": "rows_desktop",
       "min": 1,
       "max": 8,
       "step": 1,
       "label": "Rows on screen (desktop)",
-      "info": "How many rows fit in the first screen. Image height adjusts to match.",
+      "info": "Used when sizing is \"Fit rows to the screen\". Image height adjusts to match.",
       "default": 3
     },
     {
@@ -128,6 +140,55 @@
       "step": 1,
       "label": "Rows on screen (mobile)",
       "default": 3
+    },
+    {
+      "type": "range",
+      "id": "image_height_desktop",
+      "min": 15,
+      "max": 70,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image height (desktop)",
+      "info": "Used when sizing is \"Fixed image height\".",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image height (mobile)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between images (desktop)",
+      "info": "Applies between images and between rows.",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between images (mobile)",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "reserve_header_space",
+      "label": "Leave space for the header",
+      "info": "The header floats over the page, so this keeps it clear of the first row.",
+      "default": true
     },
     {
       "type": "color_scheme",
