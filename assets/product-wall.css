@@ -1,6 +1,11 @@
 .product-wall {
   --wall-gap: 10px;
-  --wall-card-h: var(--wall-card-h-desktop, 29vh);
+  --wall-rows: var(--wall-rows-desktop, 3);
+  /* Fill the first screen: viewport minus header, gaps and text, split across the rows */
+  --wall-card-h: max(
+    120px,
+    calc((100svh - var(--header-group-height, 0px) - (var(--wall-rows) + 1) * var(--wall-gap) - var(--wall-rows) * var(--wall-meta-h, 0px)) / var(--wall-rows))
+  );
   --wall-meta-size: 10px;
   padding: var(--wall-gap) 0;
   overflow: hidden;
@@ -105,7 +110,7 @@
 @media (max-width: 640px) {
   .product-wall {
     --wall-gap: 8px;
-    --wall-card-h: var(--wall-card-h-mobile, 24svh);
+    --wall-rows: var(--wall-rows-mobile, 3);
     --wall-meta-size: 9px;
   }
 }

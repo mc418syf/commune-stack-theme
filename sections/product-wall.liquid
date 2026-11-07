@@ -1,6 +1,21 @@
 {%- liquid
   assign section_color = section.settings.color_scheme
   assign collection_handle = section.settings.collection.handle | default: 'all'
+
+  comment
+    Rows on screen drive the image height, so reserve room for the text under each image.
+  endcomment
+  assign meta_lines = 0
+  if section.settings.show_vendor or section.settings.show_price
+    assign meta_lines = meta_lines | plus: 1
+  endif
+  if section.settings.show_title
+    assign meta_lines = meta_lines | plus: 1
+  endif
+  assign meta_height = 0
+  if meta_lines > 0
+    assign meta_height = meta_lines | times: 13 | plus: 6
+  endif
 -%}
 
 <section
@@ -16,7 +31,7 @@
   data-show-price="{{ section.settings.show_price }}"
   data-currency="{{ shop.currency }}"
   data-sold-out-text="{{ 'products.product.sold_out' | t | escape }}"
-  style="--wall-card-h-desktop: {{ section.settings.card_height_desktop }}vh; --wall-card-h-mobile: {{ section.settings.card_height_mobile }}svh;"
+  style="--wall-rows-desktop: {{ section.settings.rows_desktop }}; --wall-rows-mobile: {{ section.settings.rows_mobile }}; --wall-meta-h: {{ meta_height }}px;"
 >
   <div class="product-wall__rows" data-product-wall-rows aria-label="{{ section.settings.collection.title | default: 'All products' | escape }}"></div>
   <noscript>
@@ -97,23 +112,22 @@
     },
     {
       "type": "range",
-      "id": "card_height_desktop",
-      "min": 18,
-      "max": 45,
+      "id": "rows_desktop",
+      "min": 1,
+      "max": 8,
       "step": 1,
-      "unit": "vh",
-      "label": "Image height on desktop",
-      "default": 29
+      "label": "Rows on screen (desktop)",
+      "info": "How many rows fit in the first screen. Image height adjusts to match.",
+      "default": 3
     },
     {
       "type": "range",
-      "id": "card_height_mobile",
-      "min": 14,
-      "max": 40,
+      "id": "rows_mobile",
+      "min": 1,
+      "max": 8,
       "step": 1,
-      "unit": "vh",
-      "label": "Image height on mobile",
-      "default": 24
+      "label": "Rows on screen (mobile)",
+      "default": 3
     },
     {
       "type": "color_scheme",
