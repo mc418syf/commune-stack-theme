@@ -12,13 +12,14 @@
     "product_wall": {
       "type": "product-wall",
       "settings": {
-        "hide_sold_out": false,
-        "show_vendor": true,
-        "show_title": true,
-        "show_price": true,
-        "speed": 100,
+        "collection": "",
+        "hide_sold_out": true,
+        "show_vendor": false,
+        "show_title": false,
+        "show_price": false,
+        "speed": 25,
         "products_per_row": 28,
-        "card_height_desktop": 29,
+        "card_height_desktop": 36,
         "card_height_mobile": 24,
         "color_scheme": "scheme1"
       }
@@ -40,6 +41,7 @@
     },
     "image_with_text_overlay_yYaW8G": {
       "type": "image-with-text-overlay",
+      "disabled": true,
       "custom_css": [],
       "name": "Image with text overlay",
       "settings": {
