@@ -1,0 +1,131 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign collection_handle = section.settings.collection.handle | default: 'all'
+-%}
+
+<section
+  class="product-wall bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+  data-product-wall
+  data-collection="{{ collection_handle }}"
+  data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
+  data-per-row="{{ section.settings.products_per_row }}"
+  data-hide-sold-out="{{ section.settings.hide_sold_out }}"
+  data-show-vendor="{{ section.settings.show_vendor }}"
+  data-show-title="{{ section.settings.show_title }}"
+  data-show-price="{{ section.settings.show_price }}"
+  data-currency="{{ shop.currency }}"
+  data-sold-out-text="{{ 'products.product.sold_out' | t | escape }}"
+  style="--wall-card-h-desktop: {{ section.settings.card_height_desktop }}vh; --wall-card-h-mobile: {{ section.settings.card_height_mobile }}svh;"
+>
+  <div class="product-wall__rows" data-product-wall-rows aria-label="{{ section.settings.collection.title | default: 'All products' | escape }}"></div>
+  <noscript>
+    <p class="product-wall__empty"><a href="{{ section.settings.collection.url | default: routes.all_products_collection_url }}">{{ 'collections.general.view_all' | t }}</a></p>
+  </noscript>
+</section>
+
+{{ 'product-wall.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-wall.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product wall",
+  "disabled_on": {
+    "groups": ["aside"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Every product in rotating rows. Rows autoplay in alternating directions; visitors can move the mouse, scroll or swipe to shuffle them, and tap a product to open it. Reduced-motion visitors get static rows."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave empty to show all products."
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_sold_out",
+      "label": "Hide sold out products",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Product details"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show brand",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout and motion"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 0,
+      "max": 400,
+      "step": 25,
+      "unit": "%",
+      "label": "Scroll speed",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "label": "Products per row",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "card_height_desktop",
+      "min": 18,
+      "max": 45,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image height on desktop",
+      "default": 29
+    },
+    {
+      "type": "range",
+      "id": "card_height_mobile",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image height on mobile",
+      "default": 24
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product wall"
+    }
+  ]
+}
+{% endschema %}
