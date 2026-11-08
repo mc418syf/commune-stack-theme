@@ -36,12 +36,16 @@
       "settings": {
         "logo_max_width": 120,
         "logo_max_width_mobile": 110,
-        "menu": "main-menu",
+        "menu": "menu-1",
         "layout": "logo_left_menu_right",
+        "logo_position": "auto",
         "mobile_layout": "logo_left",
-        "mobile_menu": "inline",
+        "mobile_menu": "drawer",
+        "mobile_position": "top",
+        "mobile_glass_opacity": 45,
+        "mobile_glass_blur": 20,
         "header_vertical_spacing": "py-2",
-        "show_search": true,
+        "show_search": false,
         "sticky_header": true,
         "show_icons": false,
         "show_try_on_button": true,
@@ -63,5 +67,3 @@
     "header"
   ]
 }
-
-
