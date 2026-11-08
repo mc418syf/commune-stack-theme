@@ -115,56 +115,6 @@
 /* The description as a paragraph: only for the mobile order (see below) */
 .record-lede { display: none; }
 
-/* ---- Buttons: square bars, 52px ---- */
-[data-product-root] .add-to-cart-container {
-  max-width: none;
-  margin-top: 0;
-}
-
-[data-product-root] #addToCartButton,
-[data-product-root] [data-try-on-pdp] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 52px;
-  min-height: 52px;
-  margin: 0;
-  padding: 0 16px;
-  font-family: var(--body-font-stack);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  -webkit-text-stroke: 0;
-  border-radius: 0;
-  color: var(--rec-ink);
-}
-
-[data-product-root] #addToCartButton {
-  background: var(--rec-accent);
-  border: 1px solid var(--rec-accent);
-}
-
-[data-product-root] [data-try-on-pdp] {
-  background: transparent;
-  border: 1px solid var(--rec-ink);
-}
-
-[data-product-root] #addToCartButton:hover:not(:disabled) { background: var(--rec-ink); border-color: var(--rec-ink); color: var(--rec-accent); }
-[data-product-root] [data-try-on-pdp]:hover:not(:disabled) { background: var(--rec-ink); color: rgb(var(--color-scheme-background)); }
-
-[data-product-root] #addToCartButton:focus-visible,
-[data-product-root] [data-try-on-pdp]:focus-visible {
-  outline: 2px solid var(--rec-ink);
-  outline-offset: 3px;
-}
-
-[data-product-root] [data-try-on-pdp] { margin-top: 0; }
-[data-product-root] .add-to-cart-container + div,
-[data-product-root] div:has(> [data-try-on-pdp]) { max-width: none; margin-top: 8px; }
-
 /* ---- Layout inside the image-strip product page ---- */
 
 /* Desktop and tablet: name, price and tabs on the left (up to 640px), the record and buttons on the right (up to 560px) */
