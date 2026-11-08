@@ -174,27 +174,31 @@
         for (const r of rows) r.v = clamp(r.v + dy * (staticMode ? 5 * shuffleStrength : 3) * r.dir, -MAX_SPEED, MAX_SPEED);
       };
 
+      // Wheel and swipe over the wall drive the shuffle directly, so it works whether or not the page
+      // can scroll. Scroll events are skipped while those are active, so one gesture isn't counted twice.
+      let ty = null, tx = null, lastWheel = 0;
       addEventListener('scroll', () => {
         const dy = scrollY - state.scrollY;
         state.scrollY = scrollY;
+        if (ty !== null || performance.now() - lastWheel < 150) return;
         push(dy);
       }, { passive: true, signal: abort.signal });
 
-      // When the page itself can't scroll (the wall fills the screen), wheel and swipe drive the shuffle.
-      const pageScrolls = () => document.documentElement.scrollHeight > innerHeight + 2;
       root.addEventListener('wheel', (e) => {
-        if (!pageScrolls() && Math.abs(e.deltaY) > Math.abs(e.deltaX)) push(e.deltaY);
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        lastWheel = performance.now();
+        push(e.deltaY);
       }, { passive: true, signal: abort.signal });
 
-      let ty = null, tx = null;
       root.addEventListener('touchstart', (e) => { ty = e.touches[0].clientY; tx = e.touches[0].clientX; }, { passive: true, signal: abort.signal });
       root.addEventListener('touchmove', (e) => {
         if (ty === null) return;
         const dy = ty - e.touches[0].clientY, dx = tx - e.touches[0].clientX;
         ty = e.touches[0].clientY; tx = e.touches[0].clientX;
-        if (!pageScrolls() && Math.abs(dy) > Math.abs(dx)) push(dy);
+        if (Math.abs(dy) > Math.abs(dx)) push(dy);
       }, { passive: true, signal: abort.signal });
       root.addEventListener('touchend', () => (ty = null), { passive: true, signal: abort.signal });
+      root.addEventListener('touchcancel', () => (ty = null), { passive: true, signal: abort.signal });
 
       for (const r of rows) {
         r.el.addEventListener('mouseenter', () => (r.hover = true), on);

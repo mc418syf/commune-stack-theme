@@ -47,6 +47,14 @@
   </noscript>
 </section>
 
+{%- if section.settings.hide_footer_mobile -%}
+  {% style %}
+    @media (max-width: 1023px) {
+      .shopify-section-group-footer-group { display: none; }
+    }
+  {% endstyle %}
+{%- endif -%}
+
 {{ 'product-wall.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'product-wall.js' | asset_url }}" defer></script>
 
@@ -72,6 +80,13 @@
       "id": "hide_sold_out",
       "label": "Hide sold out products",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_footer_mobile",
+      "label": "Hide the footer on mobile",
+      "info": "Removes the footer group on phones and tablets on pages that use this section, so the wall is the whole screen.",
+      "default": true
     },
     {
       "type": "header",
