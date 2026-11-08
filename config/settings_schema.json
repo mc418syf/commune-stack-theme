@@ -668,6 +668,17 @@
         "default": "500"
       },
       {
+        "type": "range",
+        "id": "product_card_size_offset",
+        "label": "Product cards: size below the product page",
+        "info": "Vendor, title and price on the product cards are this much smaller than on the product page.",
+        "min": 0,
+        "max": 6,
+        "step": 1,
+        "unit": "px",
+        "default": 2
+      },
+      {
         "type": "select",
         "id": "product_info_letterspacing",
         "label": "Letter spacing",
