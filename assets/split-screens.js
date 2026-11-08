@@ -29,6 +29,27 @@
       neighbours.forEach((el) => el.classList.toggle('split-snap-point', snapMode !== 'off'));
     };
 
+    // A short haptic tick when a new asset snaps into view (mobile, full screen layout)
+    const haptics = !designMode && root.dataset.haptics === 'true' && root.dataset.mobileLayout === 'full' && 'vibrate' in navigator;
+    let hapticObserver;
+    let current = null;
+    let armed = false;
+    if (haptics) {
+      const arm = () => { armed = true; };
+      addEventListener('touchstart', arm, { passive: true, once: true });
+      hapticObserver = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting || e.target === current) continue;
+          const first = current === null;
+          current = e.target;
+          if (!first && armed && MOBILE.matches && !REDUCED.matches) {
+            try { navigator.vibrate(12); } catch (err) { /* blocked until the visitor has tapped the page */ }
+          }
+        }
+      }, { threshold: 0.6 });
+      root.querySelectorAll('.split__panel:not(.split__panel--empty)').forEach((p) => hapticObserver.observe(p));
+    }
+
     const sectionWatcher = new IntersectionObserver(([e]) => {
       inView = e.isIntersecting;
       applySnap();
@@ -39,6 +60,7 @@
     return () => {
       watcher.disconnect();
       sectionWatcher.disconnect();
+      if (hapticObserver) hapticObserver.disconnect();
       MOBILE.removeEventListener('change', applySnap);
       html.classList.remove('split-snap');
       neighbours.forEach((el) => el.classList.remove('split-snap-point'));

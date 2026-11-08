@@ -94,6 +94,8 @@
         "height_mobile": 100,
         "gap": 0,
         "snap": "mobile",
+        "mobile_layout": "full",
+        "mobile_haptics": true,
         "color_scheme": "scheme2"
       }
     },

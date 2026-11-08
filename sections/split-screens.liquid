@@ -16,6 +16,8 @@
   data-split-screens
   data-snap="{{ section.settings.snap }}"
   data-mobile-ratio="{{ ratio_mode }}"
+  data-mobile-layout="{{ section.settings.mobile_layout }}"
+  data-haptics="{{ section.settings.mobile_haptics }}"
   style="--split-h-desktop: {{ section.settings.height_desktop }}vh; --split-h-mobile: {{ section.settings.height_mobile }}svh; --split-gap: {{ section.settings.gap }}px;{% if ratio_mode == 'fixed' %} --split-ratio: {{ mobile_ratio }};{% endif %}"
 >
   {%- for block in section.blocks -%}
@@ -92,9 +94,9 @@
           {%- endif -%}
           {%- if button_label != blank -%}
             {%- if block.settings.button_style == 'link' -%}
-              <span class="split__cta theme-link inline-block">{{ button_label | escape }}</span>
+              <span class="split__cta theme-link inline-block"{% if block.settings.button_color != blank %} style="color: {{ block.settings.button_color }};"{% endif %}>{{ button_label | escape }}</span>
             {%- else -%}
-              <span class="split__cta theme-button theme-button--in-group inline-block">{{ button_label | escape }}</span>
+              <span class="split__cta theme-button theme-button--in-group inline-block"{% if block.settings.button_color != blank %} style="color: {{ block.settings.button_color }};"{% endif %}>{{ button_label | escape }}</span>
             {%- endif -%}
           {%- endif -%}
         </div>
@@ -140,20 +142,68 @@
     },
     {
       "type": "select",
-      "id": "mobile_ratio",
-      "label": "Mobile image aspect ratio",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
       "options": [
-        { "value": "fill", "label": "Fill the screen (two halves)" },
-        { "value": "1 / 1", "label": "Square (1:1)" },
-        { "value": "4 / 5", "label": "Portrait (4:5)" },
-        { "value": "3 / 4", "label": "Portrait (3:4)" },
-        { "value": "2 / 3", "label": "Tall portrait (2:3)" },
-        { "value": "4 / 3", "label": "Landscape (4:3)" },
-        { "value": "16 / 9", "label": "Wide (16:9)" },
-        { "value": "original", "label": "Original image ratio" }
+        {
+          "value": "full",
+          "label": "Full screen (one asset per page)"
+        },
+        {
+          "value": "stacked",
+          "label": "Two assets stacked per page"
+        }
+      ],
+      "default": "full",
+      "info": "Full screen shows each asset on its own page and snaps from one to the next."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_haptics",
+      "label": "Vibrate when snapping to the next asset (mobile)",
+      "info": "A short haptic tick as each asset lands. Supported on Android browsers; iPhones don't allow web pages to vibrate. Off in the theme editor.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile image aspect ratio (stacked layout)",
+      "options": [
+        {
+          "value": "fill",
+          "label": "Fill the screen (two halves)"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "3 / 4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "2 / 3",
+          "label": "Tall portrait (2:3)"
+        },
+        {
+          "value": "4 / 3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "16 / 9",
+          "label": "Wide (16:9)"
+        },
+        {
+          "value": "original",
+          "label": "Original image ratio"
+        }
       ],
       "default": "fill",
-      "info": "Shape of each asset on mobile. Fill splits the screen height in half; other ratios size each asset from the screen width, so a screen can be shorter or taller than the phone."
+      "info": "Used when the mobile layout is Two assets stacked per page. Fill splits the screen height in half; other ratios size each asset from the screen width, so a screen can be shorter or taller than the phone."
     },
     {
       "type": "range",
@@ -163,7 +213,7 @@
       "step": 5,
       "unit": "vh",
       "label": "Screen height (mobile)",
-      "info": "Used when the mobile aspect ratio is Fill the screen.",
+      "info": "Height of each asset on mobile in full screen layout, or of the pair when stacked and filling the screen.",
       "default": 100
     },
     {
@@ -393,6 +443,12 @@
             }
           ],
           "default": "button"
+        },
+        {
+          "type": "color",
+          "id": "button_color",
+          "label": "Button text color",
+          "info": "Leave unset to use the theme's button colors."
         },
         {
           "type": "url",

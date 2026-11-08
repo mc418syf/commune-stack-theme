@@ -81,6 +81,7 @@
 .split__text--plain .split__cta { color: inherit; }
 
 .split__cta { margin-top: 4px; }
+.split__cta[style*='color'] { border-color: currentColor; }
 
 @media (hover: hover) {
   a.split__panel:hover .split__media { transform: scale(1.03); }
@@ -101,22 +102,39 @@ html.split-snap { scroll-snap-type: y mandatory; }
     scroll-snap-stop: always;
   }
 
-  /* Fixed or original ratios: each asset is sized from the screen width instead of splitting the height */
-  .split[data-mobile-ratio='fixed'] .split__screen,
-  .split[data-mobile-ratio='original'] .split__screen {
+  /* Stacked with a fixed or original ratio: each asset is sized from the screen width instead of splitting the height */
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='fixed'] .split__screen,
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='original'] .split__screen {
     height: auto;
     grid-template-rows: none;
   }
 
-  .split[data-mobile-ratio='fixed'] .split__panel { aspect-ratio: var(--split-ratio, 4 / 5); }
-  .split[data-mobile-ratio='original'] .split__panel { aspect-ratio: var(--split-ar, 0.8); }
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='fixed'] .split__panel { aspect-ratio: var(--split-ratio, 4 / 5); }
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='original'] .split__panel { aspect-ratio: var(--split-ar, 0.8); }
+
+  /* Full screen: every asset is its own page and snaps into place */
+  .split[data-mobile-layout='full'] .split__screen {
+    grid-template-rows: none;
+    grid-auto-rows: var(--split-h-mobile, 100svh);
+    height: auto;
+    scroll-snap-align: none;
+  }
+
+  .split[data-mobile-layout='full'] .split__panel {
+    height: var(--split-h-mobile, 100svh);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .split[data-mobile-layout='full'] .split__panel--empty { display: none; }
 
   .split__text { padding: 16px; gap: 8px; }
   .split__text--v-bottom { padding-bottom: 24px; }
   .split__text--v-top { padding-top: 56px; }
 
-  /* Keep the lower asset's text clear of a header docked to the bottom */
-  .split__panel:last-child .split__text--v-bottom { padding-bottom: calc(24px + var(--header-bar-height, 0px)); }
+  /* Keep text clear of a header docked to the bottom: the lower asset when stacked, every asset when full screen */
+  .split[data-mobile-layout='stacked'] .split__panel:last-child .split__text--v-bottom,
+  .split[data-mobile-layout='full'] .split__text--v-bottom { padding-bottom: calc(24px + var(--header-bar-height, 0px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
