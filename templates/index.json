@@ -41,6 +41,30 @@
         "color_scheme": "scheme1"
       }
     },
+    "split_screens": {
+      "type": "split-screens",
+      "blocks": {
+        "screen_1": {
+          "type": "screen",
+          "settings": {
+            "a_heading": "First asset",
+            "a_subheading": "Add an image or video",
+            "b_heading": "Second asset",
+            "b_subheading": "Add an image or video"
+          }
+        }
+      },
+      "block_order": [
+        "screen_1"
+      ],
+      "settings": {
+        "height_desktop": 100,
+        "height_mobile": 100,
+        "gap": 0,
+        "snap": "mobile",
+        "color_scheme": "scheme1"
+      }
+    },
     "featured-navigation": {
       "type": "featured-navigation",
       "disabled": true,
@@ -174,6 +198,7 @@
   },
   "order": [
     "product_wall",
+    "split_screens",
     "featured-navigation",
     "image_with_text_overlay_yYaW8G",
     "featured_custom_links_FQDUX4",
