@@ -192,7 +192,6 @@
   hidden
 ></div>
 
-{% unless request.design_mode %}
   {% if section.settings.infinite_scroll %}
     <script>
       /* Returning from a product page: hide the listing until the saved scroll position is rebuilt */
@@ -209,7 +208,6 @@
       })();
     </script>
   {% endif %}
-{% endunless %}
 
 {% paginate collection.products by product_limit %}
   <section

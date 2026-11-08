@@ -1,7 +1,6 @@
 (() => {
   'use strict';
 
-  const design = !!(window.Shopify && window.Shopify.designMode);
   const html = document.documentElement;
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -14,7 +13,6 @@
   const wantsTop = () => !!config() && config().dataset.top === 'true';
 
   // One saved position per listing (collection + filters + sort), not per page.
-  // Not used in the theme editor, where there is no navigating away and back.
   const stateKey = () => {
     const u = new URL(location.href);
     u.searchParams.delete('page');
@@ -30,7 +28,6 @@
   };
   // The history entry is only updated at moments that matter (click, leaving the page): browsers rate-limit replaceState
   const write = (patch, toHistory = false) => {
-    if (design) return;
     const next = Object.assign(read() || {}, patch);
     try { sessionStorage.setItem(stateKey(), JSON.stringify(next)); } catch (e) { /* private mode */ }
     if (toHistory) {
@@ -56,7 +53,7 @@
   }
 
   // We restore the position ourselves, because the extra pages are not in the HTML the browser reloads
-  if (!design && isInfinite() && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (isInfinite() && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   const grid = () => document.querySelector('#results ul.collection-list');
   const pagination = () => document.querySelector('#results [data-plp-pagination]');
@@ -92,6 +89,7 @@
 
   // ---- Infinite scroll -------------------------------------------------------------------------
 
+  let restoredOnce = false;
   const feed = { grid: null, next: null, last: 1, loading: false, observer: null, sentinel: null, status: null };
 
   async function loadNext() {
@@ -197,7 +195,10 @@
       if (entries.some((e) => e.isIntersecting)) loadNext();
     }, { rootMargin: '1200px 0px' });
 
-    const saved = !design && isBackForward() ? read() : null;
+    // Only on the first build after the page loads: the theme editor re-renders the section later on,
+    // and that must not jump the preview back to an old position
+    const saved = !restoredOnce && isBackForward() ? read() : null;
+    restoredOnce = true;
     if (saved && saved.lastPage > feed.last) {
       try {
         await restore(saved);
@@ -224,13 +225,11 @@
 
   let saveTimer;
   const saveScroll = () => {
-    if (design) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }), 150);
   };
 
   document.addEventListener('click', (e) => {
-    if (design) return;
     const link = e.target.closest && e.target.closest('#results ' + PRODUCT_LINK);
     if (!link) return;
     const li = link.closest('li');
@@ -246,7 +245,7 @@
     if (document.visibilityState === 'hidden') write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }, true);
   });
   addEventListener('pageshow', (e) => {
-    if (!e.persisted || design || !feed.grid) return;
+    if (!e.persisted || !feed.grid) return;
     const saved = read();
     if (saved && scrollY < 50 && typeof saved.y === 'number' && saved.y > 200) scrollToSaved(saved);
   });
