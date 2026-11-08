@@ -29,6 +29,7 @@
   data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
   data-sizing="{{ section.settings.sizing }}"
   data-reserve-header="{{ section.settings.reserve_header_space }}"
+  data-lock-page="{{ section.settings.lock_page }}"
   data-one-screen="{{ section.settings.one_screen }}"
   data-rows-desktop="{{ section.settings.rows_desktop }}"
   data-rows-mobile="{{ section.settings.rows_mobile }}"
@@ -168,6 +169,13 @@
       "id": "one_screen",
       "label": "Keep the wall to one screen",
       "info": "The wall is exactly as tall as the screen (minus the header) and shows the rows set below. All products are spread across those rows. Turn off to stack as many rows as needed and scroll the page.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "lock_page",
+      "label": "Lock page scrolling",
+      "info": "The page stays fixed on the screen. Scrolling, swiping or moving the pointer only shuffles the wall. Needs \"Keep the wall to one screen\", and is off inside the theme editor so you can still scroll the preview.",
       "default": true
     },
     {

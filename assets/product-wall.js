@@ -76,6 +76,10 @@
     const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
     const speedScale = parseFloat(cfg.speed);
     const staticMode = cfg.motion === 'on_scroll';
+    // Lock the page so scroll and swipe only shuffle the wall. Not in the theme editor, where the preview must scroll.
+    const lockPage = cfg.lockPage === 'true' && cfg.oneScreen === 'true' && !(window.Shopify && window.Shopify.designMode);
+    if (lockPage) document.documentElement.classList.add('product-wall-locked');
+
     const hoverShuffle = cfg.hoverShuffle !== 'false';
     const shuffleStrength = parseFloat(cfg.shuffle) || 1;
     const hideSold = cfg.hideSoldOut === 'true';
@@ -302,6 +306,7 @@
 
     return () => {
       abort.abort();
+      document.documentElement.classList.remove('product-wall-locked');
       cancelAnimationFrame(frameId);
       if (observer) observer.disconnect();
       if (resizer) resizer.disconnect();

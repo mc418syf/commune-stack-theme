@@ -110,6 +110,19 @@
 
 .product-wall__card:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 
+/* Page lock: the wall is the whole page, so gestures shuffle it instead of scrolling */
+html.product-wall-locked,
+html.product-wall-locked body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.product-wall-locked .product-wall,
+html.product-wall-locked .product-wall__row {
+  touch-action: none;
+}
+
 .product-wall__empty { padding: 80px 18px; text-align: center; }
 
 .product-wall[data-sizing='fixed'] { --wall-card-h: var(--wall-h-desktop, 36vh); }
