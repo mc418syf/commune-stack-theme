@@ -38,8 +38,9 @@
       "block_order": [
         "menu"
       ],
+      "disabled": true,
       "custom_css": [
-        ".grid{margin-top: 15px;}"
+        ".grid {margin-top: 15px;}"
       ],
       "settings": {
         "show_payment_icons": false,

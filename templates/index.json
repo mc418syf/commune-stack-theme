@@ -61,6 +61,7 @@
             "text_horizontal": "center",
             "button_label": "Shop All",
             "button_style": "link",
+            "button_color": "#292929",
             "link": "shopify://collections/all"
           }
         },
@@ -80,6 +81,7 @@
             "text_horizontal": "center",
             "button_label": "Book a Visit",
             "button_style": "link",
+            "button_color": "",
             "link": ""
           }
         }
@@ -90,12 +92,12 @@
       ],
       "settings": {
         "height_desktop": 100,
-        "mobile_ratio": "2 / 3",
-        "height_mobile": 100,
-        "gap": 0,
-        "snap": "mobile",
         "mobile_layout": "full",
         "mobile_haptics": true,
+        "mobile_ratio": "2 / 3",
+        "height_mobile": 85,
+        "gap": 0,
+        "snap": "mobile",
         "color_scheme": "scheme2"
       }
     },
