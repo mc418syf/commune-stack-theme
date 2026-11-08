@@ -57,7 +57,7 @@
     {%- if enter_mode != 'scroll' and section.settings.cta_text != blank -%}
       <button type="button" class="product-wall__cta" data-product-wall-cta>{{ section.settings.cta_text | escape }}</button>
     {%- endif -%}
-    {%- if enter_mode != 'cta' -%}
+    {%- if enter_mode != 'cta' and section.settings.scroll_hint_text != blank -%}
       <p class="product-wall__scroll-hint" aria-hidden="true">{{ section.settings.scroll_hint_text | escape }}<span class="product-wall__arrow"></span></p>
     {%- endif -%}
   {%- endif -%}
@@ -122,7 +122,8 @@
       "type": "text",
       "id": "scroll_hint_text",
       "label": "Scroll hint text",
-      "default": "Scroll to enter"
+      "default": "Scroll to enter",
+      "info": "Leave empty to hide the hint."
     },
     {
       "type": "checkbox",
