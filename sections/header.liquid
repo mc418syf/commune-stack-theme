@@ -33,6 +33,11 @@
   assign item_spacing = section.settings.header_vertical_spacing
   assign show_try_on_button = section.settings.show_try_on_button
   assign mobile_layout = section.settings.mobile_layout
+  assign mobile_bottom = false
+  if section.settings.mobile_position == 'bottom'
+    assign mobile_bottom = true
+    assign mobile_layout = 'logo_center'
+  endif
 -%}
 
 {%- capture header_logo -%}
@@ -181,6 +186,7 @@
   data-overlay-text-color-scheme="{{ overlay_text_color_scheme }}"
   id="{{ section.id }}"
   data-theme-header
+  {% if mobile_bottom %}data-mobile-bottom="true"{% endif %}
 >
   <header
     x-ref="header"
@@ -392,6 +398,18 @@
   </header>
 </header-section>
 
+{% if mobile_bottom %}
+  <script>
+    (() => {
+      const bar = document.querySelector('#{{ section.id }} header');
+      if (!bar || !window.ResizeObserver) return;
+      new ResizeObserver(() => {
+        document.documentElement.style.setProperty('--header-bar-height', bar.getBoundingClientRect().height + 'px');
+      }).observe(bar);
+    })();
+  </script>
+{% endif %}
+
 {%- liquid
   if settings.enable_breadcrumbs
     render 'breadcrumbs', section_color: 'header'
@@ -452,7 +470,7 @@
   }
 
   /* === Mobile centered logo (only for the logo-center mobile layout) === */
-  {% if section.settings.mobile_layout == 'logo_center' %}
+  {% if mobile_layout == 'logo_center' %}
   @media (max-width: 1023px) {
     #shopify-section-{{ section.id }} a.header-logo-mobile-centered {
       position: absolute;
@@ -465,6 +483,42 @@
     #shopify-section-{{ section.id }} a.header-logo-mobile-centered .max-w-\[var\(--logo-max-width\)\] {
       max-width: calc(var(--logo-max-width) * 0.9);
     }
+  }
+  {% endif %}
+
+  {% if mobile_bottom %}
+  /* === Mobile: header docked to the bottom with a glass effect === */
+  @media (max-width: 1023px) {
+    #shopify-section-{{ section.id }} {
+      position: fixed !important;
+      top: auto !important;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    #shopify-section-{{ section.id }} header-section {
+      position: static !important;
+    }
+    #shopify-section-{{ section.id }} header[x-ref='header'] {
+      background-color: rgb(var(--color-scheme-background) / {{ section.settings.mobile_glass_opacity | divided_by: 100.0 }}) !important;
+      -webkit-backdrop-filter: blur({{ section.settings.mobile_glass_blur }}px) saturate(160%);
+      backdrop-filter: blur({{ section.settings.mobile_glass_blur }}px) saturate(160%);
+      border-bottom: 0;
+      border-top: 1px solid rgb(var(--color-scheme-text) / 0.12);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    /* Search opens upward, since there is no room below the bar */
+    #shopify-section-{{ section.id }} .header-search-panel {
+      top: auto !important;
+      bottom: 100% !important;
+    }
+    #shopify-section-{{ section.id }} .predictive-search-results {
+      top: auto !important;
+      bottom: calc(100% + var(--gridline-width, 0px)) !important;
+      height: calc(100svh - 160px) !important;
+    }
+    /* Keep the end of the page clear of the bar */
+    body { padding-bottom: var(--header-bar-height, 56px); }
   }
   {% endif %}
 
@@ -699,6 +753,37 @@
         }
       ],
       "default": "logo_left"
+    },
+    {
+      "type": "select",
+      "id": "mobile_position",
+      "label": "Mobile header position",
+      "info": "Bottom docks the header to the bottom of the screen with the logo centered and a glass effect.",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom (glass)" }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "range",
+      "id": "mobile_glass_opacity",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Glass opacity (bottom header)",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "mobile_glass_blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Glass blur (bottom header)",
+      "default": 20
     },
     {
       "type": "select",

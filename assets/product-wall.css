@@ -4,7 +4,7 @@
   /* Fill the first screen: viewport minus header, gaps and text, split across the rows */
   --wall-card-h: max(
     120px,
-    calc((100svh - var(--wall-header-h, 0px) - (var(--wall-rows) + 1) * var(--wall-gap) - var(--wall-rows) * var(--wall-meta-h, 0px)) / var(--wall-rows))
+    calc((100svh - var(--wall-header-h, 0px) - var(--wall-bottom-h, 0px) - (var(--wall-rows) + 1) * var(--wall-gap) - var(--wall-rows) * var(--wall-meta-h, 0px)) / var(--wall-rows))
   );
   --wall-meta-size: 10px;
   padding: calc(var(--wall-gap) + var(--wall-header-h, 0px)) 0 var(--wall-gap);

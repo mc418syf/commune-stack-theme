@@ -54,12 +54,17 @@
     let resizer;
 
     // The header floats over the page (it takes no space), so reserve room for it above the first row.
-    const header = document.querySelector('header[data-theme-header]');
+    const header = document.querySelector('[data-theme-header] header');
+    // On mobile the header can be docked to the bottom, which reserves room there instead.
+    const narrow = matchMedia('(max-width: 1023px)');
     const reserve = () => {
       const h = cfg.reserveHeader === 'true' && header ? header.getBoundingClientRect().height : 0;
-      root.style.setProperty('--wall-header-h', h + 'px');
+      const atBottom = narrow.matches && header && header.closest('[data-theme-header]').hasAttribute('data-mobile-bottom');
+      root.style.setProperty('--wall-header-h', (atBottom ? 0 : h) + 'px');
+      root.style.setProperty('--wall-bottom-h', (atBottom && cfg.reserveHeader === 'true' ? h : 0) + 'px');
     };
     reserve();
+    narrow.addEventListener('change', reserve, on);
     const headerWatch = new ResizeObserver(reserve);
     if (header) headerWatch.observe(header);
 
