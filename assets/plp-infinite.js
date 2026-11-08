@@ -1,21 +1,20 @@
 (() => {
   'use strict';
 
-  // Not in the theme editor, where the listing is re-rendered constantly
-  if (window.Shopify && window.Shopify.designMode) return;
-
-  const config = document.getElementById('plp-config');
-  if (!config) return;
-
-  const infinite = config.dataset.infinite === 'true';
-  const wantsTop = config.dataset.top === 'true';
+  const design = !!(window.Shopify && window.Shopify.designMode);
   const html = document.documentElement;
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)');
 
   const PLACEHOLDER = 'li[aria-hidden="true"][role="presentation"]';
   const PRODUCT_LINK = 'a[href*="/products/"]';
 
-  // One saved position per listing (collection + filters + sort), not per page
+  // The settings live on a marker element that is re-rendered with the section, so read them fresh
+  const config = () => document.getElementById('plp-config');
+  const isInfinite = () => !!config() && config().dataset.infinite === 'true';
+  const wantsTop = () => !!config() && config().dataset.top === 'true';
+
+  // One saved position per listing (collection + filters + sort), not per page.
+  // Not used in the theme editor, where there is no navigating away and back.
   const stateKey = () => {
     const u = new URL(location.href);
     u.searchParams.delete('page');
@@ -23,6 +22,7 @@
   };
   const read = () => { try { return JSON.parse(sessionStorage.getItem(stateKey())); } catch (e) { return null; } };
   const write = (patch) => {
+    if (design) return;
     try { sessionStorage.setItem(stateKey(), JSON.stringify(Object.assign(read() || {}, patch))); } catch (e) { /* private mode */ }
   };
 
@@ -34,8 +34,17 @@
     return !!nav && nav.type === 'back_forward';
   };
 
+  // Keep Shopify's preview parameters on our fetches, so pages come from the theme being previewed or edited
+  const PREVIEW_PARAMS = ['preview_theme_id', '_fd', 'pb', '_ab', '_bt'];
+  function withPreview(href) {
+    const url = new URL(href, location.origin);
+    const current = new URLSearchParams(location.search);
+    PREVIEW_PARAMS.forEach((k) => { if (current.has(k) && !url.searchParams.has(k)) url.searchParams.set(k, current.get(k)); });
+    return url.pathname + url.search;
+  }
+
   // We restore the position ourselves, because the extra pages are not in the HTML the browser reloads
-  if (infinite && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (!design && isInfinite() && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   const grid = () => document.querySelector('#results ul.collection-list');
   const pagination = () => document.querySelector('#results [data-plp-pagination]');
@@ -45,7 +54,7 @@
   };
 
   async function fetchPage(href) {
-    const res = await fetch(href, { credentials: 'same-origin' });
+    const res = await fetch(withPreview(href), { credentials: 'same-origin' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return new DOMParser().parseFromString(await res.text(), 'text/html');
   }
@@ -85,7 +94,7 @@
       feed.next = nextHrefIn(doc);
       write({ lastPage: feed.last });
     } catch (e) {
-      feed.next = feed.next; // leave it, so scrolling again retries
+      /* leave feed.next as it is, so scrolling again retries */
     } finally {
       feed.loading = false;
       feed.status.hidden = true;
@@ -100,6 +109,7 @@
     if (feed.observer) feed.observer.disconnect();
     if (feed.sentinel) feed.sentinel.remove();
     if (feed.status) feed.status.remove();
+    feed.observer = feed.sentinel = feed.status = null;
   }
 
   async function restore(saved) {
@@ -133,7 +143,14 @@
   async function setupFeed() {
     const g = grid();
     const pager = pagination();
-    if (!infinite || !g || !pager || g === feed.grid) return;
+
+    // Turned off in the settings (or the section was swapped): put things back as they were
+    if (!isInfinite()) {
+      if (feed.grid) { stopFeed(); feed.grid = null; }
+      if (pager) pager.style.display = '';
+      return;
+    }
+    if (!g || !pager || g === feed.grid) return;
     stopFeed();
 
     feed.grid = g;
@@ -158,7 +175,7 @@
       if (entries.some((e) => e.isIntersecting)) loadNext();
     }, { rootMargin: '1200px 0px' });
 
-    const saved = isBackForward() ? read() : null;
+    const saved = !design && isBackForward() ? read() : null;
     if (saved && saved.lastPage > feed.last) {
       try {
         await restore(saved);
@@ -177,7 +194,7 @@
     }
     html.classList.remove('plp-restoring');
 
-    if (feed.next) feed.observer.observe(feed.sentinel);
+    if (feed.observer && feed.next) feed.observer.observe(feed.sentinel);
     else stopFeed();
   }
 
@@ -185,11 +202,13 @@
 
   let saveTimer;
   const saveScroll = () => {
+    if (design) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }), 150);
   };
 
   document.addEventListener('click', (e) => {
+    if (design) return;
     const link = e.target.closest && e.target.closest('#results ' + PRODUCT_LINK);
     if (!link) return;
     const li = link.closest('li');
@@ -200,14 +219,21 @@
     });
   }, true);
 
-  addEventListener('scroll', saveScroll, { passive: true });
   addEventListener('pagehide', () => write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }));
 
   // ---- Back to top ------------------------------------------------------------------------------
 
-  let topButton;
+  let topButton = null;
+  const updateTop = () => {
+    if (topButton && topButton.isConnected) topButton.classList.toggle('is-visible', scrollY > innerHeight * 1.2);
+  };
+
   function setupTop() {
-    if (!wantsTop || topButton) return;
+    if (!wantsTop()) {
+      if (topButton) { topButton.remove(); topButton = null; }
+      return;
+    }
+    if (topButton && topButton.isConnected) return;
     const host = document.getElementById('filterable') || document.body;
     topButton = document.createElement('button');
     topButton.type = 'button';
@@ -218,27 +244,40 @@
       window.scrollTo({ top: 0, behavior: REDUCED.matches ? 'auto' : 'smooth' });
     });
     host.appendChild(topButton);
-
-    const update = () => topButton.classList.toggle('is-visible', scrollY > innerHeight * 1.2);
-    addEventListener('scroll', update, { passive: true });
-    update();
+    updateTop();
   }
 
-  // ---- Boot, and re-boot when filters or sorting replace the results ---------------------------
+  addEventListener('scroll', () => { updateTop(); saveScroll(); }, { passive: true });
+
+  // ---- Boot, and re-boot when filters, sorting or the theme editor replace the results ---------
 
   function boot() {
     setupTop();
     setupFeed();
   }
 
-  boot();
-
-  const results = document.getElementById('results');
-  if (results) {
+  let watcher = null;
+  function watch() {
+    if (watcher) watcher.disconnect();
+    const results = document.getElementById('results');
+    if (!results) return;
     // Filtering and sorting swap the contents of #results, which drops our sentinel and grid reference
-    new MutationObserver(() => {
-      if (feed.grid && !feed.grid.isConnected) { feed.grid = null; stopFeed(); }
+    watcher = new MutationObserver(() => {
+      if (feed.grid && !feed.grid.isConnected) { stopFeed(); feed.grid = null; }
       boot();
-    }).observe(results.parentElement || results, { childList: true, subtree: true });
+    });
+    watcher.observe(results.parentElement || results, { childList: true, subtree: true });
   }
+
+  function init() {
+    if (!config()) return;
+    boot();
+    watch();
+  }
+
+  init();
+
+  // The theme editor re-renders the whole section when a setting changes
+  document.addEventListener('shopify:section:load', () => { stopFeed(); feed.grid = null; topButton = null; init(); });
+  document.addEventListener('shopify:section:unload', () => { stopFeed(); feed.grid = null; if (watcher) watcher.disconnect(); });
 })();

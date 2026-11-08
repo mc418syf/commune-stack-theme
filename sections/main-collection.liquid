@@ -649,9 +649,7 @@
 {% endif %}
 
 {{ 'plp-infinite.css' | asset_url | stylesheet_tag }}
-{% unless request.design_mode %}
-  <script src="{{ 'plp-infinite.js' | asset_url }}" defer></script>
-{% endunless %}
+<script src="{{ 'plp-infinite.js' | asset_url }}" defer></script>
 
 {% unless request.design_mode %}
   {% if show_filters or show_sort %}
@@ -883,7 +881,7 @@
       "type": "checkbox",
       "id": "infinite_scroll",
       "label": "Infinite scrolling",
-      "info": "Loads the next page automatically while scrolling instead of showing page numbers. Going back from a product returns to the same spot. Off inside the theme editor.",
+      "info": "Loads the next page automatically while scrolling instead of showing page numbers. Going back from a product returns to the same spot.",
       "default": true
     },
     {
