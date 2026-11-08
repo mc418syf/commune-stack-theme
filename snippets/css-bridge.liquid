@@ -417,3 +417,34 @@
     }
   }
 </style>
+
+{%- if settings.type_system == 'commune' -%}
+  {%- liquid
+    comment
+      Commune compact: every step is a whole pixel size, converted to rem for the chosen base font size.
+      xs 9, sm 10, base 12, lg 14, xl 16, 2xl 18, 3xl 24, 4xl 32, 5xl 40, 6xl 48, 7xl 64, 8xl 80, 9xl 96
+    endcomment
+    assign type_base = settings.base_font_size | times: 1.0
+  -%}
+  <style>
+    :root {
+      --font-size-xs: {{ 9 | divided_by: type_base }}rem;
+      --font-size-sm: {{ 10 | divided_by: type_base }}rem;
+      --font-size-base: {{ 12 | divided_by: type_base }}rem;
+      --font-size-lg: {{ 14 | divided_by: type_base }}rem;
+      --font-size-xl: {{ 16 | divided_by: type_base }}rem;
+      --font-size-2xl: {{ 18 | divided_by: type_base }}rem;
+      --font-size-3xl: {{ 24 | divided_by: type_base }}rem;
+      --font-size-4xl: {{ 32 | divided_by: type_base }}rem;
+      --font-size-5xl: {{ 40 | divided_by: type_base }}rem;
+      --font-size-6xl: {{ 48 | divided_by: type_base }}rem;
+      --font-size-7xl: {{ 64 | divided_by: type_base }}rem;
+      --font-size-8xl: {{ 80 | divided_by: type_base }}rem;
+      --font-size-9xl: {{ 96 | divided_by: type_base }}rem;
+
+      /* Small text needs a little more air than headings */
+      --base-line-height: 1.4;
+      --heading-line-height: 1.15;
+    }
+  </style>
+{%- endif -%}

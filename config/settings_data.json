@@ -165,7 +165,8 @@
           "secondary": "#fcfcfc"
         }
       }
-    }
+    },
+    "type_system": "commune"
   },
   "presets": {
     "Modern": {

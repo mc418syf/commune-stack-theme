@@ -115,6 +115,17 @@
     "name": "Typography",
     "settings": [
       {
+        "type": "select",
+        "id": "type_system",
+        "label": "Type scale",
+        "info": "Commune compact replaces the theme's 1.25x scale with clean steps of 9 / 10 / 12 / 14 / 16 / 18 / 24 / 32 / 40 / 48 / 64 / 80 / 96 px (at a 12px base). Headings, body text, buttons and labels all follow it.",
+        "options": [
+          { "value": "default", "label": "Theme default (1.25x scale)" },
+          { "value": "commune", "label": "Commune compact (clean steps)" }
+        ],
+        "default": "default"
+      },
+      {
         "type": "range",
         "id": "base_font_size",
         "min": 10,
