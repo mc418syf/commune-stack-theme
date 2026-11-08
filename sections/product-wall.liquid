@@ -23,6 +23,8 @@
   data-color-scheme="{{ section_color }}"
   data-product-wall
   data-collection="{{ collection_handle }}"
+  data-motion="{{ section.settings.motion }}"
+  data-shuffle="{{ section.settings.shuffle_strength | divided_by: 100.0 }}"
   data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
   data-sizing="{{ section.settings.sizing }}"
   data-reserve-header="{{ section.settings.reserve_header_space }}"
@@ -97,13 +99,35 @@
       "content": "Layout and motion"
     },
     {
+      "type": "select",
+      "id": "motion",
+      "label": "Motion",
+      "options": [
+        { "value": "autoplay", "label": "Autoplay (rows always moving)" },
+        { "value": "on_scroll", "label": "Static, shuffles when scrolling" }
+      ],
+      "default": "autoplay",
+      "info": "Static keeps the rows still until the visitor scrolls or swipes, then shuffles them in alternating directions."
+    },
+    {
+      "type": "range",
+      "id": "shuffle_strength",
+      "min": 25,
+      "max": 300,
+      "step": 25,
+      "unit": "%",
+      "label": "Shuffle strength",
+      "info": "Used when motion is static.",
+      "default": 100
+    },
+    {
       "type": "range",
       "id": "speed",
       "min": 0,
       "max": 400,
       "step": 25,
       "unit": "%",
-      "label": "Scroll speed",
+      "label": "Autoplay speed",
       "default": 100
     },
     {

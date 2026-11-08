@@ -75,6 +75,8 @@
 
     const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
     const speedScale = parseFloat(cfg.speed);
+    const staticMode = cfg.motion === 'on_scroll';
+    const shuffleStrength = parseFloat(cfg.shuffle) || 1;
     const hideSold = cfg.hideSoldOut === 'true';
     const money = new Intl.NumberFormat(document.documentElement.lang || undefined, {
       style: 'currency', currency: cfg.currency || 'USD', maximumFractionDigits: 0,
@@ -107,7 +109,7 @@
         host.appendChild(el);
 
         const dir = i % 2 ? 1 : -1;
-        const speed = REDUCED.matches ? 0 : 16 + ((i * 37) % 6) * 7;
+        const speed = REDUCED.matches || staticMode ? 0 : 16 + ((i * 37) % 6) * 7;
         return {
           el, dir,
           track: el.firstChild,
@@ -151,7 +153,7 @@
 
       // Pointer: every row reacts a little differently, so the wall shuffles.
       addEventListener('pointermove', (e) => {
-        if (e.pointerType !== 'mouse') return;
+        if (e.pointerType !== 'mouse' || staticMode) return;
         state.nx = e.clientX / innerWidth;
         if (state.lastX !== null && !REDUCED.matches) {
           const dx = e.clientX - state.lastX;
@@ -165,13 +167,33 @@
         state.lastY = e.clientY;
       }, { passive: true, signal: abort.signal });
 
-      // Page scroll gives each row a push in its own direction.
+      // Scrolling gives each row a push in its own direction.
+      const push = (dy) => {
+        if (REDUCED.matches) return;
+        for (const r of rows) r.v = clamp(r.v + dy * (staticMode ? 5 * shuffleStrength : 3) * r.dir, -MAX_SPEED, MAX_SPEED);
+      };
+
       addEventListener('scroll', () => {
         const dy = scrollY - state.scrollY;
         state.scrollY = scrollY;
-        if (REDUCED.matches) return;
-        for (const r of rows) r.v = clamp(r.v + dy * 3 * r.dir, -MAX_SPEED, MAX_SPEED);
+        push(dy);
       }, { passive: true, signal: abort.signal });
+
+      // When the page itself can't scroll (the wall fills the screen), wheel and swipe drive the shuffle.
+      const pageScrolls = () => document.documentElement.scrollHeight > innerHeight + 2;
+      root.addEventListener('wheel', (e) => {
+        if (!pageScrolls() && Math.abs(e.deltaY) > Math.abs(e.deltaX)) push(e.deltaY);
+      }, { passive: true, signal: abort.signal });
+
+      let ty = null, tx = null;
+      root.addEventListener('touchstart', (e) => { ty = e.touches[0].clientY; tx = e.touches[0].clientX; }, { passive: true, signal: abort.signal });
+      root.addEventListener('touchmove', (e) => {
+        if (ty === null) return;
+        const dy = ty - e.touches[0].clientY, dx = tx - e.touches[0].clientX;
+        ty = e.touches[0].clientY; tx = e.touches[0].clientX;
+        if (!pageScrolls() && Math.abs(dy) > Math.abs(dx)) push(dy);
+      }, { passive: true, signal: abort.signal });
+      root.addEventListener('touchend', () => (ty = null), { passive: true, signal: abort.signal });
 
       for (const r of rows) {
         r.el.addEventListener('mouseenter', () => (r.hover = true), on);
@@ -255,7 +277,7 @@
             r.o += s; r.snap -= s;
             if (Math.abs(r.snap) < 0.5) r.snap = 0;
           }
-          if (FINE_POINTER.matches && !REDUCED.matches) r.ptx = (state.nx - 0.5) * -180 * r.depth * r.dir;
+          if (FINE_POINTER.matches && !REDUCED.matches && !staticMode) r.ptx = (state.nx - 0.5) * -180 * r.depth * r.dir;
           r.px += (r.ptx - r.px) * pEase;
 
           if (!r.visible || !r.w) continue;
@@ -271,7 +293,7 @@
 
     loadProducts(cfg.collection)
       .then((list) => run(hideSold ? list.filter((p) => p.available) : list))
-      .catch(() => {});
+      .catch((err) => console.error('[product-wall]', err));
 
     return () => {
       abort.abort();
