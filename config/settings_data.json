@@ -13,6 +13,7 @@
     "color_border": "#000000",
     "modal_color_scheme": "scheme1",
     "selected_text_background_color": "accent",
+    "type_system": "commune",
     "base_font_size": 12,
     "font_heading": "sans_serif_n4",
     "heading_uppercase": true,
@@ -54,7 +55,8 @@
     "under_image_display_format": "title_left_price_under",
     "quick_buy_position": "over_image",
     "title_price_display": "over_image_bottom",
-    "product_info_size": 14,
+    "product_info_size": 13,
+    "product_card_size_offset": 2,
     "product_info_letterspacing": "0em",
     "product_price_size": 12,
     "quick_buy_variant_picker_option_style": "text_underline",
@@ -165,8 +167,7 @@
           "secondary": "#fcfcfc"
         }
       }
-    },
-    "type_system": "commune"
+    }
   },
   "presets": {
     "Modern": {

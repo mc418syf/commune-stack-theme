@@ -51,7 +51,7 @@
           "settings": {
             "description_tab_label": "Description",
             "tab_gap": 20,
-            "tab_titles_bold": true,
+            "tab_titles_bold": false,
             "tab_2_title": "Measurement",
             "tab_2_content": "<p>{{ product.metafields.custom.measurement | metafield_tag }}</p>",
             "tab_3_title": "",
@@ -97,8 +97,8 @@
         "mobile_slide_overlap": 60,
         "desktop_media_width": "two-thirds",
         "desktop_media_position": "left",
-        "title_price_gap": 4,
         "vendor_title_gap": 4,
+        "title_price_gap": 4,
         "desktop_layout": "strip",
         "strip_height": 70,
         "strip_gap": 0,
