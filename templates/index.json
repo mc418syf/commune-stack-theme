@@ -25,7 +25,7 @@
         "one_screen": true,
         "sizing": "fit_rows",
         "rows_desktop": 3,
-        "rows_mobile": 3,
+        "rows_mobile": 4,
         "image_height_desktop": 36,
         "image_height_mobile": 24,
         "gap_desktop": 10,
