@@ -1,0 +1,224 @@
+/* Product page, "archive record" detail section.
+   A typed printout in the style of a dot-matrix store directory: monospace, uppercase,
+   <ANGLE BRACKET> values and a dashed rule under every line.
+   Fonts come from the theme's own font settings (--heading-font-stack, --body-font-stack). */
+
+[data-product-root] {
+  --rec-ink: #111111;
+  --rec-divider: #CFCDC6;
+  --rec-accent: #FF5A1F;
+  --rec-muted: #6B6B66;
+}
+
+/* ---- The record list (also used by the stock block) ---- */
+.record {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px dashed var(--rec-divider);
+  font-family: var(--body-font-stack);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--rec-ink);
+}
+
+.record__heading,
+.record__row {
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--rec-divider);
+}
+
+.record__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.record__label { flex: none; }
+
+/* Long values such as the material may wrap */
+.record__value {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.record__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: var(--rec-accent);
+  vertical-align: middle;
+}
+
+.record--stock { margin-bottom: 16px; }
+
+@media (min-width: 768px) {
+  .record__heading,
+  .record__row { padding: 9px 0; }
+}
+
+/* ---- Tabs ---- */
+.product-tabs--record { margin-top: 0; }
+
+.product-tabs--record .product-tabs__titles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.product-tabs--record .product-tabs__tab {
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 0 6px;
+  font-family: var(--heading-font-stack);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em !important; /* the theme sets its own tracking on tabs with !important */
+  -webkit-text-stroke: 0;
+  color: var(--rec-muted);
+  opacity: 1;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.product-tabs--record .product-tabs__tab--active {
+  color: var(--rec-ink);
+  border-bottom-color: var(--rec-ink);
+}
+
+.product-tabs--record .product-tabs__tab:focus-visible,
+.product-tabs--record .product-tabs__panel:focus-visible {
+  outline: 2px solid var(--rec-ink);
+  outline-offset: 3px;
+}
+
+/* Both panels are as tall as each other, so the page does not jump when switching */
+.product-tabs--record .product-tabs__panel { min-height: 440px; }
+
+.product-tabs__static-title {
+  margin: 24px 0 8px;
+  font-family: var(--heading-font-stack);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--rec-ink);
+}
+
+@media (min-width: 768px) {
+  .product-tabs--record .product-tabs__tab {
+    min-height: 0;
+    padding: 0 0 6px;
+    font-size: 20px;
+  }
+}
+
+/* The description as a paragraph: only for the mobile order (see below) */
+.record-lede { display: none; }
+
+/* ---- Buttons: square bars, 52px ---- */
+[data-product-root] .add-to-cart-container {
+  max-width: none;
+  margin-top: 0;
+}
+
+[data-product-root] #addToCartButton,
+[data-product-root] [data-try-on-pdp] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  margin: 0;
+  padding: 0 16px;
+  font-family: var(--body-font-stack);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0;
+  border-radius: 0;
+  color: var(--rec-ink);
+}
+
+[data-product-root] #addToCartButton {
+  background: var(--rec-accent);
+  border: 1px solid var(--rec-accent);
+}
+
+[data-product-root] [data-try-on-pdp] {
+  background: transparent;
+  border: 1px solid var(--rec-ink);
+}
+
+[data-product-root] #addToCartButton:hover:not(:disabled) { background: var(--rec-ink); border-color: var(--rec-ink); color: var(--rec-accent); }
+[data-product-root] [data-try-on-pdp]:hover:not(:disabled) { background: var(--rec-ink); color: rgb(var(--color-scheme-background)); }
+
+[data-product-root] #addToCartButton:focus-visible,
+[data-product-root] [data-try-on-pdp]:focus-visible {
+  outline: 2px solid var(--rec-ink);
+  outline-offset: 3px;
+}
+
+[data-product-root] [data-try-on-pdp] { margin-top: 0; }
+[data-product-root] .add-to-cart-container + div,
+[data-product-root] div:has(> [data-try-on-pdp]) { max-width: none; margin-top: 8px; }
+
+/* ---- Layout inside the image-strip product page ---- */
+
+/* Desktop and tablet: name, price and tabs on the left (up to 640px), the record and buttons on the right (up to 560px) */
+@media (min-width: 768px) {
+  .product-strip .product-block-area {
+    display: grid;
+    grid-template-columns: minmax(0, 640px) minmax(0, 560px);
+    justify-content: space-between;
+    column-gap: 40px;
+    align-items: start;
+  }
+
+  .product-strip .pb-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .product-strip .pb-col--left { max-width: none; }
+}
+
+/* Mobile: one column in this order: name, price, description paragraph, stock block, Add to cart,
+   Try in-store, tabs, panel. The description block is taken apart so its paragraph and its tabs
+   can sit at different places in the column. */
+@media (max-width: 767px) {
+  .product-strip .pb[data-pb='description'] { display: contents; }
+
+  .product-strip .record-lede {
+    display: block;
+    order: 4;
+    margin: 12px 0 0;
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  .product-strip .product-tabs--record:not(.product-tabs--static) {
+    order: 6;
+    margin-top: 24px;
+  }
+
+  /* The paragraph already shows the description, so the tabs below hold the record only */
+  .product-strip .product-tabs--record [data-tab='description'] { display: none; }
+  .product-strip .product-tabs--desc-only { display: none; }
+}

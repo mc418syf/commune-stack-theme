@@ -18,6 +18,9 @@
   assign name_font_pdp = heading_font | font_modify: 'weight', name_weight_pdp
   assign name_font_card = heading_font | font_modify: 'weight', name_weight_card
 
+  assign record_tab_font = heading_font | font_modify: 'weight', '600'
+  assign record_button_font = body_font | font_modify: 'weight', '500'
+
   assign product_info_choice = settings.product_info_weight | default: '500'
   assign product_info_weight = product_info_choice
   assign product_info_stroke = '0px'
@@ -61,6 +64,8 @@
   {{ heading_font | font_face: font_display: 'swap' }}
   {% if name_font_pdp %}{{ name_font_pdp | font_face: font_display: 'swap' }}{% endif %}
   {% if name_font_card %}{{ name_font_card | font_face: font_display: 'swap' }}{% endif %}
+  {% if record_tab_font %}{{ record_tab_font | font_face: font_display: 'swap' }}{% endif %}
+  {% if record_button_font %}{{ record_button_font | font_face: font_display: 'swap' }}{% endif %}
 
   {%- liquid
     if body_font_bold

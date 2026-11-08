@@ -18,6 +18,10 @@
     {{ block.shopify_attributes }}
   {% endif %}
 >
+  {%- if block and block.settings.show_archive_stock and quick_buy != true -%}
+    {% render 'product-record-stock', product: product, current_variant: current_variant, block: block %}
+  {%- endif -%}
+
   {% form 'product', product, id: product_form_id %}
     {{ form | payment_terms }}
 

@@ -43,13 +43,16 @@
             "show_pickup_availability": false,
             "show_gift_card_recipient": false,
             "show_try_on_button": true,
-            "try_on_button_label": "Try In-Store"
+            "try_on_button_label": "Try In-Store",
+            "show_archive_stock": true,
+            "default_condition": "Good"
           }
         },
         "description_rWXWew": {
           "type": "description",
           "settings": {
             "description_tab_label": "Description",
+            "archive_layout": true,
             "tab_gap": 20,
             "tab_titles_bold": false,
             "tab_2_title": "Measurement",

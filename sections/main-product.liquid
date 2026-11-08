@@ -879,6 +879,24 @@
           "id": "try_on_button_label",
           "label": "Button label",
           "default": "Try In-Store"
+        },
+        {
+          "type": "header",
+          "content": "Archive record"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_archive_stock",
+          "label": "Show the archive record stock block",
+          "default": true,
+          "info": "Status, condition and reference above the Add to cart bar."
+        },
+        {
+          "type": "text",
+          "id": "default_condition",
+          "label": "Default condition",
+          "default": "Good",
+          "info": "Shown when a product has no custom.condition metafield. Leave empty to hide the row."
         }
       ]
     },
@@ -895,6 +913,13 @@
         {
           "type": "paragraph",
           "content": "Tab 1 is always the product description. Add up to 5 extra tabs below. Leave a tab title blank to hide that tab."
+        },
+        {
+          "type": "checkbox",
+          "id": "archive_layout",
+          "label": "Archive record layout",
+          "default": true,
+          "info": "Two tabs: Description, and Measurement built from the custom.measurement metafield as a typed record. Replaces the extra tabs below while on."
         },
         {
           "type": "text",

@@ -1,0 +1,144 @@
+{%- comment -%}
+  Archive record: turns the multi-line metafield custom.measurement into dashed rows.
+
+  Format (one per line):
+    Size XS, fits men's S.        -> Size row (the leading "Size" and a trailing full stop are removed)
+    - Chest: 49cm/19.5in          -> a measurement row, shown as <49 CM (19.5 IN)>
+    - Material: 100% cotton       -> Record group
+    - Made in: Japan              -> Record group
+  Blank lines and other lines without a colon are ignored. Material and Made in fall back to the
+  custom.material and custom.made_in metafields when they are not in the text.
+  Every value is escaped; nothing from the metafield is output raw.
+
+  Output: nothing when there is nothing to show, so callers can test the captured result.
+{%- endcomment -%}
+
+{%- assign raw = product.metafields.custom.measurement.value | default: '' -%}
+{%- assign size_value = '' -%}
+{%- assign made_in_value = '' -%}
+{%- assign material_value = '' -%}
+{%- assign length_rows = '' -%}
+{%- assign shoulder_rows = '' -%}
+{%- assign chest_rows = '' -%}
+{%- assign sleeve_rows = '' -%}
+{%- assign other_rows = '' -%}
+
+{%- assign lines = raw | newline_to_br | split: '<br />' -%}
+{%- for line_raw in lines -%}
+  {%- assign line = line_raw | strip -%}
+  {%- if line.size == 0 -%}
+    {%- continue -%}
+  {%- endif -%}
+
+  {%- assign head = line | slice: 0, 4 | downcase -%}
+  {%- assign first_char = line | slice: 0, 1 -%}
+
+  {%- if head == 'size' -%}
+    {%- assign size_text = line | slice: 4, 500 | strip -%}
+    {%- assign lead = size_text | slice: 0, 1 -%}
+    {%- if lead == ':' or lead == '-' -%}
+      {%- assign size_text = size_text | slice: 1, 500 | strip -%}
+    {%- endif -%}
+    {%- assign tail = size_text | slice: -1, 1 -%}
+    {%- if tail == '.' -%}
+      {%- assign size_length = size_text.size | minus: 1 -%}
+      {%- assign size_text = size_text | slice: 0, size_length | strip -%}
+    {%- endif -%}
+    {%- if size_text.size > 0 -%}
+      {%- assign size_value = size_text -%}
+    {%- endif -%}
+
+  {%- elsif first_char == '-' and line contains ':' -%}
+    {%- assign rest = line | slice: 1, 500 | strip -%}
+    {%- assign parts = rest | split: ':' -%}
+    {%- assign label = parts[0] | strip -%}
+    {%- assign value = rest | remove_first: parts[0] | remove_first: ':' | strip -%}
+    {%- if label.size == 0 or value.size == 0 -%}
+      {%- continue -%}
+    {%- endif -%}
+    {%- assign label_l = label | downcase -%}
+
+    {%- if label_l == 'material' -%}
+      {%- assign material_value = value -%}
+    {%- elsif label_l == 'made in' or label_l == 'made_in' or label_l == 'made-in' -%}
+      {%- assign made_in_value = value -%}
+    {%- else -%}
+      {%- comment -%} 49cm/19.5in becomes 49 cm (19.5 in); a value without a slash stays as typed {%- endcomment -%}
+      {%- assign display_value = value -%}
+      {%- if value contains '/' -%}
+        {%- assign pair = value | split: '/' -%}
+        {%- assign left = pair[0] | strip -%}
+        {%- assign right = pair[1] | strip -%}
+        {%- assign left_unit = left | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9' | remove: '.' | strip -%}
+        {%- assign right_unit = right | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9' | remove: '.' | strip -%}
+        {%- assign left_text = left -%}
+        {%- if left_unit.size > 0 -%}
+          {%- assign left_number = left | remove: left_unit | strip -%}
+          {%- assign left_text = left_number | append: ' ' | append: left_unit -%}
+        {%- endif -%}
+        {%- assign right_text = right -%}
+        {%- if right_unit.size > 0 -%}
+          {%- assign right_number = right | remove: right_unit | strip -%}
+          {%- assign right_text = right_number | append: ' ' | append: right_unit -%}
+        {%- endif -%}
+        {%- assign display_value = left_text | append: ' (' | append: right_text | append: ')' -%}
+      {%- endif -%}
+
+      {%- capture row -%}
+        <li class="record__row"><span class="record__label">{{ label | escape }}</span><span class="record__value">&lt;{{ display_value | escape }}&gt;</span></li>
+      {%- endcapture -%}
+
+      {%- comment -%} Length, Shoulder, Chest, Sleeve first, in that order; anything else after them {%- endcomment -%}
+      {%- assign key6 = label_l | slice: 0, 6 -%}
+      {%- assign key8 = label_l | slice: 0, 8 -%}
+      {%- assign key5 = label_l | slice: 0, 5 -%}
+      {%- if key6 == 'length' -%}
+        {%- assign length_rows = length_rows | append: row -%}
+      {%- elsif key8 == 'shoulder' -%}
+        {%- assign shoulder_rows = shoulder_rows | append: row -%}
+      {%- elsif key5 == 'chest' -%}
+        {%- assign chest_rows = chest_rows | append: row -%}
+      {%- elsif key6 == 'sleeve' -%}
+        {%- assign sleeve_rows = sleeve_rows | append: row -%}
+      {%- else -%}
+        {%- assign other_rows = other_rows | append: row -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if made_in_value.size == 0 -%}
+  {%- assign made_in_value = product.metafields.custom.made_in | metafield_text | default: '' -%}
+{%- endif -%}
+{%- if material_value.size == 0 -%}
+  {%- assign material_value = product.metafields.custom.material | metafield_text | default: '' -%}
+{%- endif -%}
+
+{%- capture record_group -%}
+  {%- if size_value.size > 0 -%}
+    <li class="record__row"><span class="record__label">Size</span><span class="record__value">&lt;{{ size_value | escape }}&gt;</span></li>
+  {%- endif -%}
+  {%- if made_in_value.size > 0 -%}
+    <li class="record__row"><span class="record__label">Made in</span><span class="record__value">&lt;{{ made_in_value | escape }}&gt;</span></li>
+  {%- endif -%}
+  {%- if material_value.size > 0 -%}
+    <li class="record__row"><span class="record__label">Material</span><span class="record__value">&lt;{{ material_value | escape }}&gt;</span></li>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture measured_group -%}
+  {{- length_rows }}{{ shoulder_rows }}{{ chest_rows }}{{ sleeve_rows }}{{ other_rows -}}
+{%- endcapture -%}
+
+{%- if record_group contains 'record__row' or measured_group contains 'record__row' -%}
+  <ul class="record">
+    {%- if record_group contains 'record__row' -%}
+      <li class="record__heading">&lt;RECORD&gt;</li>
+      {{- record_group -}}
+    {%- endif -%}
+    {%- if measured_group contains 'record__row' -%}
+      <li class="record__heading">&lt;MEASURED FLAT&gt;</li>
+      {{- measured_group -}}
+    {%- endif -%}
+  </ul>
+{%- endif -%}
