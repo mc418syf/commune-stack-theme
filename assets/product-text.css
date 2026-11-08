@@ -56,6 +56,6 @@
 }
 
 /* ---- Space between vendor, title and price ---- */
-.product-tile-vendor { margin-bottom: var(--product-text-gap, 6px); }
+.product-tile-meta .product-tile-vendor { margin-bottom: var(--product-text-gap, 6px); }
 
 .product-tile-meta .product-tile-price { margin-top: var(--product-text-gap, 6px); }
