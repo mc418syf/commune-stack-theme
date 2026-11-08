@@ -14,8 +14,8 @@
     "modal_color_scheme": "scheme1",
     "selected_text_background_color": "accent",
     "type_system": "commune",
-    "base_font_size": 12,
-    "font_heading": "barlow_condensed_n7",
+    "base_font_size": 13,
+    "font_heading": "barlow_n4",
     "heading_uppercase": true,
     "heading_underline": false,
     "heading_letterspacing": 0,
@@ -56,7 +56,8 @@
     "quick_buy_position": "over_image",
     "title_price_display": "over_image_bottom",
     "product_info_size": 13,
-    "product_vendor_title_gap": 3,
+    "product_name_weight_card": "500",
+    "product_vendor_title_gap": 0,
     "product_title_price_gap": 6,
     "product_card_size_offset": 2,
     "product_info_letterspacing": "0em",
@@ -121,13 +122,13 @@
           "background": "#ebebeb",
           "text": "#000000",
           "accent": "#000000",
-          "accent_contrast": "#FCFCFC",
+          "accent_contrast": "#fcfcfc",
           "secondary": "#000000"
         }
       },
       "scheme2": {
         "settings": {
-          "background": "#FF7F00",
+          "background": "#ff7f00",
           "text": "#000000",
           "accent": "#ffffff",
           "accent_contrast": "#000000",
