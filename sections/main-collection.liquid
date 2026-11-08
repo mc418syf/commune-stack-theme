@@ -185,6 +185,32 @@
   </section>
 {%- endif -%}
 
+<div
+  id="plp-config"
+  data-infinite="{{ section.settings.infinite_scroll }}"
+  data-top="{{ section.settings.back_to_top }}"
+  hidden
+></div>
+
+{% unless request.design_mode %}
+  {% if section.settings.infinite_scroll %}
+    <script>
+      /* Returning from a product page: hide the listing until the saved scroll position is rebuilt */
+      (function () {
+        try {
+          var nav = performance.getEntriesByType('navigation')[0];
+          var u = new URL(location.href);
+          u.searchParams.delete('page');
+          if (nav && nav.type === 'back_forward' && sessionStorage.getItem('plp-state:' + u.pathname + u.search)) {
+            document.documentElement.classList.add('plp-restoring');
+            setTimeout(function () { document.documentElement.classList.remove('plp-restoring'); }, 4000);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  {% endif %}
+{% endunless %}
+
 {% paginate collection.products by product_limit %}
   <section
     id="filterable"
@@ -561,7 +587,9 @@
         {%- endif -%}
         {% liquid
           if paginate.pages > 1
+            echo '<div data-plp-pagination>'
             render 'pagination' with paginate, paginate: paginate, section_color: section_color
+            echo '</div>'
           endif
         %}
       </div>
@@ -619,6 +647,11 @@
     ></script>
   {% endunless %}
 {% endif %}
+
+{{ 'plp-infinite.css' | asset_url | stylesheet_tag }}
+{% unless request.design_mode %}
+  <script src="{{ 'plp-infinite.js' | asset_url }}" defer></script>
+{% endunless %}
 
 {% unless request.design_mode %}
   {% if show_filters or show_sort %}
@@ -841,6 +874,23 @@
       "unit": "px",
       "default": 0,
       "info": "Equal left and right margin around the product grid on mobile."
+    },
+    {
+      "type": "header",
+      "content": "Loading more products"
+    },
+    {
+      "type": "checkbox",
+      "id": "infinite_scroll",
+      "label": "Infinite scrolling",
+      "info": "Loads the next page automatically while scrolling instead of showing page numbers. Going back from a product returns to the same spot. Off inside the theme editor.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "back_to_top",
+      "label": "Show a back to top button",
+      "default": true
     },
     {
       "type": "header",
