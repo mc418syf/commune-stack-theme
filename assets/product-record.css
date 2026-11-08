@@ -48,17 +48,7 @@
   overflow-wrap: anywhere;
 }
 
-.record__dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-left: 8px;
-  border-radius: 50%;
-  background: var(--rec-accent);
-  vertical-align: middle;
-}
-
-.record--stock { margin-bottom: 16px; }
+.record-block { margin-bottom: 16px; }
 
 @media (min-width: 768px) {
   .record__heading,
@@ -104,9 +94,6 @@
   outline: 2px solid var(--rec-ink);
   outline-offset: 3px;
 }
-
-/* Both panels are as tall as each other, so the page does not jump when switching */
-.product-tabs--record .product-tabs__panel { min-height: 440px; }
 
 .product-tabs__static-title {
   margin: 24px 0 8px;

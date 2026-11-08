@@ -1,18 +1,11 @@
 {%- if block.settings.archive_layout -%}
 {%- liquid
   assign description_label = block.settings.description_tab_label | default: 'Description'
-  assign record_label = block.settings.tab_2_title | default: 'Measurement'
 -%}
 
 {{ 'product-record.css' | asset_url | stylesheet_tag }}
 
-{%- capture record_html -%}
-  {%- render 'product-record', product: product -%}
-{%- endcapture -%}
 {%- assign has_record = false -%}
-{%- if record_html contains 'record__row' -%}
-  {%- assign has_record = true -%}
-{%- endif -%}
 
 {%- assign tab_prefix = 'tab-' | append: section.id -%}
 
@@ -57,20 +50,6 @@
       class="product-tabs__tab"
     >{{ description_label | upcase }}</button>
 
-    {%- if has_record -%}
-      <button
-        type="button"
-        role="tab"
-        id="{{ tab_prefix }}-record"
-        aria-controls="{{ tab_prefix }}-record-panel"
-        data-tab="record"
-        @click="active = 1"
-        :aria-selected="active === 1 ? 'true' : 'false'"
-        :tabindex="active === 1 ? 0 : -1"
-        :class="active === 1 ? 'product-tabs__tab--active' : ''"
-        class="product-tabs__tab"
-      >{{ record_label | upcase }}</button>
-    {%- endif -%}
   </div>
 
   <div class="product-tabs__content">
@@ -83,18 +62,6 @@
       x-data="RTE"
       class="product-tabs__panel rte"
     >{{ product.description }}</div>
-
-    {%- if has_record -%}
-      <div
-        role="tabpanel"
-        id="{{ tab_prefix }}-record-panel"
-        aria-labelledby="{{ tab_prefix }}-record"
-        tabindex="0"
-        x-show="active === 1"
-        class="product-tabs__panel"
-        style="display: none;"
-      >{{ record_html }}</div>
-    {%- endif -%}
   </div>
 </div>
 
@@ -103,10 +70,6 @@
   <div class="product-tabs product-tabs--record product-tabs--static">
     <h2 class="product-tabs__static-title">{{ description_label | upcase }}</h2>
     <div class="product-tabs__panel rte">{{ product.description }}</div>
-    {%- if has_record -%}
-      <h2 class="product-tabs__static-title">{{ record_label | upcase }}</h2>
-      <div class="product-tabs__panel">{{ record_html }}</div>
-    {%- endif -%}
   </div>
 </noscript>
 {%- else -%}

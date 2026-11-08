@@ -10,6 +10,8 @@
   custom.material and custom.made_in metafields when they are not in the text.
   Every value is escaped; nothing from the metafield is output raw.
 
+  Shown: the measurements, then Condition and Material. Size and Made in are read but not shown.
+
   Output: nothing when there is nothing to show, so callers can test the captured result.
 {%- endcomment -%}
 
@@ -114,31 +116,21 @@
   {%- assign material_value = product.metafields.custom.material | metafield_text | default: '' -%}
 {%- endif -%}
 
-{%- capture record_group -%}
-  {%- if size_value.size > 0 -%}
-    <li class="record__row"><span class="record__label">Size</span><span class="record__value">&lt;{{ size_value | escape }}&gt;</span></li>
-  {%- endif -%}
-  {%- if made_in_value.size > 0 -%}
-    <li class="record__row"><span class="record__label">Made in</span><span class="record__value">&lt;{{ made_in_value | escape }}&gt;</span></li>
+{%- assign condition_value = condition | default: '' -%}
+{%- if condition_value.size == 0 -%}
+  {%- assign condition_value = product.metafields.custom.condition | metafield_text | default: '' -%}
+{%- endif -%}
+
+{%- capture record_rows -%}
+  {{- length_rows }}{{ shoulder_rows }}{{ chest_rows }}{{ sleeve_rows }}{{ other_rows -}}
+  {%- if condition_value.size > 0 -%}
+    <li class="record__row"><span class="record__label">Condition</span><span class="record__value">&lt;{{ condition_value | escape }}&gt;</span></li>
   {%- endif -%}
   {%- if material_value.size > 0 -%}
     <li class="record__row"><span class="record__label">Material</span><span class="record__value">&lt;{{ material_value | escape }}&gt;</span></li>
   {%- endif -%}
 {%- endcapture -%}
 
-{%- capture measured_group -%}
-  {{- length_rows }}{{ shoulder_rows }}{{ chest_rows }}{{ sleeve_rows }}{{ other_rows -}}
-{%- endcapture -%}
-
-{%- if record_group contains 'record__row' or measured_group contains 'record__row' -%}
-  <ul class="record">
-    {%- if record_group contains 'record__row' -%}
-      <li class="record__heading">&lt;RECORD&gt;</li>
-      {{- record_group -}}
-    {%- endif -%}
-    {%- if measured_group contains 'record__row' -%}
-      <li class="record__heading">&lt;MEASURED FLAT&gt;</li>
-      {{- measured_group -}}
-    {%- endif -%}
-  </ul>
+{%- if record_rows contains 'record__row' -%}
+  <ul class="record">{{ record_rows }}</ul>
 {%- endif -%}

@@ -1,35 +1,13 @@
 {%- comment -%}
-  Archive record: stock block that sits above the Add to cart bar.
-  Status follows the selected variant, Condition comes from custom.condition (or the block's default),
-  Ref is the SKU or, without one, the product id.
+  Archive record block above the Add to cart bar: the measurements, Condition and Material.
+  Condition comes from custom.condition, or the block's default_condition when the product has none.
 {%- endcomment -%}
 
 {{ 'product-record.css' | asset_url | stylesheet_tag }}
 
-{%- assign stock_variant = current_variant | default: product.selected_or_first_available_variant -%}
-{%- assign condition = product.metafields.custom.condition | metafield_text | default: '' -%}
-{%- if condition.size == 0 -%}
-  {%- assign condition = block.settings.default_condition | default: '' -%}
+{%- capture record_html -%}
+  {%- render 'product-record', product: product, condition: block.settings.default_condition -%}
+{%- endcapture -%}
+{%- if record_html contains 'record__row' -%}
+  <div class="record-block">{{ record_html }}</div>
 {%- endif -%}
-{%- assign ref = stock_variant.sku | default: product.id -%}
-
-<ul class="record record--stock">
-  <li class="record__heading">&lt;ARCHIVE RECORD&gt;</li>
-  <li class="record__row">
-    <span class="record__label">Status</span>
-    <span class="record__value">
-      <span
-        x-show="!currentVariant || currentVariantAvailable"
-        {% unless stock_variant.available %}style="display: none;"{% endunless %}
-      >&lt;IN STOCK&gt;<span class="record__dot" aria-hidden="true"></span></span>
-      <span
-        x-show="currentVariant && !currentVariantAvailable"
-        {% if stock_variant.available %}style="display: none;"{% endif %}
-      >&lt;SOLD OUT&gt;</span>
-    </span>
-  </li>
-  {%- if condition.size > 0 -%}
-    <li class="record__row"><span class="record__label">Condition</span><span class="record__value">&lt;{{ condition | escape }}&gt;</span></li>
-  {%- endif -%}
-  <li class="record__row"><span class="record__label">Ref</span><span class="record__value">&lt;{{ ref | escape }}&gt;</span></li>
-</ul>
