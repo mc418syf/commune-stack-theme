@@ -160,6 +160,42 @@
     }
   }
 
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Images close to the saved spot: once they have their size, nothing above the viewport will move any more
+  function imagesNearViewport() {
+    const limit = innerHeight * 1.3;
+    return [...feed.grid.querySelectorAll('img')].filter((img) => {
+      const r = img.getBoundingClientRect();
+      return r.bottom > -limit && r.top < innerHeight + limit;
+    });
+  }
+
+  const imagesReady = (imgs, ms) => Promise.race([
+    Promise.all(imgs.map((img) => (img.complete ? null : new Promise((done) => {
+      img.addEventListener('load', done, { once: true });
+      img.addEventListener('error', done, { once: true });
+    })))),
+    sleep(ms),
+  ]);
+
+  // Keeps the listing hidden until the position is final, so the page lands once instead of
+  // landing and then shifting as fonts and images arrive
+  async function settleLayout(saved) {
+    let moved = false;
+    const mark = () => { moved = true; };
+    ['wheel', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, mark, { once: true, passive: true }));
+    if (document.readyState !== 'complete') {
+      await Promise.race([new Promise((r) => addEventListener('load', r, { once: true })), sleep(3000)]);
+    }
+    for (let pass = 0; pass < 2 && !moved; pass++) {
+      await imagesReady(imagesNearViewport(), 1200);
+      if (moved) break;
+      scrollToSaved(saved);
+      await Promise.race([new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))), sleep(120)]);
+    }
+  }
+
   async function setupFeed() {
     const g = grid();
     const pager = pagination();
@@ -205,15 +241,10 @@
       } catch (e) { /* fall back to the first page */ }
     }
     if (saved) {
-      scrollToSaved(saved);
-      // Images above the anchor can still change the layout, so settle once more unless the visitor has scrolled
-      let moved = false;
-      const mark = () => { moved = true; };
-      ['wheel', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, mark, { once: true, passive: true }));
-      const settle = () => { if (!moved) scrollToSaved(saved); };
-      if (document.readyState === 'complete') setTimeout(settle, 300);
-      else addEventListener('load', () => setTimeout(settle, 150), { once: true });
-      setTimeout(settle, 900);
+      try {
+        scrollToSaved(saved);
+        await settleLayout(saved);
+      } catch (e) { /* show the listing wherever it ended up */ }
     }
     html.classList.remove('plp-restoring');
 

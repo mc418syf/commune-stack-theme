@@ -202,7 +202,7 @@
           u.searchParams.delete('page');
           if (nav && nav.type === 'back_forward' && sessionStorage.getItem('plp-state:' + u.pathname + u.search)) {
             document.documentElement.classList.add('plp-restoring');
-            setTimeout(function () { document.documentElement.classList.remove('plp-restoring'); }, 10000);
+            setTimeout(function () { document.documentElement.classList.remove('plp-restoring'); }, 12000);
           }
         } catch (e) {}
       })();
