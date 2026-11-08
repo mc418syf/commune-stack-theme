@@ -56,6 +56,7 @@
     "quick_buy_position": "over_image",
     "title_price_display": "over_image_bottom",
     "product_info_size": 13,
+    "product_text_gap": 0,
     "product_card_size_offset": 2,
     "product_info_letterspacing": "0em",
     "product_price_size": 12,
