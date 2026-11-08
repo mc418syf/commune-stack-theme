@@ -1,6 +1,7 @@
 /* Hide the listing while a returning visitor's scroll position is rebuilt, so it doesn't flash at the top */
 html.plp-restoring #results { opacity: 0; transition: none !important; }
 
+/* Only if rebuilding takes a while (it normally does not), say so after a couple of seconds */
 html.plp-restoring body::after {
   content: 'Loading';
   position: fixed;
@@ -11,9 +12,15 @@ html.plp-restoring body::after {
   font-size: 11px;
   letter-spacing: .14em;
   text-transform: uppercase;
-  opacity: .6;
   pointer-events: none;
+  opacity: 0;
+  animation: plp-fade-in .3s ease 2.5s forwards;
 }
+
+@keyframes plp-fade-in { to { opacity: .6; } }
+
+/* Placeholder tiles shown for a moment while the real ones load */
+.plp-ghost { background: rgb(var(--color-scheme-text, 17 17 17) / .04) !important; }
 
 .plp-status {
   padding: 28px 0 36px;

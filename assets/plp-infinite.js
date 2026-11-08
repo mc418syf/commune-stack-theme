@@ -68,7 +68,7 @@
     return new DOMParser().parseFromString(await res.text(), 'text/html');
   }
 
-  function append(target, doc) {
+  function append(target, doc, page) {
     const incoming = doc.querySelector('#results ul.collection-list');
     if (!incoming) return;
     // The trailing filler cells only belong at the very end, so replace them each time
@@ -82,7 +82,9 @@
         if (seen.has(path)) continue;
         seen.add(path);
       }
-      frag.appendChild(document.importNode(li, true));
+      const node = document.importNode(li, true);
+      if (page) node.dataset.plpPage = page;
+      frag.appendChild(node);
     }
     target.appendChild(frag);
   }
@@ -99,8 +101,9 @@
     try {
       const href = feed.next;
       const doc = await fetchPage(href);
-      append(feed.grid, doc);
-      feed.last = parseInt(new URL(href, location.origin).searchParams.get('page'), 10) || feed.last + 1;
+      const loadedPage = parseInt(new URL(href, location.origin).searchParams.get('page'), 10) || feed.last + 1;
+      append(feed.grid, doc, loadedPage);
+      feed.last = loadedPage;
       feed.next = nextHrefIn(doc);
       write({ lastPage: feed.last });
     } catch (e) {
@@ -144,7 +147,7 @@
     await Promise.all([worker(), worker()]);
     for (let i = 0; i < docs.length; i++) {
       if (!docs[i]) break; // stop at the first missing page so the list never has a hole
-      append(feed.grid, docs[i]);
+      append(feed.grid, docs[i], feed.last + 1);
       feed.last = feed.last + 1;
       feed.next = nextHrefIn(docs[i]);
     }
@@ -161,6 +164,108 @@
   }
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // ---- Instant return: remember tile heights, restore placeholders, fill in the products afterwards ----
+
+  const realTiles = () => [...feed.grid.children].filter((li) => !li.matches(PLACEHOLDER) && !li.dataset.plpGhost);
+
+  // The exact height of every tile, and how many came from each page
+  function captureLayout() {
+    if (!feed.grid) return null;
+    const tiles = [...feed.grid.children].filter((li) => !li.matches(PLACEHOLDER));
+    const counts = {};
+    tiles.forEach((li) => { const p = li.dataset.plpPage || startPage(); counts[p] = (counts[p] || 0) + 1; });
+    return {
+      vw: innerWidth,
+      heights: tiles.map((li) => Math.round(li.getBoundingClientRect().height * 100) / 100),
+      counts,
+      next: feed.next,
+    };
+  }
+
+  // Placeholders with the saved heights, so the page is as tall as it was and the scroll position can be set at once
+  function restoreGhosts(saved) {
+    const L = saved.layout;
+    if (!L || L.vw !== innerWidth || !Array.isArray(L.heights) || !L.counts) return null;
+    const sample = realTiles()[0];
+    if (!sample) return null;
+    let index = realTiles().length;
+    const pages = [];
+    for (let p = feed.last + 1; p <= saved.lastPage; p++) {
+      const n = L.counts[p];
+      if (!n) return null;
+      pages.push([p, n]);
+    }
+    const total = pages.reduce((sum, [, n]) => sum + n, 0);
+    if (!total || index + total > L.heights.length) return null;
+
+    feed.grid.querySelectorAll(':scope > ' + PLACEHOLDER).forEach((li) => li.remove());
+    const frag = document.createDocumentFragment();
+    for (const [p, n] of pages) {
+      for (let i = 0; i < n; i++) {
+        const ghost = document.createElement('li');
+        ghost.className = sample.className + ' plp-ghost';
+        ghost.dataset.plpGhost = '1';
+        ghost.dataset.plpPage = p;
+        ghost.setAttribute('aria-hidden', 'true');
+        ghost.style.height = L.heights[index++] + 'px';
+        frag.appendChild(ghost);
+      }
+    }
+    feed.grid.appendChild(frag);
+    return pages.map(([p]) => p);
+  }
+
+  // Swap each page's placeholders for the real tiles, the page nearest the clicked product first
+  async function hydrateGhosts(saved, pages, userMoved) {
+    const base = feed.next;
+    const urlFor = (p) => {
+      const u = new URL(base, location.origin);
+      u.searchParams.set('page', p);
+      return u.pathname + u.search;
+    };
+    const anchorPage = (saved.anchor && saved.anchor.page) || pages[0];
+    const queue = pages.slice().sort((a, b) => Math.abs(a - anchorPage) - Math.abs(b - anchorPage));
+    const fetchWithRetry = (u) => fetchPage(u).catch(() => sleep(400).then(() => fetchPage(u))).catch(() => null);
+    const docs = {};
+
+    const swap = (p, doc) => {
+      const ghosts = [...feed.grid.querySelectorAll('li[data-plp-ghost="1"][data-plp-page="' + p + '"]')];
+      const incoming = doc.querySelector('#results ul.collection-list');
+      if (!ghosts.length || !incoming) { ghosts.forEach((g) => g.remove()); return; }
+      const seen = new Set([...feed.grid.querySelectorAll(PRODUCT_LINK)].map(productPath));
+      const frag = document.createDocumentFragment();
+      for (const li of incoming.children) {
+        if (li.matches(PLACEHOLDER)) { if (p === saved.lastPage) frag.appendChild(document.importNode(li, true)); continue; }
+        const link = li.querySelector(PRODUCT_LINK);
+        if (link) {
+          const path = productPath(link);
+          if (seen.has(path)) continue;
+          seen.add(path);
+        }
+        const node = document.importNode(li, true);
+        node.dataset.plpPage = p;
+        frag.appendChild(node);
+      }
+      ghosts[0].before(frag);
+      ghosts.forEach((g) => g.remove());
+      // Same heights, so nothing should move; keep the clicked product exact if it has not been touched
+      if (!userMoved() && saved.anchor) scrollToSaved(saved);
+    };
+
+    const worker = async () => {
+      while (queue.length) {
+        const p = queue.shift();
+        const doc = await fetchWithRetry(urlFor(p));
+        if (doc) { docs[p] = doc; swap(p, doc); }
+        else feed.grid.querySelectorAll('li[data-plp-ghost="1"][data-plp-page="' + p + '"]').forEach((g) => g.remove());
+      }
+    };
+    await Promise.all([worker(), worker(), worker()]);
+
+    feed.last = saved.lastPage;
+    feed.next = docs[saved.lastPage] ? nextHrefIn(docs[saved.lastPage]) : (saved.layout && saved.layout.next) || null;
+  }
 
   // Images close to the saved spot: once they have their size, nothing above the viewport will move any more
   function imagesNearViewport() {
@@ -211,6 +316,7 @@
 
     feed.grid = g;
     feed.last = startPage();
+    [...g.children].forEach((li) => { if (!li.matches(PLACEHOLDER)) li.dataset.plpPage = feed.last; });
     feed.next = nextHrefIn(document);
     feed.loading = false;
 
@@ -235,18 +341,31 @@
     // and that must not jump the preview back to an old position
     const saved = !restoredOnce && isBackForward() ? read() : null;
     restoredOnce = true;
-    if (saved && saved.lastPage > feed.last) {
+    let ghostPages = null;
+    if (saved && saved.lastPage > feed.last) ghostPages = restoreGhosts(saved);
+
+    if (saved && !ghostPages && saved.lastPage > feed.last) {
+      // Can't rebuild instantly (window size changed, or nothing saved): fetch the pages while the listing is hidden
       try {
         await restore(saved);
       } catch (e) { /* fall back to the first page */ }
     }
+
     if (saved) {
       try {
         scrollToSaved(saved);
-        await settleLayout(saved);
+        if (!ghostPages) await settleLayout(saved);
       } catch (e) { /* show the listing wherever it ended up */ }
     }
     html.classList.remove('plp-restoring');
+
+    if (ghostPages) {
+      // Shown straight away; the products fill in behind it
+      let moved = false;
+      const mark = () => { moved = true; };
+      ['wheel', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, mark, { once: true, passive: true }));
+      await hydrateGhosts(saved, ghostPages, () => moved);
+    }
 
     if (feed.observer && feed.next) feed.observer.observe(feed.sentinel);
     else stopFeed();
@@ -265,15 +384,16 @@
     if (!link) return;
     const li = link.closest('li');
     write({
-      anchor: { href: productPath(link), top: Math.round(li ? li.getBoundingClientRect().top : 0) },
+      anchor: { href: productPath(link), top: Math.round(li ? li.getBoundingClientRect().top : 0), page: li ? Number(li.dataset.plpPage) || undefined : undefined },
       y: Math.round(scrollY),
       lastPage: feed.last || startPage(),
+      layout: captureLayout(),
     }, true);
   }, true);
 
-  addEventListener('pagehide', () => write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }, true));
+  addEventListener('pagehide', () => write({ y: Math.round(scrollY), lastPage: feed.last || startPage(), layout: captureLayout() }, true));
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }, true);
+    if (document.visibilityState === 'hidden') write({ y: Math.round(scrollY), lastPage: feed.last || startPage(), layout: captureLayout() }, true);
   });
   addEventListener('pageshow', (e) => {
     if (!e.persisted || !feed.grid) return;
