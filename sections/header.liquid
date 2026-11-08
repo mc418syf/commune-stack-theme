@@ -33,6 +33,10 @@
   assign item_spacing = section.settings.header_vertical_spacing
   assign show_try_on_button = section.settings.show_try_on_button
   assign mobile_layout = section.settings.mobile_layout
+  assign mobile_menu_inline = false
+  if section.settings.mobile_menu == 'inline'
+    assign mobile_menu_inline = true
+  endif
   assign mobile_bottom = false
   if section.settings.mobile_position == 'bottom'
     assign mobile_bottom = true
@@ -329,7 +333,7 @@
               {{ header_logo }}
             </div>
           {% elsif mobile_layout == 'logo_center' %}
-            {{ header_menu_toggle }}
+            {% unless mobile_menu_inline %}{{ header_menu_toggle }}{% endunless %}
           {% endif %}
         </div>
 
@@ -341,7 +345,7 @@
 
         <div class="flex justify-end gap-2 items-center text-right{% if mobile_layout == 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
           {% if mobile_layout == 'logo_left' %}
-            {{ header_menu_toggle }}
+            {% unless mobile_menu_inline %}{{ header_menu_toggle }}{% endunless %}
           {% endif %}
 
           {% if layout contains 'menu_drawer' %}
@@ -392,6 +396,12 @@
           </div>
         </div>
       </div>
+
+      {%- if mobile_menu_inline -%}
+        <div class="header-mobile-menu px-section-horizontal-spacing">
+          {{ header_menu }}
+        </div>
+      {%- endif -%}
     </nav>
   </header>
 </header-section>
@@ -456,6 +466,22 @@
       position: relative;
     }
   }
+
+  /* === Mobile: the desktop menu links instead of a menu button === */
+  {% if mobile_menu_inline %}
+  #shopify-section-{{ section.id }} .header-mobile-menu { padding-bottom: 6px; }
+  #shopify-section-{{ section.id }} .header-mobile-menu ul.menu {
+    justify-content: center !important;
+    row-gap: 0;
+  }
+  #shopify-section-{{ section.id }} .header-mobile-menu .menu-item > a {
+    padding-left: 0.4rem !important;
+    padding-right: 0.4rem !important;
+    font-size: 12px;
+  }
+  /* Dropdowns need hover, so mobile shows the top level only */
+  #shopify-section-{{ section.id }} .header-mobile-menu .submenu { display: none !important; }
+  {% endif %}
 
   /* === Logo width === */
   #shopify-section-{{ section.id }} {
@@ -729,10 +755,22 @@
       "label": "Logo position (desktop)",
       "info": "Overrides where the logo sits. Left puts the menu on the right, Center puts the menu on the left, Right puts the menu on the left and the logo at the far right. Ignored by the menu drawer layouts.",
       "options": [
-        { "value": "auto", "label": "Use desktop layout" },
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Center" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "auto",
+          "label": "Use desktop layout"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ],
       "default": "auto"
     },
@@ -754,12 +792,35 @@
     },
     {
       "type": "select",
+      "id": "mobile_menu",
+      "label": "Mobile menu",
+      "options": [
+        {
+          "value": "drawer",
+          "label": "Menu button (opens a drawer)"
+        },
+        {
+          "value": "inline",
+          "label": "Show the desktop menu links"
+        }
+      ],
+      "default": "drawer",
+      "info": "Show the desktop menu links puts the same links under the logo on mobile and removes the menu button. Dropdowns are not shown on mobile."
+    },
+    {
+      "type": "select",
       "id": "mobile_position",
       "label": "Mobile header position",
       "info": "Bottom docks the header to the bottom of the screen with the logo centered and a glass effect.",
       "options": [
-        { "value": "top", "label": "Top" },
-        { "value": "bottom", "label": "Bottom (glass)" }
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom (glass)"
+        }
       ],
       "default": "top"
     },
@@ -940,7 +1001,7 @@
       "id": "enable_logo_scroll_swap",
       "label": "Swap/hide logo on scroll",
       "default": false,
-      "info": "On overlay homepages, hides the main logo at the top and shows it once you scroll, swapping with the Overlay logo. Off by default — the logo stays on screen the whole time (recommended when the logo sits on the left)."
+      "info": "On overlay homepages, hides the main logo at the top and shows it once you scroll, swapping with the Overlay logo. Off by default \u2014 the logo stays on screen the whole time (recommended when the logo sits on the left)."
     }
   ]
 }

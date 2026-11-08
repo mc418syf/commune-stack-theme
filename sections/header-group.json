@@ -39,6 +39,7 @@
         "menu": "main-menu",
         "layout": "logo_left_menu_right",
         "mobile_layout": "logo_left",
+        "mobile_menu": "inline",
         "header_vertical_spacing": "py-2",
         "show_search": true,
         "sticky_header": true,
