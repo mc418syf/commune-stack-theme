@@ -48,3 +48,8 @@
   -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
   letter-spacing: var(--product-info-letterspacing, -0.025em);
 }
+
+/* The tabs also carry the theme's heading class, which loads later and sets its own tracking */
+.product-tabs__tab {
+  letter-spacing: var(--product-info-letterspacing, -0.025em) !important;
+}
