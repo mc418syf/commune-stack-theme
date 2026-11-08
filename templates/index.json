@@ -95,6 +95,7 @@
         "link_FgQa6y",
         "link_NPL7Nd"
       ],
+      "disabled": true,
       "custom_css": [
         ".w-full {margin-top: 20px;}"
       ],
