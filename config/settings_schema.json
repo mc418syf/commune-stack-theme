@@ -657,6 +657,19 @@
         "default": "500"
       },
       {
+        "type": "select",
+        "id": "product_info_letterspacing",
+        "label": "Letter spacing",
+        "info": "Applies to the vendor, title and price together so they match.",
+        "options": [
+          { "value": "-0.04em", "label": "Tighter" },
+          { "value": "-0.025em", "label": "Tight (like the headings)" },
+          { "value": "0em", "label": "Normal" },
+          { "value": "0.03em", "label": "Wide" }
+        ],
+        "default": "-0.025em"
+      },
+      {
         "type": "range",
         "id": "product_price_size",
         "label": "Price size",

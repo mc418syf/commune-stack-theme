@@ -9,11 +9,13 @@
   font-size: var(--product-info-size, 12px);
   font-weight: var(--product-info-weight, 400);
   -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
+  letter-spacing: var(--product-info-letterspacing, -0.025em);
   line-height: 1.35;
 }
 
 [data-product-root] .product-price-block {
   font-size: var(--product-price-size, 10px);
+  letter-spacing: var(--product-info-letterspacing, -0.025em);
   line-height: 1.35;
 }
 
@@ -28,10 +30,12 @@
   font-size: var(--product-info-size, 12px);
   font-weight: var(--product-info-weight, 400);
   -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
+  letter-spacing: var(--product-info-letterspacing, -0.025em);
   line-height: 1.35;
 }
 
 .product-tile-price,
 .product-tile-price * {
   font-size: var(--product-price-size, 10px);
+  letter-spacing: var(--product-info-letterspacing, -0.025em);
 }
