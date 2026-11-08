@@ -655,8 +655,33 @@
       },
       {
         "type": "select",
+        "id": "product_name_weight_pdp",
+        "label": "Brand and title weight: product page, header",
+        "info": "Brand and title use the heading font. The weight is loaded from that font, so it is a real weight, not a faux bold.",
+        "options": [
+          { "value": "400", "label": "Regular" },
+          { "value": "500", "label": "Medium" },
+          { "value": "600", "label": "Semibold" },
+          { "value": "700", "label": "Bold" }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "select",
+        "id": "product_name_weight_card",
+        "label": "Brand and title weight: product cards",
+        "options": [
+          { "value": "400", "label": "Regular" },
+          { "value": "500", "label": "Medium" },
+          { "value": "600", "label": "Semibold" },
+          { "value": "700", "label": "Bold" }
+        ],
+        "default": "400"
+      },
+      {
+        "type": "select",
         "id": "product_info_weight",
-        "label": "Vendor and title weight",
+        "label": "Buttons and tabs weight",
         "info": "The theme font has only Regular and Bold, so the two in-between looks thicken Regular with a fine outline. They look the same on every device.",
         "options": [
           { "value": "400", "label": "Regular" },

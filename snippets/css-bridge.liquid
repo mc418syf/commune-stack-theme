@@ -13,6 +13,11 @@
     Vendor and title weight. The two in-between choices keep the Regular weight and add a fine outline,
     because the theme font has no Medium.
   endcomment
+  assign name_weight_pdp = settings.product_name_weight_pdp | default: '600'
+  assign name_weight_card = settings.product_name_weight_card | default: '400'
+  assign name_font_pdp = heading_font | font_modify: 'weight', name_weight_pdp
+  assign name_font_card = heading_font | font_modify: 'weight', name_weight_card
+
   assign product_info_choice = settings.product_info_weight | default: '500'
   assign product_info_weight = product_info_choice
   assign product_info_stroke = '0px'
@@ -54,6 +59,8 @@
 {% style %}
   {{ body_font | font_face: font_display: 'swap' }}
   {{ heading_font | font_face: font_display: 'swap' }}
+  {% if name_font_pdp %}{{ name_font_pdp | font_face: font_display: 'swap' }}{% endif %}
+  {% if name_font_card %}{{ name_font_card | font_face: font_display: 'swap' }}{% endif %}
 
   {%- liquid
     if body_font_bold
@@ -220,6 +227,8 @@
       --product-info-size: {{ settings.product_info_size | default: 12 }}px;
       --product-info-weight: {{ product_info_weight }};
       --product-info-stroke: {{ product_info_stroke }};
+      --product-name-weight-pdp: {{ name_weight_pdp }};
+      --product-name-weight-card: {{ name_weight_card }};
       --product-card-offset: {{ settings.product_card_size_offset | default: 2 }}px;
       --product-vendor-title-gap: {{ settings.product_vendor_title_gap | default: 6 }}px;
       --product-title-price-gap: {{ settings.product_title_price_gap | default: 6 }}px;

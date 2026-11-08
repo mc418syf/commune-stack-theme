@@ -1,21 +1,29 @@
 /* One set of text sizes for the product page and the product cards.
    Values come from Theme settings > Product text (see snippets/css-bridge.liquid). */
 
-/* ---- Product page ---- */
+/* ---- Product page ----
+   Brand and title: the heading font (Barlow Condensed), identical style.
+   Price and description: the body font (IBM Plex Mono). */
 [data-product-root] .product-vendor-block,
 [data-product-root] .product-vendor-block a,
 [data-product-root] .product-title-block,
 [data-product-root] .product-title-block a {
-  font-size: var(--product-info-size, 12px);
-  font-weight: var(--product-info-weight, 400);
-  -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
-  letter-spacing: var(--product-info-letterspacing, -0.025em);
+  font-family: var(--heading-font-stack);
+  font-size: var(--product-info-size, 14px);
+  font-weight: var(--product-name-weight-pdp, 600);
+  font-style: normal;
+  -webkit-text-stroke: 0;
+  text-transform: var(--heading-capitalize, none);
+  letter-spacing: var(--product-info-letterspacing, 0);
   line-height: 1.35;
 }
 
 [data-product-root] .product-price-block {
-  font-size: var(--product-price-size, 10px);
-  letter-spacing: var(--product-info-letterspacing, -0.025em);
+  font-family: var(--body-font-stack);
+  font-size: var(--product-price-size, 12px);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: var(--product-info-letterspacing, 0);
   line-height: 1.35;
 }
 
@@ -27,18 +35,21 @@
 
 .product-tile-vendor,
 .product-tile-title {
+  font-family: var(--heading-font-stack);
   font-size: calc(var(--product-info-size, 14px) - var(--product-card-offset, 2px));
-  /* Cards stay Regular; the heavier in-between weight is for the product page only */
-  font-weight: 400;
+  font-weight: var(--product-name-weight-card, 400);
+  font-style: normal;
   -webkit-text-stroke: 0;
-  letter-spacing: var(--product-info-letterspacing, -0.025em);
+  letter-spacing: var(--product-info-letterspacing, 0);
   line-height: 1.35;
 }
 
 .product-tile-price,
 .product-tile-price * {
+  font-family: var(--body-font-stack);
   font-size: calc(var(--product-price-size, 12px) - var(--product-card-offset, 2px));
-  letter-spacing: var(--product-info-letterspacing, -0.025em);
+  font-weight: 400;
+  letter-spacing: var(--product-info-letterspacing, 0);
 }
 
 /* ---- Buttons and tabs: same in-between weight and letter spacing as the vendor and title ---- */
@@ -59,3 +70,27 @@
 .product-tile-meta .product-tile-vendor { margin-bottom: var(--product-vendor-title-gap, 6px); }
 
 .product-tile-meta .product-tile-price { margin-top: var(--product-title-price-gap, 6px); }
+
+/* ---- Header: the heading font ---- */
+[data-theme-header] header a,
+[data-theme-header] header button,
+[data-theme-header] header nav span {
+  font-family: var(--heading-font-stack);
+  font-weight: var(--product-name-weight-pdp, 600);
+}
+
+/* ---- Filters: headings in the heading font, values stay in the body font ---- */
+#filter-drop-down-toggle,
+#sort-drop-down-toggle,
+#filterable .filters-wrapper h3,
+#filterable [data-fragment-id='filters-form-sidebar'] h3 {
+  font-family: var(--heading-font-stack);
+  font-weight: var(--product-name-weight-pdp, 600);
+}
+
+#filterable .filters-wrapper label,
+#filterable [data-fragment-id='filters-form-sidebar'] label,
+#filterable [data-fragment-id='filters-form-sidebar'] input,
+#filterable .filters-wrapper input {
+  font-family: var(--body-font-stack);
+}
