@@ -17,10 +17,10 @@
   list-style: none;
   border-top: 1px dashed var(--rec-divider);
   font-family: var(--body-font-stack);
-  font-size: 13px;
+  font-size: 9px;
   font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0.02em;
+  line-height: 14px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--rec-ink);
@@ -29,7 +29,7 @@
 .record__heading,
 .record__row {
   margin: 0;
-  padding: 10px 0;
+  padding: 7px 0;
   border-bottom: 1px dashed var(--rec-divider);
 }
 
@@ -52,7 +52,7 @@
 
 @media (min-width: 768px) {
   .record__heading,
-  .record__row { padding: 9px 0; }
+  .record__row { padding: 6px 0; }
 }
 
 /* ---- Tabs ---- */
@@ -146,8 +146,8 @@
     display: block;
     order: 4;
     margin: 12px 0 0;
-    font-size: 13px;
-    line-height: 20px;
+    font-size: 10px;
+    line-height: 16px;
   }
 
   .product-strip .product-tabs--record:not(.product-tabs--static) {
@@ -159,3 +159,12 @@
   .product-strip .product-tabs--record [data-tab='description'] { display: none; }
   .product-strip .product-tabs--desc-only { display: none; }
 }
+
+/* Product page body text: 10px (the record list above is 9px) */
+.product-strip .product-tabs__panel.rte,
+.product-strip .record-lede {
+  font-size: 10px;
+  line-height: 16px;
+}
+.product-strip .product-tabs__panel.rte *,
+.product-strip .record-lede * { font-size: inherit; line-height: inherit; }
