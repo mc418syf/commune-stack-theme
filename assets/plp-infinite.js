@@ -20,10 +20,22 @@
     u.searchParams.delete('page');
     return 'plp-state:' + u.pathname + u.search;
   };
-  const read = () => { try { return JSON.parse(sessionStorage.getItem(stateKey())); } catch (e) { return null; } };
-  const write = (patch) => {
+  const read = () => {
+    try {
+      const fromSession = JSON.parse(sessionStorage.getItem(stateKey()));
+      if (fromSession) return fromSession;
+    } catch (e) { /* storage blocked */ }
+    // Fallback: the history entry itself remembers it, which also works in in-app browsers
+    return (history.state && history.state.plpState) || null;
+  };
+  // The history entry is only updated at moments that matter (click, leaving the page): browsers rate-limit replaceState
+  const write = (patch, toHistory = false) => {
     if (design) return;
-    try { sessionStorage.setItem(stateKey(), JSON.stringify(Object.assign(read() || {}, patch))); } catch (e) { /* private mode */ }
+    const next = Object.assign(read() || {}, patch);
+    try { sessionStorage.setItem(stateKey(), JSON.stringify(next)); } catch (e) { /* private mode */ }
+    if (toHistory) {
+      try { history.replaceState(Object.assign({}, history.state, { plpState: next }), ''); } catch (e) { /* not allowed here */ }
+    }
   };
 
   const startPage = () => parseInt(new URLSearchParams(location.search).get('page'), 10) || 1;
@@ -121,11 +133,21 @@
       url.searchParams.set('page', p);
       pages.push(url.pathname + url.search);
     }
-    const docs = await Promise.all(pages.map((u) => fetchPage(u).catch(() => null)));
+    // Two requests at a time, each retried once, so a slow connection or rate limit does not drop pages
+    const fetchWithRetry = (u) => fetchPage(u).catch(() => new Promise((r) => setTimeout(r, 400)).then(() => fetchPage(u))).catch(() => null);
+    const docs = new Array(pages.length).fill(null);
+    let cursor = 0;
+    const worker = async () => {
+      while (cursor < pages.length) {
+        const i = cursor++;
+        docs[i] = await fetchWithRetry(pages[i]);
+      }
+    };
+    await Promise.all([worker(), worker()]);
     for (let i = 0; i < docs.length; i++) {
-      if (!docs[i]) break;
+      if (!docs[i]) break; // stop at the first missing page so the list never has a hole
       append(feed.grid, docs[i]);
-      feed.last = saved.lastPage - (docs.length - 1 - i);
+      feed.last = feed.last + 1;
       feed.next = nextHrefIn(docs[i]);
     }
   }
@@ -216,10 +238,18 @@
       anchor: { href: productPath(link), top: Math.round(li ? li.getBoundingClientRect().top : 0) },
       y: Math.round(scrollY),
       lastPage: feed.last || startPage(),
-    });
+    }, true);
   }, true);
 
-  addEventListener('pagehide', () => write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }));
+  addEventListener('pagehide', () => write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }, true));
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') write({ y: Math.round(scrollY), lastPage: feed.last || startPage() }, true);
+  });
+  addEventListener('pageshow', (e) => {
+    if (!e.persisted || design || !feed.grid) return;
+    const saved = read();
+    if (saved && scrollY < 50 && typeof saved.y === 'number' && saved.y > 200) scrollToSaved(saved);
+  });
 
   // ---- Back to top ------------------------------------------------------------------------------
 
