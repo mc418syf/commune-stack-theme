@@ -179,7 +179,7 @@
 
 <section
   class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
-  {% if desktop_strip %}style="--strip-h: {{ section.settings.strip_height }}vh;"{% endif %}
+  {% if desktop_strip %}style="--strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;"{% endif %}
   id="{{ section.id }}"
   x-data="
     Theme_Product({
@@ -608,6 +608,17 @@
       "unit": "vh",
       "label": "Image strip height",
       "default": 58,
+      "info": "Used by the image strip layout."
+    },
+    {
+      "type": "range",
+      "id": "strip_gap",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between strip images",
+      "default": 48,
       "info": "Used by the image strip layout."
     },
     {

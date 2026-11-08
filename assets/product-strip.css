@@ -30,20 +30,21 @@
     display: flex !important;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 3rem;
+    gap: var(--strip-gap, 3rem);
     padding: 3.5rem 2rem 4.5rem;
     overflow-x: auto;
     overflow-y: hidden;
     counter-reset: strip;
-    scroll-snap-type: x proximity;
-    scroll-padding: 0 2rem;
+    /* No scroll snapping: it fights the eased scrolling in product-strip.js */
+    overscroll-behavior-x: contain;
+    will-change: scroll-position;
     scrollbar-width: none;
     cursor: grab;
     background: rgb(var(--color-scheme-background));
   }
 
   .product-strip .splide__list::-webkit-scrollbar { display: none; }
-  .product-strip .splide__list.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+  .product-strip .splide__list.is-dragging { cursor: grabbing; user-select: none; }
 
   .product-strip .splide__slide {
     position: relative;
@@ -51,7 +52,6 @@
     flex: none;
     width: auto !important;
     counter-increment: strip;
-    scroll-snap-align: center;
     background: transparent;
   }
 

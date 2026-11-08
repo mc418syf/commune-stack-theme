@@ -109,7 +109,8 @@
         "color_scheme": "",
         "override_header_footer_color_scheme": true,
         "desktop_layout": "strip",
-        "strip_height": 58
+        "strip_height": 58,
+        "strip_gap": 48
       }
     },
     "related-products": {
