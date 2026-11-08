@@ -97,8 +97,6 @@
         "mobile_slide_overlap": 60,
         "desktop_media_width": "two-thirds",
         "desktop_media_position": "left",
-        "vendor_title_gap": 4,
-        "title_price_gap": 4,
         "desktop_layout": "strip",
         "strip_height": 70,
         "strip_gap": 0,

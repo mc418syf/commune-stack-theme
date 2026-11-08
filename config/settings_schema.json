@@ -669,6 +669,17 @@
       },
       {
         "type": "range",
+        "id": "product_text_gap",
+        "label": "Space between vendor, title and price",
+        "info": "The gap between the vendor, the title and the price, on the product page and on the product cards.",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 6
+      },
+      {
+        "type": "range",
         "id": "product_card_size_offset",
         "label": "Product cards: size below the product page",
         "info": "Vendor, title and price on the product cards are this much smaller than on the product page.",
