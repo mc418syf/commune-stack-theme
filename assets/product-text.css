@@ -28,8 +28,9 @@
 .product-tile-vendor,
 .product-tile-title {
   font-size: calc(var(--product-info-size, 14px) - var(--product-card-offset, 2px));
-  font-weight: var(--product-info-weight, 400);
-  -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
+  /* Cards stay Regular; the heavier in-between weight is for the product page only */
+  font-weight: 400;
+  -webkit-text-stroke: 0;
   letter-spacing: var(--product-info-letterspacing, -0.025em);
   line-height: 1.35;
 }
