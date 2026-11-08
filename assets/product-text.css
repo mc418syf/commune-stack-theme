@@ -55,7 +55,7 @@
   letter-spacing: var(--product-info-letterspacing, -0.025em) !important;
 }
 
-/* ---- Space between vendor, title and price ---- */
-.product-tile-meta .product-tile-vendor { margin-bottom: var(--product-text-gap, 6px); }
+/* ---- Space between vendor and title, and between title and price ---- */
+.product-tile-meta .product-tile-vendor { margin-bottom: var(--product-vendor-title-gap, 6px); }
 
-.product-tile-meta .product-tile-price { margin-top: var(--product-text-gap, 6px); }
+.product-tile-meta .product-tile-price { margin-top: var(--product-title-price-gap, 6px); }

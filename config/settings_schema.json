@@ -669,9 +669,20 @@
       },
       {
         "type": "range",
-        "id": "product_text_gap",
-        "label": "Space between vendor, title and price",
-        "info": "The gap between the vendor, the title and the price, on the product page and on the product cards.",
+        "id": "product_vendor_title_gap",
+        "label": "Space between vendor and title",
+        "info": "On the product page and on the product cards.",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 6
+      },
+      {
+        "type": "range",
+        "id": "product_title_price_gap",
+        "label": "Space between title and price",
+        "info": "On the product page and on the product cards.",
         "min": 0,
         "max": 24,
         "step": 1,

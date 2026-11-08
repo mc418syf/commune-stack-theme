@@ -173,11 +173,11 @@
 {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
 {{ 'modules-slideshow.bundle.css' | asset_url | stylesheet_tag }}
 <style>
-  /* Space between vendor, title and price: one theme-wide value (Theme settings > Product text), shared with the product cards */
-  #{{ section.id }} .product-price-block { margin-top: var(--product-text-gap, 6px); }
+  /* Space between vendor, title and price: theme-wide values (Theme settings > Product text), shared with the product cards */
+  #{{ section.id }} .product-price-block { margin-top: var(--product-title-price-gap, 6px); }
   /* Space between the vendor and the title (the title keeps its own spacing when there is no vendor above it) */
   #{{ section.id }} .product-vendor-block + .product-title-block,
-  #{{ section.id }} .pb[data-pb='vendor'] + .pb[data-pb='title'] .product-title-block { margin-top: var(--product-text-gap, 6px); }
+  #{{ section.id }} .pb[data-pb='vendor'] + .pb[data-pb='title'] .product-title-block { margin-top: var(--product-vendor-title-gap, 6px); }
 </style>
 {%- if desktop_strip -%}
   {{ 'product-strip.css' | asset_url | stylesheet_tag }}
