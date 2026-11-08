@@ -172,6 +172,10 @@
 
 {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
 {{ 'modules-slideshow.bundle.css' | asset_url | stylesheet_tag }}
+<style>
+  /* Space above the price (normally the space between the title and the price) */
+  #{{ section.id }} .product-price-block { margin-top: var(--title-price-gap, 1rem); }
+</style>
 {%- if desktop_strip -%}
   {{ 'product-strip.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'product-strip.js' | asset_url }}" defer></script>
@@ -179,8 +183,8 @@
 
 <section
   class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
-  {% if desktop_strip %}style="--strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;"{% endif %}
   id="{{ section.id }}"
+  style="--title-price-gap: {{ section.settings.title_price_gap }}px;{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %}"
   x-data="
     Theme_Product({
       product: {{ product | json | escape }},
@@ -587,6 +591,17 @@
         }
       ],
       "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "title_price_gap",
+      "min": 0,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between title and price",
+      "default": 16,
+      "info": "The gap above the price, on desktop and mobile."
     },
     {
       "type": "select",

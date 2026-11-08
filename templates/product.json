@@ -100,6 +100,7 @@
         "desktop_layout": "strip",
         "strip_height": 58,
         "strip_gap": 8,
+        "title_price_gap": 8,
         "two_media_per_row": true,
         "first_media_full_width": false,
         "variant_media_behavior": "scroll",
