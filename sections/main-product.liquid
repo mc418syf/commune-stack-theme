@@ -175,6 +175,9 @@
 <style>
   /* Space above the price (normally the space between the title and the price) */
   #{{ section.id }} .product-price-block { margin-top: var(--title-price-gap, 1rem); }
+  /* Space between the vendor and the title (the title keeps its own spacing when there is no vendor above it) */
+  #{{ section.id }} .product-vendor-block + .product-title-block,
+  #{{ section.id }} .pb[data-pb='vendor'] + .pb[data-pb='title'] .product-title-block { margin-top: var(--vendor-title-gap, 0.5rem); }
 </style>
 {%- if desktop_strip -%}
   {{ 'product-strip.css' | asset_url | stylesheet_tag }}
@@ -184,7 +187,7 @@
 <section
   class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
   id="{{ section.id }}"
-  style="--title-price-gap: {{ section.settings.title_price_gap }}px;{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %}"
+  style="--vendor-title-gap: {{ section.settings.vendor_title_gap }}px; --title-price-gap: {{ section.settings.title_price_gap }}px;{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %}"
   x-data="
     Theme_Product({
       product: {{ product | json | escape }},
@@ -591,6 +594,17 @@
         }
       ],
       "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "vendor_title_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between vendor and title",
+      "default": 8,
+      "info": "The gap between the vendor and the title, on desktop and mobile."
     },
     {
       "type": "range",
