@@ -646,13 +646,15 @@
         "type": "select",
         "id": "product_info_weight",
         "label": "Vendor and title weight",
+        "info": "The theme font has only Regular and Bold, so the two in-between looks thicken Regular with a fine outline. They look the same on every device.",
         "options": [
           { "value": "400", "label": "Regular" },
-          { "value": "500", "label": "Medium" },
-          { "value": "600", "label": "Semibold" },
+          { "value": "450", "label": "In between: light" },
+          { "value": "500", "label": "In between: medium" },
+          { "value": "600", "label": "Semibold (renders as Bold)" },
           { "value": "700", "label": "Bold" }
         ],
-        "default": "600"
+        "default": "500"
       },
       {
         "type": "range",

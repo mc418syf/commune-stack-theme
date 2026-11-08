@@ -7,7 +7,8 @@
 [data-product-root] .product-title-block,
 [data-product-root] .product-title-block a {
   font-size: var(--product-info-size, 12px);
-  font-weight: var(--product-info-weight, 600);
+  font-weight: var(--product-info-weight, 400);
+  -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
   line-height: 1.35;
 }
 
@@ -25,7 +26,8 @@
 .product-tile-vendor,
 .product-tile-title {
   font-size: var(--product-info-size, 12px);
-  font-weight: var(--product-info-weight, 600);
+  font-weight: var(--product-info-weight, 400);
+  -webkit-text-stroke: var(--product-info-stroke, 0.45px) currentColor;
   line-height: 1.35;
 }
 

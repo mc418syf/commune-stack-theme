@@ -8,6 +8,21 @@
   assign heading_font = settings.font_heading
   assign heading_font_weight = heading_font.weight
   assign heading_font_style = heading_font.style
+
+  comment
+    Vendor and title weight. The two in-between choices keep the Regular weight and add a fine outline,
+    because the theme font has no Medium.
+  endcomment
+  assign product_info_choice = settings.product_info_weight | default: '500'
+  assign product_info_weight = product_info_choice
+  assign product_info_stroke = '0px'
+  if product_info_choice == '450'
+    assign product_info_weight = '400'
+    assign product_info_stroke = '0.25px'
+  elsif product_info_choice == '500'
+    assign product_info_weight = '400'
+    assign product_info_stroke = '0.45px'
+  endif
 -%}
 {% comment %} theme-check-disable AssetPreload {% endcomment %}
 {% comment %}
@@ -203,7 +218,8 @@
 
     :root {
       --product-info-size: {{ settings.product_info_size | default: 12 }}px;
-      --product-info-weight: {{ settings.product_info_weight | default: 600 }};
+      --product-info-weight: {{ product_info_weight }};
+      --product-info-stroke: {{ product_info_stroke }};
       --product-price-size: {{ settings.product_price_size | default: 10 }}px;
 
       --font-size-xs: 0.64rem;
