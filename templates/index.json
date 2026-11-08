@@ -44,18 +44,24 @@
     "split_screens": {
       "type": "split-screens",
       "blocks": {
-        "screen_1": {
-          "type": "screen",
+        "asset_1": {
+          "type": "asset",
           "settings": {
-            "a_heading": "First asset",
-            "a_subheading": "Add an image or video",
-            "b_heading": "Second asset",
-            "b_subheading": "Add an image or video"
+            "heading": "First asset",
+            "subheading": "Add an image or video"
+          }
+        },
+        "asset_2": {
+          "type": "asset",
+          "settings": {
+            "heading": "Second asset",
+            "subheading": "Add an image or video"
           }
         }
       },
       "block_order": [
-        "screen_1"
+        "asset_1",
+        "asset_2"
       ],
       "settings": {
         "height_desktop": 100,
@@ -205,4 +211,3 @@
     "17705185213dda64bf"
   ]
 }
-

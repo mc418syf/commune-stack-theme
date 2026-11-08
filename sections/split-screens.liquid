@@ -1,6 +1,5 @@
 {%- liquid
   assign section_color = section.settings.color_scheme
-  assign prefixes = 'a_,b_' | split: ','
 -%}
 
 <section
@@ -11,95 +10,93 @@
   style="--split-h-desktop: {{ section.settings.height_desktop }}vh; --split-h-mobile: {{ section.settings.height_mobile }}svh; --split-gap: {{ section.settings.gap }}px;"
 >
   {%- for block in section.blocks -%}
-    <div class="split__screen" {{ block.shopify_attributes }}>
-      {%- for prefix in prefixes -%}
-        {%- liquid
-          assign key = prefix | append: 'media_type'
-          assign media_type = block.settings[key]
-          assign key = prefix | append: 'image'
-          assign image = block.settings[key]
-          assign key = prefix | append: 'video'
-          assign video = block.settings[key]
-          assign key = prefix | append: 'heading'
-          assign heading = block.settings[key]
-          assign key = prefix | append: 'subheading'
-          assign subheading = block.settings[key]
-          assign key = prefix | append: 'button_label'
-          assign button_label = block.settings[key]
-          assign key = prefix | append: 'link'
-          assign link = block.settings[key]
-          assign key = prefix | append: 'text_style'
-          assign text_style = block.settings[key]
-          assign key = prefix | append: 'text_color'
-          assign text_color = block.settings[key]
-          assign key = prefix | append: 'text_position'
-          assign text_position = block.settings[key]
-          assign key = prefix | append: 'overlay'
-          assign overlay = block.settings[key]
-          assign alt_text = image.alt | default: heading
-          assign eager = false
-          assign loading_attr = 'lazy'
-          if forloop.parentloop.first and section.index <= 2
-            assign eager = true
-            assign loading_attr = 'eager'
-          endif
-          assign tag = 'div'
-          if link != blank
-            assign tag = 'a'
-          endif
-        -%}
+    {%- liquid
+      assign pair_position = forloop.index0 | modulo: 2
+      assign media_type = block.settings.media_type
+      assign image = block.settings.image
+      assign video = block.settings.video
+      assign heading = block.settings.heading
+      assign subheading = block.settings.subheading
+      assign button_label = block.settings.button_label
+      assign link = block.settings.link
+      assign alt_text = image.alt | default: heading
+      assign eager = false
+      assign loading_attr = 'lazy'
+      if forloop.index <= 2 and section.index <= 2
+        assign eager = true
+        assign loading_attr = 'eager'
+      endif
+      assign tag = 'div'
+      if link != blank
+        assign tag = 'a'
+      endif
+    -%}
 
-        <{{ tag }}
-          class="split__panel"
-          {% if link != blank %}href="{{ link }}"{% endif %}
-          style="--split-text-color: {{ text_color }}; --split-overlay: {{ overlay | divided_by: 100.0 }};"
+    {%- if pair_position == 0 -%}
+      <div class="split__screen">
+    {%- endif -%}
+
+    <{{ tag }}
+      class="split__panel group"
+      {% if link != blank %}href="{{ link }}"{% endif %}
+      style="--split-text-color: {{ block.settings.text_color }}; --split-overlay: {{ block.settings.overlay | divided_by: 100.0 }};"
+      {{ block.shopify_attributes }}
+    >
+      {%- if media_type == 'video' and video != blank -%}
+        <video
+          class="split__media"
+          muted
+          loop
+          playsinline
+          preload="{% if eager %}auto{% else %}none{% endif %}"
+          {% if eager %}autoplay{% endif %}
+          {% if video.preview_image %}poster="{{ video.preview_image | image_url: width: 1600 }}"{% endif %}
+          aria-label="{{ heading | default: video.alt | escape }}"
         >
-          {%- if media_type == 'video' and video != blank -%}
-            <video
-              class="split__media"
-              muted
-              loop
-              playsinline
-              preload="{% if eager %}auto{% else %}none{% endif %}"
-              {% if eager %}autoplay{% endif %}
-              {% if video.preview_image %}poster="{{ video.preview_image | image_url: width: 1600 }}"{% endif %}
-              aria-label="{{ heading | default: video.alt | escape }}"
-            >
-              {%- for source in video.sources -%}
-                <source src="{{ source.url }}" type="{{ source.mime_type }}">
-              {%- endfor -%}
-            </video>
-          {%- elsif image != blank -%}
-            {{
-              image
-              | image_url: width: 1600
-              | image_tag:
-                loading: loading_attr,
-                widths: '600, 900, 1200, 1600',
-                sizes: '(min-width: 750px) 50vw, 100vw',
-                class: 'split__media',
-                alt: alt_text
-            }}
-          {%- else -%}
-            <div class="split__media split__placeholder" aria-hidden="true"></div>
-          {%- endif -%}
+          {%- for source in video.sources -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {%- endfor -%}
+        </video>
+      {%- elsif image != blank -%}
+        {{
+          image
+          | image_url: width: 1600
+          | image_tag:
+            loading: loading_attr,
+            widths: '600, 900, 1200, 1600',
+            sizes: '(min-width: 750px) 50vw, 100vw',
+            class: 'split__media',
+            alt: alt_text
+        }}
+      {%- else -%}
+        <div class="split__media split__placeholder" aria-hidden="true"></div>
+      {%- endif -%}
 
-          {%- if heading != blank or subheading != blank or button_label != blank -%}
-            <div class="split__text split__text--{{ text_position }} split__text--{{ text_style }}">
-              {%- if heading != blank -%}
-                <h2 class="split__heading"><span>{{ heading | escape }}</span></h2>
-              {%- endif -%}
-              {%- if subheading != blank -%}
-                <p class="split__sub"><span>{{ subheading | escape }}</span></p>
-              {%- endif -%}
-              {%- if button_label != blank -%}
-                <span class="split__button">{{ button_label | escape }}</span>
-              {%- endif -%}
-            </div>
+      {%- if heading != blank or subheading != blank or button_label != blank -%}
+        <div class="split__text split__text--v-{{ block.settings.text_vertical }} split__text--h-{{ block.settings.text_horizontal }} split__text--{{ block.settings.text_style }}">
+          {%- if heading != blank -%}
+            <h2 class="split__heading font-heading {{ block.settings.heading_size }}"><span>{{ heading | escape }}</span></h2>
           {%- endif -%}
-        </{{ tag }}>
-      {%- endfor -%}
-    </div>
+          {%- if subheading != blank -%}
+            <p class="split__sub font-body {{ block.settings.subheading_size }}"><span>{{ subheading | escape }}</span></p>
+          {%- endif -%}
+          {%- if button_label != blank -%}
+            {%- if block.settings.button_style == 'link' -%}
+              <span class="split__cta theme-link inline-block">{{ button_label | escape }}</span>
+            {%- else -%}
+              <span class="split__cta theme-button theme-button--in-group inline-block">{{ button_label | escape }}</span>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </{{ tag }}>
+
+    {%- if pair_position == 1 or forloop.last -%}
+      {%- if pair_position == 0 -%}
+        <div class="split__panel split__panel--empty" aria-hidden="true"><div class="split__media split__placeholder"></div></div>
+      {%- endif -%}
+      </div>
+    {%- endif -%}
   {%- endfor -%}
 </section>
 
@@ -119,7 +116,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Each screen shows two images or videos side by side on desktop. On mobile each screen is one page with the two stacked, and scrolling snaps from screen to screen. Add a screen for each pair."
+      "content": "Add assets (images or videos). Every two assets make one screen: side by side on desktop, stacked on mobile with one screen per page and snap scrolling."
     },
     {
       "type": "range",
@@ -182,17 +179,13 @@
   ],
   "blocks": [
     {
-      "type": "screen",
-      "name": "Screen",
-      "limit": 10,
+      "type": "asset",
+      "name": "Asset",
+      "limit": 20,
       "settings": [
         {
-          "type": "header",
-          "content": "First asset (left on desktop, top on mobile)"
-        },
-        {
           "type": "select",
-          "id": "a_media_type",
+          "id": "media_type",
           "label": "Media",
           "options": [
             {
@@ -208,41 +201,71 @@
         },
         {
           "type": "image_picker",
-          "id": "a_image",
+          "id": "image",
           "label": "Image",
           "info": "Also used as the poster while a video loads."
         },
         {
           "type": "video",
-          "id": "a_video",
+          "id": "video",
           "label": "Video",
           "info": "Uploaded to Shopify (Content > Files). Plays muted on a loop."
         },
         {
+          "type": "header",
+          "content": "Text"
+        },
+        {
           "type": "text",
-          "id": "a_heading",
+          "id": "heading",
           "label": "Heading"
         },
         {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading size",
+          "options": [
+            {
+              "value": "text-heading-standard",
+              "label": "Standard"
+            },
+            {
+              "value": "text-heading-feature",
+              "label": "Feature"
+            },
+            {
+              "value": "text-heading-secondary",
+              "label": "Secondary"
+            }
+          ],
+          "default": "text-heading-standard",
+          "info": "Uses the theme's heading font and sizes."
+        },
+        {
           "type": "text",
-          "id": "a_subheading",
+          "id": "subheading",
           "label": "Subheading"
         },
         {
-          "type": "text",
-          "id": "a_button_label",
-          "label": "Button text",
-          "info": "Leave empty to hide the button."
-        },
-        {
-          "type": "url",
-          "id": "a_link",
-          "label": "Link",
-          "info": "The whole panel links here."
+          "type": "select",
+          "id": "subheading_size",
+          "label": "Subheading size",
+          "options": [
+            {
+              "value": "text-base",
+              "label": "Base"
+            },
+            {
+              "value": "text-lg",
+              "label": "Large"
+            }
+          ],
+          "default": "text-base",
+          "info": "Uses the theme's body font."
         },
         {
           "type": "select",
-          "id": "a_text_style",
+          "id": "text_style",
           "label": "Text style",
           "options": [
             {
@@ -258,145 +281,96 @@
         },
         {
           "type": "color",
-          "id": "a_text_color",
+          "id": "text_color",
           "label": "Plain text color",
           "default": "#ffffff"
         },
         {
-          "type": "select",
-          "id": "a_text_position",
-          "label": "Text position",
-          "options": [
-            {
-              "value": "bottom",
-              "label": "Bottom"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "top",
-              "label": "Top"
-            }
-          ],
-          "default": "bottom"
-        },
-        {
           "type": "range",
-          "id": "a_overlay",
+          "id": "overlay",
           "min": 0,
           "max": 60,
           "step": 5,
           "unit": "%",
           "label": "Darken media",
+          "info": "Helps plain text stay readable.",
           "default": 0
         },
         {
           "type": "header",
-          "content": "Second asset (right on desktop, bottom on mobile)"
+          "content": "Placement"
         },
         {
           "type": "select",
-          "id": "b_media_type",
-          "label": "Media",
+          "id": "text_vertical",
+          "label": "Vertical position",
           "options": [
             {
-              "value": "image",
-              "label": "Image"
+              "value": "top",
+              "label": "Top"
             },
             {
-              "value": "video",
-              "label": "Video"
-            }
-          ],
-          "default": "image"
-        },
-        {
-          "type": "image_picker",
-          "id": "b_image",
-          "label": "Image",
-          "info": "Also used as the poster while a video loads."
-        },
-        {
-          "type": "video",
-          "id": "b_video",
-          "label": "Video",
-          "info": "Uploaded to Shopify (Content > Files). Plays muted on a loop."
-        },
-        {
-          "type": "text",
-          "id": "b_heading",
-          "label": "Heading"
-        },
-        {
-          "type": "text",
-          "id": "b_subheading",
-          "label": "Subheading"
-        },
-        {
-          "type": "text",
-          "id": "b_button_label",
-          "label": "Button text",
-          "info": "Leave empty to hide the button."
-        },
-        {
-          "type": "url",
-          "id": "b_link",
-          "label": "Link",
-          "info": "The whole panel links here."
-        },
-        {
-          "type": "select",
-          "id": "b_text_style",
-          "label": "Text style",
-          "options": [
-            {
-              "value": "highlight",
-              "label": "Highlighted (boxed)"
+              "value": "center",
+              "label": "Middle"
             },
-            {
-              "value": "plain",
-              "label": "Plain"
-            }
-          ],
-          "default": "highlight"
-        },
-        {
-          "type": "color",
-          "id": "b_text_color",
-          "label": "Plain text color",
-          "default": "#ffffff"
-        },
-        {
-          "type": "select",
-          "id": "b_text_position",
-          "label": "Text position",
-          "options": [
             {
               "value": "bottom",
               "label": "Bottom"
+            }
+          ],
+          "default": "bottom"
+        },
+        {
+          "type": "select",
+          "id": "text_horizontal",
+          "label": "Horizontal position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
             },
             {
               "value": "center",
               "label": "Center"
             },
             {
-              "value": "top",
-              "label": "Top"
+              "value": "right",
+              "label": "Right"
             }
           ],
-          "default": "bottom"
+          "default": "center"
         },
         {
-          "type": "range",
-          "id": "b_overlay",
-          "min": 0,
-          "max": 60,
-          "step": 5,
-          "unit": "%",
-          "label": "Darken media",
-          "default": 0
+          "type": "header",
+          "content": "Button and link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button text",
+          "info": "Leave empty to hide the button."
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "button",
+              "label": "Button"
+            },
+            {
+              "value": "link",
+              "label": "Link"
+            }
+          ],
+          "default": "button"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "The whole asset links here."
         }
       ]
     }
@@ -406,7 +380,10 @@
       "name": "Split screens",
       "blocks": [
         {
-          "type": "screen"
+          "type": "asset"
+        },
+        {
+          "type": "asset"
         }
       ]
     }
