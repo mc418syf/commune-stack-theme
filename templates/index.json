@@ -21,6 +21,7 @@
         "products_per_row": 28,
         "one_screen": true,
         "motion": "autoplay",
+        "hover_shuffle": true,
         "sizing": "fit_rows",
         "rows_desktop": 3,
         "rows_mobile": 3,

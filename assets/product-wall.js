@@ -76,6 +76,7 @@
     const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
     const speedScale = parseFloat(cfg.speed);
     const staticMode = cfg.motion === 'on_scroll';
+    const hoverShuffle = cfg.hoverShuffle !== 'false';
     const shuffleStrength = parseFloat(cfg.shuffle) || 1;
     const hideSold = cfg.hideSoldOut === 'true';
     const money = new Intl.NumberFormat(document.documentElement.lang || undefined, {
@@ -153,14 +154,14 @@
 
       // Pointer: every row reacts a little differently, so the wall shuffles.
       addEventListener('pointermove', (e) => {
-        if (e.pointerType !== 'mouse' || staticMode) return;
+        if (e.pointerType !== 'mouse' || !hoverShuffle) return;
         state.nx = e.clientX / innerWidth;
         if (state.lastX !== null && !REDUCED.matches) {
           const dx = e.clientX - state.lastX;
           const dy = e.clientY - state.lastY;
           for (const r of rows) {
             if (r.dragging) continue;
-            r.v = clamp(r.v + dx * 3.2 * r.gain + Math.abs(dy) * 0.8 * r.dir, -MAX_SPEED, MAX_SPEED);
+            r.v = clamp(r.v + (dx * 3.2 * r.gain + Math.abs(dy) * 0.8 * r.dir) * (staticMode ? shuffleStrength : 1), -MAX_SPEED, MAX_SPEED);
           }
         }
         state.lastX = e.clientX;
@@ -277,7 +278,7 @@
             r.o += s; r.snap -= s;
             if (Math.abs(r.snap) < 0.5) r.snap = 0;
           }
-          if (FINE_POINTER.matches && !REDUCED.matches && !staticMode) r.ptx = (state.nx - 0.5) * -180 * r.depth * r.dir;
+          if (FINE_POINTER.matches && !REDUCED.matches && hoverShuffle) r.ptx = (state.nx - 0.5) * -180 * r.depth * r.dir;
           r.px += (r.ptx - r.px) * pEase;
 
           if (!r.visible || !r.w) continue;

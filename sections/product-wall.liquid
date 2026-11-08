@@ -23,6 +23,7 @@
   data-color-scheme="{{ section_color }}"
   data-product-wall
   data-collection="{{ collection_handle }}"
+  data-hover-shuffle="{{ section.settings.hover_shuffle }}"
   data-motion="{{ section.settings.motion }}"
   data-shuffle="{{ section.settings.shuffle_strength | divided_by: 100.0 }}"
   data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
@@ -110,6 +111,13 @@
       "info": "Static keeps the rows still until the visitor scrolls or swipes, then shuffles them in alternating directions."
     },
     {
+      "type": "checkbox",
+      "id": "hover_shuffle",
+      "label": "Shuffle when the pointer moves (desktop)",
+      "info": "Moving the mouse over the wall pushes the rows and shifts them slightly with the cursor. Works in both motion modes.",
+      "default": true
+    },
+    {
       "type": "range",
       "id": "shuffle_strength",
       "min": 25,
@@ -117,7 +125,7 @@
       "step": 25,
       "unit": "%",
       "label": "Shuffle strength",
-      "info": "Used when motion is static.",
+      "info": "Strength of the scroll and pointer shuffle in static mode.",
       "default": 100
     },
     {
