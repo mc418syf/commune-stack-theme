@@ -1,5 +1,13 @@
 {%- liquid
   assign section_color = section.settings.color_scheme
+
+  assign mobile_ratio = section.settings.mobile_ratio
+  assign ratio_mode = 'fixed'
+  if mobile_ratio == 'fill'
+    assign ratio_mode = 'fill'
+  elsif mobile_ratio == 'original'
+    assign ratio_mode = 'original'
+  endif
 -%}
 
 <section
@@ -7,7 +15,8 @@
   data-color-scheme="{{ section_color }}"
   data-split-screens
   data-snap="{{ section.settings.snap }}"
-  style="--split-h-desktop: {{ section.settings.height_desktop }}vh; --split-h-mobile: {{ section.settings.height_mobile }}svh; --split-gap: {{ section.settings.gap }}px;"
+  data-mobile-ratio="{{ ratio_mode }}"
+  style="--split-h-desktop: {{ section.settings.height_desktop }}vh; --split-h-mobile: {{ section.settings.height_mobile }}svh; --split-gap: {{ section.settings.gap }}px;{% if ratio_mode == 'fixed' %} --split-ratio: {{ mobile_ratio }};{% endif %}"
 >
   {%- for block in section.blocks -%}
     {%- liquid
@@ -20,6 +29,7 @@
       assign button_label = block.settings.button_label
       assign link = block.settings.link
       assign alt_text = image.alt | default: heading
+      assign panel_ratio = image.aspect_ratio | default: video.aspect_ratio | default: 0.8
       assign eager = false
       assign loading_attr = 'lazy'
       if forloop.index <= 2 and section.index <= 2
@@ -39,7 +49,7 @@
     <{{ tag }}
       class="split__panel group"
       {% if link != blank %}href="{{ link }}"{% endif %}
-      style="--split-text-color: {{ block.settings.text_color }}; --split-overlay: {{ block.settings.overlay | divided_by: 100.0 }};"
+      style="--split-ar: {{ panel_ratio }}; --split-text-color: {{ block.settings.text_color }}; --split-overlay: {{ block.settings.overlay | divided_by: 100.0 }};"
       {{ block.shopify_attributes }}
     >
       {%- if media_type == 'video' and video != blank -%}
@@ -129,6 +139,23 @@
       "default": 100
     },
     {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile image aspect ratio",
+      "options": [
+        { "value": "fill", "label": "Fill the screen (two halves)" },
+        { "value": "1 / 1", "label": "Square (1:1)" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "3 / 4", "label": "Portrait (3:4)" },
+        { "value": "2 / 3", "label": "Tall portrait (2:3)" },
+        { "value": "4 / 3", "label": "Landscape (4:3)" },
+        { "value": "16 / 9", "label": "Wide (16:9)" },
+        { "value": "original", "label": "Original image ratio" }
+      ],
+      "default": "fill",
+      "info": "Shape of each asset on mobile. Fill splits the screen height in half; other ratios size each asset from the screen width, so a screen can be shorter or taller than the phone."
+    },
+    {
       "type": "range",
       "id": "height_mobile",
       "min": 60,
@@ -136,6 +163,7 @@
       "step": 5,
       "unit": "vh",
       "label": "Screen height (mobile)",
+      "info": "Used when the mobile aspect ratio is Fill the screen.",
       "default": 100
     },
     {

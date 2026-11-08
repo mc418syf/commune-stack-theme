@@ -101,6 +101,16 @@ html.split-snap { scroll-snap-type: y mandatory; }
     scroll-snap-stop: always;
   }
 
+  /* Fixed or original ratios: each asset is sized from the screen width instead of splitting the height */
+  .split[data-mobile-ratio='fixed'] .split__screen,
+  .split[data-mobile-ratio='original'] .split__screen {
+    height: auto;
+    grid-template-rows: none;
+  }
+
+  .split[data-mobile-ratio='fixed'] .split__panel { aspect-ratio: var(--split-ratio, 4 / 5); }
+  .split[data-mobile-ratio='original'] .split__panel { aspect-ratio: var(--split-ar, 0.8); }
+
   .split__text { padding: 16px; gap: 8px; }
   .split__text--v-bottom { padding-bottom: 24px; }
   .split__text--v-top { padding-top: 56px; }
