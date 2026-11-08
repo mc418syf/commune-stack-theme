@@ -316,6 +316,7 @@
     {% endif %}
 
     {%- render 'css-bridge' -%}
+    {{ 'product-text.css' | asset_url | stylesheet_tag }}
 
     {{ 'base.bundle.css' | asset_url | stylesheet_tag }}
     <meta name="google-site-verification" content="A5GAnSvB4HIADbrD586ctJWZ8CEMSPC9Yg26HksS3Os" />

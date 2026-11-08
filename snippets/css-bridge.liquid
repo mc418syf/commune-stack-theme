@@ -202,6 +202,9 @@
     -%}
 
     :root {
+      --product-info-size: {{ settings.product_info_size | default: 12 }}px;
+      --product-info-weight: {{ settings.product_info_weight | default: 600 }};
+      --product-price-size: {{ settings.product_price_size | default: 10 }}px;
 
       --font-size-xs: 0.64rem;
       --font-size-sm: 0.8rem;

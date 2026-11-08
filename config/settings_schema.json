@@ -626,6 +626,48 @@
     ]
   },
   {
+    "name": "Product text",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "One set of text sizes for the product page and the product cards in collections, search and recommendations."
+      },
+      {
+        "type": "range",
+        "id": "product_info_size",
+        "label": "Vendor and title size",
+        "min": 10,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 12
+      },
+      {
+        "type": "select",
+        "id": "product_info_weight",
+        "label": "Vendor and title weight",
+        "options": [
+          { "value": "400", "label": "Regular" },
+          { "value": "500", "label": "Medium" },
+          { "value": "600", "label": "Semibold" },
+          { "value": "700", "label": "Bold" }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "range",
+        "id": "product_price_size",
+        "label": "Price size",
+        "min": 8,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 10,
+        "info": "Typically 2px smaller than the vendor and title."
+      }
+    ]
+  },
+  {
     "name": "Quick buy drawer",
     "settings": [
       {

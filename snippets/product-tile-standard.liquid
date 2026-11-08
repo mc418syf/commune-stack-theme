@@ -356,7 +356,7 @@ PLP product card
       endif
     -%}
 
-    <div class="{{ meta_class }} {{ layout_class }}">
+    <div class="product-tile-meta {{ meta_class }} {{ layout_class }}">
       {% if enable_quick_buy and settings.quick_buy_position == 'over_image' %}
         <a
           href="{{ product.url }}"
@@ -370,15 +370,15 @@ PLP product card
       {%- unless hide_title -%}
         <div class="{{ title_class }} break-word">
           {% if settings.product_grid_show_vendor and product.vendor != '' %}
-            <p class="mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
+            <p class="product-tile-vendor mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
           {% endif %}
           <a href="{{ product.url }}" class="inline-block">
-            <p aria-hidden="true" class="{% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
+            <p aria-hidden="true" class="product-tile-title {% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
           </a>
         </div>
       {%- endunless -%}
 
-      <div class="{{ price_class }}">
+      <div class="product-tile-price {{ price_class }}">
         {% if sold_out %}
           <s class="text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</s>
         {% else %}
