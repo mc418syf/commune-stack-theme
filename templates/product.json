@@ -107,7 +107,9 @@
         "enable_video_looping": false,
         "max_width_of_content": "w-full",
         "color_scheme": "",
-        "override_header_footer_color_scheme": true
+        "override_header_footer_color_scheme": true,
+        "desktop_layout": "strip",
+        "strip_height": 58
       }
     },
     "related-products": {

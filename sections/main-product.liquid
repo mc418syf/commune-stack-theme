@@ -3,6 +3,11 @@
   assign enable_video_looping = section.settings.enable_video_looping
   assign two_media_per_row = section.settings.two_media_per_row
 
+  assign desktop_strip = false
+  if section.settings.desktop_layout == 'strip'
+    assign desktop_strip = true
+  endif
+
   assign models = product.media | where: 'media_type', 'model'
 
   assign desktop_media_width = section.settings.desktop_media_width
@@ -167,9 +172,14 @@
 
 {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
 {{ 'modules-slideshow.bundle.css' | asset_url | stylesheet_tag }}
+{%- if desktop_strip -%}
+  {{ 'product-strip.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'product-strip.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 <section
-  class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background"
+  class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
+  {% if desktop_strip %}style="--strip-h: {{ section.settings.strip_height }}vh;"{% endif %}
   id="{{ section.id }}"
   x-data="
     Theme_Product({
@@ -279,6 +289,7 @@
               class="splide__slide bg-scheme-background{% unless forloop.first %} max-lg:[.splide:not(.is-active)_&]:hidden{% endunless %}"
               data-index="{{ forloop.index0 }}"
               data-order="{{ forloop.index }}"
+              {% if desktop_strip %}data-media-type="{{ media.media_type }}" style="--strip-ar: {{ media.aspect_ratio }};"{% endif %}
               {% if enable_variant_media or single_variant_mode %}
                 {% if media_group_id %}
                   data-media-group-id="{{ media_group_id }}"
@@ -576,6 +587,28 @@
         }
       ],
       "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        { "value": "split", "label": "Media beside the details" },
+        { "value": "strip", "label": "Image strip on top, details below" }
+      ],
+      "default": "split",
+      "info": "Image strip: every image sits in one horizontal row you scroll or drag sideways, numbered underneath. Title, price and description sit below on the left, with the options and add to cart on the right. Mobile is unchanged."
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "min": 35,
+      "max": 75,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image strip height",
+      "default": 58,
+      "info": "Used by the image strip layout."
     },
     {
       "type": "checkbox",

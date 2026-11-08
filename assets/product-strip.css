@@ -1,0 +1,110 @@
+/* Product page, "Image strip on top, details below" desktop layout.
+   Everything inside the media query is desktop only; mobile keeps the theme's own layout. */
+
+.pb-col { display: contents; }
+
+@media (min-width: 1024px) {
+  /* One column of full-width rows instead of media | details */
+  .product-strip {
+    display: block !important;
+    background: rgb(var(--color-scheme-background));
+  }
+
+  .product-strip .product-media-container,
+  .product-strip .product-content-container {
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  /* ---- Image strip ---- */
+  .product-strip .product-media-container { padding: 0; border: 0; }
+  .product-strip .splide--product { position: static !important; }
+
+  .product-strip .splide__track {
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible;
+  }
+
+  .product-strip .splide__list {
+    display: flex !important;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 3rem;
+    padding: 3.5rem 2rem 4.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    counter-reset: strip;
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 2rem;
+    scrollbar-width: none;
+    cursor: grab;
+    background: rgb(var(--color-scheme-background));
+  }
+
+  .product-strip .splide__list::-webkit-scrollbar { display: none; }
+  .product-strip .splide__list.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+
+  .product-strip .splide__slide {
+    position: relative;
+    display: block;
+    flex: none;
+    width: auto !important;
+    counter-increment: strip;
+    scroll-snap-align: center;
+    background: transparent;
+  }
+
+  /* The theme hides the slides that don't belong to the selected variant with lg:hidden; keep that working */
+  .product-strip .splide__slide.lg\:hidden { display: none; }
+
+  .product-strip .splide__slide [data-product-single-media-wrapper] { padding: 0; }
+
+  .product-strip .splide__slide img {
+    display: block;
+    width: auto;
+    max-width: none;
+    height: var(--strip-h, 58vh);
+    -webkit-user-drag: none;
+  }
+
+  /* Videos and 3D models have no intrinsic size, so size them from their aspect ratio */
+  .product-strip .splide__slide:not([data-media-type='image']) {
+    width: calc(var(--strip-h, 58vh) * var(--strip-ar, 1)) !important;
+    height: var(--strip-h, 58vh);
+  }
+
+  /* 1, 2, 3 ... under each image */
+  .product-strip .splide__slide::after {
+    content: counter(strip);
+    position: absolute;
+    left: 0;
+    bottom: -2.25rem;
+    font-size: 11px;
+    letter-spacing: .08em;
+    opacity: .45;
+  }
+
+  /* ---- Details below: description left, options and add to cart right ---- */
+  .product-strip .product-content-container { padding: 0 2rem 4rem; }
+
+  .product-strip .product-block-area {
+    position: static !important;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 26rem);
+    column-gap: 4rem;
+    align-items: start;
+    width: 100%;
+    max-width: none;
+    padding-top: 1.5rem;
+  }
+
+  .product-strip .pb-col { display: flex; flex-direction: column; min-width: 0; }
+  .product-strip .pb-col--left { max-width: 44rem; }
+  .product-strip .pb-col--left .product-title-block { margin-top: 0; }
+}
+
+/* Mobile: the two columns dissolve and each block goes back to its original place */
+@media (max-width: 1023px) {
+  .product-strip .product-block-area { display: flex; flex-direction: column; }
+}
