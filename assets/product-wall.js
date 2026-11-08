@@ -68,6 +68,11 @@
     const headerWatch = new ResizeObserver(reserve);
     if (header) headerWatch.observe(header);
 
+    const oneScreen = cfg.oneScreen === 'true';
+    const rowCount = matchMedia('(max-width: 640px)').matches
+      ? parseInt(cfg.rowsMobile, 10)
+      : parseInt(cfg.rowsDesktop, 10);
+
     const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
     const speedScale = parseFloat(cfg.speed);
     const hideSold = cfg.hideSoldOut === 'true';
@@ -90,7 +95,7 @@
     }
 
     function buildRows(products) {
-      const count = Math.max(4, Math.ceil(products.length / perRow));
+      const count = oneScreen ? Math.max(1, rowCount || 3) : Math.max(4, Math.ceil(products.length / perRow));
       const buckets = Array.from({ length: count }, () => []);
       shuffle(products.slice()).forEach((p, i) => buckets[i % count].push(p));
 
@@ -290,6 +295,14 @@
       if (stop) { stop(); mounted.delete(el); }
     });
   }
+
+  // The row count differs between desktop and mobile, so rebuild when the breakpoint is crossed.
+  matchMedia('(max-width: 640px)').addEventListener('change', () => {
+    unmountAll(document);
+    document.querySelectorAll('[data-product-wall-rows]').forEach((el) => (el.innerHTML = ''));
+    document.querySelectorAll('[data-product-wall]').forEach((el) => el.classList.remove('is-ready'));
+    mountAll(document);
+  });
 
   mountAll(document);
   document.addEventListener('shopify:section:load', (e) => mountAll(e.target));

@@ -26,6 +26,9 @@
   data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
   data-sizing="{{ section.settings.sizing }}"
   data-reserve-header="{{ section.settings.reserve_header_space }}"
+  data-one-screen="{{ section.settings.one_screen }}"
+  data-rows-desktop="{{ section.settings.rows_desktop }}"
+  data-rows-mobile="{{ section.settings.rows_mobile }}"
   data-per-row="{{ section.settings.products_per_row }}"
   data-hide-sold-out="{{ section.settings.hide_sold_out }}"
   data-show-vendor="{{ section.settings.show_vendor }}"
@@ -110,7 +113,15 @@
       "max": 50,
       "step": 2,
       "label": "Products per row",
+      "info": "Only used when \"Keep the wall to one screen\" is off.",
       "default": 28
+    },
+    {
+      "type": "checkbox",
+      "id": "one_screen",
+      "label": "Keep the wall to one screen",
+      "info": "The wall is exactly as tall as the screen (minus the header) and shows the rows set below. All products are spread across those rows. Turn off to stack as many rows as needed and scroll the page.",
+      "default": true
     },
     {
       "type": "select",

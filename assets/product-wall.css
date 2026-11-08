@@ -11,6 +11,11 @@
   overflow: hidden;
 }
 
+.product-wall[data-one-screen='true'] {
+  box-sizing: border-box;
+  height: calc(100svh - var(--wall-bottom-h, 0px));
+}
+
 .product-wall__rows {
   display: flex;
   flex-direction: column;
