@@ -12,6 +12,13 @@
   if section.settings.show_title
     assign meta_lines = meta_lines | plus: 1
   endif
+  assign opening = section.settings.opening_screen
+  assign one_screen = section.settings.one_screen
+  if opening
+    assign one_screen = true
+  endif
+  assign enter_mode = section.settings.enter_mode
+
   assign meta_height = 0
   if meta_lines > 0
     assign meta_height = meta_lines | times: 13 | plus: 6
@@ -30,7 +37,10 @@
   data-sizing="{{ section.settings.sizing }}"
   data-reserve-header="{{ section.settings.reserve_header_space }}"
   data-lock-page="{{ section.settings.lock_page }}"
-  data-one-screen="{{ section.settings.one_screen }}"
+  data-one-screen="{{ one_screen }}"
+  data-opening="{{ opening }}"
+  data-enter-mode="{{ enter_mode }}"
+  data-once-per-session="{{ section.settings.once_per_session }}"
   data-rows-desktop="{{ section.settings.rows_desktop }}"
   data-rows-mobile="{{ section.settings.rows_mobile }}"
   data-per-row="{{ section.settings.products_per_row }}"
@@ -43,6 +53,14 @@
   style="--wall-rows-desktop: {{ section.settings.rows_desktop }}; --wall-rows-mobile: {{ section.settings.rows_mobile }}; --wall-h-desktop: {{ section.settings.image_height_desktop }}vh; --wall-h-mobile: {{ section.settings.image_height_mobile }}svh; --wall-gap-desktop: {{ section.settings.gap_desktop }}px; --wall-gap-mobile: {{ section.settings.gap_mobile }}px; --wall-meta-h: {{ meta_height }}px;"
 >
   <div class="product-wall__rows" data-product-wall-rows aria-label="{{ section.settings.collection.title | default: 'All products' | escape }}"></div>
+  {%- if opening -%}
+    {%- if enter_mode != 'scroll' and section.settings.cta_text != blank -%}
+      <button type="button" class="product-wall__cta" data-product-wall-cta>{{ section.settings.cta_text | escape }}</button>
+    {%- endif -%}
+    {%- if enter_mode != 'cta' -%}
+      <p class="product-wall__scroll-hint" aria-hidden="true">{{ section.settings.scroll_hint_text | escape }}<span class="product-wall__arrow"></span></p>
+    {%- endif -%}
+  {%- endif -%}
   <noscript>
     <p class="product-wall__empty"><a href="{{ section.settings.collection.url | default: routes.all_products_collection_url }}">{{ 'collections.general.view_all' | t }}</a></p>
   </noscript>
@@ -69,6 +87,53 @@
     {
       "type": "paragraph",
       "content": "Every product in rotating rows. Rows autoplay in alternating directions; visitors can move the mouse, scroll or swipe to shuffle them, and tap a product to open it. Reduced-motion visitors get static rows."
+    },
+    {
+      "type": "header",
+      "content": "Opening screen"
+    },
+    {
+      "type": "checkbox",
+      "id": "opening_screen",
+      "label": "Use as the website's opening screen",
+      "info": "The wall covers the whole screen and the page below is the actual homepage. Visitors enter with the button, by scrolling or swiping up, or both. Not applied inside the theme editor, so you can still edit the page.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "enter_mode",
+      "label": "How visitors enter",
+      "options": [
+        { "value": "both", "label": "Button, or scroll / swipe" },
+        { "value": "cta", "label": "Button only" },
+        { "value": "scroll", "label": "Scroll / swipe only" }
+      ],
+      "default": "both",
+      "info": "Scrolling or swiping up slides the wall away to reveal the homepage. Scrolling back up at the top brings it back."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Enter",
+      "info": "Shown in the middle of the screen. Leave empty to hide the button."
+    },
+    {
+      "type": "text",
+      "id": "scroll_hint_text",
+      "label": "Scroll hint text",
+      "default": "Scroll to enter"
+    },
+    {
+      "type": "checkbox",
+      "id": "once_per_session",
+      "label": "Show the opening screen once per visit",
+      "info": "After entering, going back to the homepage in the same browser session skips the wall.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Products"
     },
     {
       "type": "collection",
@@ -175,7 +240,7 @@
       "type": "checkbox",
       "id": "lock_page",
       "label": "Lock page scrolling",
-      "info": "The page stays fixed on the screen. Scrolling, swiping or moving the pointer only shuffles the wall. Needs \"Keep the wall to one screen\", and is off inside the theme editor so you can still scroll the preview.",
+      "info": "Not needed for the opening screen, which locks itself. The page stays fixed on the screen. Scrolling, swiping or moving the pointer only shuffles the wall. Needs \"Keep the wall to one screen\", and is off inside the theme editor so you can still scroll the preview.",
       "default": true
     },
     {

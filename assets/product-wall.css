@@ -123,6 +123,84 @@ html.product-wall-locked .product-wall__row {
   touch-action: none;
 }
 
+/* Opening screen: the wall covers the page until the visitor enters */
+html.product-wall-opening .product-wall {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background-color: rgb(var(--color-scheme-background));
+  transition: transform .95s cubic-bezier(.7, 0, .2, 1);
+}
+
+html.product-wall-opening .product-wall.is-open {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+html.product-wall-opening .product-wall.is-gone { visibility: hidden; }
+
+.product-wall__cta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  padding: 14px 38px;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: inherit;
+  cursor: pointer;
+  background: rgb(var(--color-scheme-background) / .45);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgb(var(--color-scheme-text) / .25);
+  border-radius: 999px;
+  transition: background-color .25s ease, transform .25s ease;
+}
+
+.product-wall__cta:hover { background: rgb(var(--color-scheme-background) / .75); transform: translate(-50%, -50%) scale(1.04); }
+.product-wall__cta:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+.product-wall__scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--wall-bottom-h, 0px) + 18px);
+  z-index: 5;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.product-wall__arrow {
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+  animation: product-wall-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes product-wall-bob {
+  0%, 100% { transform: translateY(0) rotate(45deg); }
+  50% { transform: translateY(5px) rotate(45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-wall__arrow { animation: none; }
+  html.product-wall-opening .product-wall { transition: none; }
+}
+
 .product-wall__empty { padding: 80px 18px; text-align: center; }
 
 .product-wall[data-sizing='fixed'] { --wall-card-h: var(--wall-h-desktop, 36vh); }

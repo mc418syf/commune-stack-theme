@@ -76,9 +76,101 @@
     const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
     const speedScale = parseFloat(cfg.speed);
     const staticMode = cfg.motion === 'on_scroll';
+    const html = document.documentElement;
+    const designMode = !!(window.Shopify && window.Shopify.designMode);
+    const lock = (on) => html.classList.toggle('product-wall-locked', on);
+
+    // Opening screen: the wall covers the page until the visitor enters. Not in the theme editor.
+    const opening = cfg.opening === 'true' && !designMode;
+    const enterMode = cfg.enterMode || 'both';
+    const viaScroll = enterMode === 'scroll' || enterMode === 'both';
+    const SESSION_KEY = 'product-wall-entered';
+    let entered = false;
+    let busy = false;
+
+    function setEntered(next, instant) {
+      if (next === entered && !instant) return;
+      entered = next;
+      root.dataset.entered = String(next);
+      root.classList.toggle('is-open', next);
+      lock(!next);
+      if (next) {
+        root.setAttribute('inert', '');
+        busy = !instant;
+        if (cfg.oncePerSession === 'true') { try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) { /* private mode */ } }
+        const done = () => { if (!entered) return; root.classList.add('is-gone'); busy = false; };
+        if (instant) done();
+        else {
+          // transitionend also bubbles up from the rows' own fades, so only react to the wall itself
+          root.addEventListener('transitionend', (e) => { if (e.target === root) done(); }, { signal: abort.signal });
+          setTimeout(done, 1200);
+        }
+      } else {
+        root.classList.remove('is-gone');
+        root.removeAttribute('inert');
+        busy = true;
+        scrollTo(0, 0);
+        setTimeout(() => (busy = false), 1000);
+      }
+    }
+
     // Lock the page so scroll and swipe only shuffle the wall. Not in the theme editor, where the preview must scroll.
-    const lockPage = cfg.lockPage === 'true' && cfg.oneScreen === 'true' && !(window.Shopify && window.Shopify.designMode);
-    if (lockPage) document.documentElement.classList.add('product-wall-locked');
+    const lockPage = !opening && cfg.lockPage === 'true' && cfg.oneScreen === 'true' && !designMode;
+    if (lockPage) lock(true);
+
+    if (opening) {
+      html.classList.add('product-wall-opening');
+      let seen = root.dataset.entered === 'true';
+      try { seen = seen || (cfg.oncePerSession === 'true' && !!sessionStorage.getItem(SESSION_KEY)); } catch (e) { /* private mode */ }
+      if (seen) setEntered(true, true);
+      else { scrollTo(0, 0); lock(true); }
+
+      // Scroll or swipe up to enter; scroll or swipe down at the very top to come back.
+      let acc = 0, accAt = 0, startY = null, startX = null, startAtTop = false;
+      const gather = (d) => {
+        const now = performance.now();
+        if (now - accAt > 400) acc = 0;
+        accAt = now;
+        return (acc += d);
+      };
+      if (viaScroll) {
+        addEventListener('wheel', (e) => {
+          if (busy || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+          if (!entered && e.deltaY > 0 && gather(e.deltaY) > 90) setEntered(true);
+          else if (entered && scrollY <= 0 && e.deltaY < 0 && gather(-e.deltaY) > 140) setEntered(false);
+        }, { passive: true, signal: abort.signal });
+
+        addEventListener('touchstart', (e) => {
+          startY = e.touches[0].clientY; startX = e.touches[0].clientX; startAtTop = scrollY <= 0;
+        }, { passive: true, signal: abort.signal });
+        addEventListener('touchmove', (e) => {
+          if (startY === null || busy) return;
+          const dy = startY - e.touches[0].clientY, dx = startX - e.touches[0].clientX;
+          if (Math.abs(dy) < Math.abs(dx)) return;
+          if (!entered && dy > 70) { setEntered(true); startY = null; }
+          else if (entered && startAtTop && scrollY <= 0 && dy < -110) { setEntered(false); startY = null; }
+        }, { passive: true, signal: abort.signal });
+        addEventListener('touchend', () => (startY = null), { passive: true, signal: abort.signal });
+
+        addEventListener('keydown', (e) => {
+          if (entered || busy || e.defaultPrevented) return;
+          if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && e.target === document.body)) {
+            e.preventDefault();
+            setEntered(true);
+          }
+        }, { signal: abort.signal });
+      }
+    }
+
+    const cta = root.querySelector('[data-product-wall-cta]');
+    if (cta) {
+      cta.addEventListener('click', () => {
+        if (opening) { setEntered(true); return; }
+        // In the theme editor the wall is a normal section, so the button scrolls to whatever follows it.
+        const next = root.closest('.shopify-section') && root.closest('.shopify-section').nextElementSibling;
+        if (next) next.scrollIntoView({ behavior: 'smooth' });
+      }, { signal: abort.signal });
+    }
 
     const hoverShuffle = cfg.hoverShuffle !== 'false';
     const shuffleStrength = parseFloat(cfg.shuffle) || 1;
@@ -158,7 +250,7 @@
 
       // Pointer: every row reacts a little differently, so the wall shuffles.
       addEventListener('pointermove', (e) => {
-        if (e.pointerType !== 'mouse' || !hoverShuffle) return;
+        if (e.pointerType !== 'mouse' || !hoverShuffle || entered) return;
         state.nx = e.clientX / innerWidth;
         if (state.lastX !== null && !REDUCED.matches) {
           const dx = e.clientX - state.lastX;
@@ -174,7 +266,7 @@
 
       // Scrolling gives each row a push in its own direction.
       const push = (dy) => {
-        if (REDUCED.matches) return;
+        if (REDUCED.matches || entered) return;
         for (const r of rows) r.v = clamp(r.v + dy * (staticMode ? 5 * shuffleStrength : 3) * r.dir, -MAX_SPEED, MAX_SPEED);
       };
 
@@ -271,6 +363,7 @@
       function frame(now) {
         const dt = Math.min(0.05, (now - last) / 1000);
         last = now;
+        if (entered) { frameId = requestAnimationFrame(frame); return; }
         const ease = 1 - Math.exp(-dt * 1.6);
         const pEase = 1 - Math.exp(-dt * 5);
         const sEase = 1 - Math.exp(-dt * 8);
@@ -306,7 +399,7 @@
 
     return () => {
       abort.abort();
-      document.documentElement.classList.remove('product-wall-locked');
+      html.classList.remove('product-wall-locked', 'product-wall-opening');
       cancelAnimationFrame(frameId);
       if (observer) observer.disconnect();
       if (resizer) resizer.disconnect();
