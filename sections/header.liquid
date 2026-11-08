@@ -4,7 +4,7 @@
   assign overlay_text_color_scheme = section.settings.overlay_text_color_scheme
   assign show_icons = section.settings.show_icons
 
-  {% comment %}DISABLED: overlay header / scroll logo swap — forced off{% endcomment %}
+  # DISABLED: overlay header / scroll logo swap — forced off
   assign overlay_header = false
   assign overlay_header_with_sticky = false
   assign overlay_header_without_sticky = false
@@ -166,8 +166,6 @@
         --color-gridline: {{ section.settings.color_scheme.settings.text.rgb }};
       }
     {% endif %}
-    {% style %}
-{% endstyle %}
   {% endstyle %}
 {% endif %}
 
