@@ -124,7 +124,7 @@ h1, h2, h3, .text-heading-standard {
   font-weight: var(--price-weight);
   letter-spacing: var(--price-ls);
   font-variant-numeric: tabular-nums;
-  color: var(--gray);
+  color: var(--ink);
   -webkit-text-stroke: 0;
 }
 /* Sale price is the one price that takes the accent: orange-ink on paper */
@@ -208,8 +208,12 @@ hr, .border-gridline-color { border-color: var(--rule); }
   font-family: var(--font-mono);
   font-size: var(--body-size);
   line-height: var(--body-lh);
+  letter-spacing: var(--body-ls);
   color: var(--ink);
 }
+
+/* Record column: the label (left) is secondary, the value (right) is the main colour */
+.record__label { color: var(--gray); }
 
 /* Card price: after the general price rule so the offset applies */
 .product-tile-price, .product-tile-price * {
