@@ -56,6 +56,8 @@
 }
 
 /* ---- Description heading (desktop) ---- */
+.product-desc { margin-top: var(--info-desc-gap, 32px); }
+
 .product-desc__title {
   display: inline-block;
   margin: 0 0 16px;

@@ -187,7 +187,7 @@
 <section
   class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
   id="{{ section.id }}"
-  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %} --info-left: {{ section.settings.info_left_width | default: 33 }}%; --info-right: {{ section.settings.info_right_width | default: 33 }}%; --info-px-d: {{ section.settings.info_padding_x_desktop | default: 32 }}px; --info-py-d: {{ section.settings.info_padding_y_desktop | default: 24 }}px; --info-px-m: {{ section.settings.info_padding_x_mobile | default: 12 }}px; --info-py-m: {{ section.settings.info_padding_y_mobile | default: 16 }}px;"
+  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %} --info-desc-gap: {{ section.settings.info_desc_gap | default: 32 }}px; --info-left: {{ section.settings.info_left_width | default: 33 }}%; --info-right: {{ section.settings.info_right_width | default: 33 }}%; --info-px-d: {{ section.settings.info_padding_x_desktop | default: 32 }}px; --info-py-d: {{ section.settings.info_padding_y_desktop | default: 24 }}px; --info-px-m: {{ section.settings.info_padding_x_mobile | default: 12 }}px; --info-py-m: {{ section.settings.info_padding_y_mobile | default: 16 }}px;"
   x-data="
     Theme_Product({
       product: {{ product | json | escape }},
@@ -652,6 +652,16 @@
       "unit": "%",
       "label": "Right column (record list and buttons) width",
       "default": 33
+    },
+    {
+      "type": "range",
+      "id": "info_desc_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between price and description",
+      "default": 32
     },
     {
       "type": "header",
