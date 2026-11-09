@@ -243,3 +243,6 @@ hr, .border-gridline-color { border-color: var(--rule); }
   font-size: calc(var(--price-size) - var(--product-card-offset, 2px) - var(--recs-card-offset, 2px));
   line-height: calc(var(--price-lh) - var(--product-card-offset, 2px) - var(--recs-card-offset, 2px));
 }
+
+/* The product description fills its column, so Theme editor > Product information columns controls its width */
+.product-strip .product-desc__body, .product-strip .record-lede { max-width: none; }
