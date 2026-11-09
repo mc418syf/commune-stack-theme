@@ -55,7 +55,7 @@ html.edge-locked { overflow: hidden; }
 /* ---- Scrim + panel ---- */
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
-.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+.edge-panel { position: fixed; z-index: 50; left: 0; width: calc(var(--panel-w) + var(--rail-w)); padding-left: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
   display: flex; flex-direction: column; top: var(--edge-win-top, 0px); bottom: auto; max-height: calc(100vh - var(--edge-win-top, 0px)); max-height: calc(100dvh - var(--edge-win-top, 0px)); transition: transform 0.2s ease-out; }
 .edge-panel[data-tab='cart'] { top: auto; bottom: 0; max-height: 100vh; max-height: 100dvh; }
@@ -234,8 +234,19 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rail__v.is-active { color: var(--ink); }
 
 /* Extra colour layer under the text of every window (Header > Colour layer under the text) */
-.edge-panes { background: var(--vellum-text, transparent); }
-.edge-search__r { background-image: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)); }
 
 /* The rail labels sit on the same extra colour layer as the window text */
-.edge-rail { background-image: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)); }
+
+/* One sheet: the rail strip, the window behind its label and the window itself share the same layers */
+.edge-rail { background: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.edge-rail__bg, .edge-panel, .edge-search {
+  background: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)), var(--vellum-layer, var(--vellum));
+  -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+}
+.edge-rail__bg { position: fixed; z-index: 45; left: 0; top: 0; bottom: 0; width: var(--rail-w); pointer-events: none; }
+.edge-panes, .edge-search__r { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.edge-search { left: 0 !important; padding-left: var(--rail-w) !important; }
+@media (min-width: 768px) { .edge-search { width: calc(var(--panel-w) + var(--rail-w)) !important; } }
+
+/* No light divider lines between the sections of a window (the dashed list rules stay) */
+.edge-rule, .edge-sec, .edge-foot, .edge-switchrow, .edge-search__r { border-top: 0 !important; }

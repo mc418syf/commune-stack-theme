@@ -167,7 +167,7 @@
   /* ---------- search ---------- */
   function setSearchLabel(open) {
     const l = $('[data-edge-search-label]');
-    if (l) l.textContent = open ? '<Search>' : 'Search';
+    if (l) l.textContent = 'Search';
     const b = $('[data-edge-search]');
     if (b) b.setAttribute('aria-expanded', open);
   }
