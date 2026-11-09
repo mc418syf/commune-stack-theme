@@ -84,12 +84,11 @@
   :root {
     --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
-    --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
+    --tab-w: {{ section.settings.tab_width | default: 30 }}px;
     --strip-h: {{ section.settings.strip_height | default: 56 }}px;
   }
   @media (min-width: 768px) {
     :root {
-      --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
       --panel-w: {{ section.settings.panel_width | default: 380 }}px;
     }
   }
@@ -226,23 +225,14 @@
     },
     {
       "type": "range",
-      "id": "rail_width_desktop",
+      "id": "tab_width",
       "min": 24,
-      "max": 80,
+      "max": 48,
       "step": 2,
       "unit": "px",
-      "label": "Rail width, desktop",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "rail_width_mobile",
-      "min": 24,
-      "max": 64,
-      "step": 2,
-      "unit": "px",
-      "label": "Rail width, mobile",
-      "default": 36
+      "label": "Tab width",
+      "default": 30,
+      "info": "The width of the folder tabs on the left edge."
     },
     {
       "type": "range",
@@ -323,13 +313,13 @@
     {
       "type": "checkbox",
       "id": "tab_filter",
-      "label": "Filter tab",
+      "label": "Filter tab (collection pages)",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "tab_cart",
-      "label": "Cart tab inside the panel (cart and try-on)",
+      "label": "Cart window opens from the Cart tab",
       "default": true
     },
     {

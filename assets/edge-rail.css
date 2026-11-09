@@ -2,8 +2,8 @@
 /* Edge rail + products-first grid. Values follow the "Edge rail" design (desktop 1440, mobile 390).
    Rail 40px desktop / 36px mobile; panel 380px / calc(100vw - 36px); gutters 24px / 16px; breakpoint = theme md (768px). */
 
-:root { --tab-w: 30px; --edge-offset: calc(var(--rail-w) + var(--tab-w)); --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 36px; --panel-w: calc(100vw - var(--rail-w) - var(--tab-w)); --strip-h: 56px; --gut: 16px; }
-@media (min-width: 768px) { :root { --rail-w: 40px; --panel-w: 380px; --gut: 24px; } }
+:root { --tab-w: 30px; --edge-offset: calc(var(--rail-w) + var(--tab-w)); --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 0px; --panel-w: calc(100vw - var(--rail-w) - var(--tab-w)); --strip-h: 56px; --gut: 16px; }
+@media (min-width: 768px) { :root { --rail-w: 0px; --panel-w: 380px; --gut: 24px; } }
 
 body { padding-left: var(--edge-offset); }
 html.edge-locked { overflow: hidden; }
@@ -39,11 +39,11 @@ html.edge-locked { overflow: hidden; }
 }
 
 /* ---- Rail ---- */
-.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 0;
+.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: none; border-right: 0;
   display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 12px 0; }
 .edge-rail__group { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 /* Folder tabs: stick out of the spine's right edge, rounded on the outer side, text reads top to bottom */
-.edge-tab { position: relative; left: calc(var(--rail-w) - 1px); width: var(--tab-w); box-sizing: border-box; padding: 16px 0 !important; min-height: 44px;
+.edge-tab { position: relative; left: 0; width: var(--tab-w); box-sizing: border-box; padding: 16px 0 !important; min-height: 44px;
   writing-mode: vertical-rl; display: flex !important; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums;
   background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border: 1px solid var(--vellum-edge) !important; border-left: 0 !important; border-radius: 0 10px 10px 0 !important; color: var(--ink); }
@@ -69,13 +69,8 @@ html.edge-locked { overflow: hidden; }
 .edge-scrim.is-entering { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .edge-panel, .edge-scrim { transition: none; } }
 
-.edge-tabs { display: flex; align-items: flex-end; gap: 14px; height: 56px; padding: 0 var(--gut); border-bottom: 1px solid var(--rule); flex: none; overflow-x: auto; }
-.edge-tabs button { font-family: var(--font-display); font-weight: 600; font-size: 18px; line-height: 22px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gray);
-  min-height: 44px; min-width: 44px; padding: 0 0 10px !important; margin: 0 0 -1px; border-bottom: 2px solid transparent !important; white-space: nowrap; }
-.edge-tabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--ink) !important; }
-@media (min-width: 768px) { .edge-tabs { gap: 16px; } .edge-tabs button { font-size: 20px; line-height: 24px; } }
 
-.edge-panes { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.edge-panes { padding-top: 16px; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .edge-panes > [role='tabpanel'] { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
 .edge-panes > [hidden] { display: none; }
 [data-edge-filters] { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
