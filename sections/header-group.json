@@ -50,6 +50,7 @@
         "rail_width_mobile": 24,
         "panel_width": 380,
         "strip_height": 40,
+        "logo_align": "center",
         "show_cart": true,
         "show_search": true,
         "show_try_on": true,
