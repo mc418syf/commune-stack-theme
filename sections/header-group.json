@@ -36,9 +36,10 @@
       "settings": {
         "logo_max_width": 350,
         "logo_max_width_mobile": 120,
-        "edge_menu": "",
+        "edge_menu": "menu-1",
         "menu": "menu-1",
         "color_scheme": "scheme1",
+        "vellum_stack": true,
         "vellum_match_page": true,
         "vellum_color": "#f4f3ef",
         "vellum_opacity": 56,
@@ -60,7 +61,12 @@
         "tab_menu": true,
         "tab_filter": true,
         "tab_cart": true,
-        "tab_try_on": true
+        "tab_try_on": true,
+        "hover_expand": true,
+        "footer_menu": "footer",
+        "menu_footer_links": true,
+        "menu_newsletter": true,
+        "menu_social": true
       }
     }
   },
