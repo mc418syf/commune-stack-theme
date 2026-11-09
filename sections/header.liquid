@@ -84,7 +84,7 @@
   :root {
     --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
-    --tab-w: {{ section.settings.tab_width | default: 30 }}px;
+    --tab-h: {{ section.settings.tab_height | default: 30 }}px;
     --strip-h: {{ section.settings.strip_height | default: 56 }}px;
   }
   @media (min-width: 768px) {
@@ -225,14 +225,14 @@
     },
     {
       "type": "range",
-      "id": "tab_width",
+      "id": "tab_height",
       "min": 24,
       "max": 48,
       "step": 2,
       "unit": "px",
-      "label": "Tab width",
+      "label": "Tab height",
       "default": 30,
-      "info": "The width of the folder tabs on the left edge."
+      "info": "The height of the folder tabs along the top edge."
     },
     {
       "type": "range",
@@ -241,9 +241,9 @@
       "max": 560,
       "step": 10,
       "unit": "px",
-      "label": "Panel and search width, desktop",
+      "label": "Window width, desktop",
       "default": 380,
-      "info": "On mobile the panel fills the screen beside the rail."
+      "info": "Menu, Search, Filter and Cart windows drop down from the tabs. On mobile they are full width."
     },
     {
       "type": "range",
