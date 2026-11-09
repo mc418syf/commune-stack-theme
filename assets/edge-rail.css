@@ -56,12 +56,12 @@ html.edge-locked { overflow: hidden; }
 /* ---- Scrim + panel ---- */
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
-.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+.edge-panel { position: fixed; z-index: 50; left: 0; width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
-  display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out; }
+  display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out 0.06s; }
 .edge-panel[data-tab='cart'] { bottom: auto; }
 .edge-panel[data-tab='try'] { top: auto; bottom: 0; }
-.edge-panel.is-entering { transform: translateX(-100%); }
+.edge-panel.is-entering { transform: translateX(-100%); transition-delay: 0s; }
 .edge-scrim { transition: opacity 0.2s ease-out; }
 .edge-scrim.is-entering { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .edge-panel, .edge-scrim { transition: none; } }
@@ -227,7 +227,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-social__icon svg { width: 100%; height: 100%; fill: currentColor; }
 .edge-social__icon svg path { fill: currentColor; }
 
-/* The close x rides the sheet: when the panel is open it sits at the panel's right edge and slides back with it */
-.edge-rail__plus { transition: transform 0.2s ease-out; }
-.edge-rail.is-open .edge-rail__plus { transform: translateX(var(--panel-w)); }
-@media (prefers-reduced-motion: reduce) { .edge-rail__plus { transition: none; } }
+/* Opening pushes the rail out to the panel's right edge first, then the panel expands in the space it left */
+.edge-rail { transition: transform 0.2s ease-out; }
+.edge-rail.is-open { transform: translateX(var(--panel-w)); }
+@media (prefers-reduced-motion: reduce) { .edge-rail, .edge-panel { transition: none !important; } }
