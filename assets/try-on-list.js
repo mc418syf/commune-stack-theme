@@ -71,6 +71,7 @@ function tryOnPDP(btn) {
     price:        tryOnMoney(variant.price || btn.dataset.priceCents),
     image,
     url:          `${btn.dataset.url}?variant=${variantId}`,
+    sku:          variant.sku || '',
   });
 
   tryOnRefreshButton(btn);

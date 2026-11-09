@@ -1,0 +1,207 @@
+{%- comment -%}
+  Edge rail: left rail, top strip (switch · logo · filter summary), tools panel (Menu / Filter / Cart / Try-on) and search bar.
+  Cart and Try-on lines are drawn by assets/edge-rail.js from /cart.js and $store.tryOnList.
+  Params: header_logo (captured logo markup)
+{%- endcomment -%}
+
+{%- liquid
+  assign rail_menu = linklists[section.settings.edge_menu]
+  if rail_menu == blank or rail_menu.links.size == 0
+    assign rail_menu = linklists[section.settings.menu]
+  endif
+
+  assign filter_source = nil
+  if template.name == 'collection'
+    assign filter_source = collection.filters
+  elsif template.name == 'search'
+    assign filter_source = search.filters
+  endif
+
+  assign on_plp = false
+  if filter_source != blank
+    assign on_plp = true
+  endif
+
+  assign results_count = collection.products_count
+  if template.name == 'search'
+    assign results_count = search.results_count
+  endif
+
+  assign active_total = 0
+  assign summary = ''
+  assign avail_value = nil
+  if on_plp
+    for f in filter_source
+      if f.param_name == 'filter.v.availability'
+        assign avail_value = f.values | where: 'value', '1' | first
+      endif
+      if f.type != 'price_range' and f.param_name != 'filter.v.availability'
+        for v in f.active_values
+          assign active_total = active_total | plus: 1
+          if summary == ''
+            assign summary = v.label
+          else
+            assign summary = summary | append: ' · ' | append: v.label
+          endif
+        endfor
+      endif
+    endfor
+  endif
+-%}
+
+<div class="edge-strip__inner">
+  <div class="edge-strip__left">
+    {%- if on_plp and avail_value -%}
+      <button
+        type="button"
+        class="edge-switch"
+        role="switch"
+        aria-checked="{{ avail_value.active }}"
+        data-edge-switch
+        data-url-add="{{ avail_value.url_to_add }}"
+        data-url-remove="{{ avail_value.url_to_remove }}"
+      >
+        <i aria-hidden="true"></i>
+        <span class="edge-switch__d">Hide sold out</span>
+        <span class="edge-switch__m">In stock</span>
+      </button>
+    {%- endif -%}
+  </div>
+  <div class="edge-strip__logo">{{ header_logo }}</div>
+  <div class="edge-strip__right">
+    {%- if on_plp and active_total > 0 -%}
+      <button type="button" class="edge-summary" data-edge-open="filter">
+        <span class="edge-summary__d">&lt;{{ summary | escape }}&gt;</span>
+        <span class="edge-summary__m">Filter [{{ active_total }}]</span>
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+<nav class="edge-rail" aria-label="Edge rail" data-edge-rail>
+  <div class="edge-rail__group">
+    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Open cart">
+      <span class="edge-dot" aria-hidden="true"></span>
+      <span>Cart <span data-edge-count="cart">{{ cart.item_count }}</span></span>
+    </button>
+    <button type="button" class="edge-rail__v" data-edge-search aria-label="Search">
+      <span>Search</span>
+    </button>
+  </div>
+  <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Open menu">+</button>
+  <div class="edge-rail__group">
+    <button type="button" class="edge-rail__v" data-edge-open="try" aria-haspopup="dialog" aria-expanded="false" aria-label="Open try-on list">
+      <span class="edge-dot edge-dot--hollow" aria-hidden="true"></span>
+      <span>Try-on <span data-edge-count="try">0</span></span>
+    </button>
+  </div>
+  <noscript>
+    <ul class="edge-noscript">
+      <li><a href="{{ routes.cart_url }}">Cart</a></li>
+      <li><a href="{{ routes.search_url }}">Search</a></li>
+      <li><a href="/pages/try-in-store">Try-on</a></li>
+    </ul>
+  </noscript>
+</nav>
+
+<div class="edge-scrim" data-edge-scrim hidden></div>
+
+<section class="edge-panel" role="dialog" aria-modal="true" aria-label="Tools" data-edge-panel data-tab="menu" hidden>
+  <div class="edge-tabs" role="tablist" aria-label="Tools">
+    <button type="button" role="tab" id="edge-tab-menu" aria-controls="edge-pane-menu" aria-selected="true" data-edge-tab="menu">Menu</button>
+    <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter{% if active_total > 0 %} <span data-edge-count="filter">[{{ active_total }}]</span>{% endif %}</button>
+    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1">Cart <span data-edge-count="cart">{{ cart.item_count }}</span></button>
+    <button type="button" role="tab" id="edge-tab-try" aria-controls="edge-pane-try" aria-selected="false" data-edge-tab="try" tabindex="-1">Try-on <span data-edge-count="try">0</span></button>
+  </div>
+
+  <div class="edge-panes">
+    <div role="tabpanel" id="edge-pane-menu" aria-labelledby="edge-tab-menu" data-edge-pane="menu">
+      <ol class="edge-menu">
+        {%- if rail_menu != blank and rail_menu.links.size > 0 -%}
+          {%- for link in rail_menu.links -%}
+            <li>
+              <a class="edge-row" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+                <span class="edge-row__n">{{ forloop.index | prepend: '0' }}</span>
+                <span class="edge-row__l">{{ link.title }}</span>
+                {%- if forloop.first and link.url contains '/collections' -%}
+                  <span class="edge-row__c">[{{ collections.all.products_count }}]</span>
+                {%- endif -%}
+              </a>
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a class="edge-row" href="/collections/all"><span class="edge-row__n">01</span><span class="edge-row__l">Shop</span><span class="edge-row__c">[{{ collections.all.products_count }}]</span></a></li>
+          <li><a class="edge-row" href="/pages/book"><span class="edge-row__n">02</span><span class="edge-row__l">Appointment</span></a></li>
+          <li><a class="edge-row" href="/pages/information"><span class="edge-row__n">03</span><span class="edge-row__l">Information</span></a></li>
+          <li><a class="edge-row" href="{{ routes.account_url }}"><span class="edge-row__n">04</span><span class="edge-row__l">Customer information</span></a></li>
+        {%- endif -%}
+      </ol>
+    </div>
+
+    <div role="tabpanel" id="edge-pane-filter" aria-labelledby="edge-tab-filter" data-edge-pane="filter" hidden>
+      <div data-edge-filters>
+        {%- if on_plp -%}
+          <form class="edge-filters" data-edge-filter-form onsubmit="return false">
+            {%- for f in filter_source -%}
+              {%- if f.type == 'price_range' or f.param_name == 'filter.v.availability' -%}{%- continue -%}{%- endif -%}
+              {%- liquid
+                assign label = f.label
+                assign label_down = f.label | downcase
+                if label_down == 'vendor' or label_down == 'brand'
+                  assign label = 'Designer'
+                elsif label_down == 'product type' or label_down == 'type'
+                  assign label = 'Category'
+                endif
+                assign n_active = f.active_values.size
+              -%}
+              <div class="edge-group" data-edge-group>
+                <button type="button" class="edge-group__h" aria-expanded="false" data-edge-group-toggle>
+                  <span>{{ label }}{% if n_active > 0 %} [{{ n_active }}]{% endif %}</span>
+                  <span class="edge-group__s" aria-hidden="true">+</span>
+                </button>
+                <ul class="edge-group__list" hidden>
+                  {%- for v in f.values -%}
+                    <li>
+                      <button
+                        type="button"
+                        class="edge-opt"
+                        aria-pressed="{{ v.active }}"
+                        data-edge-url="{% if v.active %}{{ v.url_to_remove }}{% else %}{{ v.url_to_add }}{% endif %}"
+                        {% if v.count == 0 and v.active == false %}disabled{% endif %}
+                      >
+                        <span><span class="edge-opt__box" aria-hidden="true">{% if v.active %}[x]{% else %}[ ]{% endif %}</span> {{ v.label }}</span>
+                        <span class="edge-opt__c">{{ v.count }}</span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endfor -%}
+          </form>
+          <div class="edge-foot" data-edge-foot="filter">
+            <button type="button" class="edge-pill edge-pill--primary" data-edge-close>Show {{ results_count }} pieces</button>
+            <a class="edge-link" href="{{ collection.url | default: routes.search_url }}{% if template.name == 'search' %}?q={{ search.terms | escape }}{% endif %}" data-edge-clear>Clear all</a>
+          </div>
+        {%- else -%}
+          <p class="edge-empty">Filters appear on collection pages. <a class="edge-link" href="/collections/all">Browse the shop</a></p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div role="tabpanel" id="edge-pane-cart" aria-labelledby="edge-tab-cart" data-edge-pane="cart" hidden>
+      <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
+    </div>
+
+    <div role="tabpanel" id="edge-pane-try" aria-labelledby="edge-tab-try" data-edge-pane="try" hidden>
+      <div data-edge-list="try"><p class="edge-empty">Loading…</p></div>
+    </div>
+  </div>
+</section>
+
+<form class="edge-search" action="{{ routes.search_url }}" method="get" role="search" data-edge-searchbar hidden>
+  <label class="edge-search__l" for="edge-search-input">&lt;Search&gt;</label>
+  <input id="edge-search-input" class="edge-search__i" type="search" name="q" placeholder="Name, designer, category" autocomplete="off" data-edge-input>
+  <input type="hidden" name="options[prefix]" value="last">
+  <button type="button" class="edge-search__x" data-edge-search-close>Close ×</button>
+  <div class="edge-search__r" data-edge-results aria-live="polite"></div>
+</form>

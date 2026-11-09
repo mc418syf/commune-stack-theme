@@ -8,81 +8,7 @@
 </head>
   <head>
     {{ 'brand-list.css' | asset_url | stylesheet_tag }}
-    <!-- custom header transparent + hide-logo (paste after base.bundle.css) -->
-    <style>
-      /* ===== 使 header 下拉菜单背景透明（覆盖常见主题结构） ===== */
-      /* 注意：如果你的主题使用不同 class 名称，下面规则依然尽力覆盖多数情况 */
-
-      header[data-theme-header] .no-js-focus-container,
-      header[data-theme-header] .no-js-focus-container ul,
-      header[data-theme-header] .no-js-focus-container li,
-      header[data-theme-header] .no-js-focus-container a,
-      header[data-theme-header] .header-menu .dropdown,
-      header[data-theme-header] .header-menu .submenu,
-      header[data-theme-header] .desktop-megamenu,
-      header[data-theme-header] .desktop-megamenu .megamenu__panel,
-      .header-menu .no-js-focus-container,
-      .header-menu .dropdown,
-      .header-menu .submenu,
-      .header-menu .menu,
-      .megamenu,
-      .megamenu__panel,
-      .dropdown-menu {
-        background: transparent !important;        /* 背景透明 */
-        background-color: transparent !important;
-        box-shadow: none !important;              /* 去掉阴影 */
-        border: none !important;                  /* 去掉外层 border（如需保留可删除此行） */
-      }
-
-      /* 确保每个 <li> / 链接背景也透明（有些主题在 li 上填充） */
-      header[data-theme-header] .no-js-focus-container li,
-      header[data-theme-header] .no-js-focus-container a,
-      .header-menu .no-js-focus-container li,
-      .header-menu .no-js-focus-container a {
-        background: transparent !important;
-      }
-
-      /* 保留分割线（如果你想要仍有细线分隔项，可使用下面规则启用） */
-      /* 如果你不需要分隔线，注释掉下面两行 */
-      header[data-theme-header] .no-js-focus-container li + li,
-      .header-menu .no-js-focus-container li + li {
-        border-top: 1px solid rgba(0,0,0,0.08) !important; /* 可调整颜色/粗细 */
-      }
-
-      /* 如果菜单里有阴影下划线样式，确保去掉或变透明 */
-      header[data-theme-header] .no-js-focus-container,
-      .header-menu .no-js-focus-container {
-        -webkit-box-shadow: none !important;
-        box-shadow: none !important;
-      }
-
-      /* 文字保持可读：如果背景下内容颜色太杂，可以设一个半透明底或毛玻璃（可选） */
-      /* 取消注释下面两行可以改为半透明白并加点模糊（在现代浏览器中会有毛玻璃效果） */
-      /*
-      header[data-theme-header] .no-js-focus-container,
-      .header-menu .no-js-focus-container {
-        background: rgba(255,255,255,0.55) !important;
-        backdrop-filter: blur(6px) saturate(110%) !important;
-      }
-      */
-
-      /* 小屏 / mobile 也应用（按需） */
-      @media (max-width: 1023px) {
-        header[data-theme-header] .no-js-focus-container,
-        header[data-theme-header] .header-menu .dropdown {
-          background: transparent !important;
-          box-shadow: none !important;
-          border: none !important;
-        }
-      }
-
-      /* 防止被更高优先级选择器覆盖 — 保持文本渲染良好 */
-      header[data-theme-header] .no-js-focus-container a,
-      .header-menu .no-js-focus-container a {
-        color: inherit !important;
-        -webkit-font-smoothing: antialiased;
-        text-rendering: optimizeLegibility;
-      }
+        <style>
       .product-card__badge--sold-out,
       .badge--soldout,
       .badge--sold-out,
@@ -195,7 +121,7 @@
       {% comment %}theme-check-enable ParserBlockingScript{% endcomment %}
     {% endif %}
 
-    {% if settings.cart_type == 'drawer' or template == 'cart' %}
+    {% if template == 'cart' %}
       <script src="{{ 'cart-items.js' | asset_url }}" type="module"></script>
       <script src="{{ 'cart-footer.js' | asset_url }}" type="module"></script>
       {% if settings.cart_notes_enable %}
@@ -213,7 +139,6 @@
       ></script>
       {% comment %} If theme editor, load all modules {% endcomment %}
       <script src="{{ 'cart-count.js' | asset_url }}" type="module"></script>
-      <script src="{{ 'header.js' | asset_url }}" type="module"></script>
       {% if settings.predictive_search_enabled %}
         <script
           src="{{ 'predictive-search.js' | asset_url }}"
@@ -320,6 +245,7 @@
 
     {{ 'base.bundle.css' | asset_url | stylesheet_tag }}
     {{ 'commune-type.css' | asset_url | stylesheet_tag }}
+    {{ 'edge-rail.css' | asset_url | stylesheet_tag }}
     <meta name="google-site-verification" content="A5GAnSvB4HIADbrD586ctJWZ8CEMSPC9Yg26HksS3Os" />
   </head>
   <!-- REMOVED: custom-hide-logo-on-scroll script (caused half-logo glitch on page navigation) -->
@@ -329,7 +255,6 @@
     </a>
 
     {% sections 'header-group' %}
-    {%- section 'menu-drawer' -%}
     {% render 'header-group-support' %}
 
     <main id="MainContent">
@@ -369,13 +294,9 @@
 
     <script src="{{ 'modals.js' | asset_url }}" type="module"></script>
 
-    {% comment %} Modal contents {% endcomment %}
-    {% if settings.cart_type == 'drawer' %}
-      {% render 'drawer-cart' %}
-    {% endif %}
-
     {% comment %} Commune Try In-Store — store only (no drawer; header links to /pages/try-in-store) {% endcomment %}
     <script src="{{ 'try-on-list.js' | asset_url }}" defer></script>
+    <script src="{{ 'edge-rail.js' | asset_url }}" defer></script>
 
     <script
       src="{{ 'alpine.bundle.js' | asset_url }}"
