@@ -39,7 +39,7 @@
         "description_rWXWew": {
           "type": "description",
           "settings": {
-            "show_heading": true,
+            "show_heading": false,
             "description_tab_label": "Description"
           }
         },
@@ -115,10 +115,10 @@
         "desktop_layout": "strip",
         "strip_height": 70,
         "strip_gap": 0,
-        "info_left_width": 33,
-        "info_right_width": 33,
+        "info_left_width": 40,
+        "info_right_width": 30,
         "info_padding_x_desktop": 32,
-        "info_padding_y_desktop": 24,
+        "info_padding_y_desktop": 32,
         "info_padding_x_mobile": 12,
         "info_padding_y_mobile": 16,
         "two_media_per_row": true,
