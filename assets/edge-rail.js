@@ -404,6 +404,13 @@
     if (openGroupIndex() < 0) setGroup(0);
   }
 
+  function sortUrl(value) {
+    const u = new URL(location.href);
+    u.searchParams.set('sort_by', value);
+    u.searchParams.delete('page');
+    return u.pathname + u.search;
+  }
+
   let swapSeq = 0;
   async function applyUrl(url, push) {
     const seq = ++swapSeq;
@@ -488,7 +495,7 @@
       return setGroup(i === openGroupIndex() ? -1 : i);
     }
     const opt = t.closest('.edge-opt');
-    if (opt) return applyUrl(opt.dataset.edgeUrl);
+    if (opt) return applyUrl(opt.dataset.edgeUrl || sortUrl(opt.dataset.edgeSort));
     const clear = t.closest('[data-edge-clear]');
     if (clear) {
       e.preventDefault();

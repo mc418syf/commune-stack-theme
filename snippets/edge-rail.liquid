@@ -229,6 +229,32 @@
                 </ul>
               </div>
             {%- endfor -%}
+            {%- liquid
+              if template.name == 'search'
+                assign sort_opts = search.sort_options
+                assign cur_sort = search.sort_by | default: search.default_sort_by
+              else
+                assign sort_opts = collection.sort_options
+                assign cur_sort = collection.sort_by | default: collection.default_sort_by
+              endif
+            -%}
+            {%- if sort_opts.size > 0 -%}
+              <div class="edge-group" data-edge-group>
+                <button type="button" class="edge-group__h" aria-expanded="false" data-edge-group-toggle>
+                  <span>&lt;Sort by&gt;</span>
+                  <span class="edge-group__s" aria-hidden="true">+</span>
+                </button>
+                <ul class="edge-group__list" hidden>
+                  {%- for o in sort_opts -%}
+                    <li>
+                      <button type="button" class="edge-opt" aria-pressed="{% if o.value == cur_sort %}true{% else %}false{% endif %}" data-edge-sort="{{ o.value }}">
+                        <span class="edge-opt__l"><span class="edge-opt__box" aria-hidden="true"></span>{{ o.name }}</span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
           </form>
           <div class="edge-switchrow">
     {%- if show_switch != false -%}
@@ -253,7 +279,6 @@
     {%- endif -%}
           </div>
           <div class="edge-foot" data-edge-foot="filter">
-            <button type="button" class="edge-pill edge-pill--primary" data-edge-close>Show [{{ results_count }}] pieces</button>
             <a class="edge-link" href="{{ collection.url | default: routes.search_url }}{% if template.name == 'search' %}?q={{ search.terms | escape }}{% endif %}" data-edge-clear>Clear all</a>
           </div>
         {%- else -%}
