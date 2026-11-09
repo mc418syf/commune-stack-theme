@@ -110,7 +110,6 @@
           {%- for link in rail_menu.links -%}
             <li>
               <a class="edge-row" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
-                <span class="edge-row__n">{{ forloop.index | prepend: '0' }}</span>
                 <span class="edge-row__l">{{ link.title }}</span>
                 {%- if forloop.first and link.url contains '/collections' -%}
                   <span class="edge-row__c">[{{ collections.all.products_count }}]</span>
@@ -119,10 +118,10 @@
             </li>
           {%- endfor -%}
         {%- else -%}
-          <li><a class="edge-row" href="/collections/all"><span class="edge-row__n">01</span><span class="edge-row__l">Shop</span><span class="edge-row__c">[{{ collections.all.products_count }}]</span></a></li>
-          <li><a class="edge-row" href="/pages/book"><span class="edge-row__n">02</span><span class="edge-row__l">Appointment</span></a></li>
-          <li><a class="edge-row" href="/pages/information"><span class="edge-row__n">03</span><span class="edge-row__l">Information</span></a></li>
-          <li><a class="edge-row" href="{{ routes.account_url }}"><span class="edge-row__n">04</span><span class="edge-row__l">Customer information</span></a></li>
+          <li><a class="edge-row" href="/collections/all"><span class="edge-row__l">Shop</span><span class="edge-row__c">[{{ collections.all.products_count }}]</span></a></li>
+          <li><a class="edge-row" href="/pages/book"><span class="edge-row__l">Appointment</span></a></li>
+          <li><a class="edge-row" href="/pages/information"><span class="edge-row__l">Information</span></a></li>
+          <li><a class="edge-row" href="{{ routes.account_url }}"><span class="edge-row__l">Customer information</span></a></li>
         {%- endif -%}
       </ol>
       {%- assign footer_list = linklists[cfg.footer_menu] -%}
