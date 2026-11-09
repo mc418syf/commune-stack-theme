@@ -44,8 +44,6 @@ html.edge-locked { overflow: hidden; }
 .edge-rail__group { display: flex; flex-direction: column; align-items: center; gap: 28px; }
 .edge-rail__v { writing-mode: vertical-rl; transform: rotate(180deg); min-width: 44px; padding: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .edge-rail__v:hover { color: var(--ink); }
-.edge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); display: inline-block; flex: none; box-sizing: border-box; }
-.edge-dot--hollow { background: none; border: 1px solid var(--ink); }
 .edge-noscript { display: none; }
 .edge-rail button:focus-visible, .edge-panel button:focus-visible, .edge-panel a:focus-visible,
 .edge-search button:focus-visible, .edge-search input:focus-visible, .edge-switch:focus-visible, .edge-summary:focus-visible {
@@ -200,7 +198,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* ---- Menu tab: items, footer links, newsletter, social ---- */
 .edge-menu .edge-row { border-bottom: 0; }
 [data-edge-pane='menu'] { padding-bottom: 4px; }
-.edge-rule { border: 0; border-top: 1px solid var(--rule); margin: 4px var(--gut); flex: none; }
+.edge-rule { border: 0; border-top: 1px solid var(--rule); margin: 10px var(--gut); flex: none; }
 .edge-footlinks { list-style: none; margin: 0; padding: 0 var(--gut); }
 .edge-footlinks a { display: flex; align-items: center; min-height: 28px; color: var(--gray); text-decoration: none;
   font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -246,8 +244,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rail__bg { position: fixed; z-index: 45; left: 0; top: 0; bottom: 0; width: var(--rail-w); pointer-events: none; }
 .edge-panes, .edge-search__r { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
-/* No light divider lines between the sections of a window (the dashed list rules stay) */
-.edge-rule, .edge-sec, .edge-foot, .edge-switchrow, .edge-search__r { border-top: 0 !important; }
+/* Light divider lines show between the Menu sections and above Try-on in the Cart window; Filter and Search stay line-free */
+.edge-foot, .edge-switchrow, .edge-search__r { border-top: 0 !important; }
 
 /* Product titles in the Cart window: bold, in the product card's name style */
 .edge-panel .edge-line__name {

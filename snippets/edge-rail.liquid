@@ -88,7 +88,6 @@
   <div class="edge-rail__group">
     {%- if show_cart != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
-      <span class="edge-dot" aria-hidden="true"></span>
       <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
     </button>
     {%- endif -%}
