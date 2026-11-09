@@ -17,9 +17,9 @@
   list-style: none;
   border-top: 1px dashed var(--rec-divider);
   font-family: var(--body-font-stack);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
-  line-height: 16px;
+  line-height: 21px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
@@ -29,7 +29,7 @@
 .record__heading,
 .record__row {
   margin: 0;
-  padding: 7px 0;
+  padding: 6px 0;
   border-bottom: 1px dashed var(--rec-divider);
 }
 
