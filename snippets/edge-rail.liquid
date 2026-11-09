@@ -56,29 +56,7 @@
 -%}
 
 <div class="edge-strip__inner">
-  <div class="edge-strip__left">
-    {%- if on_plp and show_switch != false -%}
-      {%- comment -%} With the Availability filter enabled in Search & Discovery the switch uses filter.v.availability; without it, it hides sold-out cards on the page. {%- endcomment -%}
-      <button
-        type="button"
-        class="edge-switch"
-        role="switch"
-        {% if avail_value %}
-          aria-checked="{{ avail_value.active }}"
-          data-edge-switch
-          data-url-add="{{ avail_value.url_to_add }}"
-          data-url-remove="{{ avail_value.url_to_remove }}"
-        {% else %}
-          aria-checked="false"
-          data-edge-switch-local
-        {% endif %}
-      >
-        <i aria-hidden="true"></i>
-        <span class="edge-switch__d">Hide sold out</span>
-        <span class="edge-switch__m">In stock</span>
-      </button>
-    {%- endif -%}
-  </div>
+  <div class="edge-strip__left"></div>
   <div class="edge-strip__logo">{{ header_logo }}</div>
   <div class="edge-strip__right">
     {%- if on_plp and active_total > 0 -%}
@@ -204,6 +182,28 @@
               </div>
             {%- endfor -%}
           </form>
+          <div class="edge-switchrow">
+    {%- if show_switch != false -%}
+      {%- comment -%} With the Availability filter enabled in Search & Discovery the switch uses filter.v.availability; without it, it hides sold-out cards on the page. {%- endcomment -%}
+      <button
+        type="button"
+        class="edge-switch"
+        role="switch"
+        {% if avail_value %}
+          aria-checked="{{ avail_value.active }}"
+          data-edge-switch
+          data-url-add="{{ avail_value.url_to_add }}"
+          data-url-remove="{{ avail_value.url_to_remove }}"
+        {% else %}
+          aria-checked="false"
+          data-edge-switch-local
+        {% endif %}
+      >
+        <i aria-hidden="true"></i>
+        <span>Hide sold out</span>
+      </button>
+    {%- endif -%}
+          </div>
           <div class="edge-foot" data-edge-foot="filter">
             <button type="button" class="edge-pill edge-pill--primary" data-edge-close>Show [{{ results_count }}] pieces</button>
             <a class="edge-link" href="{{ collection.url | default: routes.search_url }}{% if template.name == 'search' %}?q={{ search.terms | escape }}{% endif %}" data-edge-clear>Clear all</a>

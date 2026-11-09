@@ -340,6 +340,7 @@
         }
       );
       if (push !== false) history.pushState({ edge: true }, '', url);
+      syncLocalSwitch();
       setGroup(gi < 0 ? 0 : gi);
       if (focusPath && focusPath[0] > -1) {
         const g = $$('[data-edge-group]')[focusPath[0]];
@@ -366,6 +367,10 @@
     btn.setAttribute('aria-checked', on);
     document.documentElement.classList.toggle('edge-hide-soldout', on);
     try { localStorage.setItem(SOLD_KEY, on ? '1' : '0'); } catch (_) {}
+  }
+  function syncLocalSwitch() {
+    const btn = $('[data-edge-switch-local]');
+    if (btn) btn.setAttribute('aria-checked', document.documentElement.classList.contains('edge-hide-soldout'));
   }
   function restoreLocalSwitch() {
     const btn = $('[data-edge-switch-local]');

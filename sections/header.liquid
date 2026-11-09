@@ -90,7 +90,7 @@
   id="{{ section.id }}"
   data-theme-header
 >
-  <header class="edge-strip text-scheme-text" data-color-scheme="{{ section_color }}">
+  <header class="edge-strip text-scheme-text" data-color-scheme="{{ section_color }}" data-plp="{% if template.name == 'collection' or template.name == 'search' %}true{% else %}false{% endif %}">
     {% render 'edge-rail', header_logo: header_logo, section: section %}
   </header>
 </header-section>

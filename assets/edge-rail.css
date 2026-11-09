@@ -156,7 +156,6 @@ html.edge-locked { overflow: hidden; }
 }
 
 /* ---- PLP: products first. Flush grid, no gutters; name and price on hover (desktop) or under the photo (mobile). ---- */
-#filterable { padding-top: var(--strip-h); }
 #results .collection-list { gap: 0 !important; padding: 0 !important; margin: 0 !important; }
 #results .collection-list > li { padding: 0 !important; }
 #results .collection-list .group > .relative > .w-full { padding: 0 !important; border: 0 !important; }
@@ -185,3 +184,9 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* filter option text: 9px (needs the panel prefix to beat the shared button reset) */
 .edge-panel .edge-opt, .edge-panel .edge-opt__c, .edge-panel .edge-opt__l { font-size: 9px !important; line-height: 12px !important; letter-spacing: 0.04em !important; }
+
+/* PLP: the logo strip is transparent, sits over the grid and sticks while scrolling; only the logo and summary take clicks */
+.edge-strip[data-plp='true'] { position: fixed; left: var(--rail-w); right: 0; background: transparent; pointer-events: none; }
+.edge-strip[data-plp='true'] a, .edge-strip[data-plp='true'] button { pointer-events: auto; }
+.edge-switchrow { flex: none; padding: 0 var(--gut); border-top: 1px solid var(--rule); border-bottom: 1px dashed var(--rule-dashed); }
+.edge-switchrow .edge-switch { min-height: 44px; width: 100%; gap: 10px; }
