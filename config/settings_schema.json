@@ -989,7 +989,7 @@
         "step": 1,
         "unit": "px",
         "default": 14,
-        "info": "Cards, grid, search, cart and product page."
+        "info": "Product page and cart. Product cards are smaller by the card offset in Product text. Buttons use this size too."
       },
       {
         "type": "select",
@@ -1157,16 +1157,6 @@
       {
         "type": "header",
         "content": "Buttons"
-      },
-      {
-        "type": "range",
-        "id": "size_button",
-        "label": "Size",
-        "min": 11,
-        "max": 28,
-        "step": 1,
-        "unit": "px",
-        "default": 13
       },
       {
         "type": "select",

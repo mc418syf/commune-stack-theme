@@ -23,7 +23,7 @@
   --label-size: var(--cfg-label-size, 11px);   --label-lh: calc(var(--label-size) * 1.27); --label-ls: var(--cfg-label-ls, 0.08em);
   --body-size: var(--cfg-body-size, 13px);     --body-lh: calc(var(--body-size) * 1.62);
   --tab-size: var(--cfg-tab-size-m, 18px);     --tab-lh: calc(var(--tab-size) * 1.22);    --tab-ls: var(--cfg-tab-ls, 0.04em);
-  --button-size: var(--cfg-button-size, 13px);
+  --button-size: var(--name-size); /* buttons match the product name */
 
   --hero-weight: var(--cfg-hero-weight, 600);   --head-weight: var(--cfg-head-weight, 600);
   --mark-weight: var(--cfg-mark-weight, 600);   --name-weight: var(--cfg-name-weight, 600);
@@ -101,7 +101,18 @@ h1, h2, h3, .text-heading-standard {
   text-transform: uppercase;
   -webkit-text-stroke: 0;
 }
-.product-tile-meta { font-size: var(--name-size); line-height: var(--name-lh); }
+
+/* Product cards (collection grid, search, recommendations) are the product page sizes minus the card offset
+   (Theme settings > Product text) */
+.product-tile-meta { font-size: calc(var(--name-size) - var(--product-card-offset, 2px)); line-height: calc(var(--name-lh) - var(--product-card-offset, 2px)); }
+.product-tile-vendor, .product-tile-title, .product-tile-vendor a, .product-tile-title a {
+  font-size: calc(var(--name-size) - var(--product-card-offset, 2px));
+  line-height: calc(var(--name-lh) - var(--product-card-offset, 2px));
+}
+.product-tile-price, .product-tile-price * {
+  font-size: calc(var(--price-size) - var(--product-card-offset, 2px));
+  line-height: calc(var(--price-lh) - var(--product-card-offset, 2px));
+}
 
 [data-product-root] .product-vendor-block, [data-product-root] .product-vendor-block a { color: var(--ink); }
 

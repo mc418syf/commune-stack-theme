@@ -59,7 +59,7 @@
     "product_name_weight_card": "600",
     "product_vendor_title_gap": 0,
     "product_title_price_gap": 6,
-    "product_card_size_offset": 0,
+    "product_card_size_offset": 2,
     "product_info_letterspacing": "0.1em",
     "product_price_size": 12,
     "quick_buy_variant_picker_option_style": "text_underline",
