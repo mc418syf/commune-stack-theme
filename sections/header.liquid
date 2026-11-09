@@ -60,6 +60,7 @@
 
 {%- liquid
   assign vellum_alpha = section.settings.vellum_opacity | default: 72 | divided_by: 100.0
+  assign strip_alpha = section.settings.strip_opacity | default: 35 | divided_by: 100.0
   assign vellum_rgb = section.settings.vellum_color | default: '#F4F3EF' | color_to_rgb | remove: 'rgb(' | remove: ')'
 -%}
 {% style %}
@@ -73,6 +74,8 @@
   :root {
     --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
+    --strip-bg: rgba({{ vellum_rgb }}, {{ strip_alpha }});
+    --strip-blur: {{ section.settings.strip_blur | default: 12 }}px;
     --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
     --strip-h: {{ section.settings.strip_height | default: 56 }}px;
   }
@@ -90,7 +93,7 @@
   id="{{ section.id }}"
   data-theme-header
 >
-  <header class="edge-strip text-scheme-text" data-color-scheme="{{ section_color }}">
+  <header class="edge-strip text-scheme-text" data-color-scheme="{{ section_color }}" data-sticky="{{ section.settings.strip_sticky | default: true }}">
     {% render 'edge-rail', header_logo: header_logo, section: section %}
   </header>
 </header-section>
@@ -172,6 +175,27 @@
       "default": 18
     },
     {
+      "type": "range",
+      "id": "strip_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Logo strip opacity",
+      "default": 35,
+      "info": "0 is fully transparent."
+    },
+    {
+      "type": "range",
+      "id": "strip_blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Logo strip blur",
+      "default": 12
+    },
+    {
       "type": "color",
       "id": "ink_color",
       "label": "Text colour",
@@ -239,6 +263,13 @@
       "unit": "px",
       "label": "Logo strip height",
       "default": 56
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_sticky",
+      "label": "Sticky logo strip",
+      "default": true,
+      "info": "Keeps the logo strip at the top while scrolling."
     },
     {
       "type": "header",
