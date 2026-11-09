@@ -55,12 +55,12 @@
     "under_image_display_format": "title_left_price_under",
     "quick_buy_position": "over_image",
     "title_price_display": "over_image_bottom",
-    "product_info_size": 13,
-    "product_name_weight_card": "500",
+    "product_info_size": 14,
+    "product_name_weight_card": "600",
     "product_vendor_title_gap": 0,
     "product_title_price_gap": 6,
-    "product_card_size_offset": 2,
-    "product_info_letterspacing": "0em",
+    "product_card_size_offset": 0,
+    "product_info_letterspacing": "0.1em",
     "product_price_size": 12,
     "quick_buy_variant_picker_option_style": "text_underline",
     "enable_breadcrumbs": false,
@@ -95,7 +95,7 @@
     "favicon": "shopify://shop_images/commune_2_61e6ab6d-7427-4dc0-998e-3473a33ae5d3.jpg",
     "currency_code_enabled": true,
     "product_text_gap": 0,
-    "heading_font_weight_override": "500",
+    "heading_font_weight_override": "600",
     "social_twitter_link": "",
     "social_vimeo_link": "",
     "full_bleed_grid": true,
@@ -119,11 +119,11 @@
     "color_schemes": {
       "scheme1": {
         "settings": {
-          "background": "#ebebeb",
-          "text": "#000000",
-          "accent": "#000000",
-          "accent_contrast": "#fcfcfc",
-          "secondary": "#000000"
+          "background": "#F4F3EF",
+          "text": "#111111",
+          "accent": "#FF5A1F",
+          "accent_contrast": "#111111",
+          "secondary": "#6B6B66"
         }
       },
       "scheme2": {

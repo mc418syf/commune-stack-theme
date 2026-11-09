@@ -176,7 +176,7 @@ html.product-wall-opening .product-wall.is-gone { visibility: hidden; }
   align-items: center;
   gap: 6px;
   transform: translateX(-50%);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: .14em;
   text-transform: uppercase;
   pointer-events: none;

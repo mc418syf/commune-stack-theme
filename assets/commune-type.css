@@ -1,0 +1,165 @@
+/* Commune type system. Condensed caps carry the brand voice, mono carries facts, orange is the one accent.
+   Tokens first, then one rule group per row of the type scale. Loaded after base.bundle.css. */
+
+:root {
+  --font-display: var(--heading-font-stack), 'Barlow Condensed', sans-serif;
+  --font-mono: var(--body-font-stack), 'IBM Plex Mono', monospace;
+
+  --paper: #F4F3EF;
+  --ink: #111111;
+  --gray: #6B6B66;
+  --rule: #D9D8D2;
+  --rule-dashed: #CFCDC6;
+  --orange: #FF5A1F;      /* fills, rules, dots; ink text on top */
+  --orange-ink: #C23B05;  /* orange text or links on paper */
+
+  /* Type scale: size / line-height, weight, letter-spacing */
+  --hero-size: 40px;       --hero-lh: 38px;       --hero-ls: 0.02em;
+  --head-size: 22px;       --head-lh: 24px;       --head-ls: 0.10em;
+  --mark-size: 18px;       --mark-lh: 22px;       --mark-ls: 0.32em;
+  --name-size: 14px;       --name-lh: 18px;       --name-ls: 0.10em;
+  --price-size: 12px;      --price-lh: 16px;
+  --label-size: 11px;      --label-lh: 14px;      --label-ls: 0.08em;
+  --body-size: 13px;       --body-lh: 21px;
+  --tab-size: 18px;        --tab-lh: 22px;        --tab-ls: 0.04em;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --hero-size: 64px; --hero-lh: 60px;
+    --head-size: 28px; --head-lh: 30px;
+    --mark-size: 20px; --mark-lh: 24px;
+    --tab-size: 20px;  --tab-lh: 24px;
+  }
+}
+
+/* ---- Base: body, descriptions ---- */
+html, body {
+  font-family: var(--font-mono);
+  font-size: var(--body-size);
+  line-height: var(--body-lh);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.rte, .rte p, .rte li { font-size: var(--body-size); line-height: var(--body-lh); }
+.rte { max-width: 56ch; }
+
+/* ---- Hero / display and section head ---- */
+.text-heading-feature, .text-heading-secondary {
+  font-family: var(--font-display);
+  font-size: var(--hero-size);
+  line-height: var(--hero-lh);
+  font-weight: 600;
+  letter-spacing: var(--hero-ls);
+  text-transform: uppercase;
+}
+
+h1, h2, h3, .text-heading-standard {
+  font-family: var(--font-display);
+  font-size: var(--head-size);
+  line-height: var(--head-lh);
+  font-weight: 600;
+  letter-spacing: var(--head-ls);
+  text-transform: uppercase;
+}
+
+/* ---- Wordmark ---- */
+[data-theme-header] header [data-wordmark],
+[data-theme-header] header .wordmark {
+  font-family: var(--font-display);
+  font-size: var(--mark-size);
+  line-height: var(--mark-lh);
+  font-weight: 600;
+  letter-spacing: var(--mark-ls);
+  text-transform: uppercase;
+}
+
+/* ---- Product name: cards, grid, search, cart, product page ---- */
+.product-tile-vendor, .product-tile-title,
+[data-product-root] .product-vendor-block, [data-product-root] .product-vendor-block a,
+[data-product-root] .product-title-block, [data-product-root] .product-title-block a,
+.cart-item-name, #CartDrawer .cart-item-title {
+  font-family: var(--font-display);
+  font-size: var(--name-size);
+  line-height: var(--name-lh);
+  font-weight: 600;
+  letter-spacing: var(--name-ls);
+  text-transform: uppercase;
+  -webkit-text-stroke: 0;
+}
+.product-tile-meta { font-size: var(--name-size); line-height: var(--name-lh); }
+
+/* ---- Price ---- */
+.product-tile-price, .product-tile-price *,
+[data-product-root] .product-price-block, [data-product-root] .product-price-block * {
+  font-family: var(--font-mono);
+  font-size: var(--price-size);
+  line-height: var(--price-lh);
+  font-weight: 400;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--gray);
+  -webkit-text-stroke: 0;
+}
+/* Sale price is the one price that takes the accent: orange-ink on paper */
+.product-tile-price .text-scheme-accent, [data-product-root] .product-price-block .text-scheme-accent { color: var(--orange-ink); }
+
+/* ---- Nav, labels, tags, filters ---- */
+[data-theme-header] header a, [data-theme-header] header button, [data-theme-header] header nav span,
+#filter-drop-down-toggle, #sort-drop-down-toggle,
+#filterable .filters-wrapper h3, #filterable [data-fragment-id='filters-form-sidebar'] h3,
+#filterable label, .product-tile-tag, .sold-out-tag, footer h2, footer h3, footer a {
+  font-family: var(--font-mono);
+  font-size: var(--label-size);
+  line-height: var(--label-lh);
+  font-weight: 400;
+  letter-spacing: var(--label-ls);
+  text-transform: uppercase;
+  -webkit-text-stroke: 0;
+}
+
+/* ---- Tabs and the description heading ---- */
+.product-desc__title {
+  font-family: var(--font-display);
+  font-size: var(--tab-size);
+  line-height: var(--tab-lh);
+  font-weight: 600;
+  letter-spacing: var(--tab-ls);
+}
+
+/* ---- Buttons: mono 13px caps; primary orange with ink text, secondary 1px ink border. Shape stays as the theme sets it ---- */
+.theme-button, .add-to-cart, #addToCartButton, [data-try-on-pdp], button[type='submit'] {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0;
+}
+.theme-button, .add-to-cart, #addToCartButton {
+  background-color: var(--orange);
+  border-color: var(--orange);
+  color: var(--ink);
+}
+.theme-button--secondary, [data-try-on-pdp] {
+  background-color: transparent;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+}
+
+/* ---- Inputs ---- */
+input, select, textarea { font-family: var(--font-mono); font-size: var(--body-size); letter-spacing: 0; color: var(--ink); }
+
+/* ---- Links: no underline for emphasis; underline on hover or focus; inline text links get an offset ---- */
+a { text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; text-decoration-color: var(--orange); text-underline-offset: 3px; }
+.rte a, p a { text-decoration: underline; text-underline-offset: 3px; }
+em, i, .italic { font-style: normal; }
+
+/* ---- Focus ring ---- */
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+/* ---- Rules ---- */
+hr, .border-gridline-color { border-color: var(--rule); }
