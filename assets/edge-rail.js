@@ -110,6 +110,12 @@
   }
 
   /* ---------- search ---------- */
+  function setSearchLabel(open) {
+    const l = $('[data-edge-search-label]');
+    if (l) l.textContent = open ? '<Search>' : 'Search';
+    const b = $('[data-edge-search]');
+    if (b) b.setAttribute('aria-expanded', open);
+  }
   function openSearch(trigger) {
     if (isOpen) {
       isOpen = false;
@@ -120,12 +126,14 @@
     }
     lastTrigger = trigger;
     bar.hidden = false;
+    setSearchLabel(true);
     input.focus();
     renderResults(null);
   }
   function closeSearch() {
     if (bar.hidden) return;
     bar.hidden = true;
+    setSearchLabel(false);
     results.innerHTML = '';
     input.value = '';
   }
@@ -134,7 +142,7 @@
   let sSeq = 0;
   function renderResults(products) {
     if (products === null) {
-      results.innerHTML = '<p class="edge-empty">Search by piece name. Try vest or jacket.</p>';
+      results.innerHTML = '';
     } else if (!products.length) {
       results.innerHTML = '<p class="edge-empty">&lt;No match&gt;</p>';
     } else {

@@ -197,3 +197,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-strip[data-logo='left'] .edge-strip__logo { position: absolute; left: var(--gut); top: 0; bottom: 0; }
 .edge-strip[data-logo='right'] .edge-strip__logo { position: absolute; right: var(--gut); top: 0; bottom: 0; }
 .edge-strip[data-logo='right'] .edge-strip__right { right: auto; left: var(--gut); justify-content: flex-start; }
+
+/* Search bar: no <Search> label, input starts at the gutter; close is a bare × */
+@media (min-width: 768px) { .edge-search__i { padding-left: var(--gut) !important; } }
+.edge-search__x { font-size: 16px !important; letter-spacing: 0 !important; min-width: 44px; }

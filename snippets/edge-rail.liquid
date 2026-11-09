@@ -78,7 +78,7 @@
     {%- endif -%}
     {%- if show_search != false -%}
     <button type="button" class="edge-rail__v" data-edge-search aria-label="Search">
-      <span>Search</span>
+      <span data-edge-search-label>Search</span>
     </button>
     {%- endif -%}
   </div>
@@ -225,9 +225,8 @@
 </section>
 
 <form class="edge-search" action="{{ routes.search_url }}" method="get" role="search" data-edge-searchbar hidden>
-  <label class="edge-search__l" for="edge-search-input">&lt;Search&gt;</label>
-  <input id="edge-search-input" class="edge-search__i" type="search" name="q" placeholder="Name, designer, category" autocomplete="off" data-edge-input>
+  <input id="edge-search-input" class="edge-search__i" type="search" name="q" placeholder="Name, designer, category" autocomplete="off" data-edge-input aria-label="Search">
   <input type="hidden" name="options[prefix]" value="last">
-  <button type="button" class="edge-search__x" data-edge-search-close>Close ×</button>
+  <button type="button" class="edge-search__x" data-edge-search-close aria-label="Close search">×</button>
   <div class="edge-search__r" data-edge-results aria-live="polite"></div>
 </form>
