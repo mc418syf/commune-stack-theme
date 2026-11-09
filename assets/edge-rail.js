@@ -316,7 +316,6 @@
           )
         )
         .join('') +
-      '<div class="edge-ledger"><span>Payment</span><span>&lt;None, try only&gt;</span></div>' +
       '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="/pages/book">Book a fitting</a></div></div>';
   }
 

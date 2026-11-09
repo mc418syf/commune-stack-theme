@@ -250,3 +250,9 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* No light divider lines between the sections of a window (the dashed list rules stay) */
 .edge-rule, .edge-sec, .edge-foot, .edge-switchrow, .edge-search__r { border-top: 0 !important; }
+
+/* Product titles in the Cart window: bold, in the product card's name style */
+.edge-panel .edge-line__name {
+  font-family: var(--font-display) !important; font-weight: 600 !important; font-size: var(--name-size, 13px) !important;
+  line-height: var(--name-lh, 18px) !important; letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase !important;
+}
