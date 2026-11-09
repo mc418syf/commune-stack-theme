@@ -55,9 +55,11 @@ html.edge-locked { overflow: hidden; }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
 .edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
-  display: flex; flex-direction: column; top: var(--edge-win-top, 0px); bottom: auto; max-height: calc(100vh - var(--edge-win-top, 0px)); max-height: calc(100dvh - var(--edge-win-top, 0px)); transition: transform 0.2s ease-out; }
+  display: flex; flex-direction: column; top: var(--edge-win-top, 0px); bottom: auto; max-height: calc(100vh - var(--edge-win-top, 0px)); max-height: calc(100dvh - var(--edge-win-top, 0px)); transition: clip-path 0.2s ease-out;
+  clip-path: inset(-24px -24px -24px calc(-1 * var(--rail-w))); }
 .edge-panel[data-tab='cart'] { top: auto; bottom: 0; max-height: 100vh; max-height: 100dvh; }
-.edge-panel.is-entering { transform: translateX(-100%); transition-delay: 0s; }
+/* The window opens out from the rail's right edge (it is revealed left to right), not from the screen edge behind the rail */
+.edge-panel.is-entering { clip-path: inset(-24px 100% -24px 0); transition-delay: 0s; }
 .edge-scrim { transition: opacity 0.2s ease-out; }
 .edge-scrim.is-entering { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .edge-panel, .edge-scrim { transition: none; } }
