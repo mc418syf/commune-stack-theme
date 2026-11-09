@@ -64,10 +64,20 @@
 
   /* ---------- panel ---------- */
   // Each rail button opens its own window: one pane per button, no tab row inside the panel
+  function positionWindow(tab) {
+    const btn = $('[data-edge-rail] [data-edge-open="' + tab + '"]');
+    if (!btn || tab === 'cart') {
+      panel.style.removeProperty('--edge-win-top');
+      return;
+    }
+    panel.style.setProperty('--edge-win-top', Math.max(0, Math.round(btn.getBoundingClientRect().top)) + 'px');
+  }
+
   function setTab(tab) {
     const names = $$('[data-edge-pane]', panel).map((p) => p.dataset.edgePane);
     if (names.indexOf(tab) < 0) tab = names[0] || 'menu';
     panel.dataset.tab = tab;
+    positionWindow(tab);
     panel.setAttribute('aria-label', WINDOW_LABELS[tab] || 'Tools');
     $$('[data-edge-pane]', panel).forEach((p) => (p.hidden = p.dataset.edgePane !== tab));
     if (tab === 'cart') {
@@ -170,6 +180,11 @@
       syncTriggers();
     }
     lastTrigger = trigger;
+    const sb = $('[data-edge-search]');
+    if (sb) {
+      const r = sb.getBoundingClientRect();
+      bar.style.setProperty('--edge-win-top', Math.max(0, Math.round(r.top + r.height / 2 - 28)) + 'px');
+    }
     bar.hidden = false;
     setSearchLabel(true);
     input.focus();
@@ -541,6 +556,10 @@
 
   /* after a newsletter sign-up the page reloads with ?customer_posted=true: show the result */
   if (/customer_posted=true/.test(location.search) && $('[data-edge-news-ok]')) openPanel('menu', plus);
+
+  window.addEventListener('resize', () => {
+    if (isOpen) positionWindow(panel.dataset.tab);
+  });
 
   /* ---------- init ---------- */
   restoreLocalSwitch();
