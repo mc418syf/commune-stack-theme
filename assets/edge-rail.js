@@ -13,7 +13,9 @@
   const panel = $('[data-edge-panel]');
   if (!panel) return;
   const scrim = $('[data-edge-scrim]');
-  const plus = $('[data-edge-toggle]');
+  const railEl = $('[data-edge-rail]');
+  const homeTab = $('[data-edge-open="menu"]') || $('[data-edge-open="cart"]') || $('[data-edge-search]');
+  const cartTab = $('[data-edge-open="cart"]') || homeTab;
   const bar = $('[data-edge-searchbar]');
   const input = $('[data-edge-input]');
   const results = $('[data-edge-results]');
@@ -60,21 +62,27 @@
       if (on && focusTab) b.focus();
     });
     $$('[data-edge-pane]', panel).forEach((p) => (p.hidden = p.dataset.edgePane !== tab));
-    if (tab === 'cart') refreshCart();
-    if (tab === 'try') renderTry();
+    if (tab === 'cart') {
+      refreshCart();
+      renderTry();
+    }
     if (tab === 'filter') ensureGroupOpen();
     syncTriggers();
   }
 
   function syncTriggers() {
-    const railEl = $('[data-edge-rail]');
-    if (railEl) railEl.classList.toggle('is-open', isOpen);
-    plus.textContent = isOpen ? '×' : '+';
-    plus.setAttribute('aria-label', isOpen ? 'Close panel' : 'Open menu');
-    plus.setAttribute('aria-expanded', isOpen);
-    $$('[data-edge-open="cart"], [data-edge-open="try"]', $('[data-edge-rail]')).forEach((b) =>
-      b.setAttribute('aria-expanded', isOpen && panel.dataset.tab === b.dataset.edgeOpen)
-    );
+    const searchOpen = !bar.hidden;
+    if (railEl) {
+      railEl.classList.toggle('is-open', isOpen);
+      railEl.classList.toggle('is-open-search', searchOpen);
+    }
+    $$('[data-edge-open="menu"], [data-edge-open="cart"]', railEl).forEach((b) => {
+      const on = isOpen && panel.dataset.tab === b.dataset.edgeOpen;
+      b.setAttribute('aria-expanded', on);
+      b.classList.toggle('is-active', on);
+    });
+    const st = $('[data-edge-search]');
+    if (st) st.classList.toggle('is-active', searchOpen);
   }
 
   let pinned = false;
@@ -90,7 +98,7 @@
   function openPanel(tab, trigger, hover) {
     closeSearch();
     clearTimeout(closeTimer);
-    lastTrigger = trigger || lastTrigger || plus;
+    lastTrigger = trigger || lastTrigger || homeTab;
     const wasOpen = isOpen;
     isOpen = true;
     if (!wasOpen) pinned = !hover;
@@ -133,12 +141,12 @@
       },
       reduceMotion ? 0 : 220
     );
-    if (restoreFocus !== false) (lastTrigger || plus).focus();
+    if (restoreFocus !== false) (lastTrigger || homeTab).focus();
   }
 
   function focusables() {
     const sel = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
-    return $$(sel, panel).filter((el) => !el.closest('[hidden]') && el.tabIndex >= 0).concat([plus]);
+    return $$(sel, panel).filter((el) => !el.closest('[hidden]') && el.tabIndex >= 0).concat($$('[data-edge-rail] button'));
   }
 
   /* ---------- search ---------- */
@@ -158,7 +166,11 @@
     }
     lastTrigger = trigger;
     bar.hidden = false;
+    bar.classList.add('is-entering');
+    void bar.offsetWidth;
+    setTimeout(() => bar.classList.remove('is-entering'), 20);
     setSearchLabel(true);
+    syncTriggers();
     input.focus();
     renderResults(null);
   }
@@ -166,6 +178,7 @@
     if (bar.hidden) return;
     bar.hidden = true;
     setSearchLabel(false);
+    syncTriggers();
     results.innerHTML = '';
     input.value = '';
   }
@@ -424,12 +437,9 @@
     const t = e.target;
     const open = t.closest('[data-edge-open]');
     if (open) {
+      if (isOpen && pinned && panel.dataset.tab === open.dataset.edgeOpen) return closePanel();
       pin();
       return openPanel(open.dataset.edgeOpen, open);
-    }
-    if (t.closest('[data-edge-toggle]')) {
-      if (isOpen && !pinned) return pin();
-      return isOpen ? closePanel() : openPanel('menu', plus);
     }
     if (t.closest('[data-edge-search]')) return openSearch(t.closest('[data-edge-search]'));
     if (t.closest('[data-edge-search-close]')) {
@@ -486,8 +496,8 @@
   });
 
   /* PDP: Add to cart opens the Cart tab, Try in-store opens the Try-on tab */
-  document.body.addEventListener('baseline:cart:afteradditem', () => openPanel('cart', plus));
-  window.addEventListener('open-try-on', () => openPanel('try', $('[data-edge-open="try"]')));
+  document.body.addEventListener('baseline:cart:afteradditem', () => openPanel('cart', cartTab));
+  window.addEventListener('open-try-on', () => openPanel('cart', cartTab));
   window.addEventListener('storage', renderTry);
 
   /* ---------- hover to open (desktop) ---------- */
@@ -513,7 +523,7 @@
       const o = e.target.closest('[data-edge-open]');
       const tab = o ? o.dataset.edgeOpen : 'menu';
       if (isOpen && (pinned || panel.dataset.tab === tab)) return;
-      openPanel(tab, o || plus, true);
+      openPanel(tab, o || homeTab, true);
     });
     rail.addEventListener('mouseleave', () => {
       overRail = false;
@@ -534,7 +544,7 @@
   });
 
   /* after a newsletter sign-up the page reloads with ?customer_posted=true: show the result */
-  if (/customer_posted=true/.test(location.search) && $('[data-edge-news-ok]')) openPanel('menu', plus);
+  if (/customer_posted=true/.test(location.search) && $('[data-edge-news-ok]')) openPanel('menu', homeTab);
 
   /* ---------- init ---------- */
   restoreLocalSwitch();
