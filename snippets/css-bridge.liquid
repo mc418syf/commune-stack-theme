@@ -482,5 +482,23 @@
       --cfg-label-size: {{ settings.size_label | default: 11 }}px;
       --cfg-body-size: {{ settings.size_body | default: 13 }}px;
       --cfg-button-size: {{ settings.size_button | default: 13 }}px;
+      --cfg-hero-weight: {{ settings.weight_hero | default: 600 }};
+      --cfg-hero-ls: {{ settings.tracking_hero | default: 2 | divided_by: 100.0 }}em;
+      --cfg-head-weight: {{ settings.weight_head | default: 600 }};
+      --cfg-head-ls: {{ settings.tracking_head | default: 10 | divided_by: 100.0 }}em;
+      --cfg-mark-weight: {{ settings.weight_mark | default: 600 }};
+      --cfg-mark-ls: {{ settings.tracking_mark | default: 32 | divided_by: 100.0 }}em;
+      --cfg-tab-weight: {{ settings.weight_tab | default: 600 }};
+      --cfg-tab-ls: {{ settings.tracking_tab | default: 4 | divided_by: 100.0 }}em;
+      --cfg-name-weight: {{ settings.weight_name | default: 600 }};
+      --cfg-name-ls: {{ settings.tracking_name | default: 10 | divided_by: 100.0 }}em;
+      --cfg-price-weight: {{ settings.weight_price | default: 400 }};
+      --cfg-price-ls: {{ settings.tracking_price | default: 0 | divided_by: 100.0 }}em;
+      --cfg-label-weight: {{ settings.weight_label | default: 400 }};
+      --cfg-label-ls: {{ settings.tracking_label | default: 8 | divided_by: 100.0 }}em;
+      --cfg-body-weight: {{ settings.weight_body | default: 400 }};
+      --cfg-body-ls: {{ settings.tracking_body | default: 0 | divided_by: 100.0 }}em;
+      --cfg-button-weight: {{ settings.weight_button | default: 500 }};
+      --cfg-button-ls: {{ settings.tracking_button | default: 8 | divided_by: 100.0 }}em;
     }
 </style>

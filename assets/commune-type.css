@@ -15,15 +15,22 @@
 
   /* Type scale. Sizes come from Theme settings > Font sizes (--cfg-*, set in snippets/css-bridge.liquid);
      line heights keep the ratios of the scale. Mobile values are the default, desktop below. */
-  --hero-size: var(--cfg-hero-size-m, 40px);   --hero-lh: calc(var(--hero-size) * 0.95);  --hero-ls: 0.02em;
-  --head-size: var(--cfg-head-size-m, 22px);   --head-lh: calc(var(--head-size) * 1.09);  --head-ls: 0.10em;
-  --mark-size: var(--cfg-mark-size-m, 18px);   --mark-lh: calc(var(--mark-size) * 1.22);  --mark-ls: 0.32em;
-  --name-size: var(--cfg-name-size, 14px);     --name-lh: calc(var(--name-size) * 1.29);  --name-ls: 0.10em;
+  --hero-size: var(--cfg-hero-size-m, 40px);   --hero-lh: calc(var(--hero-size) * 0.95);  --hero-ls: var(--cfg-hero-ls, 0.02em);
+  --head-size: var(--cfg-head-size-m, 22px);   --head-lh: calc(var(--head-size) * 1.09);  --head-ls: var(--cfg-head-ls, 0.10em);
+  --mark-size: var(--cfg-mark-size-m, 18px);   --mark-lh: calc(var(--mark-size) * 1.22);  --mark-ls: var(--cfg-mark-ls, 0.32em);
+  --name-size: var(--cfg-name-size, 14px);     --name-lh: calc(var(--name-size) * 1.29);  --name-ls: var(--cfg-name-ls, 0.10em);
   --price-size: var(--cfg-price-size, 12px);   --price-lh: calc(var(--price-size) * 1.34);
-  --label-size: var(--cfg-label-size, 11px);   --label-lh: calc(var(--label-size) * 1.27); --label-ls: 0.08em;
+  --label-size: var(--cfg-label-size, 11px);   --label-lh: calc(var(--label-size) * 1.27); --label-ls: var(--cfg-label-ls, 0.08em);
   --body-size: var(--cfg-body-size, 13px);     --body-lh: calc(var(--body-size) * 1.62);
-  --tab-size: var(--cfg-tab-size-m, 18px);     --tab-lh: calc(var(--tab-size) * 1.22);    --tab-ls: 0.04em;
+  --tab-size: var(--cfg-tab-size-m, 18px);     --tab-lh: calc(var(--tab-size) * 1.22);    --tab-ls: var(--cfg-tab-ls, 0.04em);
   --button-size: var(--cfg-button-size, 13px);
+
+  --hero-weight: var(--cfg-hero-weight, 600);   --head-weight: var(--cfg-head-weight, 600);
+  --mark-weight: var(--cfg-mark-weight, 600);   --name-weight: var(--cfg-name-weight, 600);
+  --price-weight: var(--cfg-price-weight, 400); --label-weight: var(--cfg-label-weight, 400);
+  --body-weight: var(--cfg-body-weight, 400);   --tab-weight: var(--cfg-tab-weight, 600);
+  --button-weight: var(--cfg-button-weight, 500);
+  --price-ls: var(--cfg-price-ls, 0em); --body-ls: var(--cfg-body-ls, 0em); --button-ls: var(--cfg-button-ls, 0.08em);
 }
 
 @media (min-width: 768px) {
@@ -42,8 +49,9 @@ html { font-family: var(--font-mono); color: var(--ink); }
 body {
   font-family: var(--font-mono);
   font-size: var(--body-size);
+  letter-spacing: var(--body-ls);
   line-height: var(--body-lh);
-  font-weight: 400;
+  font-weight: var(--body-weight);
   color: var(--ink);
 }
 
@@ -55,7 +63,7 @@ body {
   font-family: var(--font-display);
   font-size: var(--hero-size);
   line-height: var(--hero-lh);
-  font-weight: 600;
+  font-weight: var(--hero-weight);
   letter-spacing: var(--hero-ls);
   text-transform: uppercase;
 }
@@ -64,7 +72,7 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-display);
   font-size: var(--head-size);
   line-height: var(--head-lh);
-  font-weight: 600;
+  font-weight: var(--head-weight);
   letter-spacing: var(--head-ls);
   text-transform: uppercase !important; /* section heading classes set their own case */
 }
@@ -75,7 +83,7 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-display);
   font-size: var(--mark-size);
   line-height: var(--mark-lh);
-  font-weight: 600;
+  font-weight: var(--mark-weight);
   letter-spacing: var(--mark-ls);
   text-transform: uppercase;
 }
@@ -88,7 +96,7 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-display);
   font-size: var(--name-size);
   line-height: var(--name-lh);
-  font-weight: 600;
+  font-weight: var(--name-weight);
   letter-spacing: var(--name-ls);
   text-transform: uppercase;
   -webkit-text-stroke: 0;
@@ -103,8 +111,8 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-mono);
   font-size: var(--price-size);
   line-height: var(--price-lh);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--price-weight);
+  letter-spacing: var(--price-ls);
   font-variant-numeric: tabular-nums;
   color: var(--gray);
   -webkit-text-stroke: 0;
@@ -120,7 +128,7 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-mono);
   font-size: var(--label-size);
   line-height: var(--label-lh);
-  font-weight: 400;
+  font-weight: var(--label-weight);
   letter-spacing: var(--label-ls);
   text-transform: uppercase;
   -webkit-text-stroke: 0;
@@ -131,7 +139,7 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-display);
   font-size: var(--tab-size);
   line-height: var(--tab-lh);
-  font-weight: 600;
+  font-weight: var(--tab-weight);
   letter-spacing: var(--tab-ls);
 }
 
@@ -140,8 +148,8 @@ h1, h2, h3, .text-heading-standard {
   font-family: var(--font-mono);
   font-size: var(--button-size);
   line-height: calc(var(--button-size) * 1.23);
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: var(--button-weight);
+  letter-spacing: var(--button-ls);
   text-transform: uppercase;
   -webkit-text-stroke: 0;
 }
