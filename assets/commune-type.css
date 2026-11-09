@@ -165,3 +165,8 @@ em, i, .italic { font-style: normal; }
 
 /* ---- Rules ---- */
 hr, .border-gridline-color { border-color: var(--rule); }
+
+/* Brand and title links carry no underline or link border until hover or focus */
+[data-product-root] .product-vendor-block a, [data-product-root] .product-title-block a,
+.product-tile-vendor a, .product-tile-title a { border-bottom: 0; text-decoration: none; }
+[data-product-root] .product-vendor-block a:hover, [data-product-root] .product-title-block a:hover { text-decoration: underline; }

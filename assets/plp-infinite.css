@@ -42,7 +42,7 @@ html.plp-restoring body::after {
   height: 44px;
   padding: 0;
   font: inherit;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1;
   color: rgb(var(--color-scheme-text, 17 17 17));
   cursor: pointer;
