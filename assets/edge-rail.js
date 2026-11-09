@@ -13,13 +13,11 @@
   const panel = $('[data-edge-panel]');
   if (!panel) return;
   const scrim = $('[data-edge-scrim]');
-  const railEl = $('[data-edge-rail]');
-  const homeTab = $('[data-edge-open="menu"]') || $('[data-edge-open="cart"]') || $('[data-edge-search]');
-  const cartTab = $('[data-edge-open="cart"]') || homeTab;
+  const plus = $('[data-edge-toggle]');
   const bar = $('[data-edge-searchbar]');
   const input = $('[data-edge-input]');
   const results = $('[data-edge-results]');
-  const WINDOW_LABELS = { menu: 'Menu', filter: 'Filter', cart: 'Cart and try-on' };
+  const TABS = $$('[data-edge-tab]', panel).map((b) => b.dataset.edgeTab);
 
   let cart = null;
   let lastTrigger = null;
@@ -52,34 +50,31 @@
   }
 
   /* ---------- panel ---------- */
-  // Each folder tab opens its own window: one pane per tab, no tab row inside the panel
-  function setTab(tab) {
-    const names = $$('[data-edge-pane]', panel).map((p) => p.dataset.edgePane);
-    if (names.indexOf(tab) < 0) tab = names[0] || 'menu';
+  function setTab(tab, focusTab) {
+    if (TABS.indexOf(tab) < 0) tab = TABS[0] || 'menu';
     panel.dataset.tab = tab;
-    panel.setAttribute('aria-label', WINDOW_LABELS[tab] || 'Tools');
+    $$('[data-edge-tab]', panel).forEach((b) => {
+      const on = b.dataset.edgeTab === tab;
+      b.setAttribute('aria-selected', on);
+      b.tabIndex = on ? 0 : -1;
+      if (on && focusTab) b.focus();
+    });
     $$('[data-edge-pane]', panel).forEach((p) => (p.hidden = p.dataset.edgePane !== tab));
-    if (tab === 'cart') {
-      refreshCart();
-      renderTry();
-    }
+    if (tab === 'cart') refreshCart();
+    if (tab === 'try') renderTry();
     if (tab === 'filter') ensureGroupOpen();
     syncTriggers();
   }
 
   function syncTriggers() {
-    const searchOpen = !bar.hidden;
-    if (railEl) {
-      railEl.classList.toggle('is-open', isOpen);
-      railEl.classList.toggle('is-open-search', searchOpen);
-    }
-    $$('[data-edge-open]', railEl).forEach((b) => {
-      const on = isOpen && panel.dataset.tab === b.dataset.edgeOpen;
-      b.setAttribute('aria-expanded', on);
-      b.classList.toggle('is-active', on);
-    });
-    const st = $('[data-edge-search]');
-    if (st) st.classList.toggle('is-active', searchOpen);
+    const railEl = $('[data-edge-rail]');
+    if (railEl) railEl.classList.toggle('is-open', isOpen);
+    plus.textContent = isOpen ? '×' : '+';
+    plus.setAttribute('aria-label', isOpen ? 'Close panel' : 'Open menu');
+    plus.setAttribute('aria-expanded', isOpen);
+    $$('[data-edge-open="cart"], [data-edge-open="try"]', $('[data-edge-rail]')).forEach((b) =>
+      b.setAttribute('aria-expanded', isOpen && panel.dataset.tab === b.dataset.edgeOpen)
+    );
   }
 
   let pinned = false;
@@ -95,7 +90,7 @@
   function openPanel(tab, trigger, hover) {
     closeSearch();
     clearTimeout(closeTimer);
-    lastTrigger = trigger || lastTrigger || homeTab;
+    lastTrigger = trigger || lastTrigger || plus;
     const wasOpen = isOpen;
     isOpen = true;
     if (!wasOpen) pinned = !hover;
@@ -114,9 +109,8 @@
     if (pinned) document.documentElement.classList.add('edge-locked');
     setTab(tab);
     if (!wasOpen && !hover) {
-      const pane = $('[data-edge-pane]:not([hidden])', panel);
-      const first = pane && pane.querySelector('a[href], button:not([disabled]), input');
-      (first || panel).focus({ preventScroll: true });
+      const sel = $('[data-edge-tab][aria-selected="true"]', panel);
+      if (sel) sel.focus();
     }
   }
 
@@ -139,12 +133,12 @@
       },
       reduceMotion ? 0 : 220
     );
-    if (restoreFocus !== false) (lastTrigger || homeTab).focus();
+    if (restoreFocus !== false) (lastTrigger || plus).focus();
   }
 
   function focusables() {
     const sel = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
-    return $$(sel, panel).filter((el) => !el.closest('[hidden]') && el.tabIndex >= 0).concat($$('[data-edge-rail] button'));
+    return $$(sel, panel).filter((el) => !el.closest('[hidden]') && el.tabIndex >= 0).concat([plus]);
   }
 
   /* ---------- search ---------- */
@@ -164,11 +158,7 @@
     }
     lastTrigger = trigger;
     bar.hidden = false;
-    bar.classList.add('is-entering');
-    void bar.offsetWidth;
-    setTimeout(() => bar.classList.remove('is-entering'), 20);
     setSearchLabel(true);
-    syncTriggers();
     input.focus();
     renderResults(null);
   }
@@ -176,7 +166,6 @@
     if (bar.hidden) return;
     bar.hidden = true;
     setSearchLabel(false);
-    syncTriggers();
     results.innerHTML = '';
     input.value = '';
   }
@@ -435,9 +424,12 @@
     const t = e.target;
     const open = t.closest('[data-edge-open]');
     if (open) {
-      if (isOpen && pinned && panel.dataset.tab === open.dataset.edgeOpen) return closePanel();
       pin();
       return openPanel(open.dataset.edgeOpen, open);
+    }
+    if (t.closest('[data-edge-toggle]')) {
+      if (isOpen && !pinned) return pin();
+      return isOpen ? closePanel() : openPanel('menu', plus);
     }
     if (t.closest('[data-edge-search]')) return openSearch(t.closest('[data-edge-search]'));
     if (t.closest('[data-edge-search-close]')) {
@@ -445,6 +437,11 @@
       return lastTrigger && lastTrigger.focus();
     }
     if (t.closest('[data-edge-scrim]') || t.closest('[data-edge-close]')) return closePanel();
+    const tab = t.closest('[data-edge-tab]');
+    if (tab) {
+      pin();
+      return setTab(tab.dataset.edgeTab);
+    }
     const gt = t.closest('[data-edge-group-toggle]');
     if (gt) {
       const i = $$('[data-edge-group]').indexOf(gt.closest('[data-edge-group]'));
@@ -481,11 +478,16 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
+    const tabBtn = e.target.closest && e.target.closest('[data-edge-tab]');
+    if (tabBtn && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      const i = TABS.indexOf(tabBtn.dataset.edgeTab);
+      setTab(TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length], true);
+    }
   });
 
   /* PDP: Add to cart opens the Cart tab, Try in-store opens the Try-on tab */
-  document.body.addEventListener('baseline:cart:afteradditem', () => openPanel('cart', cartTab));
-  window.addEventListener('open-try-on', () => openPanel('cart', cartTab));
+  document.body.addEventListener('baseline:cart:afteradditem', () => openPanel('cart', plus));
+  window.addEventListener('open-try-on', () => openPanel('try', $('[data-edge-open="try"]')));
   window.addEventListener('storage', renderTry);
 
   /* ---------- hover to open (desktop) ---------- */
@@ -511,7 +513,7 @@
       const o = e.target.closest('[data-edge-open]');
       const tab = o ? o.dataset.edgeOpen : 'menu';
       if (isOpen && (pinned || panel.dataset.tab === tab)) return;
-      openPanel(tab, o || homeTab, true);
+      openPanel(tab, o || plus, true);
     });
     rail.addEventListener('mouseleave', () => {
       overRail = false;
@@ -532,7 +534,7 @@
   });
 
   /* after a newsletter sign-up the page reloads with ?customer_posted=true: show the result */
-  if (/customer_posted=true/.test(location.search) && $('[data-edge-news-ok]')) openPanel('menu', homeTab);
+  if (/customer_posted=true/.test(location.search) && $('[data-edge-news-ok]')) openPanel('menu', plus);
 
   /* ---------- init ---------- */
   restoreLocalSwitch();

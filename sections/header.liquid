@@ -84,11 +84,12 @@
   :root {
     --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
-    --tab-w: {{ section.settings.tab_width | default: 30 }}px;
+    --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
     --strip-h: {{ section.settings.strip_height | default: 56 }}px;
   }
   @media (min-width: 768px) {
     :root {
+      --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
       --panel-w: {{ section.settings.panel_width | default: 380 }}px;
     }
   }
@@ -225,14 +226,23 @@
     },
     {
       "type": "range",
-      "id": "tab_width",
+      "id": "rail_width_desktop",
       "min": 24,
-      "max": 48,
+      "max": 80,
       "step": 2,
       "unit": "px",
-      "label": "Tab width",
-      "default": 30,
-      "info": "The width of the folder tabs on the left edge."
+      "label": "Rail width, desktop",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "rail_width_mobile",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Rail width, mobile",
+      "default": 36
     },
     {
       "type": "range",
@@ -289,13 +299,19 @@
     {
       "type": "checkbox",
       "id": "show_cart",
-      "label": "Cart tab (cart and try-on together)",
+      "label": "Cart button",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "show_search",
-      "label": "Search tab",
+      "label": "Search button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_try_on",
+      "label": "Try-on button",
       "default": true
     },
     {
@@ -313,13 +329,19 @@
     {
       "type": "checkbox",
       "id": "tab_filter",
-      "label": "Filter tab (collection pages)",
+      "label": "Filter tab",
       "default": true
     },
     {
       "type": "checkbox",
       "id": "tab_cart",
-      "label": "Cart window opens from the Cart tab",
+      "label": "Cart tab",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_try_on",
+      "label": "Try-on tab",
       "default": true
     },
     {

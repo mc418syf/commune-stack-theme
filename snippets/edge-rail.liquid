@@ -1,5 +1,5 @@
 {%- comment -%}
-  Edge rail: left rail, top strip (switch · logo · filter summary), tools panel (Menu / Filter / Cart, where Cart holds the cart and the try-on list) and search bar.
+  Edge rail: left rail, top strip (switch · logo · filter summary), tools panel (Menu / Filter / Cart / Try-on) and search bar.
   Cart and Try-on lines are drawn by assets/edge-rail.js from /cart.js and $store.tryOnList.
   Params: header_logo (captured logo markup)
 {%- endcomment -%}
@@ -8,10 +8,12 @@
   assign cfg = section.settings
   assign show_cart = cfg.show_cart
   assign show_search = cfg.show_search
+  assign show_try = cfg.show_try_on
   assign show_switch = cfg.show_stock_switch
   assign tab_menu = cfg.tab_menu
   assign tab_filter = cfg.tab_filter
   assign tab_cart = cfg.tab_cart
+  assign tab_try = cfg.tab_try_on
   assign rail_menu = linklists[section.settings.edge_menu]
 
   assign filter_source = nil
@@ -68,27 +70,24 @@
 
 <nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
   <div class="edge-rail__group">
-    {%- if tab_menu != false -%}
-    <button type="button" class="edge-tab" data-edge-open="menu" aria-haspopup="dialog" aria-expanded="false" aria-label="Menu">
-      <span>Menu</span>
+    {%- if show_cart != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart">
+      <span class="edge-dot" aria-hidden="true"></span>
+      <span>Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</span>
     </button>
     {%- endif -%}
     {%- if show_search != false -%}
-    <button type="button" class="edge-tab" data-edge-search aria-label="Search">
+    <button type="button" class="edge-rail__v" data-edge-search aria-label="Search">
       <span data-edge-search-label>Search</span>
     </button>
     {%- endif -%}
-    {%- if on_plp and tab_filter != false -%}
-    <button type="button" class="edge-tab" data-edge-open="filter" aria-haspopup="dialog" aria-expanded="false" aria-label="Filter">
-      <span>Filter{% if active_total > 0 %} [{{ active_total }}]{% endif %}</span>
-    </button>
-    {%- endif -%}
   </div>
+  <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Menu and filter">+</button>
   <div class="edge-rail__group">
-    {%- if show_cart != false -%}
-    <button type="button" class="edge-tab" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart and try-on">
-      <span class="edge-dot" aria-hidden="true"></span>
-      <span>Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>] / Try-on [<span data-edge-count="try">0</span>]</span>
+    {%- if show_try != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="try" aria-haspopup="dialog" aria-expanded="false" aria-label="Try-on list">
+      <span class="edge-dot edge-dot--hollow" aria-hidden="true"></span>
+      <span>Try-on [<span data-edge-count="try">0</span>]</span>
     </button>
     {%- endif -%}
   </div>
@@ -104,8 +103,23 @@
 <div class="edge-scrim" data-edge-scrim hidden></div>
 
 <section class="edge-panel" role="dialog" aria-modal="true" aria-label="Tools" data-edge-panel data-tab="menu" hidden>
+  <div class="edge-tabs" role="tablist" aria-label="Tools">
+    {%- if tab_menu != false -%}
+    <button type="button" role="tab" id="edge-tab-menu" aria-controls="edge-pane-menu" aria-selected="true" data-edge-tab="menu">Menu</button>
+    {%- endif -%}
+    {%- if tab_filter != false -%}
+    <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter</button>
+    {%- endif -%}
+    {%- if tab_cart != false -%}
+    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1">Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</button>
+    {%- endif -%}
+    {%- if tab_try != false -%}
+    <button type="button" role="tab" id="edge-tab-try" aria-controls="edge-pane-try" aria-selected="false" data-edge-tab="try" tabindex="-1">Try-on [<span data-edge-count="try">0</span>]</button>
+    {%- endif -%}
+  </div>
+
   <div class="edge-panes">
-    <div role="region" id="edge-pane-menu" aria-label="Menu" data-edge-pane="menu">
+    <div role="tabpanel" id="edge-pane-menu" aria-labelledby="edge-tab-menu" data-edge-pane="menu">
       <ol class="edge-menu">
         {%- if rail_menu != blank and rail_menu.links.size > 0 -%}
           {%- for link in rail_menu.links -%}
@@ -192,7 +206,7 @@
       {%- endif -%}
     </div>
 
-    <div role="region" id="edge-pane-filter" aria-label="Filter" data-edge-pane="filter" hidden>
+    <div role="tabpanel" id="edge-pane-filter" aria-labelledby="edge-tab-filter" data-edge-pane="filter" hidden>
       <div data-edge-filters>
         {%- if on_plp -%}
           <form class="edge-filters" data-edge-filter-form onsubmit="return false">
@@ -264,15 +278,12 @@
       </div>
     </div>
 
-    <div role="region" id="edge-pane-cart" aria-label="Cart and try-on" data-edge-pane="cart" hidden>
-      <section class="edge-sec" aria-label="Cart">
-        <h3 class="edge-sec__h">Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</h3>
-        <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
-      </section>
-      <section class="edge-sec" aria-label="Try-on">
-        <h3 class="edge-sec__h">Try-on [<span data-edge-count="try">0</span>]</h3>
-        <div data-edge-list="try"><p class="edge-empty">Loading…</p></div>
-      </section>
+    <div role="tabpanel" id="edge-pane-cart" aria-labelledby="edge-tab-cart" data-edge-pane="cart" hidden>
+      <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
+    </div>
+
+    <div role="tabpanel" id="edge-pane-try" aria-labelledby="edge-tab-try" data-edge-pane="try" hidden>
+      <div data-edge-list="try"><p class="edge-empty">Loading…</p></div>
     </div>
   </div>
 </section>
