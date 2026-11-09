@@ -109,10 +109,6 @@ h1, h2, h3, .text-heading-standard {
   font-size: calc(var(--name-size) - var(--product-card-offset, 2px));
   line-height: calc(var(--name-lh) - var(--product-card-offset, 2px));
 }
-.product-tile-price, .product-tile-price * {
-  font-size: calc(var(--price-size) - var(--product-card-offset, 2px));
-  line-height: calc(var(--price-lh) - var(--product-card-offset, 2px));
-}
 
 [data-product-root] .product-vendor-block, [data-product-root] .product-vendor-block a { color: var(--ink); }
 
@@ -210,4 +206,10 @@ hr, .border-gridline-color { border-color: var(--rule); }
   font-size: var(--body-size);
   line-height: var(--body-lh);
   color: var(--ink);
+}
+
+/* Card price: after the general price rule so the offset applies */
+.product-tile-price, .product-tile-price * {
+  font-size: calc(var(--price-size) - var(--product-card-offset, 2px));
+  line-height: calc(var(--price-lh) - var(--product-card-offset, 2px));
 }
