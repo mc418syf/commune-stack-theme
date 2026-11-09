@@ -179,6 +179,20 @@
   #{{ section.id }} .product-vendor-block + .product-title-block,
   #{{ section.id }} .pb[data-pb='vendor'] + .pb[data-pb='title'] .product-title-block { margin-top: var(--product-vendor-title-gap, 6px); }
 </style>
+<style>
+  /* Mobile gallery: no pager row under the image, a 01/05 counter on the image instead */
+  #{{ section.id }} .pdp-count {
+    position: absolute; right: 12px; bottom: 12px; z-index: 3;
+    padding: 4px 8px; background: rgb(var(--color-scheme-background));
+    font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 1023px) {
+    #{{ section.id }} .pdp-pager { display: none !important; }
+    #{{ section.id }} .product-media-container { padding-bottom: 0 !important; }
+    #{{ section.id }} .product-content-container { box-shadow: none !important; }
+  }
+</style>
+<script src="{{ 'product-gallery.js' | asset_url }}" defer></script>
 {%- if desktop_strip -%}
   {{ 'product-strip.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'product-strip.js' | asset_url }}" defer></script>
@@ -224,6 +238,7 @@
     <div
       class="splide splide--product lg:!sticky lg:top-sticky-header-less-gridline {% if negative_margin %}lg:-mb-gridline{% endif %}"
       data-drag-disabled="{{ has_interactive_media }}"
+      data-mobile-per-screen="{{ section.settings.mobile_images_per_screen | default: '1' }}"
       {% if product.media.size > 1 %}
         data-slideshow-enabled="true"
       {% endif %}
@@ -336,7 +351,7 @@
       {% assign first_3d_model = models | first %}
       {% if product.media.size > 1 %}
         <div
-          class="mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 opacity-0 no-js:hidden lg:hidden"
+          class="pdp-pager mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 opacity-0 no-js:hidden lg:hidden"
           x-data="
             {
               paginationIsWrapped: false,
@@ -368,6 +383,9 @@
               <span class="block">{% render 'icon-arrow-right' %}</span>
             </button>
           </div>
+        </div>
+        <div class="pdp-count lg:hidden" data-pdp-count aria-live="polite">
+          <span data-cur>01</span>/<span data-tot>{% if product.media.size < 10 %}0{% endif %}{{ product.media.size }}</span>
         </div>
       {% endif %}
       {%- if first_3d_model -%}
@@ -416,6 +434,8 @@
   {%- liquid
     # How far the details panel rises over the image (in vh).
     assign slide_distance = section.settings.mobile_slide_overlap | default: 60
+    assign per_screen = section.settings.mobile_images_per_screen | default: '1' | plus: 0.0
+    assign gallery_vw = 133.333 | divided_by: per_screen
   -%}
   <style>
     /* === Mobile image slide-over (komune-style) ===
@@ -426,7 +446,7 @@
     @media (max-width: 1023px) {
       #{{ section.id }} .product-media-container {
         position: relative;
-        height: calc(133.333vw + {{ slide_distance }}vh);
+        height: calc({{ gallery_vw }}vw + {{ slide_distance }}vh);
         padding-bottom: 0 !important;
         border-bottom: 0 !important;
       }
@@ -452,7 +472,6 @@
         z-index: 2;
         margin-top: -{{ slide_distance }}vh;
         border-radius: 0;
-        box-shadow: 0 -16px 40px rgba(14, 14, 14, 0.1);
       }
     }
   </style>
@@ -538,6 +557,27 @@
       "content": "Mobile image slide-over"
     },
     {
+      "type": "select",
+      "id": "mobile_images_per_screen",
+      "label": "Images per screen on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.25",
+          "label": "1.25 (next image peeks in)"
+        },
+        {
+          "value": "1.5",
+          "label": "1.5"
+        }
+      ],
+      "default": "1",
+      "info": "1.25 shows one full image with a quarter of the next one."
+    },
+    {
       "type": "checkbox",
       "id": "mobile_slide_over",
       "label": "Enable image slide-over on mobile",
@@ -600,8 +640,14 @@
       "id": "desktop_layout",
       "label": "Desktop layout",
       "options": [
-        { "value": "split", "label": "Media beside the details" },
-        { "value": "strip", "label": "Image strip on top, details below" }
+        {
+          "value": "split",
+          "label": "Media beside the details"
+        },
+        {
+          "value": "strip",
+          "label": "Image strip on top, details below"
+        }
       ],
       "default": "split",
       "info": "Image strip: every image sits in one horizontal row you scroll or drag sideways, numbered underneath. Title, price and description sit below on the left, with the options and add to cart on the right. Mobile is unchanged."
@@ -2541,7 +2587,6 @@
         }
       ]
     }
-    
   ]
 }
 {% endschema %}

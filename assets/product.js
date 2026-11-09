@@ -834,6 +834,13 @@ document.addEventListener('alpine:init', () => {
               destroy: true,
             };
           }
+
+          // Mobile: show a fraction of the next image (Images per screen on mobile)
+          const perScreen = parseFloat(this.splideEl.dataset.mobilePerScreen) || 1;
+          if (perScreen > 1) {
+            this.mainSplideOptions.fixedWidth = `${100 / perScreen}%`;
+            this.mainSplideOptions.gap = '4px';
+          }
         } else {
           this.mainSplideOptions = {
             type: 'slide',
