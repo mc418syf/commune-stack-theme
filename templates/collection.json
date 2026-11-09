@@ -12,7 +12,8 @@
     "main": {
       "type": "main-collection",
       "custom_css": [
-        ".text-scheme-secondary {text-transform: uppercase;}"
+        ".text-scheme-secondary {text-transform: uppercase;}",
+        ".collection {margin-top: 40px;}"
       ],
       "settings": {
         "hide_title": true,
@@ -26,8 +27,8 @@
         "grid": 4,
         "rows": 12,
         "grid_mobile": "2",
-        "product_grid_gap": 0,
-        "product_grid_side_margin": 0,
+        "product_grid_gap": 6,
+        "product_grid_side_margin": 6,
         "infinite_scroll": true,
         "back_to_top": true,
         "enable_quick_buy": false,
@@ -38,7 +39,7 @@
         "collapse_filters": false,
         "capitalize_filters": true,
         "filters_layout_on_desktop": "drop_down",
-        "color_scheme": "",
+        "color_scheme": "scheme1",
         "override_header_footer_color_scheme": false
       }
     }
