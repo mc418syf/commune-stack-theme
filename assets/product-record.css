@@ -20,7 +20,7 @@
   font-size: var(--body-size, 13px);
   font-weight: 400;
   line-height: var(--body-lh, 21px);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--body-ls, 0);
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--rec-ink);
