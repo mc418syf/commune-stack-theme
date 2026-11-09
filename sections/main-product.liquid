@@ -187,7 +187,7 @@
 <section
   class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
   id="{{ section.id }}"
-  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %} --info-px-d: {{ section.settings.info_padding_x_desktop }}px; --info-py-d: {{ section.settings.info_padding_y_desktop }}px; --info-px-m: {{ section.settings.info_padding_x_mobile }}px; --info-py-m: {{ section.settings.info_padding_y_mobile }}px;"
+  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %} --info-left: {{ section.settings.info_left_width }}%; --info-right: {{ section.settings.info_right_width }}%; --info-px-d: {{ section.settings.info_padding_x_desktop }}px; --info-py-d: {{ section.settings.info_padding_y_desktop }}px; --info-px-m: {{ section.settings.info_padding_x_mobile }}px; --info-py-m: {{ section.settings.info_padding_y_mobile }}px;"
   x-data="
     Theme_Product({
       product: {{ product | json | escape }},
@@ -630,6 +630,31 @@
     },
     {
       "type": "header",
+      "content": "Product information columns"
+    },
+    {
+      "type": "range",
+      "id": "info_left_width",
+      "min": 30,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Left column (description) width",
+      "default": 50,
+      "info": "Image strip layout, desktop."
+    },
+    {
+      "type": "range",
+      "id": "info_right_width",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Right column (record list and buttons) width",
+      "default": 33
+    },
+    {
+      "type": "header",
       "content": "Product information padding"
     },
     {
@@ -924,24 +949,150 @@
           "id": "try_on_button_label",
           "label": "Button label",
           "default": "Try In-Store"
-        },
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Record list",
+      "limit": 1,
+      "settings": [
         {
-          "type": "header",
-          "content": "Archive record"
+          "type": "paragraph",
+          "content": "A list of dashed rows built from product metafields. Place it above the Add to cart block so it sits in the right column."
         },
         {
           "type": "checkbox",
-          "id": "show_archive_stock",
-          "label": "Show the archive record stock block",
+          "id": "show_measurements",
+          "label": "Show measurements",
           "default": true,
-          "info": "Status, condition and reference above the Add to cart bar."
+          "info": "Reads lines like - Chest: 49cm/19.5in from the metafield below, one row each."
         },
         {
           "type": "text",
-          "id": "default_condition",
-          "label": "Default condition",
-          "default": "Good",
-          "info": "Shown when a product has no custom.condition metafield. Leave empty to hide the row."
+          "id": "measurement_key",
+          "label": "Measurement metafield (namespace.key)",
+          "default": "custom.measurement"
+        },
+        {
+          "type": "header",
+          "content": "Row 1"
+        },
+        {
+          "type": "text",
+          "id": "label_1",
+          "label": "Label",
+          "default": "Condition"
+        },
+        {
+          "type": "text",
+          "id": "key_1",
+          "label": "Metafield (namespace.key)",
+          "default": "custom.condition",
+          "info": "For example custom.material"
+        },
+        {
+          "type": "text",
+          "id": "fallback_1",
+          "label": "Text when the metafield is empty",
+          "default": "Good"
+        },
+        {
+          "type": "header",
+          "content": "Row 2"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "Label",
+          "default": "Material"
+        },
+        {
+          "type": "text",
+          "id": "key_2",
+          "label": "Metafield (namespace.key)",
+          "default": "custom.material"
+        },
+        {
+          "type": "text",
+          "id": "fallback_2",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 3"
+        },
+        {
+          "type": "text",
+          "id": "label_3",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_3",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_3",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 4"
+        },
+        {
+          "type": "text",
+          "id": "label_4",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_4",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_4",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 5"
+        },
+        {
+          "type": "text",
+          "id": "label_5",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_5",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_5",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 6"
+        },
+        {
+          "type": "text",
+          "id": "label_6",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_6",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_6",
+          "label": "Text when the metafield is empty"
         }
       ]
     },

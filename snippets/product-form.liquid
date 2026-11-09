@@ -5,7 +5,7 @@
   assign strip_layout = false
   if section.settings.desktop_layout == 'strip'
     assign strip_layout = true
-    assign right_types = 'variant_picker,quantity_selector,buy_buttons,information_list,inventory,location_inventory,icon_list,popup,share' | split: ','
+    assign right_types = 'variant_picker,quantity_selector,record,buy_buttons,information_list,inventory,location_inventory,icon_list,popup,share' | split: ','
     assign left_html = ''
     assign right_html = ''
   endif
@@ -31,6 +31,8 @@
         render 'product-form-component-quantity-selector', block: block, product: product, product_form_id: product_form_id
       when 'buy_buttons'
         render 'product-form-component-buy-buttons', block: block, product: product, product_form_id: product_form_id
+      when 'record'
+        render 'product-block-record', block: block, product: product
       when 'description'
         render 'product-block-description', block: block, product: product
       when 'text'

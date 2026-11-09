@@ -43,9 +43,19 @@
             "show_pickup_availability": false,
             "show_gift_card_recipient": false,
             "show_try_on_button": true,
-            "try_on_button_label": "Try In-Store",
-            "show_archive_stock": true,
-            "default_condition": "Good"
+            "try_on_button_label": "Try In-Store"
+          }
+        },
+        "record_Lk3Qm9": {
+          "type": "record",
+          "settings": {
+            "show_measurements": true,
+            "measurement_key": "custom.measurement",
+            "label_1": "Condition",
+            "key_1": "custom.condition",
+            "fallback_1": "Good",
+            "label_2": "Material",
+            "key_2": "custom.material"
           }
         },
         "description_rWXWew": {
@@ -73,6 +83,7 @@
         "title",
         "price",
         "variant_picker",
+        "record_Lk3Qm9",
         "buy_buttons",
         "description_rWXWew",
         "complementary_Gx88yw"

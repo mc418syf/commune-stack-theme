@@ -1,21 +1,17 @@
 {%- comment -%}
-  Archive record: turns the multi-line metafield custom.measurement into dashed rows.
+  Turns the text of a measurement metafield (passed in as `source`) into dashed list rows.
 
   Format (one per line):
-    Size XS, fits men's S.        -> Size row (the leading "Size" and a trailing full stop are removed)
-    - Chest: 49cm/19.5in          -> a measurement row, shown as <49 CM (19.5 IN)>
-    - Material: 100% cotton       -> Record group
-    - Made in: Japan              -> Record group
-  Blank lines and other lines without a colon are ignored. Material and Made in fall back to the
-  custom.material and custom.made_in metafields when they are not in the text.
+    - Chest: 49cm/19.5in          -> a row shown as <49 CM (19.5 IN)>
+    - Material: 100% cotton       -> a row shown as <100% COTTON>
+  Lines that do not start with "-" and contain a colon (such as "Size XS.") are ignored.
+  Length, Shoulders, Chest and Sleeves come first, in that order; any other row follows.
   Every value is escaped; nothing from the metafield is output raw.
 
-  Shown: the measurements, then Condition and Material. Size and Made in are read but not shown.
-
-  Output: nothing when there is nothing to show, so callers can test the captured result.
+  Output: <li> rows only, nothing when there are none. The caller wraps them in <ul class="record">.
 {%- endcomment -%}
 
-{%- assign raw = product.metafields.custom.measurement.value | default: '' -%}
+{%- assign raw = source | default: '' -%}
 {%- assign size_value = '' -%}
 {%- assign made_in_value = '' -%}
 {%- assign material_value = '' -%}
@@ -60,11 +56,7 @@
     {%- endif -%}
     {%- assign label_l = label | downcase -%}
 
-    {%- if label_l == 'material' -%}
-      {%- assign material_value = value -%}
-    {%- elsif label_l == 'made in' or label_l == 'made_in' or label_l == 'made-in' -%}
-      {%- assign made_in_value = value -%}
-    {%- else -%}
+    {%- if label_l.size > 0 -%}
       {%- comment -%} 49cm/19.5in becomes 49 cm (19.5 in); a value without a slash stays as typed {%- endcomment -%}
       {%- assign display_value = value -%}
       {%- if value contains '/' -%}
@@ -109,28 +101,4 @@
   {%- endif -%}
 {%- endfor -%}
 
-{%- if made_in_value.size == 0 -%}
-  {%- assign made_in_value = product.metafields.custom.made_in | metafield_text | default: '' -%}
-{%- endif -%}
-{%- if material_value.size == 0 -%}
-  {%- assign material_value = product.metafields.custom.material | metafield_text | default: '' -%}
-{%- endif -%}
-
-{%- assign condition_value = condition | default: '' -%}
-{%- if condition_value.size == 0 -%}
-  {%- assign condition_value = product.metafields.custom.condition | metafield_text | default: '' -%}
-{%- endif -%}
-
-{%- capture record_rows -%}
-  {{- length_rows }}{{ shoulder_rows }}{{ chest_rows }}{{ sleeve_rows }}{{ other_rows -}}
-  {%- if condition_value.size > 0 -%}
-    <li class="record__row"><span class="record__label">Condition</span><span class="record__value">&lt;{{ condition_value | escape }}&gt;</span></li>
-  {%- endif -%}
-  {%- if material_value.size > 0 -%}
-    <li class="record__row"><span class="record__label">Material</span><span class="record__value">&lt;{{ material_value | escape }}&gt;</span></li>
-  {%- endif -%}
-{%- endcapture -%}
-
-{%- if record_rows contains 'record__row' -%}
-  <ul class="record">{{ record_rows }}</ul>
-{%- endif -%}
+{{- length_rows }}{{ shoulder_rows }}{{ chest_rows }}{{ sleeve_rows }}{{ other_rows -}}
