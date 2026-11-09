@@ -39,6 +39,7 @@
         "description_rWXWew": {
           "type": "description",
           "settings": {
+            "show_heading": true,
             "description_tab_label": "Description"
           }
         },
@@ -114,7 +115,7 @@
         "desktop_layout": "strip",
         "strip_height": 70,
         "strip_gap": 0,
-        "info_left_width": 50,
+        "info_left_width": 33,
         "info_right_width": 33,
         "info_padding_x_desktop": 32,
         "info_padding_y_desktop": 24,

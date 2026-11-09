@@ -8,6 +8,8 @@
 <div class="record-lede rte" {{ block.shopify_attributes }}>{{ product.description }}</div>
 
 <section class="product-desc">
-  <h2 class="product-desc__title">{{ description_label | upcase }}</h2>
+  {%- if block.settings.show_heading != false -%}
+    <h2 class="product-desc__title">{{ description_label | upcase }}</h2>
+  {%- endif -%}
   <div class="product-desc__body rte">{{ product.description }}</div>
 </section>
