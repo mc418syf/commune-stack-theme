@@ -18,12 +18,13 @@
   --hero-size: var(--cfg-hero-size-m, 40px);   --hero-lh: calc(var(--hero-size) * 0.95);  --hero-ls: var(--cfg-hero-ls, 0.02em);
   --head-size: var(--cfg-head-size-m, 22px);   --head-lh: calc(var(--head-size) * 1.09);  --head-ls: var(--cfg-head-ls, 0.10em);
   --mark-size: var(--cfg-mark-size-m, 18px);   --mark-lh: calc(var(--mark-size) * 1.22);  --mark-ls: var(--cfg-mark-ls, 0.32em);
-  --name-size: var(--cfg-name-size, 14px);     --name-lh: calc(var(--name-size) * 1.29);  --name-ls: var(--cfg-name-ls, 0.10em);
-  --price-size: var(--cfg-price-size, 12px);   --price-lh: calc(var(--price-size) * 1.34);
+  --name-size: var(--cfg-name-size-m, 14px);     --name-lh: calc(var(--name-size) * 1.29);  --name-ls: var(--cfg-name-ls, 0.10em);
+  --price-size: var(--cfg-price-size-m, 12px);   --price-lh: calc(var(--price-size) * 1.34);
   --label-size: var(--cfg-label-size, 11px);   --label-lh: calc(var(--label-size) * 1.27); --label-ls: var(--cfg-label-ls, 0.08em);
   --body-size: var(--cfg-body-size, 13px);     --body-lh: calc(var(--body-size) * 1.62);
   --tab-size: var(--cfg-tab-size-m, 18px);     --tab-lh: calc(var(--tab-size) * 1.22);    --tab-ls: var(--cfg-tab-ls, 0.04em);
-  --button-size: var(--name-size); /* buttons match the product name */
+  --button-size: var(--cfg-button-size, 14px);
+  --add-to-cart-button-height: max(44px, calc(var(--button-size) * 3.6));
 
   --hero-weight: var(--cfg-hero-weight, 600);   --head-weight: var(--cfg-head-weight, 600);
   --mark-weight: var(--cfg-mark-weight, 600);   --name-weight: var(--cfg-name-weight, 600);
@@ -39,6 +40,8 @@
     --head-size: var(--cfg-head-size-d, 28px);
     --mark-size: var(--cfg-mark-size-d, 20px);
     --tab-size: var(--cfg-tab-size-d, 20px);
+    --name-size: var(--cfg-name-size-d, 16px);
+    --price-size: var(--cfg-price-size-d, 14px);
   }
 }
 

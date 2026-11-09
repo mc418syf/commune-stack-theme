@@ -467,6 +467,15 @@
 {%- endif -%}
 
 {%- comment -%} Font sizes from Theme settings > Font sizes; assets/commune-type.css turns them into the type roles {%- endcomment -%}
+{%- liquid
+  comment
+    Product name and price: the mobile size falls back to the old single setting; desktop is 2px bigger unless set
+  endcomment
+  assign name_m = settings.size_name_mobile | default: settings.size_name | default: 14
+  assign name_d = settings.size_name_desktop | default: name_m | plus: 2
+  assign price_m = settings.size_price_mobile | default: settings.size_price | default: 12
+  assign price_d = settings.size_price_desktop | default: price_m | plus: 2
+-%}
 <style>
     :root {
       --cfg-hero-size-d: {{ settings.size_hero_desktop | default: 64 }}px;
@@ -477,8 +486,11 @@
       --cfg-mark-size-m: {{ settings.size_mark_mobile | default: 18 }}px;
       --cfg-tab-size-d: {{ settings.size_tab_desktop | default: 20 }}px;
       --cfg-tab-size-m: {{ settings.size_tab_mobile | default: 18 }}px;
-      --cfg-name-size: {{ settings.size_name | default: 14 }}px;
-      --cfg-price-size: {{ settings.size_price | default: 12 }}px;
+      --cfg-name-size-m: {{ name_m }}px;
+      --cfg-name-size-d: {{ name_d }}px;
+      --cfg-price-size-m: {{ price_m }}px;
+      --cfg-price-size-d: {{ price_d }}px;
+      --cfg-button-size: {{ settings.size_button | default: 14 }}px;
       --cfg-label-size: {{ settings.size_label | default: 11 }}px;
       --cfg-body-size: {{ settings.size_body | default: 13 }}px;
       --cfg-hero-weight: {{ settings.weight_hero | default: 600 }};
