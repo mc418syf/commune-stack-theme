@@ -822,7 +822,8 @@ document.addEventListener('alpine:init', () => {
             pagination: Boolean(
               this.splideEl.querySelector('.splide__pagination')
             ),
-            rewind: true,
+            // Infinite: after the last image the first one follows (and the other way round)
+            type: 'loop',
             speed: 600,
             drag: !(this.splideEl.dataset.dragDisabled === 'true'),
             mediaQuery: 'min',
