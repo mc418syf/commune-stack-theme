@@ -434,8 +434,6 @@
   {%- liquid
     # How far the details panel rises over the image (in vh).
     assign slide_distance = section.settings.mobile_slide_overlap | default: 60
-    assign per_screen = section.settings.mobile_images_per_screen | default: '1' | plus: 0.0
-    assign gallery_vw = 133.333 | divided_by: per_screen
   -%}
   <style>
     /* === Mobile image slide-over (komune-style) ===
@@ -446,9 +444,15 @@
     @media (max-width: 1023px) {
       #{{ section.id }} .product-media-container {
         position: relative;
-        height: calc({{ gallery_vw }}vw + {{ slide_distance }}vh);
+        height: auto;
         padding-bottom: 0 !important;
         border-bottom: 0 !important;
+      }
+      /* The runway is the image's own height plus the slide distance, so the details panel meets the image exactly */
+      #{{ section.id }} .product-media-container::after {
+        content: '';
+        display: block;
+        height: {{ slide_distance }}vh;
       }
       /* Gallery pins at its natural 3:4 height */
       #{{ section.id }} .product-media-container .splide--product {
