@@ -68,6 +68,7 @@
     "size_mark_mobile": 12,
     "size_name": 13,
     "size_price": 11,
+    "size_label": 11,
     "size_body": 11,
     "size_button": 11,
     "quick_buy_variant_picker_option_style": "text_underline",
