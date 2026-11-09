@@ -195,7 +195,7 @@
                         data-edge-url="{% if v.active %}{{ v.url_to_remove }}{% else %}{{ v.url_to_add }}{% endif %}"
                         {% if v.count == 0 and v.active == false %}disabled{% endif %}
                       >
-                        <span><span class="edge-opt__box" aria-hidden="true">{% if v.active %}[x]{% else %}[ ]{% endif %}</span> {{ v.label }}</span>
+                        <span class="edge-opt__l"><span class="edge-opt__box" aria-hidden="true"></span>{{ v.label }}</span>
                         <span class="edge-opt__c">[{{ v.count }}]</span>
                       </button>
                     </li>

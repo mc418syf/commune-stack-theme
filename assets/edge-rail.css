@@ -85,16 +85,19 @@ html.edge-locked { overflow: hidden; }
 .edge-row:hover .edge-row__l, .edge-row:hover .edge-row__c { color: var(--orange-ink); }
 
 /* Filter */
-.edge-group__h { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 !important; border-bottom: 1px dashed var(--rule-dashed) !important;
+.edge-group__h { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 40px; padding: 0 !important; border-bottom: 1px dashed var(--rule-dashed) !important;
   font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
 .edge-group__list { list-style: none; margin: 0; padding: 0; }
 .edge-group__list[hidden] { display: none; }
-.edge-opt { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 44px; padding: 0 0 0 12px !important; border-bottom: 1px dashed var(--rule-dashed) !important;
-  font-family: var(--font-mono); font-size: 11px; line-height: 20px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--gray); font-variant-numeric: tabular-nums; }
+.edge-opt { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 30px; padding: 0 0 0 4px !important; border-bottom: 1px dashed var(--rule-dashed) !important;
+  font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gray); font-variant-numeric: tabular-nums; }
 .edge-opt[aria-pressed='true'] { color: var(--ink); }
 .edge-opt:hover { color: var(--orange-ink); }
 .edge-opt:disabled { opacity: 0.45; cursor: default; }
-.edge-opt__c { color: var(--gray); }
+.edge-opt__c { color: var(--gray); font-size: 9px; }
+.edge-opt__l { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.edge-opt__box { width: 8px; height: 8px; flex: none; border-radius: 50%; border: 1px solid currentColor; box-sizing: border-box; display: inline-block; }
+.edge-opt[aria-pressed='true'] .edge-opt__box { background: currentColor; }
 
 /* Footer, buttons */
 .edge-foot { flex: none; display: flex; flex-direction: column; gap: 4px; padding: 12px var(--gut) 16px; border-top: 1px solid var(--rule); }
