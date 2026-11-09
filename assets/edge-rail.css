@@ -66,7 +66,7 @@ html.edge-locked { overflow: hidden; }
 
 
 .edge-panes { padding-top: 16px; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-.edge-panes > [role='tabpanel'] { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+.edge-panes > [data-edge-pane] { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
 .edge-panes > [hidden] { display: none; }
 [data-edge-filters] { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
 .edge-filters { flex: 1 1 auto; overflow-y: auto; padding: 0 var(--gut); }
