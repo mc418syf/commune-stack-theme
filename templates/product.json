@@ -48,6 +48,7 @@
           "settings": {
             "show_measurements": true,
             "measurement_key": "custom.measurement",
+            "gap_below": 24,
             "label_1": "Condition",
             "key_1": "custom.condition",
             "fallback_1": "Good",

@@ -38,5 +38,5 @@
 {%- endcapture -%}
 
 {%- if rows contains 'record__row' -%}
-  <div class="record-block" {{ block.shopify_attributes }}><ul class="record">{{ rows }}</ul></div>
+  <div class="record-block" style="--record-gap: {{ block.settings.gap_below | default: 24 }}px;" {{ block.shopify_attributes }}><ul class="record">{{ rows }}</ul></div>
 {%- endif -%}

@@ -48,7 +48,7 @@
   overflow-wrap: anywhere;
 }
 
-.record-block { margin: 16px 0; }
+.record-block { margin: 16px 0 var(--record-gap, 24px); }
 
 @media (min-width: 768px) {
   .record__heading,
