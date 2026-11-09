@@ -2,7 +2,7 @@
 /* Edge rail + products-first grid. Values follow the "Edge rail" design (desktop 1440, mobile 390).
    Rail 40px desktop / 36px mobile; panel 380px / calc(100vw - 36px); gutters 24px / 16px; breakpoint = theme md (768px). */
 
-:root { --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 36px; --panel-w: calc(100vw - 36px); --strip-h: 56px; --gut: 16px; }
+:root { --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 36px; --panel-w: calc(100vw - var(--rail-w)); --strip-h: 56px; --gut: 16px; }
 @media (min-width: 768px) { :root { --rail-w: 40px; --panel-w: 380px; --gut: 24px; } }
 
 body { padding-left: var(--rail-w); }
@@ -56,11 +56,10 @@ html.edge-locked { overflow: hidden; }
 /* ---- Scrim + panel ---- */
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
-.edge-panel { position: fixed; z-index: 50; left: 0; width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
-  display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out 0.06s; }
+  display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out; }
 .edge-panel[data-tab='cart'] { bottom: auto; }
-.edge-panel[data-tab='try'] { top: auto; bottom: 0; }
 .edge-panel.is-entering { transform: translateX(-100%); transition-delay: 0s; }
 .edge-scrim { transition: opacity 0.2s ease-out; }
 .edge-scrim.is-entering { opacity: 0; }
@@ -228,6 +227,11 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-social__icon svg path { fill: currentColor; }
 
 /* Opening pushes the rail out to the panel's right edge first, then the panel expands in the space it left */
-.edge-rail { transition: transform 0.2s ease-out; }
-.edge-rail.is-open { transform: translateX(var(--panel-w)); }
-@media (prefers-reduced-motion: reduce) { .edge-rail, .edge-panel { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .edge-panel { transition: none !important; } }
+
+/* The Cart button and tab disappear while the cart and the try-on list are both empty */
+.edge-rail [hidden], .edge-tabs [hidden] { display: none !important; }
+/* Cart window: the try-on lines sit under the cart lines */
+.edge-sec { border-top: 1px solid var(--rule); margin-top: 8px; }
+.edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-sec .edge-body { padding-top: 12px; }

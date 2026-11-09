@@ -8,12 +8,10 @@
   assign cfg = section.settings
   assign show_cart = cfg.show_cart
   assign show_search = cfg.show_search
-  assign show_try = cfg.show_try_on
   assign show_switch = cfg.show_stock_switch
   assign tab_menu = cfg.tab_menu
   assign tab_filter = cfg.tab_filter
   assign tab_cart = cfg.tab_cart
-  assign tab_try = cfg.tab_try_on
   assign rail_menu = linklists[section.settings.edge_menu]
 
   assign filter_source = nil
@@ -68,12 +66,12 @@
   </div>
 </div>
 
-<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
+<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}" data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
   <div class="edge-rail__group">
     {%- if show_cart != false -%}
-    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart">
+    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
       <span class="edge-dot" aria-hidden="true"></span>
-      <span>Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</span>
+      <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
     </button>
     {%- endif -%}
     {%- if show_search != false -%}
@@ -84,18 +82,11 @@
   </div>
   <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Menu and filter">+</button>
   <div class="edge-rail__group">
-    {%- if show_try != false -%}
-    <button type="button" class="edge-rail__v" data-edge-open="try" aria-haspopup="dialog" aria-expanded="false" aria-label="Try-on list">
-      <span class="edge-dot edge-dot--hollow" aria-hidden="true"></span>
-      <span>Try-on [<span data-edge-count="try">0</span>]</span>
-    </button>
-    {%- endif -%}
   </div>
   <noscript>
     <ul class="edge-noscript">
       <li><a href="{{ routes.cart_url }}">Cart</a></li>
       <li><a href="{{ routes.search_url }}">Search</a></li>
-      <li><a href="/pages/try-in-store">Try-on</a></li>
     </ul>
   </noscript>
 </nav>
@@ -111,10 +102,7 @@
     <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter</button>
     {%- endif -%}
     {%- if tab_cart != false -%}
-    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1">Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</button>
-    {%- endif -%}
-    {%- if tab_try != false -%}
-    <button type="button" role="tab" id="edge-tab-try" aria-controls="edge-pane-try" aria-selected="false" data-edge-tab="try" tabindex="-1">Try-on [<span data-edge-count="try">0</span>]</button>
+    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1"{% if cart.item_count == 0 %} hidden{% endif %}>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</button>
     {%- endif -%}
   </div>
 
@@ -280,10 +268,10 @@
 
     <div role="tabpanel" id="edge-pane-cart" aria-labelledby="edge-tab-cart" data-edge-pane="cart" hidden>
       <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
-    </div>
-
-    <div role="tabpanel" id="edge-pane-try" aria-labelledby="edge-tab-try" data-edge-pane="try" hidden>
-      <div data-edge-list="try"><p class="edge-empty">Loading…</p></div>
+      <section class="edge-sec" data-edge-try-sec aria-label="Try-on" hidden>
+        <h3 class="edge-sec__h">Try-on [<span data-edge-count="try">0</span>]</h3>
+        <div data-edge-list="try"></div>
+      </section>
     </div>
   </div>
 </section>

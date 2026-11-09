@@ -33,8 +33,21 @@
   }
 
   /* ---------- counts ---------- */
+  const counts = { cart: Number((railRoot() || {}).dataset ? railRoot().dataset.cartCount : 0) || 0, try: 0 };
+  function railRoot() {
+    return $('[data-edge-rail]');
+  }
+  // One Cart for both lists: the label shows cart + try-on, and the button is hidden while both are empty
   function setCount(kind, n) {
+    if (kind in counts) counts[kind] = n;
     $$('[data-edge-count="' + kind + '"]').forEach((el) => (el.textContent = n));
+    $$('[data-edge-count="total"]').forEach((el) => (el.textContent = counts.cart + counts.try));
+    syncCartVisibility();
+  }
+  function syncCartVisibility() {
+    const empty = counts.cart + counts.try === 0;
+    const keep = isOpen && panel.dataset.tab === 'cart';
+    $$('[data-edge-open="cart"], [data-edge-tab="cart"]').forEach((el) => (el.hidden = empty && !keep));
   }
   function tryStore() {
     return window.Alpine && window.Alpine.store ? window.Alpine.store('tryOnList') : null;
@@ -60,8 +73,10 @@
       if (on && focusTab) b.focus();
     });
     $$('[data-edge-pane]', panel).forEach((p) => (p.hidden = p.dataset.edgePane !== tab));
-    if (tab === 'cart') refreshCart();
-    if (tab === 'try') renderTry();
+    if (tab === 'cart') {
+      refreshCart();
+      renderTry();
+    }
     if (tab === 'filter') ensureGroupOpen();
     syncTriggers();
   }
@@ -133,6 +148,7 @@
       },
       reduceMotion ? 0 : 220
     );
+    syncCartVisibility();
     if (restoreFocus !== false) (lastTrigger || plus).focus();
   }
 
@@ -247,7 +263,7 @@
     const host = $('[data-edge-list="cart"]');
     if (!host || !cart) return;
     if (!cart.items.length) {
-      host.innerHTML = '<div class="edge-body"><p class="edge-empty">Your cart is empty.</p></div>';
+      host.innerHTML = tryItems().length ? '' : '<div class="edge-body"><p class="edge-empty">Your cart is empty.</p></div>';
       return;
     }
     host.innerHTML = '<div class="edge-body">' +
@@ -272,8 +288,11 @@
     if (!host) return;
     const items = tryItems();
     setCount('try', items.length);
+    const sec = $('[data-edge-try-sec]');
+    if (sec) sec.hidden = !items.length;
+    if (cart) renderCart();
     if (!items.length) {
-      host.innerHTML = '<div class="edge-body"><p class="edge-empty">Nothing to try on yet.</p></div>';
+      host.innerHTML = '';
       return;
     }
     host.innerHTML = '<div class="edge-body">' +
@@ -486,8 +505,10 @@
   });
 
   /* PDP: Add to cart opens the Cart tab, Try in-store opens the Try-on tab */
-  document.body.addEventListener('baseline:cart:afteradditem', () => openPanel('cart', plus));
-  window.addEventListener('open-try-on', () => openPanel('try', $('[data-edge-open="try"]')));
+  document.body.addEventListener('baseline:cart:afteradditem', () => {
+    refreshCart().then(() => openPanel('cart', $('[data-edge-open="cart"]') || plus));
+  });
+  window.addEventListener('open-try-on', () => openPanel('cart', $('[data-edge-open="cart"]') || plus));
   window.addEventListener('storage', renderTry);
 
   /* ---------- hover to open (desktop) ---------- */
