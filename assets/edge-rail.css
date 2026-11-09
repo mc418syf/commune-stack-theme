@@ -188,5 +188,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* PLP: the logo strip is transparent, sits over the grid and sticks while scrolling; only the logo and summary take clicks */
 .edge-strip[data-plp='true'] { position: fixed; left: var(--rail-w); right: 0; background: transparent; pointer-events: none; }
 .edge-strip[data-plp='true'] a, .edge-strip[data-plp='true'] button { pointer-events: auto; }
+/* the rail, panel, scrim and search live inside the strip element; they must keep taking clicks */
+.edge-strip[data-plp='true'] .edge-rail, .edge-strip[data-plp='true'] .edge-panel, .edge-strip[data-plp='true'] .edge-scrim, .edge-strip[data-plp='true'] .edge-search { pointer-events: auto; }
 .edge-switchrow { flex: none; padding: 0 var(--gut); border-top: 1px solid var(--rule); border-bottom: 1px dashed var(--rule-dashed); }
 .edge-switchrow .edge-switch { min-height: 44px; width: 100%; gap: 10px; }
