@@ -6,9 +6,6 @@
 
 {%- liquid
   assign rail_menu = linklists[section.settings.edge_menu]
-  if rail_menu == blank or rail_menu.links.size == 0
-    assign rail_menu = linklists[section.settings.menu]
-  endif
 
   assign filter_source = nil
   if template.name == 'collection'
@@ -51,15 +48,21 @@
 
 <div class="edge-strip__inner">
   <div class="edge-strip__left">
-    {%- if on_plp and avail_value -%}
+    {%- if on_plp -%}
+      {%- comment -%} With the Availability filter enabled in Search & Discovery the switch uses filter.v.availability; without it, it hides sold-out cards on the page. {%- endcomment -%}
       <button
         type="button"
         class="edge-switch"
         role="switch"
-        aria-checked="{{ avail_value.active }}"
-        data-edge-switch
-        data-url-add="{{ avail_value.url_to_add }}"
-        data-url-remove="{{ avail_value.url_to_remove }}"
+        {% if avail_value %}
+          aria-checked="{{ avail_value.active }}"
+          data-edge-switch
+          data-url-add="{{ avail_value.url_to_add }}"
+          data-url-remove="{{ avail_value.url_to_remove }}"
+        {% else %}
+          aria-checked="false"
+          data-edge-switch-local
+        {% endif %}
       >
         <i aria-hidden="true"></i>
         <span class="edge-switch__d">Hide sold out</span>
@@ -147,7 +150,7 @@
               {%- liquid
                 assign label = f.label
                 assign label_down = f.label | downcase
-                if label_down == 'vendor' or label_down == 'brand'
+                if label_down == 'vendor' or label_down == 'brand' or label_down == 'designers' or label_down == 'designer'
                   assign label = 'Designer'
                 elsif label_down == 'product type' or label_down == 'type'
                   assign label = 'Category'

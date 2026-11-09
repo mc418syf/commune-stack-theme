@@ -135,3 +135,4 @@ html.edge-locked { overflow: hidden; }
 .product-card--sold-out .line-through { text-decoration: none; }
 .product-tile-price .edge-soldout { margin-left: 0.5em; }
 html.edge-busy #results { opacity: 0.4; transition: opacity 0.15s; }
+html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { display: none; }

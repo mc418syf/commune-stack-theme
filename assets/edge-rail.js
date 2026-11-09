@@ -355,6 +355,21 @@
     if ($('[data-edge-filters]')) applyUrl(location.href, false);
   });
 
+  /* Hide sold out without the Availability filter: hide sold-out cards on the page */
+  const SOLD_KEY = 'commune_hide_sold_out';
+  function toggleLocalSwitch(btn) {
+    const on = btn.getAttribute('aria-checked') !== 'true';
+    btn.setAttribute('aria-checked', on);
+    document.documentElement.classList.toggle('edge-hide-soldout', on);
+    try { localStorage.setItem(SOLD_KEY, on ? '1' : '0'); } catch (_) {}
+  }
+  function restoreLocalSwitch() {
+    const btn = $('[data-edge-switch-local]');
+    let on = false;
+    try { on = localStorage.getItem(SOLD_KEY) === '1'; } catch (_) {}
+    if (btn && on) toggleLocalSwitch(btn);
+  }
+
   /* ---------- events ---------- */
   document.addEventListener('click', (e) => {
     const t = e.target;
@@ -381,6 +396,8 @@
       e.preventDefault();
       return applyUrl(clear.href);
     }
+    const local = t.closest('[data-edge-switch-local]');
+    if (local) return toggleLocalSwitch(local);
     const sw = t.closest('[data-edge-switch]');
     if (sw) return applyUrl(sw.getAttribute('aria-checked') === 'true' ? sw.dataset.urlRemove : sw.dataset.urlAdd);
     const act = t.closest('[data-edge-act]');
@@ -416,6 +433,7 @@
   window.addEventListener('storage', renderTry);
 
   /* ---------- init ---------- */
+  restoreLocalSwitch();
   setCount('try', tryItems().length);
   fetch('/cart.js', { headers: { Accept: 'application/json' } })
     .then((r) => r.json())
