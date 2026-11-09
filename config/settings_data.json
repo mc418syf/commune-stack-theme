@@ -62,6 +62,14 @@
     "product_card_size_offset": 2,
     "product_info_letterspacing": "0.1em",
     "product_price_size": 12,
+    "size_head_desktop": 14,
+    "size_head_mobile": 12,
+    "size_mark_desktop": 14,
+    "size_mark_mobile": 12,
+    "size_name": 13,
+    "size_price": 11,
+    "size_body": 11,
+    "size_button": 11,
     "quick_buy_variant_picker_option_style": "text_underline",
     "enable_breadcrumbs": false,
     "breadcrumb_separator": "bullet",
@@ -119,11 +127,11 @@
     "color_schemes": {
       "scheme1": {
         "settings": {
-          "background": "#F4F3EF",
+          "background": "#f4f3ef",
           "text": "#111111",
-          "accent": "#FF5A1F",
+          "accent": "#ff5a1f",
           "accent_contrast": "#111111",
-          "secondary": "#6B6B66"
+          "secondary": "#6b6b66"
         }
       },
       "scheme2": {

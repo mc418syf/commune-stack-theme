@@ -756,7 +756,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Size, weight and letter spacing of each text style. Line heights follow the size. Mobile sizes apply below 768px. Letter spacing is in hundredths of an em: 10 means 0.10em."
+        "content": "Size of each text style, in px. Line heights follow the size. Mobile values apply below 768px."
       },
       {
         "type": "header",
@@ -765,7 +765,7 @@
       {
         "type": "range",
         "id": "size_hero_desktop",
-        "label": "Size, desktop",
+        "label": "Desktop",
         "min": 11,
         "max": 96,
         "step": 1,
@@ -776,42 +776,12 @@
       {
         "type": "range",
         "id": "size_hero_mobile",
-        "label": "Size, mobile",
+        "label": "Mobile",
         "min": 11,
         "max": 96,
         "step": 1,
         "unit": "px",
         "default": 40
-      },
-      {
-        "type": "select",
-        "id": "weight_hero",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "600"
-      },
-      {
-        "type": "range",
-        "id": "tracking_hero",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 2
       },
       {
         "type": "header",
@@ -820,7 +790,7 @@
       {
         "type": "range",
         "id": "size_head_desktop",
-        "label": "Size, desktop",
+        "label": "Desktop",
         "min": 11,
         "max": 96,
         "step": 1,
@@ -831,42 +801,12 @@
       {
         "type": "range",
         "id": "size_head_mobile",
-        "label": "Size, mobile",
+        "label": "Mobile",
         "min": 11,
         "max": 96,
         "step": 1,
         "unit": "px",
         "default": 22
-      },
-      {
-        "type": "select",
-        "id": "weight_head",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "600"
-      },
-      {
-        "type": "range",
-        "id": "tracking_head",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 10
       },
       {
         "type": "header",
@@ -875,7 +815,7 @@
       {
         "type": "range",
         "id": "size_mark_desktop",
-        "label": "Size, desktop",
+        "label": "Desktop",
         "min": 11,
         "max": 96,
         "step": 1,
@@ -885,42 +825,12 @@
       {
         "type": "range",
         "id": "size_mark_mobile",
-        "label": "Size, mobile",
+        "label": "Mobile",
         "min": 11,
         "max": 96,
         "step": 1,
         "unit": "px",
         "default": 18
-      },
-      {
-        "type": "select",
-        "id": "weight_mark",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "600"
-      },
-      {
-        "type": "range",
-        "id": "tracking_mark",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 32
       },
       {
         "type": "header",
@@ -929,7 +839,7 @@
       {
         "type": "range",
         "id": "size_tab_desktop",
-        "label": "Size, desktop",
+        "label": "Desktop",
         "min": 11,
         "max": 96,
         "step": 1,
@@ -939,7 +849,7 @@
       {
         "type": "range",
         "id": "size_tab_mobile",
-        "label": "Size, mobile",
+        "label": "Mobile",
         "min": 11,
         "max": 96,
         "step": 1,
@@ -947,88 +857,24 @@
         "default": 18
       },
       {
-        "type": "select",
-        "id": "weight_tab",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "600"
-      },
-      {
-        "type": "range",
-        "id": "tracking_tab",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 4
-      },
-      {
         "type": "header",
-        "content": "Product name (brand and title)"
+        "content": "Same size on every screen"
       },
       {
         "type": "range",
         "id": "size_name",
-        "label": "Size",
+        "label": "Product name (brand and title)",
         "min": 11,
         "max": 28,
         "step": 1,
         "unit": "px",
         "default": 14,
-        "info": "Product page and cart. Product cards are smaller by the card offset in Product text. Buttons use this size too."
-      },
-      {
-        "type": "select",
-        "id": "weight_name",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "600"
-      },
-      {
-        "type": "range",
-        "id": "tracking_name",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 10
-      },
-      {
-        "type": "header",
-        "content": "Price"
+        "info": "Cards, grid, search, cart and product page."
       },
       {
         "type": "range",
         "id": "size_price",
-        "label": "Size",
+        "label": "Price",
         "min": 11,
         "max": 28,
         "step": 1,
@@ -1036,43 +882,9 @@
         "default": 12
       },
       {
-        "type": "select",
-        "id": "weight_price",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "400"
-      },
-      {
-        "type": "range",
-        "id": "tracking_price",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 0
-      },
-      {
-        "type": "header",
-        "content": "Nav, labels, tags, filters"
-      },
-      {
         "type": "range",
         "id": "size_label",
-        "label": "Size",
+        "label": "Nav, labels, tags, filters",
         "min": 11,
         "max": 28,
         "step": 1,
@@ -1080,43 +892,9 @@
         "default": 11
       },
       {
-        "type": "select",
-        "id": "weight_label",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "400"
-      },
-      {
-        "type": "range",
-        "id": "tracking_label",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 8
-      },
-      {
-        "type": "header",
-        "content": "Body, description and record column"
-      },
-      {
         "type": "range",
         "id": "size_body",
-        "label": "Size",
+        "label": "Body, description and record column",
         "min": 11,
         "max": 28,
         "step": 1,
@@ -1125,68 +903,14 @@
         "info": "The product description and the record list always use this size."
       },
       {
-        "type": "select",
-        "id": "weight_body",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "400"
-      },
-      {
         "type": "range",
-        "id": "tracking_body",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
+        "id": "size_button",
+        "label": "Buttons",
+        "min": 11,
+        "max": 28,
         "step": 1,
-        "unit": "/100em",
-        "default": 0
-      },
-      {
-        "type": "header",
-        "content": "Buttons"
-      },
-      {
-        "type": "select",
-        "id": "weight_button",
-        "label": "Weight",
-        "options": [
-          {
-            "value": "400",
-            "label": "Regular"
-          },
-          {
-            "value": "500",
-            "label": "Medium"
-          },
-          {
-            "value": "600",
-            "label": "Semibold"
-          }
-        ],
-        "default": "500"
-      },
-      {
-        "type": "range",
-        "id": "tracking_button",
-        "label": "Letter spacing",
-        "min": 0,
-        "max": 40,
-        "step": 1,
-        "unit": "/100em",
-        "default": 8
+        "unit": "px",
+        "default": 13
       }
     ]
   },
