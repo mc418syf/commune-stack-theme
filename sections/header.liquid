@@ -58,6 +58,32 @@
   </a>
 {%- endcapture -%}
 
+{%- liquid
+  assign vellum_alpha = section.settings.vellum_opacity | default: 72 | divided_by: 100.0
+  assign vellum_rgb = section.settings.vellum_color | default: '#F4F3EF' | color_to_rgb | remove: 'rgb(' | remove: ')'
+-%}
+{% style %}
+  .edge-rail, .edge-panel, .edge-search, .edge-strip {
+    --paper: {{ section.settings.vellum_color | default: '#F4F3EF' }};
+    --ink: {{ section.settings.ink_color | default: '#111111' }};
+    --gray: {{ section.settings.muted_color | default: '#6B6B66' }};
+    --orange: {{ section.settings.accent_color | default: '#FF5A1F' }};
+    --orange-ink: {{ section.settings.accent_text_color | default: '#C23B05' }};
+  }
+  :root {
+    --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
+    --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
+    --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
+    --strip-h: {{ section.settings.strip_height | default: 56 }}px;
+  }
+  @media (min-width: 768px) {
+    :root {
+      --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
+      --panel-w: {{ section.settings.panel_width | default: 380 }}px;
+    }
+  }
+{% endstyle %}
+
 <header-section
   class="block"
   data-color-scheme="{{ section_color }}"
@@ -112,6 +138,159 @@
       "id": "color_scheme",
       "default": "scheme1",
       "label": "Color scheme"
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "vellum_color",
+      "label": "Vellum colour",
+      "default": "#F4F3EF",
+      "info": "Colour of the rail, panel and search window."
+    },
+    {
+      "type": "range",
+      "id": "vellum_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Vellum opacity",
+      "default": 72,
+      "info": "Lower is more see-through."
+    },
+    {
+      "type": "range",
+      "id": "vellum_blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Vellum blur",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "ink_color",
+      "label": "Text colour",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Secondary text colour",
+      "default": "#6B6B66"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent fill (buttons, cart dot)",
+      "default": "#FF5A1F"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text and hover",
+      "default": "#C23B05"
+    },
+    {
+      "type": "header",
+      "content": "Width"
+    },
+    {
+      "type": "range",
+      "id": "rail_width_desktop",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Rail width, desktop",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "rail_width_mobile",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Rail width, mobile",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "panel_width",
+      "min": 280,
+      "max": 560,
+      "step": 10,
+      "unit": "px",
+      "label": "Panel and search width, desktop",
+      "default": 380,
+      "info": "On mobile the panel fills the screen beside the rail."
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "min": 40,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "label": "Logo strip height",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Components"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Cart button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Search button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_try_on",
+      "label": "Try-on button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stock_switch",
+      "label": "Hide sold out switch (collections)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_menu",
+      "label": "Menu tab",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_filter",
+      "label": "Filter tab",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_cart",
+      "label": "Cart tab",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_try_on",
+      "label": "Try-on tab",
+      "default": true
     }
   ]
 }

@@ -17,7 +17,7 @@
   const bar = $('[data-edge-searchbar]');
   const input = $('[data-edge-input]');
   const results = $('[data-edge-results]');
-  const TABS = ['menu', 'filter', 'cart', 'try'];
+  const TABS = $$('[data-edge-tab]', panel).map((b) => b.dataset.edgeTab);
 
   let cart = null;
   let lastTrigger = null;
@@ -51,7 +51,7 @@
 
   /* ---------- panel ---------- */
   function setTab(tab, focusTab) {
-    if (TABS.indexOf(tab) < 0) tab = 'menu';
+    if (TABS.indexOf(tab) < 0) tab = TABS[0] || 'menu';
     panel.dataset.tab = tab;
     $$('[data-edge-tab]', panel).forEach((b) => {
       const on = b.dataset.edgeTab === tab;

@@ -5,6 +5,15 @@
 {%- endcomment -%}
 
 {%- liquid
+  assign cfg = section.settings
+  assign show_cart = cfg.show_cart
+  assign show_search = cfg.show_search
+  assign show_try = cfg.show_try_on
+  assign show_switch = cfg.show_stock_switch
+  assign tab_menu = cfg.tab_menu
+  assign tab_filter = cfg.tab_filter
+  assign tab_cart = cfg.tab_cart
+  assign tab_try = cfg.tab_try_on
   assign rail_menu = linklists[section.settings.edge_menu]
 
   assign filter_source = nil
@@ -48,7 +57,7 @@
 
 <div class="edge-strip__inner">
   <div class="edge-strip__left">
-    {%- if on_plp -%}
+    {%- if on_plp and show_switch != false -%}
       {%- comment -%} With the Availability filter enabled in Search & Discovery the switch uses filter.v.availability; without it, it hides sold-out cards on the page. {%- endcomment -%}
       <button
         type="button"
@@ -83,20 +92,26 @@
 
 <nav class="edge-rail" aria-label="Edge rail" data-edge-rail>
   <div class="edge-rail__group">
+    {%- if show_cart != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart">
       <span class="edge-dot" aria-hidden="true"></span>
       <span>Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</span>
     </button>
+    {%- endif -%}
+    {%- if show_search != false -%}
     <button type="button" class="edge-rail__v" data-edge-search aria-label="Search">
       <span>Search</span>
     </button>
+    {%- endif -%}
   </div>
   <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Menu and filter">+</button>
   <div class="edge-rail__group">
+    {%- if show_try != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="try" aria-haspopup="dialog" aria-expanded="false" aria-label="Try-on list">
       <span class="edge-dot edge-dot--hollow" aria-hidden="true"></span>
       <span>Try-on [<span data-edge-count="try">0</span>]</span>
     </button>
+    {%- endif -%}
   </div>
   <noscript>
     <ul class="edge-noscript">
@@ -111,10 +126,18 @@
 
 <section class="edge-panel" role="dialog" aria-modal="true" aria-label="Tools" data-edge-panel data-tab="menu" hidden>
   <div class="edge-tabs" role="tablist" aria-label="Tools">
+    {%- if tab_menu != false -%}
     <button type="button" role="tab" id="edge-tab-menu" aria-controls="edge-pane-menu" aria-selected="true" data-edge-tab="menu">Menu</button>
+    {%- endif -%}
+    {%- if tab_filter != false -%}
     <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter</button>
+    {%- endif -%}
+    {%- if tab_cart != false -%}
     <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1">Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</button>
+    {%- endif -%}
+    {%- if tab_try != false -%}
     <button type="button" role="tab" id="edge-tab-try" aria-controls="edge-pane-try" aria-selected="false" data-edge-tab="try" tabindex="-1">Try-on [<span data-edge-count="try">0</span>]</button>
+    {%- endif -%}
   </div>
 
   <div class="edge-panes">
