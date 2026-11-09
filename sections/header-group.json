@@ -34,11 +34,30 @@
       "type": "header",
       "custom_css": [],
       "settings": {
-        "logo_max_width": 120,
+        "logo_max_width": 150,
         "logo_max_width_mobile": 110,
+        "edge_menu": "",
         "menu": "menu-1",
         "color_scheme": "scheme1",
-        "edge_menu": "edge-rail"
+        "vellum_color": "#FCFCFC",
+        "vellum_opacity": 72,
+        "vellum_blur": 18,
+        "ink_color": "#111111",
+        "muted_color": "#292929",
+        "accent_color": "#ff5a1f",
+        "accent_text_color": "#c23b05",
+        "rail_width_desktop": 30,
+        "rail_width_mobile": 24,
+        "panel_width": 380,
+        "strip_height": 40,
+        "show_cart": true,
+        "show_search": true,
+        "show_try_on": true,
+        "show_stock_switch": true,
+        "tab_menu": true,
+        "tab_filter": true,
+        "tab_cart": true,
+        "tab_try_on": true
       }
     }
   },

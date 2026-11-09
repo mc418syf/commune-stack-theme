@@ -182,6 +182,3 @@ html.edge-locked { overflow: hidden; }
 .product-tile-price .edge-soldout::before { content: ' · '; }
 html.edge-busy #results { opacity: 0.4; transition: opacity 0.15s; }
 html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { display: none; }
-
-/* filter option text: 9px (needs the panel prefix to beat the shared button reset) */
-.edge-panel .edge-opt, .edge-panel .edge-opt__c { font-size: 9px; line-height: 12px; letter-spacing: 0.04em; }

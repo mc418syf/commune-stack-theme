@@ -108,22 +108,6 @@
     "social_twitter_link": "",
     "social_vimeo_link": "",
     "full_bleed_grid": true,
-    "sections": {
-      "menu-drawer": {
-        "type": "menu-drawer",
-        "settings": {
-          "menu": "menu-1",
-          "secondary_menu": "",
-          "text_size": "text-heading-standard",
-          "show_borders": true,
-          "show_search": false,
-          "show_social": false,
-          "show_locale_selector": false,
-          "show_country_selector": false,
-          "color_scheme": ""
-        }
-      }
-    },
     "content_for_index": [],
     "color_schemes": {
       "scheme1": {
