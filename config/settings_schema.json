@@ -726,6 +726,17 @@
         "default": 2
       },
       {
+        "type": "range",
+        "id": "recommendation_card_size_offset",
+        "label": "Recommended products: extra size reduction",
+        "info": "Cards under \"You may also like\" are this much smaller than the collection page cards, on top of the card offset above.",
+        "min": 0,
+        "max": 6,
+        "step": 1,
+        "unit": "px",
+        "default": 2
+      },
+      {
         "type": "select",
         "id": "product_info_letterspacing",
         "label": "Letter spacing",

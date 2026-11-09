@@ -227,3 +227,15 @@ hr, .border-gridline-color { border-color: var(--rule); }
   letter-spacing: var(--name-ls);
   text-transform: uppercase;
 }
+
+/* Recommended products (You may also like): the collection card size minus a further offset */
+.related-products .product-tile-meta,
+.related-products .product-tile-vendor, .related-products .product-tile-vendor a,
+.related-products .product-tile-title, .related-products .product-tile-title a {
+  font-size: calc(var(--name-size) - var(--product-card-offset, 2px) - var(--recs-card-offset, 2px));
+  line-height: calc(var(--name-lh) - var(--product-card-offset, 2px) - var(--recs-card-offset, 2px));
+}
+.related-products .product-tile-price, .related-products .product-tile-price * {
+  font-size: calc(var(--price-size) - var(--product-card-offset, 2px) - var(--recs-card-offset, 2px));
+  line-height: calc(var(--price-lh) - var(--product-card-offset, 2px) - var(--recs-card-offset, 2px));
+}
