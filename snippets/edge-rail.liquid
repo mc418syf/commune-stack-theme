@@ -78,14 +78,19 @@
       <span data-edge-search-label>Search</span>
     </button>
     {%- endif -%}
+    {%- if on_plp and tab_filter != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="filter" aria-haspopup="dialog" aria-expanded="false" aria-label="Filter">
+      <span>Filter{% if active_total > 0 %} [{{ active_total }}]{% endif %}</span>
+    </button>
+    {%- endif -%}
+  </div>
+  <div class="edge-rail__group">
     {%- if show_cart != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
       <span class="edge-dot" aria-hidden="true"></span>
       <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
     </button>
     {%- endif -%}
-  </div>
-  <div class="edge-rail__group">
   </div>
   <noscript>
     <ul class="edge-noscript">
@@ -98,20 +103,8 @@
 <div class="edge-scrim" data-edge-scrim hidden></div>
 
 <section class="edge-panel" role="dialog" aria-modal="true" aria-label="Tools" data-edge-panel data-tab="menu" hidden>
-  <div class="edge-tabs" role="tablist" aria-label="Tools">
-    {%- if tab_menu != false -%}
-    <button type="button" role="tab" id="edge-tab-menu" aria-controls="edge-pane-menu" aria-selected="true" data-edge-tab="menu">Menu</button>
-    {%- endif -%}
-    {%- if tab_filter != false -%}
-    <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter</button>
-    {%- endif -%}
-    {%- if tab_cart != false -%}
-    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1"{% if cart.item_count == 0 %} hidden{% endif %}>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</button>
-    {%- endif -%}
-  </div>
-
   <div class="edge-panes">
-    <div role="tabpanel" id="edge-pane-menu" aria-labelledby="edge-tab-menu" data-edge-pane="menu">
+    <div role="region" id="edge-pane-menu" aria-label="Menu" data-edge-pane="menu">
       <ol class="edge-menu">
         {%- if rail_menu != blank and rail_menu.links.size > 0 -%}
           {%- for link in rail_menu.links -%}
@@ -198,7 +191,7 @@
       {%- endif -%}
     </div>
 
-    <div role="tabpanel" id="edge-pane-filter" aria-labelledby="edge-tab-filter" data-edge-pane="filter" hidden>
+    <div role="region" id="edge-pane-filter" aria-label="Filter" data-edge-pane="filter" hidden>
       <div data-edge-filters>
         {%- if on_plp -%}
           <form class="edge-filters" data-edge-filter-form onsubmit="return false">
@@ -270,7 +263,7 @@
       </div>
     </div>
 
-    <div role="tabpanel" id="edge-pane-cart" aria-labelledby="edge-tab-cart" data-edge-pane="cart" hidden>
+    <div role="region" id="edge-pane-cart" aria-label="Cart" data-edge-pane="cart" hidden>
       <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
       <section class="edge-sec" data-edge-try-sec aria-label="Try-on" hidden>
         <h3 class="edge-sec__h">Try-on [<span data-edge-count="try">0</span>]</h3>

@@ -59,7 +59,6 @@
         "show_stock_switch": true,
         "tab_menu": true,
         "tab_filter": true,
-        "tab_cart": true,
         "hover_expand": true,
         "footer_menu": "footer",
         "menu_footer_links": true,

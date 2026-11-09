@@ -17,7 +17,7 @@
   const bar = $('[data-edge-searchbar]');
   const input = $('[data-edge-input]');
   const results = $('[data-edge-results]');
-  const TABS = $$('[data-edge-tab]', panel).map((b) => b.dataset.edgeTab);
+  const WINDOW_LABELS = { menu: 'Menu', filter: 'Filter', cart: 'Cart' };
 
   let cart = null;
   let lastTrigger = null;
@@ -63,15 +63,12 @@
   }
 
   /* ---------- panel ---------- */
-  function setTab(tab, focusTab) {
-    if (TABS.indexOf(tab) < 0) tab = TABS[0] || 'menu';
+  // Each rail button opens its own window: one pane per button, no tab row inside the panel
+  function setTab(tab) {
+    const names = $$('[data-edge-pane]', panel).map((p) => p.dataset.edgePane);
+    if (names.indexOf(tab) < 0) tab = names[0] || 'menu';
     panel.dataset.tab = tab;
-    $$('[data-edge-tab]', panel).forEach((b) => {
-      const on = b.dataset.edgeTab === tab;
-      b.setAttribute('aria-selected', on);
-      b.tabIndex = on ? 0 : -1;
-      if (on && focusTab) b.focus();
-    });
+    panel.setAttribute('aria-label', WINDOW_LABELS[tab] || 'Tools');
     $$('[data-edge-pane]', panel).forEach((p) => (p.hidden = p.dataset.edgePane !== tab));
     if (tab === 'cart') {
       refreshCart();
@@ -123,8 +120,9 @@
     if (pinned) document.documentElement.classList.add('edge-locked');
     setTab(tab);
     if (!wasOpen && !hover) {
-      const sel = $('[data-edge-tab][aria-selected="true"]', panel);
-      if (sel) sel.focus();
+      const pane = $('[data-edge-pane]:not([hidden])', panel);
+      const first = pane && pane.querySelector('a[href], button:not([disabled]), input');
+      (first || panel).focus({ preventScroll: true });
     }
   }
 
@@ -453,11 +451,6 @@
       return lastTrigger && lastTrigger.focus();
     }
     if (t.closest('[data-edge-scrim]') || t.closest('[data-edge-close]')) return closePanel();
-    const tab = t.closest('[data-edge-tab]');
-    if (tab) {
-      pin();
-      return setTab(tab.dataset.edgeTab);
-    }
     const gt = t.closest('[data-edge-group-toggle]');
     if (gt) {
       const i = $$('[data-edge-group]').indexOf(gt.closest('[data-edge-group]'));
@@ -493,11 +486,6 @@
       const last = f[f.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-    const tabBtn = e.target.closest && e.target.closest('[data-edge-tab]');
-    if (tabBtn && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
-      const i = TABS.indexOf(tabBtn.dataset.edgeTab);
-      setTab(TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length], true);
     }
   });
 

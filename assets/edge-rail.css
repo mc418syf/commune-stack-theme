@@ -58,19 +58,14 @@ html.edge-locked { overflow: hidden; }
 .edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
   display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out; }
-.edge-panel[data-tab='cart'] { bottom: auto; }
+.edge-panel[data-tab='cart'] { top: auto; bottom: 0; }
 .edge-panel.is-entering { transform: translateX(-100%); transition-delay: 0s; }
 .edge-scrim { transition: opacity 0.2s ease-out; }
 .edge-scrim.is-entering { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .edge-panel, .edge-scrim { transition: none; } }
 
-.edge-tabs { display: flex; align-items: flex-end; gap: 14px; height: 56px; padding: 0 var(--gut); border-bottom: 1px solid var(--rule); flex: none; overflow-x: auto; }
-.edge-tabs button { font-family: var(--font-display); font-weight: 600; font-size: 18px; line-height: 22px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gray);
-  min-height: 44px; min-width: 44px; padding: 0 0 10px !important; margin: 0 0 -1px; border-bottom: 2px solid transparent !important; white-space: nowrap; }
-.edge-tabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--ink) !important; }
-@media (min-width: 768px) { .edge-tabs { gap: 16px; } .edge-tabs button { font-size: 20px; line-height: 24px; } }
 
-.edge-panes { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.edge-panes { padding-top: 16px; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .edge-panes > [role='tabpanel'] { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
 .edge-panes > [hidden] { display: none; }
 [data-edge-filters] { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
@@ -229,8 +224,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 @media (prefers-reduced-motion: reduce) { .edge-panel { transition: none !important; } }
 
 /* The Cart button and tab disappear while the cart and the try-on list are both empty */
-.edge-rail [hidden], .edge-tabs [hidden] { display: none !important; }
-/* Cart window: the try-on lines sit under the cart lines */
+.edge-rail [hidden], /* Cart window: the try-on lines sit under the cart lines */
 .edge-sec { border-top: 1px solid var(--rule); margin-top: 8px; }
 .edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-sec .edge-body { padding-top: 12px; }
