@@ -216,3 +216,14 @@ hr, .border-gridline-color { border-color: var(--rule); }
   font-size: calc(var(--price-size) - var(--product-card-offset, 2px));
   line-height: calc(var(--price-lh) - var(--product-card-offset, 2px));
 }
+
+/* Header nav links (Shop, Appointment, Menu) are the product name style; the cart counts stay labels */
+[data-theme-header] header a.uppercase,
+[data-theme-header] header button.uppercase {
+  font-family: var(--font-display);
+  font-size: var(--name-size);
+  line-height: var(--name-lh);
+  font-weight: var(--name-weight);
+  letter-spacing: var(--name-ls);
+  text-transform: uppercase;
+}
