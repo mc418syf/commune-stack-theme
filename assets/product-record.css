@@ -128,7 +128,7 @@
 .product-strip .product-desc__body,
 .product-strip .record-lede {
   font-size: 13px;
-  line-height: 16px;
+  line-height: 21px;
 }
 .product-strip .product-desc__body *,
 .product-strip .record-lede * { font-size: inherit; line-height: inherit; }
