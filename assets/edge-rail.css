@@ -1,4 +1,4 @@
-/* v6 filter */
+/* v3 vellum */
 /* Edge rail + products-first grid. Values follow the "Edge rail" design (desktop 1440, mobile 390).
    Rail 40px desktop / 36px mobile; panel 380px / calc(100vw - 36px); gutters 24px / 16px; breakpoint = theme md (768px). */
 
@@ -182,3 +182,6 @@ html.edge-locked { overflow: hidden; }
 .product-tile-price .edge-soldout::before { content: ' · '; }
 html.edge-busy #results { opacity: 0.4; transition: opacity 0.15s; }
 html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { display: none; }
+
+/* filter option text: 9px (needs the panel prefix to beat the shared button reset) */
+.edge-panel .edge-opt, .edge-panel .edge-opt__c, .edge-panel .edge-opt__l { font-size: 9px !important; line-height: 12px !important; letter-spacing: 0.04em !important; }
