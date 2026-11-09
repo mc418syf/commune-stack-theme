@@ -60,6 +60,7 @@
 
 {%- liquid
   assign vellum_alpha = section.settings.vellum_opacity | default: 72 | divided_by: 100.0
+  assign text_alpha = section.settings.vellum_text_layer | default: 40 | divided_by: 100.0
   assign vellum_rgb = section.settings.vellum_color | default: '#F4F3EF' | color_to_rgb | remove: 'rgb(' | remove: ')'
 -%}
 {% style %}
@@ -84,6 +85,7 @@
   :root {
     --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
+    --vellum-text: rgba({{ vellum_rgb }}, {{ text_alpha }});
     --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
     --strip-h: {{ section.settings.strip_height | default: 56 }}px;
   }
@@ -195,6 +197,17 @@
       "unit": "px",
       "label": "Vellum blur",
       "default": 18
+    },
+    {
+      "type": "range",
+      "id": "vellum_text_layer",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Colour layer under the text",
+      "default": 40,
+      "info": "An extra layer of the vellum colour behind the menu, filter and cart text, so it reads clearly over photos."
     },
     {
       "type": "color",

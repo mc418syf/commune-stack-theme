@@ -232,3 +232,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* While a window is open, the other rail labels go quiet so the open one reads as selected */
 .edge-rail.is-open .edge-rail__v:not(.is-active) { color: var(--gray); }
 .edge-rail__v.is-active { color: var(--ink); }
+
+/* Extra colour layer under the text of every window (Header > Colour layer under the text) */
+.edge-panes { background: var(--vellum-text, transparent); }
+.edge-search__r { background-image: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)); }

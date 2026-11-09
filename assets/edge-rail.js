@@ -66,7 +66,7 @@
   // Each rail button opens its own window: one pane per button, no tab row inside the panel
   function positionWindow(tab) {
     const btn = $('[data-edge-rail] [data-edge-open="' + tab + '"]');
-    if (!btn || tab === 'cart') {
+    if (!btn || tab === 'cart' || tab === 'menu') {
       panel.style.removeProperty('--edge-win-top');
       return;
     }
