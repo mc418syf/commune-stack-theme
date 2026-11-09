@@ -36,14 +36,10 @@
             "hide_unavailable_variants": true
           }
         },
-        "buy_buttons": {
-          "type": "buy_buttons",
+        "description_rWXWew": {
+          "type": "description",
           "settings": {
-            "enable_payment_button": false,
-            "show_pickup_availability": false,
-            "show_gift_card_recipient": false,
-            "show_try_on_button": true,
-            "try_on_button_label": "Try In-Store"
+            "description_tab_label": "Description"
           }
         },
         "record_Lk3Qm9": {
@@ -55,13 +51,30 @@
             "key_1": "custom.condition",
             "fallback_1": "Good",
             "label_2": "Material",
-            "key_2": "custom.material"
+            "key_2": "custom.material",
+            "fallback_2": "",
+            "label_3": "",
+            "key_3": "",
+            "fallback_3": "",
+            "label_4": "",
+            "key_4": "",
+            "fallback_4": "",
+            "label_5": "",
+            "key_5": "",
+            "fallback_5": "",
+            "label_6": "",
+            "key_6": "",
+            "fallback_6": ""
           }
         },
-        "description_rWXWew": {
-          "type": "description",
+        "buy_buttons": {
+          "type": "buy_buttons",
           "settings": {
-            "description_tab_label": "Description"
+            "enable_payment_button": false,
+            "show_pickup_availability": false,
+            "show_gift_card_recipient": false,
+            "show_try_on_button": true,
+            "try_on_button_label": "Try In-Store"
           }
         },
         "complementary_Gx88yw": {
@@ -83,9 +96,9 @@
         "title",
         "price",
         "variant_picker",
+        "description_rWXWew",
         "record_Lk3Qm9",
         "buy_buttons",
-        "description_rWXWew",
         "complementary_Gx88yw"
       ],
       "custom_css": [
@@ -101,6 +114,12 @@
         "desktop_layout": "strip",
         "strip_height": 70,
         "strip_gap": 0,
+        "info_left_width": 50,
+        "info_right_width": 33,
+        "info_padding_x_desktop": 32,
+        "info_padding_y_desktop": 24,
+        "info_padding_x_mobile": 12,
+        "info_padding_y_mobile": 16,
         "two_media_per_row": true,
         "first_media_full_width": false,
         "variant_media_behavior": "scroll",
