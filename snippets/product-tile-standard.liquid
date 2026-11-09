@@ -199,33 +199,8 @@ PLP product card
               {% endfor %}
             </ul>
 
-            {% if img_count > 1 %}
-              <!-- overlay dots on bottom of the image -->
-              <div class="plp-dots plp-dots--overlay" aria-hidden="true">
-                {% for i in (1..img_count) %}
-                  <span class="plp-dot{% if forloop.first %} is-active{% endif %}"></span>
-                {% endfor %}
-              </div>
-            {% endif %}
           </div>
 
-          <script>
-            (function(){
-              var root=document.getElementById('plp-{{ section.id }}-{{ product.id }}');
-              if(!root) return;
-              var track=root.querySelector('.plp-snap-track');
-              var dots=[].slice.call(root.querySelectorAll('.plp-dot'));
-              if(!track || !dots.length) return;
-              function setActive(i){ for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('is-active',k===i);} }
-              function onScroll(){
-                var i=Math.round(track.scrollLeft / track.clientWidth);
-                if(i<0) i=0; if(i>=dots.length) i=dots.length-1;
-                setActive(i);
-              }
-              track.addEventListener('scroll', onScroll, {passive:true});
-              setActive(0);
-            })();
-          </script>
         {% endif %}
 
 

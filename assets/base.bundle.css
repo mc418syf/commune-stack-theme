@@ -5642,41 +5642,7 @@ html.no-js .splide:not(.is-active) .no-js\:\[\.splide\:not\(\.is-active\)_\&\]\:
 .plp-snap { position: relative; }
 
 /* === Sliding progress indicator === */
-.plp-dots {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  height: 1.5px;
-  background: rgba(0, 0, 0, 0.12);
-  pointer-events: none;
-  padding: 0;
-  gap: 0;
-  justify-content: flex-start;
-}
 
-.plp-dot {
-  flex: 1;
-  height: 1.5px;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  opacity: 1;
-  width: auto;
-  transform: none;
-  transition: none;
-}
-
-.plp-dot.is-active {
-  background: rgba(0, 0, 0, 0.8);
-  border: none;
-  border-radius: 0;
-}
-
-.plp-dot:not(.is-active) {
-  opacity: 1;
-}
 
 
 /* --- PDP (Splide) — hide arrows & center dots --- */
