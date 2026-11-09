@@ -90,7 +90,7 @@
   id="{{ section.id }}"
   data-theme-header
 >
-  <header class="edge-strip text-scheme-text" data-color-scheme="{{ section_color }}" data-plp="{% if template.name == 'collection' or template.name == 'search' %}true{% else %}false{% endif %}">
+  <header class="edge-strip text-scheme-text" data-logo="{{ section.settings.logo_align | default: 'left' }}" data-color-scheme="{{ section_color }}" data-plp="{% if template.name == 'collection' or template.name == 'search' %}true{% else %}false{% endif %}">
     {% render 'edge-rail', header_logo: header_logo, section: section %}
   </header>
 </header-section>
@@ -239,6 +239,22 @@
       "unit": "px",
       "label": "Logo strip height",
       "default": 56
+    },
+    {
+      "type": "select",
+      "id": "logo_align",
+      "label": "Logo position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        }
+      ],
+      "default": "left"
     },
     {
       "type": "header",

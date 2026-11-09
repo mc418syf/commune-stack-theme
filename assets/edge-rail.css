@@ -192,3 +192,6 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-strip[data-plp='true'] .edge-rail, .edge-strip[data-plp='true'] .edge-panel, .edge-strip[data-plp='true'] .edge-scrim, .edge-strip[data-plp='true'] .edge-search { pointer-events: auto; }
 .edge-switchrow { flex: none; padding: 0 var(--gut); border-top: 1px solid var(--rule); border-bottom: 1px dashed var(--rule-dashed); }
 .edge-switchrow .edge-switch { min-height: 44px; width: 100%; gap: 10px; }
+
+/* Logo sits at the left of the page (Header > Logo position) */
+.edge-strip[data-logo='left'] .edge-strip__logo { position: absolute; left: var(--gut); top: 0; bottom: 0; }
