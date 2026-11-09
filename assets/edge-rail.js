@@ -75,33 +75,62 @@
     );
   }
 
-  function openPanel(tab, trigger) {
+  let pinned = false;
+  let closeTimer = 0;
+
+  function pin() {
+    if (isOpen && !pinned) {
+      pinned = true;
+      document.documentElement.classList.add('edge-locked');
+    }
+  }
+
+  function openPanel(tab, trigger, hover) {
     closeSearch();
+    clearTimeout(closeTimer);
     lastTrigger = trigger || lastTrigger || plus;
     const wasOpen = isOpen;
     isOpen = true;
+    if (!wasOpen) pinned = !hover;
     panel.hidden = false;
     scrim.hidden = false;
-    document.documentElement.classList.add('edge-locked');
-    if (!wasOpen && !reduceMotion) {
-      panel.classList.add('is-entering');
-      requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.remove('is-entering')));
-    }
-    setTab(tab);
     if (!wasOpen) {
+      panel.classList.add('is-entering');
+      scrim.classList.add('is-entering');
+      void panel.offsetWidth;
+      requestAnimationFrame(() => {
+        panel.classList.remove('is-entering');
+        scrim.classList.remove('is-entering');
+      });
+    }
+    if (pinned) document.documentElement.classList.add('edge-locked');
+    setTab(tab);
+    if (!wasOpen && !hover) {
       const sel = $('[data-edge-tab][aria-selected="true"]', panel);
       if (sel) sel.focus();
     }
   }
 
-  function closePanel() {
+  function closePanel(restoreFocus) {
     if (!isOpen) return;
     isOpen = false;
-    panel.hidden = true;
-    scrim.hidden = true;
+    pinned = false;
+    panel.classList.add('is-entering');
+    scrim.classList.add('is-entering');
     document.documentElement.classList.remove('edge-locked');
     syncTriggers();
-    (lastTrigger || plus).focus();
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(
+      () => {
+        if (isOpen) return;
+        panel.hidden = true;
+        scrim.hidden = true;
+        panel.classList.remove('is-entering');
+        scrim.classList.remove('is-entering');
+      },
+      reduceMotion ? 0 : 220
+    );
+    if (restoreFocus !== false) (lastTrigger || plus).focus();
   }
 
   function focusables() {
@@ -391,8 +420,14 @@
   document.addEventListener('click', (e) => {
     const t = e.target;
     const open = t.closest('[data-edge-open]');
-    if (open) return openPanel(open.dataset.edgeOpen, open);
-    if (t.closest('[data-edge-toggle]')) return isOpen ? closePanel() : openPanel('menu', plus);
+    if (open) {
+      pin();
+      return openPanel(open.dataset.edgeOpen, open);
+    }
+    if (t.closest('[data-edge-toggle]')) {
+      if (isOpen && !pinned) return pin();
+      return isOpen ? closePanel() : openPanel('menu', plus);
+    }
     if (t.closest('[data-edge-search]')) return openSearch(t.closest('[data-edge-search]'));
     if (t.closest('[data-edge-search-close]')) {
       closeSearch();
@@ -400,7 +435,10 @@
     }
     if (t.closest('[data-edge-scrim]') || t.closest('[data-edge-close]')) return closePanel();
     const tab = t.closest('[data-edge-tab]');
-    if (tab) return setTab(tab.dataset.edgeTab);
+    if (tab) {
+      pin();
+      return setTab(tab.dataset.edgeTab);
+    }
     const gt = t.closest('[data-edge-group-toggle]');
     if (gt) {
       const i = $$('[data-edge-group]').indexOf(gt.closest('[data-edge-group]'));
@@ -448,6 +486,52 @@
   document.body.addEventListener('baseline:cart:afteradditem', () => openPanel('cart', plus));
   window.addEventListener('open-try-on', () => openPanel('try', $('[data-edge-open="try"]')));
   window.addEventListener('storage', renderTry);
+
+  /* ---------- hover to open (desktop) ---------- */
+  const rail = $('[data-edge-rail]');
+  const hoverMQ = window.matchMedia('(hover: hover) and (min-width: 768px)');
+  let overRail = false;
+  let overPanel = false;
+  let leaveTimer = 0;
+  const hoverEnabled = () => rail && rail.dataset.hover !== 'false' && hoverMQ.matches && bar.hidden;
+  function scheduleLeave() {
+    if (pinned || !isOpen) return;
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(() => {
+      if (!overRail && !overPanel && !pinned) closePanel(false);
+    }, 250);
+  }
+  if (rail) {
+    rail.addEventListener('mouseover', (e) => {
+      if (!hoverEnabled()) return;
+      overRail = true;
+      clearTimeout(leaveTimer);
+      if (e.target.closest('[data-edge-search]')) return;
+      const o = e.target.closest('[data-edge-open]');
+      const tab = o ? o.dataset.edgeOpen : 'menu';
+      if (isOpen && (pinned || panel.dataset.tab === tab)) return;
+      openPanel(tab, o || plus, true);
+    });
+    rail.addEventListener('mouseleave', () => {
+      overRail = false;
+      scheduleLeave();
+    });
+  }
+  panel.addEventListener('mouseenter', () => {
+    overPanel = true;
+    clearTimeout(leaveTimer);
+  });
+  panel.addEventListener('mouseleave', () => {
+    overPanel = false;
+    scheduleLeave();
+  });
+  panel.addEventListener('pointerdown', pin);
+  panel.addEventListener('focusin', (e) => {
+    if (e.target.matches('input')) pin();
+  });
+
+  /* after a newsletter sign-up the page reloads with ?customer_posted=true: show the result */
+  if (/customer_posted=true/.test(location.search) && $('[data-edge-news-ok]')) openPanel('menu', plus);
 
   /* ---------- init ---------- */
   restoreLocalSwitch();

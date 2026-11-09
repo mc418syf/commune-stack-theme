@@ -68,7 +68,7 @@
   </div>
 </div>
 
-<nav class="edge-rail" aria-label="Edge rail" data-edge-rail>
+<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
   <div class="edge-rail__group">
     {%- if show_cart != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart">
@@ -140,6 +140,49 @@
           <li><a class="edge-row" href="{{ routes.account_url }}"><span class="edge-row__n">04</span><span class="edge-row__l">Customer information</span></a></li>
         {%- endif -%}
       </ol>
+      {%- assign footer_list = linklists[cfg.footer_menu] -%}
+      {%- if cfg.menu_footer_links != false and footer_list != blank and footer_list.links.size > 0 -%}
+        <hr class="edge-rule">
+        <ul class="edge-footlinks">
+          {%- for link in footer_list.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if cfg.menu_newsletter != false -%}
+        <hr class="edge-rule">
+        <div class="edge-news">
+          {%- form 'customer', id: 'EdgeNewsletter' -%}
+            {%- if form.posted_successfully? -%}
+              <p class="edge-news__ok" role="status" data-edge-news-ok>Thanks for subscribing.</p>
+            {%- else -%}
+              {%- if form.errors -%}<div class="edge-news__err" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <label class="edge-news__l" for="EdgeNewsletterEmail">Newsletter</label>
+              <div class="edge-news__row">
+                <input id="EdgeNewsletterEmail" type="email" name="contact[email]" placeholder="Email address" required autocomplete="email" autocapitalize="off" autocorrect="off" value="{% if customer.email != blank %}{{ customer.email }}{% endif %}">
+                <button type="submit">Sign up</button>
+              </div>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+      {%- if cfg.menu_social != false -%}
+        {%- assign social_accounts = 'Instagram, Facebook, X, TikTok, YouTube, Pinterest, Threads, Whatsapp, Discord, Tumblr, Snapchat, LinkedIn, Messenger, Email' | split: ', ' -%}
+        {%- capture social_html -%}
+          {%- for social in social_accounts -%}
+            {%- assign handle = social | handleize -%}
+            {%- assign key = 'social_' | append: handle | append: '_link' -%}
+            {%- if settings[key] != blank -%}
+              <li><a href="{% if handle == 'email' %}mailto:{% endif %}{{ settings[key] }}"{% unless handle == 'email' %} target="_blank" rel="noopener"{% endunless %}>{{ social }}</a></li>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endcapture -%}
+        {%- if social_html contains '<li>' -%}
+          <hr class="edge-rule" style="margin-top: auto;">
+          <ul class="edge-social" style="margin-top: 0;">{{ social_html }}</ul>
+        {%- endif -%}
+      {%- endif -%}
     </div>
 
     <div role="tabpanel" id="edge-pane-filter" aria-labelledby="edge-tab-filter" data-edge-pane="filter" hidden>
