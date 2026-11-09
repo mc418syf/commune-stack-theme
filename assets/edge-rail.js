@@ -1,3 +1,4 @@
+/* v3 vellum */
 /**
  * Commune edge rail: tools panel (Menu / Filter / Cart / Try-on), search and the PLP filter swap.
  * Cart lines come from /cart.js, try-on lines from the Alpine store $store.tryOnList (try-on-list.js).
