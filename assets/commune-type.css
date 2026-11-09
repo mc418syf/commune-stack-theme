@@ -61,7 +61,7 @@ h1, h2, h3, .text-heading-standard {
   line-height: var(--head-lh);
   font-weight: 600;
   letter-spacing: var(--head-ls);
-  text-transform: uppercase;
+  text-transform: uppercase !important; /* section heading classes set their own case */
 }
 
 /* ---- Wordmark ---- */
@@ -89,6 +89,8 @@ h1, h2, h3, .text-heading-standard {
   -webkit-text-stroke: 0;
 }
 .product-tile-meta { font-size: var(--name-size); line-height: var(--name-lh); }
+
+[data-product-root] .product-vendor-block, [data-product-root] .product-vendor-block a { color: var(--ink); }
 
 /* ---- Price ---- */
 .product-tile-price, .product-tile-price *,
