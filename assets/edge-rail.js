@@ -67,6 +67,8 @@
   }
 
   function syncTriggers() {
+    const railEl = $('[data-edge-rail]');
+    if (railEl) railEl.classList.toggle('is-open', isOpen);
     plus.textContent = isOpen ? '×' : '+';
     plus.setAttribute('aria-label', isOpen ? 'Close panel' : 'Open menu');
     plus.setAttribute('aria-expanded', isOpen);

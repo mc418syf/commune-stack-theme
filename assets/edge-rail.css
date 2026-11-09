@@ -220,7 +220,13 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-news__row input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 .edge-news__row button { min-height: 44px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
 .edge-news__ok, .edge-news__err { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
-.edge-social { list-style: none; margin: auto 0 0; padding: 0 var(--gut); display: flex; flex-wrap: wrap; gap: 0 16px; }
-.edge-social a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); text-decoration: none;
-  font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+.edge-social { list-style: none; margin: auto 0 0; padding: 0 calc(var(--gut) - 12px) 8px; display: flex; flex-wrap: wrap; gap: 0; }
+.edge-social a { display: inline-flex; align-items: center; justify-content: center; width: 44px; min-height: 44px; color: var(--ink); text-decoration: none; }
 .edge-social a:hover { color: var(--gray); }
+.edge-social__icon { display: inline-flex; width: 20px; height: 20px; }
+.edge-social__icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+/* The close x rides the sheet: when the panel is open it sits at the panel's right edge and slides back with it */
+.edge-rail__plus { transition: transform 0.2s ease-out; }
+.edge-rail.is-open .edge-rail__plus { transform: translateX(var(--panel-w)); }
+@media (prefers-reduced-motion: reduce) { .edge-rail__plus { transition: none; } }

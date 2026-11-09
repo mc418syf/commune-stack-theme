@@ -174,7 +174,28 @@
             {%- assign handle = social | handleize -%}
             {%- assign key = 'social_' | append: handle | append: '_link' -%}
             {%- if settings[key] != blank -%}
-              <li><a href="{% if handle == 'email' %}mailto:{% endif %}{{ settings[key] }}"{% unless handle == 'email' %} target="_blank" rel="noopener"{% endunless %}>{{ social }}</a></li>
+              <li>
+                <a href="{% if handle == 'email' %}mailto:{% endif %}{{ settings[key] }}"{% unless handle == 'email' %} target="_blank" rel="noopener"{% endunless %} aria-label="{{ social }}">
+                  <span class="edge-social__icon" aria-hidden="true">
+                    {%- case handle -%}
+                      {%- when 'instagram' -%}{%- render 'icon-instagram' -%}
+                      {%- when 'facebook' -%}{%- render 'icon-facebook' -%}
+                      {%- when 'x' -%}{%- render 'icon-x' -%}
+                      {%- when 'tiktok' -%}{%- render 'icon-tiktok' -%}
+                      {%- when 'youtube' -%}{%- render 'icon-youtube' -%}
+                      {%- when 'pinterest' -%}{%- render 'icon-pinterest' -%}
+                      {%- when 'threads' -%}{%- render 'icon-threads' -%}
+                      {%- when 'whatsapp' -%}{%- render 'icon-whatsapp' -%}
+                      {%- when 'discord' -%}{%- render 'icon-discord' -%}
+                      {%- when 'tumblr' -%}{%- render 'icon-tumblr' -%}
+                      {%- when 'snapchat' -%}{%- render 'icon-snapchat' -%}
+                      {%- when 'linkedin' -%}{%- render 'icon-linkedin' -%}
+                      {%- when 'messenger' -%}{%- render 'icon-messenger' -%}
+                      {%- when 'email' -%}{%- render 'icon-email' -%}
+                    {%- endcase -%}
+                  </span>
+                </a>
+              </li>
             {%- endif -%}
           {%- endfor -%}
         {%- endcapture -%}
