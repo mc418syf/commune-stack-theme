@@ -187,7 +187,7 @@
 <section
   class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
   id="{{ section.id }}"
-  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %}"
+  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %} --info-px-d: {{ section.settings.info_padding_x_desktop }}px; --info-py-d: {{ section.settings.info_padding_y_desktop }}px; --info-px-m: {{ section.settings.info_padding_x_mobile }}px; --info-py-m: {{ section.settings.info_padding_y_mobile }}px;"
   x-data="
     Theme_Product({
       product: {{ product | json | escape }},
@@ -629,6 +629,51 @@
       "info": "Used by the image strip layout."
     },
     {
+      "type": "header",
+      "content": "Product information padding"
+    },
+    {
+      "type": "range",
+      "id": "info_padding_x_desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop: left and right",
+      "default": 32,
+      "info": "Space at the sides of the title, description and record column. Image strip layout."
+    },
+    {
+      "type": "range",
+      "id": "info_padding_y_desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop: top and bottom",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "info_padding_x_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile: left and right",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "info_padding_y_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile: top and bottom",
+      "default": 16
+    },
+    {
       "type": "checkbox",
       "id": "two_media_per_row",
       "label": "Enable two media per row on desktop",
@@ -907,113 +952,14 @@
     },
     {
       "type": "description",
-      "name": "Description & tabs",
+      "name": "Description",
       "limit": 1,
       "settings": [
         {
-          "type": "paragraph",
-          "content": "Tab 1 is always the product description. Add up to 5 extra tabs below. Leave a tab title blank to hide that tab."
-        },
-        {
-          "type": "checkbox",
-          "id": "archive_layout",
-          "label": "Archive record layout",
-          "default": true,
-          "info": "Two tabs: Description, and Measurement built from the custom.measurement metafield as a typed record. Replaces the extra tabs below while on."
-        },
-        {
           "type": "text",
           "id": "description_tab_label",
-          "label": "Tab 1 — Description label",
+          "label": "Heading",
           "default": "Description"
-        },
-        {
-          "type": "range",
-          "id": "tab_gap",
-          "label": "Gap between tab titles (px)",
-          "min": 8,
-          "max": 64,
-          "step": 2,
-          "unit": "px",
-          "default": 20
-        },
-        {
-          "type": "checkbox",
-          "id": "tab_titles_bold",
-          "label": "Bold tab titles",
-          "default": false
-        },
-        {
-          "type": "header",
-          "content": "Tab 2"
-        },
-        {
-          "type": "text",
-          "id": "tab_2_title",
-          "label": "Title",
-          "default": "Details"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_2_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 3"
-        },
-        {
-          "type": "text",
-          "id": "tab_3_title",
-          "label": "Title",
-          "default": "Measurements"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_3_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 4"
-        },
-        {
-          "type": "text",
-          "id": "tab_4_title",
-          "label": "Title"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_4_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 5"
-        },
-        {
-          "type": "text",
-          "id": "tab_5_title",
-          "label": "Title"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_5_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 6"
-        },
-        {
-          "type": "text",
-          "id": "tab_6_title",
-          "label": "Title"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_6_content",
-          "label": "Content"
         }
       ]
     },

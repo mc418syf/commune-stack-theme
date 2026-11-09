@@ -55,61 +55,23 @@
   .record__row { padding: 6px 0; }
 }
 
-/* ---- Tabs ---- */
-.product-tabs--record { margin-top: 0; }
-
-.product-tabs--record .product-tabs__titles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 16px;
-}
-
-.product-tabs--record .product-tabs__tab {
-  min-height: 44px;
-  margin: 0;
-  padding: 10px 0 6px;
+/* ---- Description heading (desktop) ---- */
+.product-desc__title {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 0 0 6px;
   font-family: var(--heading-font-stack);
   font-size: 18px;
   font-weight: 600;
   line-height: 1.1;
   text-transform: uppercase;
-  letter-spacing: 0.04em !important; /* the theme sets its own tracking on tabs with !important */
-  -webkit-text-stroke: 0;
-  color: var(--rec-muted);
-  opacity: 1;
-  background: none;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-}
-
-.product-tabs--record .product-tabs__tab--active {
-  color: var(--rec-ink);
-  border-bottom-color: var(--rec-ink);
-}
-
-.product-tabs--record .product-tabs__tab:focus-visible,
-.product-tabs--record .product-tabs__panel:focus-visible {
-  outline: 2px solid var(--rec-ink);
-  outline-offset: 3px;
-}
-
-.product-tabs__static-title {
-  margin: 24px 0 8px;
-  font-family: var(--heading-font-stack);
-  font-size: 18px;
-  font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--rec-ink);
+  border-bottom: 2px solid var(--rec-ink);
 }
 
 @media (min-width: 768px) {
-  .product-tabs--record .product-tabs__tab {
-    min-height: 0;
-    padding: 0 0 6px;
-    font-size: 20px;
-  }
+  .product-desc__title { font-size: 20px; }
 }
 
 /* The description as a paragraph: only for the mobile order (see below) */
@@ -117,14 +79,18 @@
 
 /* ---- Layout inside the image-strip product page ---- */
 
-/* Desktop and tablet: name, price and tabs on the left (up to 640px), the record and buttons on the right (up to 560px) */
+/* Desktop and tablet: name, price and description on the left (2/3), the record and buttons on the right (1/3) */
 @media (min-width: 768px) {
+  .product-strip .product-content-container {
+    padding: var(--info-py-d, 24px) var(--info-px-d, 32px) 4rem;
+  }
+
   .product-strip .product-block-area {
     display: grid;
-    grid-template-columns: minmax(0, 640px) minmax(0, 560px);
-    justify-content: space-between;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     column-gap: 40px;
     align-items: start;
+    padding-top: 0;
   }
 
   .product-strip .pb-col {
@@ -136,35 +102,30 @@
   .product-strip .pb-col--left { max-width: none; }
 }
 
-/* Mobile: one column in this order: name, price, description paragraph, stock block, Add to cart,
-   Try in-store, tabs, panel. The description block is taken apart so its paragraph and its tabs
-   can sit at different places in the column. */
+/* Mobile: one column in this order: name, price, description paragraph, record, Add to cart, Try in-store.
+   The description block is taken apart so its paragraph sits above the record. */
 @media (max-width: 767px) {
+  .product-strip .product-content-container {
+    padding: var(--info-py-m, 16px) var(--info-px-m, 12px);
+  }
+
   .product-strip .pb[data-pb='description'] { display: contents; }
 
   .product-strip .record-lede {
     display: block;
     order: 4;
     margin: 12px 0 0;
-    font-size: 10px;
-    line-height: 16px;
   }
 
-  .product-strip .product-tabs--record:not(.product-tabs--static) {
-    order: 6;
-    margin-top: 24px;
-  }
-
-  /* The paragraph already shows the description, so the tabs below hold the record only */
-  .product-strip .product-tabs--record [data-tab='description'] { display: none; }
-  .product-strip .product-tabs--desc-only { display: none; }
+  /* The paragraph above already shows the description */
+  .product-strip .product-desc { display: none; }
 }
 
 /* Product page body text: 10px (the record list above is 9px) */
-.product-strip .product-tabs__panel.rte,
+.product-strip .product-desc__body,
 .product-strip .record-lede {
   font-size: 10px;
   line-height: 16px;
 }
-.product-strip .product-tabs__panel.rte *,
+.product-strip .product-desc__body *,
 .product-strip .record-lede * { font-size: inherit; line-height: inherit; }
