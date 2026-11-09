@@ -43,7 +43,7 @@ html.edge-locked { overflow: hidden; }
   display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 12px 0; }
 .edge-rail__group { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 /* Folder tabs: stick out of the spine's right edge, rounded on the outer side, text reads top to bottom */
-.edge-tab { position: relative; left: 0; width: var(--tab-w); box-sizing: border-box; padding: 16px 0 !important; min-height: 44px;
+.edge-rail .edge-tab { position: relative; left: 0; width: var(--tab-w); box-sizing: border-box; padding: 16px 0 !important; min-height: 44px;
   writing-mode: vertical-rl; display: flex !important; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums;
   background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border: 1px solid var(--vellum-edge) !important; border-left: 0 !important; border-radius: 0 10px 10px 0 !important; color: var(--ink); }
