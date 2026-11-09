@@ -2,13 +2,14 @@
 /* Edge rail + products-first grid. Values follow the "Edge rail" design (desktop 1440, mobile 390).
    Rail 40px desktop / 36px mobile; panel 380px / calc(100vw - 36px); gutters 24px / 16px; breakpoint = theme md (768px). */
 
-:root { --tab-h: 30px; --edge-offset: 0px; --panel-h: min(72vh, 520px); --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 0px; --panel-w: 100vw; --strip-h: 56px; --gut: 16px; }
+:root { --tab-w: 30px; --edge-offset: calc(var(--rail-w) + var(--tab-w)); --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 0px; --panel-w: calc(100vw - var(--rail-w) - var(--tab-w)); --strip-h: 56px; --gut: 16px; }
 @media (min-width: 768px) { :root { --rail-w: 0px; --panel-w: 380px; --gut: 24px; } }
 
+body { padding-left: var(--edge-offset); }
 html.edge-locked { overflow: hidden; }
 
 /* ---- Top strip: switch left, logo centred, filter summary right. No rule under it. ---- */
-.edge-strip { position: absolute; top: var(--tab-h); left: 0; right: 0; z-index: 30; height: var(--strip-h); background: transparent; }
+.edge-strip { position: absolute; top: 0; left: 0; right: 0; z-index: 30; height: var(--strip-h); background: transparent; }
 .edge-strip__inner { position: relative; height: var(--strip-h); display: flex; align-items: center; justify-content: center; padding: 0 var(--gut); }
 .edge-strip__left, .edge-strip__right { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; min-width: 0; }
 .edge-strip__left { left: var(--gut); }
@@ -38,15 +39,14 @@ html.edge-locked { overflow: hidden; }
 }
 
 /* ---- Rail ---- */
-.edge-rail { position: fixed; z-index: 60; left: 0; right: 0; top: 0; height: 0; box-sizing: border-box; background: none;
-  display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; padding: 0 var(--gut); }
-.edge-rail__group { display: flex; flex-direction: row; align-items: flex-start; gap: 6px; }
+.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: none; border-right: 0;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 12px 0; }
+.edge-rail__group { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 /* Folder tabs: stick out of the spine's right edge, rounded on the outer side, text reads top to bottom */
-.edge-rail .edge-tab { position: relative; height: var(--tab-h); box-sizing: border-box; padding: 0 14px !important;
-  display: flex !important; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
+.edge-rail .edge-tab { position: relative; left: 0; width: var(--tab-w); box-sizing: border-box; padding: 16px 0 !important; min-height: 44px;
+  writing-mode: vertical-rl; display: flex !important; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums;
   background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
-  border: 1px solid var(--vellum-edge) !important; border-top: 0 !important; border-radius: 0 0 10px 10px !important; color: var(--ink); }
-@media (max-width: 767px) { .edge-rail .edge-tab { padding: 0 10px !important; } .edge-tab__more { display: none; } }
+  border: 1px solid var(--vellum-edge) !important; border-left: 0 !important; border-radius: 0 10px 10px 0 !important; color: var(--ink); }
 .edge-tab:hover { color: var(--ink); }
 .edge-rail.is-open .edge-tab:not(.is-active), .edge-rail.is-open-search .edge-tab:not(.is-active) { color: var(--gray); }
 .edge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); display: inline-block; flex: none; box-sizing: border-box; }
@@ -58,13 +58,13 @@ html.edge-locked { overflow: hidden; }
 }
 
 /* ---- Scrim + panel ---- */
-.edge-scrim { position: fixed; z-index: 40; inset: 0; background: rgba(17, 17, 17, 0.28); }
+.edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--edge-offset); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
 .edge-panel { position: fixed; z-index: 50; left: 0; width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
-  display: flex; flex-direction: column; top: 0; bottom: auto; height: var(--panel-h); max-height: 100dvh; transition: transform 0.2s ease-out 0.06s; }
-.edge-panel[data-tab='cart'] { left: auto; right: 0; }
-.edge-panel.is-entering { transform: translateY(-100%); transition-delay: 0s; }
+  display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out 0.06s; }
+.edge-panel[data-tab='cart'] { top: auto; bottom: 0; }
+.edge-panel.is-entering { transform: translateX(-100%); transition-delay: 0s; }
 .edge-scrim { transition: opacity 0.2s ease-out; }
 .edge-scrim.is-entering { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .edge-panel, .edge-scrim { transition: none; } }
@@ -186,7 +186,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-opt, .edge-panel .edge-opt__c, .edge-panel .edge-opt__l { font-size: 9px !important; line-height: 12px !important; letter-spacing: 0.04em !important; }
 
 /* Sticky logo strip (Header > Sticky logo strip): transparent, sits over the page and stays while scrolling; only the logo and summary take clicks */
-.edge-strip[data-sticky='true'] { position: fixed; top: var(--tab-h); left: 0; right: 0; background: transparent; pointer-events: none; }
+.edge-strip[data-sticky='true'] { position: fixed; left: var(--edge-offset); right: 0; background: transparent; pointer-events: none; }
 .edge-strip[data-sticky='true'] a, .edge-strip[data-sticky='true'] button { pointer-events: auto; }
 /* the rail, panel, scrim and search live inside the strip element; they must keep taking clicks */
 .edge-strip[data-sticky='true'] .edge-rail, .edge-strip[data-sticky='true'] .edge-panel, .edge-strip[data-sticky='true'] .edge-scrim, .edge-strip[data-sticky='true'] .edge-search { pointer-events: auto; }
@@ -227,7 +227,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* Opening pushes the rail out to the panel's right edge first, then the panel expands in the space it left */
 .edge-rail { transition: transform 0.2s ease-out; }
-.edge-rail.is-open { transform: translateY(var(--panel-h)); }
+.edge-rail.is-open { transform: translateX(var(--panel-w)); }
 @media (prefers-reduced-motion: reduce) { .edge-rail, .edge-panel { transition: none !important; } }
 
 /* Cart tab: cart and try-on stacked in one pane */
@@ -235,13 +235,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-sec .edge-body { padding-top: 12px; }
 .edge-rail.is-open-search { transition: transform 0.2s ease-out; }
-.edge-rail.is-open-search { transform: translateY(var(--panel-h)); }
-.edge-search.is-entering { transform: translateY(-100%); }
+@media (min-width: 768px) {
+  .edge-rail.is-open-search { transform: translateX(var(--panel-w)); }
+  .edge-search.is-entering { transform: translateX(-100%); }
+}
 @media (prefers-reduced-motion: reduce) { .edge-search { transition: none !important; } }
-
-/* Top layout: search is a sheet like the panel (a bar across the top before) */
-.edge-search { top: 0; left: 0; right: auto; width: var(--panel-w); height: var(--panel-h); flex-wrap: wrap; align-content: flex-start; padding: 0; border-bottom: 0; overflow-y: auto; transition: transform 0.2s ease-out; }
-.edge-search__i { height: 56px; padding-left: var(--gut) !important; }
-.edge-search__x { padding-right: var(--gut) !important; }
-.edge-search__r { position: static; flex: 0 0 100%; width: 100%; border-top: 1px solid var(--rule); }
-.edge-search__r:empty { display: none; }
