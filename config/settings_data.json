@@ -27,7 +27,7 @@
     "mobile_secondary_heading_scale": 0,
     "desktop_secondary_heading_scale": 2,
     "font_body": "ibm_plex_mono_n4",
-    "base_line_height": 1.2,
+    "base_line_height": 1,
     "body_copy_uppercase": false,
     "section_title_font": "font-body",
     "section_title_align": "left",
