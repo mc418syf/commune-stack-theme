@@ -70,6 +70,12 @@
     --orange: {{ section.settings.accent_color | default: '#FF5A1F' }};
     --orange-ink: {{ section.settings.accent_text_color | default: '#C23B05' }};
   }
+  {% if section.settings.vellum_match_page != false %}
+  .edge-strip {
+    --paper: rgb(var(--color-scheme-background));
+    --vellum: rgb(var(--color-scheme-background) / {{ vellum_alpha }});
+  }
+  {% endif %}
   :root {
     --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
@@ -90,7 +96,7 @@
   id="{{ section.id }}"
   data-theme-header
 >
-  <header class="edge-strip text-scheme-text" data-logo="{{ section.settings.logo_align | default: 'left' }}" data-color-scheme="{{ section_color }}" data-plp="{% if template.name == 'collection' or template.name == 'search' %}true{% else %}false{% endif %}">
+  <header class="edge-strip text-scheme-text" data-logo="{{ section.settings.logo_align | default: 'left' }}" data-color-scheme="{{ section_color }}" data-sticky="{{ section.settings.strip_sticky | default: true }}">
     {% render 'edge-rail', header_logo: header_logo, section: section %}
   </header>
 </header-section>
@@ -142,6 +148,13 @@
     {
       "type": "header",
       "content": "Colours"
+    },
+    {
+      "type": "checkbox",
+      "id": "vellum_match_page",
+      "label": "Match the page background",
+      "default": true,
+      "info": "Colours the rail and panel from the page's colour scheme (Theme settings > Colors). Turn off to pick a vellum colour below."
     },
     {
       "type": "color",
@@ -241,6 +254,13 @@
       "default": 56
     },
     {
+      "type": "checkbox",
+      "id": "strip_sticky",
+      "label": "Sticky logo strip",
+      "default": true,
+      "info": "Transparent strip that stays at the top while scrolling."
+    },
+    {
       "type": "select",
       "id": "logo_align",
       "label": "Logo position",
@@ -252,6 +272,10 @@
         {
           "value": "center",
           "label": "Centre"
+        },
+        {
+          "value": "right",
+          "label": "Right"
         }
       ],
       "default": "left"
