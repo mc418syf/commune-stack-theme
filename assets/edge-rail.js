@@ -73,6 +73,21 @@
     panel.style.setProperty('--edge-win-top', Math.max(0, Math.round(btn.getBoundingClientRect().top)) + 'px');
   }
 
+  // Size the join between the rail label and its window (CSS ::before on the window)
+  function positionJoin(el, btn) {
+    if (!el || !btn) return;
+    const b = btn.getBoundingClientRect();
+    const p = el.getBoundingClientRect();
+    const top = Math.max(0, b.top - 6 - p.top);
+    const bottom = Math.min(p.height, b.bottom + 6 - p.top);
+    el.style.setProperty('--edge-join-top', Math.round(top) + 'px');
+    el.style.setProperty('--edge-join-h', Math.max(0, Math.round(bottom - top)) + 'px');
+  }
+  function syncJoin() {
+    if (isOpen) positionJoin(panel, $('[data-edge-rail] [data-edge-open="' + panel.dataset.tab + '"]'));
+    if (!bar.hidden) positionJoin(bar, $('[data-edge-search]'));
+  }
+
   function setTab(tab) {
     const names = $$('[data-edge-pane]', panel).map((p) => p.dataset.edgePane);
     if (names.indexOf(tab) < 0) tab = names[0] || 'menu';
@@ -86,6 +101,7 @@
     }
     if (tab === 'filter') ensureGroupOpen();
     syncTriggers();
+    syncJoin();
   }
 
   function syncTriggers() {
@@ -186,6 +202,7 @@
       bar.style.setProperty('--edge-win-top', Math.max(0, Math.round(r.top + r.height / 2 - 28)) + 'px');
     }
     bar.hidden = false;
+    syncJoin();
     setSearchLabel(true);
     input.focus();
     renderResults(null);
@@ -558,7 +575,10 @@
 
   window.addEventListener('resize', () => {
     if (isOpen) positionWindow(panel.dataset.tab);
+    syncJoin();
   });
+  // the Cart window changes height as its lines load: keep the join on the Cart label
+  if (window.ResizeObserver) new ResizeObserver(syncJoin).observe(panel);
 
   /* ---------- init ---------- */
   restoreLocalSwitch();

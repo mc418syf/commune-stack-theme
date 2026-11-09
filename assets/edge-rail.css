@@ -55,7 +55,7 @@ html.edge-locked { overflow: hidden; }
 /* ---- Scrim + panel ---- */
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
-.edge-panel { position: fixed; z-index: 50; left: 0; width: calc(var(--panel-w) + var(--rail-w)); padding-left: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
   display: flex; flex-direction: column; top: var(--edge-win-top, 0px); bottom: auto; max-height: calc(100vh - var(--edge-win-top, 0px)); max-height: calc(100dvh - var(--edge-win-top, 0px)); transition: transform 0.2s ease-out; }
 .edge-panel[data-tab='cart'] { top: auto; bottom: 0; max-height: 100vh; max-height: 100dvh; }
@@ -139,7 +139,7 @@ html.edge-locked { overflow: hidden; }
 
 /* Desktop: search lives in the sidebar window, same width as the panel */
 @media (min-width: 768px) {
-  .edge-search { right: auto; width: var(--panel-w); height: auto; flex-wrap: wrap; align-content: flex-start; padding: 0; border-bottom: 0; border-right: 0; max-height: calc(100vh - var(--edge-win-top, 0px)); overflow-y: auto; }
+  .edge-search { right: auto; width: var(--panel-w); height: auto; flex-wrap: wrap; align-content: flex-start; padding: 0; border-bottom: 0; border-right: 0; }
   .edge-search__l { padding-left: var(--gut); }
   .edge-search__x { padding-right: var(--gut) !important; }
   .edge-search__i { height: 56px; }
@@ -245,8 +245,6 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 }
 .edge-rail__bg { position: fixed; z-index: 45; left: 0; top: 0; bottom: 0; width: var(--rail-w); pointer-events: none; }
 .edge-panes, .edge-search__r { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
-.edge-search { left: 0 !important; padding-left: var(--rail-w) !important; }
-@media (min-width: 768px) { .edge-search { width: calc(var(--panel-w) + var(--rail-w)) !important; } }
 
 /* No light divider lines between the sections of a window (the dashed list rules stay) */
 .edge-rule, .edge-sec, .edge-foot, .edge-switchrow, .edge-search__r { border-top: 0 !important; }
@@ -256,3 +254,13 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   font-family: var(--font-display) !important; font-weight: 600 !important; font-size: var(--name-size, 13px) !important;
   line-height: var(--name-lh, 18px) !important; letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase !important;
 }
+
+/* The sheet joins the rail only along the open button: that label and its window share a colour,
+   the rest of the rail keeps its own. The join is sized by JS (--edge-join-top / --edge-join-h). */
+.edge-panel::before, .edge-search::before {
+  content: ''; position: absolute; left: calc(-1 * var(--rail-w)); top: var(--edge-join-top, 0px); width: var(--rail-w); height: var(--edge-join-h, 0px);
+  background: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)), var(--vellum-layer, var(--vellum));
+  -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+  pointer-events: none;
+}
+.edge-search__r { max-height: calc(100vh - var(--edge-win-top, 0px) - 56px); overflow-y: auto; }
