@@ -13,28 +13,33 @@
   --orange: #FF5A1F;      /* fills, rules, dots; ink text on top */
   --orange-ink: #C23B05;  /* orange text or links on paper */
 
-  /* Type scale: size / line-height, weight, letter-spacing */
-  --hero-size: 40px;       --hero-lh: 38px;       --hero-ls: 0.02em;
-  --head-size: 22px;       --head-lh: 24px;       --head-ls: 0.10em;
-  --mark-size: 18px;       --mark-lh: 22px;       --mark-ls: 0.32em;
-  --name-size: 14px;       --name-lh: 18px;       --name-ls: 0.10em;
-  --price-size: 12px;      --price-lh: 16px;
-  --label-size: 11px;      --label-lh: 14px;      --label-ls: 0.08em;
-  --body-size: 13px;       --body-lh: 21px;
-  --tab-size: 18px;        --tab-lh: 22px;        --tab-ls: 0.04em;
+  /* Type scale. Sizes come from Theme settings > Font sizes (--cfg-*, set in snippets/css-bridge.liquid);
+     line heights keep the ratios of the scale. Mobile values are the default, desktop below. */
+  --hero-size: var(--cfg-hero-size-m, 40px);   --hero-lh: calc(var(--hero-size) * 0.95);  --hero-ls: 0.02em;
+  --head-size: var(--cfg-head-size-m, 22px);   --head-lh: calc(var(--head-size) * 1.09);  --head-ls: 0.10em;
+  --mark-size: var(--cfg-mark-size-m, 18px);   --mark-lh: calc(var(--mark-size) * 1.22);  --mark-ls: 0.32em;
+  --name-size: var(--cfg-name-size, 14px);     --name-lh: calc(var(--name-size) * 1.29);  --name-ls: 0.10em;
+  --price-size: var(--cfg-price-size, 12px);   --price-lh: calc(var(--price-size) * 1.34);
+  --label-size: var(--cfg-label-size, 11px);   --label-lh: calc(var(--label-size) * 1.27); --label-ls: 0.08em;
+  --body-size: var(--cfg-body-size, 13px);     --body-lh: calc(var(--body-size) * 1.62);
+  --tab-size: var(--cfg-tab-size-m, 18px);     --tab-lh: calc(var(--tab-size) * 1.22);    --tab-ls: 0.04em;
+  --button-size: var(--cfg-button-size, 13px);
 }
 
 @media (min-width: 768px) {
   :root {
-    --hero-size: 64px; --hero-lh: 60px;
-    --head-size: 28px; --head-lh: 30px;
-    --mark-size: 20px; --mark-lh: 24px;
-    --tab-size: 20px;  --tab-lh: 24px;
+    --hero-size: var(--cfg-hero-size-d, 64px);
+    --head-size: var(--cfg-head-size-d, 28px);
+    --mark-size: var(--cfg-mark-size-d, 20px);
+    --tab-size: var(--cfg-tab-size-d, 20px);
   }
 }
 
 /* ---- Base: body, descriptions ---- */
-html, body {
+html { font-family: var(--font-mono); color: var(--ink); }
+
+/* The size goes on body, not html, so rem units (and every other size) stay put when the body size changes */
+body {
   font-family: var(--font-mono);
   font-size: var(--body-size);
   line-height: var(--body-lh);
@@ -133,8 +138,8 @@ h1, h2, h3, .text-heading-standard {
 /* ---- Buttons: mono 13px caps; primary ink with paper text (orange on hover), secondary 1px ink border. Shape stays as the theme sets it ---- */
 .theme-button, .add-to-cart, #addToCartButton, [data-try-on-pdp], button[type='submit'] {
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 16px;
+  font-size: var(--button-size);
+  line-height: calc(var(--button-size) * 1.23);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;

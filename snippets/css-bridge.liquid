@@ -465,3 +465,22 @@
     }
   </style>
 {%- endif -%}
+
+{%- comment -%} Font sizes from Theme settings > Font sizes; assets/commune-type.css turns them into the type roles {%- endcomment -%}
+<style>
+    :root {
+      --cfg-hero-size-d: {{ settings.size_hero_desktop | default: 64 }}px;
+      --cfg-hero-size-m: {{ settings.size_hero_mobile | default: 40 }}px;
+      --cfg-head-size-d: {{ settings.size_head_desktop | default: 28 }}px;
+      --cfg-head-size-m: {{ settings.size_head_mobile | default: 22 }}px;
+      --cfg-mark-size-d: {{ settings.size_mark_desktop | default: 20 }}px;
+      --cfg-mark-size-m: {{ settings.size_mark_mobile | default: 18 }}px;
+      --cfg-tab-size-d: {{ settings.size_tab_desktop | default: 20 }}px;
+      --cfg-tab-size-m: {{ settings.size_tab_mobile | default: 18 }}px;
+      --cfg-name-size: {{ settings.size_name | default: 14 }}px;
+      --cfg-price-size: {{ settings.size_price | default: 12 }}px;
+      --cfg-label-size: {{ settings.size_label | default: 11 }}px;
+      --cfg-body-size: {{ settings.size_body | default: 13 }}px;
+      --cfg-button-size: {{ settings.size_button | default: 13 }}px;
+    }
+</style>

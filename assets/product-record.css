@@ -17,9 +17,9 @@
   list-style: none;
   border-top: 1px dashed var(--rec-divider);
   font-family: var(--body-font-stack);
-  font-size: 13px;
+  font-size: var(--body-size, 13px);
   font-weight: 400;
-  line-height: 21px;
+  line-height: var(--body-lh, 21px);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
@@ -63,7 +63,7 @@
   margin: 0 0 16px;
   padding: 0 0 6px;
   font-family: var(--heading-font-stack);
-  font-size: 18px;
+  font-size: var(--tab-size, 18px);
   font-weight: 600;
   line-height: 1.1;
   text-transform: uppercase;
@@ -73,7 +73,6 @@
 }
 
 @media (min-width: 768px) {
-  .product-desc__title { font-size: 20px; }
 }
 
 /* The description as a paragraph: only for the mobile order (see below) */
@@ -127,8 +126,8 @@
 /* Product page body text: 10px (the record list above is 9px) */
 .product-strip .product-desc__body,
 .product-strip .record-lede {
-  font-size: 13px;
-  line-height: 21px;
+  font-size: var(--body-size, 13px);
+  line-height: var(--body-lh, 21px);
 }
 .product-strip .product-desc__body *,
 .product-strip .record-lede * { font-size: inherit; line-height: inherit; }

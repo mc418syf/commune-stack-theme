@@ -752,6 +752,169 @@
     ]
   },
   {
+    "name": "Font sizes",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Size of each text style, in px. Line heights follow the size. Mobile values apply below 768px."
+      },
+      {
+        "type": "header",
+        "content": "Hero / display"
+      },
+      {
+        "type": "range",
+        "id": "size_hero_desktop",
+        "label": "Desktop",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 64,
+        "info": "Large display headings."
+      },
+      {
+        "type": "range",
+        "id": "size_hero_mobile",
+        "label": "Mobile",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 40
+      },
+      {
+        "type": "header",
+        "content": "Section heading"
+      },
+      {
+        "type": "range",
+        "id": "size_head_desktop",
+        "label": "Desktop",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 28,
+        "info": "Section titles such as \"You may also like\"."
+      },
+      {
+        "type": "range",
+        "id": "size_head_mobile",
+        "label": "Mobile",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 22
+      },
+      {
+        "type": "header",
+        "content": "Wordmark"
+      },
+      {
+        "type": "range",
+        "id": "size_mark_desktop",
+        "label": "Desktop",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "size_mark_mobile",
+        "label": "Mobile",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 18
+      },
+      {
+        "type": "header",
+        "content": "Tabs and description heading"
+      },
+      {
+        "type": "range",
+        "id": "size_tab_desktop",
+        "label": "Desktop",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "size_tab_mobile",
+        "label": "Mobile",
+        "min": 11,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 18
+      },
+      {
+        "type": "header",
+        "content": "Same size on every screen"
+      },
+      {
+        "type": "range",
+        "id": "size_name",
+        "label": "Product name (brand and title)",
+        "min": 11,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 14,
+        "info": "Cards, grid, search, cart and product page."
+      },
+      {
+        "type": "range",
+        "id": "size_price",
+        "label": "Price",
+        "min": 11,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 12
+      },
+      {
+        "type": "range",
+        "id": "size_label",
+        "label": "Nav, labels, tags, filters",
+        "min": 11,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 11
+      },
+      {
+        "type": "range",
+        "id": "size_body",
+        "label": "Body, description and record column",
+        "min": 11,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 13,
+        "info": "The product description and the record list always use this size."
+      },
+      {
+        "type": "range",
+        "id": "size_button",
+        "label": "Buttons",
+        "min": 11,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 13
+      }
+    ]
+  },
+  {
     "name": "Quick buy drawer",
     "settings": [
       {
