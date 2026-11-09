@@ -39,7 +39,7 @@ html.edge-locked { overflow: hidden; }
 }
 
 /* ---- Rail ---- */
-.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 1px solid var(--vellum-edge);
+.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 1px solid var(--vellum-edge);
   display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 0; }
 .edge-rail__group { display: flex; flex-direction: column; align-items: center; gap: 28px; }
 .edge-rail__v { writing-mode: vertical-rl; transform: rotate(180deg); min-width: 44px; padding: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -56,7 +56,7 @@ html.edge-locked { overflow: hidden; }
 /* ---- Scrim + panel ---- */
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
-.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 1px solid var(--vellum-edge);
   display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.18s ease-out, opacity 0.18s ease-out; }
 .edge-panel[data-tab='cart'] { bottom: auto; }
@@ -126,12 +126,12 @@ html.edge-locked { overflow: hidden; }
 .edge-body .edge-empty { padding: 0; }
 
 /* ---- Search ---- */
-.edge-search { position: fixed; z-index: 55; left: var(--rail-w); right: 0; top: 0; height: var(--strip-h); box-sizing: border-box; background: var(--vellum); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-bottom: 1px solid var(--vellum-edge);
+.edge-search { position: fixed; z-index: 55; left: var(--rail-w); right: 0; top: 0; height: var(--strip-h); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-bottom: 1px solid var(--vellum-edge);
   display: flex; align-items: center; gap: 12px; padding: 0 var(--gut); }
 .edge-search__l { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-search__i { flex: 1 1 auto; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--ink); height: 44px; padding: 0 !important; outline: none; }
 .edge-search__x { min-height: 44px; white-space: nowrap; }
-.edge-search__r { position: absolute; left: 0; top: 100%; width: min(var(--panel-w), 100%); box-sizing: border-box; padding: 0 var(--gut); background: var(--vellum); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
+.edge-search__r { position: absolute; left: 0; top: 100%; width: min(var(--panel-w), 100%); box-sizing: border-box; padding: 0 var(--gut); background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
 .edge-search__r:empty { display: none; }
 .edge-search__r .edge-empty { padding: 16px 0; }
 .edge-res { min-height: 84px; gap: 14px; padding: 10px 0; align-items: center; }

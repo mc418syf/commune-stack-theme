@@ -70,6 +70,11 @@
     --orange: {{ section.settings.accent_color | default: '#FF5A1F' }};
     --orange-ink: {{ section.settings.accent_text_color | default: '#C23B05' }};
   }
+  {% if section.settings.vellum_stack != false %}
+  .edge-strip {
+    --vellum-layer: linear-gradient(rgba({{ vellum_rgb }}, {{ vellum_alpha }}), rgba({{ vellum_rgb }}, {{ vellum_alpha }})), rgb(var(--color-scheme-background));
+  }
+  {% endif %}
   {% if section.settings.vellum_match_page != false %}
   .edge-strip {
     --paper: rgb(var(--color-scheme-background));
@@ -148,6 +153,13 @@
     {
       "type": "header",
       "content": "Colours"
+    },
+    {
+      "type": "checkbox",
+      "id": "vellum_stack",
+      "label": "Stack vellum on the page background",
+      "default": true,
+      "info": "Paints the page background colour first, then lays the vellum colour and opacity on top, so the rail and panel never show the page through. Turn off for a see-through, blurred look."
     },
     {
       "type": "checkbox",
