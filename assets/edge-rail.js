@@ -133,7 +133,7 @@
   let sSeq = 0;
   function renderResults(products) {
     if (products === null) {
-      results.innerHTML = '<p class="edge-empty">Type a name, designer or category.</p>';
+      results.innerHTML = '<p class="edge-empty">Search by piece name. Try vest or jacket.</p>';
     } else if (!products.length) {
       results.innerHTML = '<p class="edge-empty">&lt;No match&gt;</p>';
     } else {
@@ -190,7 +190,7 @@
   function lineHTML(o, list, idx, moveLabel) {
     return (
       '<div class="edge-line"><a class="edge-line__img" href="' + esc(o.url) + '" tabindex="-1" aria-hidden="true">' +
-      (o.image ? '<img src="' + esc(o.image) + '" alt="" loading="lazy">' : '') + '</a><div>' +
+      (o.image ? '<img src="' + esc(o.image) + '" alt="" loading="lazy">' : '') + '</a><div class="edge-line__txt">' +
       '<a class="edge-line__name" href="' + esc(o.url) + '">' + esc(o.title) + '</a>' +
       '<div class="edge-line__ref">' + o.ref + '</div>' +
       '<div class="edge-line__price">' + esc(o.price) + '</div>' +
@@ -203,10 +203,10 @@
     const host = $('[data-edge-list="cart"]');
     if (!host || !cart) return;
     if (!cart.items.length) {
-      host.innerHTML = '<p class="edge-empty">Your cart is empty.</p>';
+      host.innerHTML = '<div class="edge-body"><p class="edge-empty">Your cart is empty.</p></div>';
       return;
     }
-    host.innerHTML =
+    host.innerHTML = '<div class="edge-body">' +
       cart.items
         .map((i, n) =>
           lineHTML(
@@ -220,7 +220,7 @@
         )
         .join('') +
       '<div class="edge-ledger"><span>Subtotal</span><span>&lt;' + esc(money(cart.items_subtotal_price, cart.currency)) + ' ' + esc(cart.currency) + '&gt;</span></div>' +
-      '<div class="edge-foot"><a class="edge-pill edge-pill--primary" href="/checkout">Checkout</a></div>';
+      '<div class="edge-foot"><a class="edge-pill edge-pill--primary" href="/checkout">Checkout</a></div></div>';
   }
 
   function renderTry() {
@@ -229,10 +229,10 @@
     const items = tryItems();
     setCount('try', items.length);
     if (!items.length) {
-      host.innerHTML = '<p class="edge-empty">Nothing to try on yet.</p>';
+      host.innerHTML = '<div class="edge-body"><p class="edge-empty">Nothing to try on yet.</p></div>';
       return;
     }
-    host.innerHTML =
+    host.innerHTML = '<div class="edge-body">' +
       items
         .map((i, n) =>
           lineHTML(
@@ -242,7 +242,7 @@
         )
         .join('') +
       '<div class="edge-ledger"><span>Payment</span><span>&lt;None, try only&gt;</span></div>' +
-      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="/pages/book">Book a fitting</a></div>';
+      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="/pages/book">Book a fitting</a></div></div>';
   }
 
   async function cartChange(line, qty) {

@@ -139,10 +139,8 @@ PLP product card
   {% endunless %}
 
   <div class="relative">
-    {%- if show_sold_out_badge and sold_out -%}
-      <div class="pointer-events-none absolute right-2 top-2 z-10 bg-scheme-accent p-2 text-scheme-background">
-        {{ 'products.product.sold_out' | t }}
-      </div>
+    {%- if sold_out -%}
+      <div class="edge-soldtag">{{ 'products.product.sold_out' | t }}</div>
     {%- elsif show_sale_badge and on_sale -%}
       <div class="pointer-events-none absolute right-2 top-2 z-10 bg-scheme-accent p-2 text-scheme-background">
         {{ 'products.product.on_sale' | t }}

@@ -83,19 +83,19 @@
 
 <nav class="edge-rail" aria-label="Edge rail" data-edge-rail>
   <div class="edge-rail__group">
-    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Open cart">
+    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart">
       <span class="edge-dot" aria-hidden="true"></span>
-      <span>Cart <span data-edge-count="cart">{{ cart.item_count }}</span></span>
+      <span>Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</span>
     </button>
     <button type="button" class="edge-rail__v" data-edge-search aria-label="Search">
       <span>Search</span>
     </button>
   </div>
-  <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Open menu">+</button>
+  <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Menu and filter">+</button>
   <div class="edge-rail__group">
-    <button type="button" class="edge-rail__v" data-edge-open="try" aria-haspopup="dialog" aria-expanded="false" aria-label="Open try-on list">
+    <button type="button" class="edge-rail__v" data-edge-open="try" aria-haspopup="dialog" aria-expanded="false" aria-label="Try-on list">
       <span class="edge-dot edge-dot--hollow" aria-hidden="true"></span>
-      <span>Try-on <span data-edge-count="try">0</span></span>
+      <span>Try-on [<span data-edge-count="try">0</span>]</span>
     </button>
   </div>
   <noscript>
@@ -112,9 +112,9 @@
 <section class="edge-panel" role="dialog" aria-modal="true" aria-label="Tools" data-edge-panel data-tab="menu" hidden>
   <div class="edge-tabs" role="tablist" aria-label="Tools">
     <button type="button" role="tab" id="edge-tab-menu" aria-controls="edge-pane-menu" aria-selected="true" data-edge-tab="menu">Menu</button>
-    <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter{% if active_total > 0 %} <span data-edge-count="filter">[{{ active_total }}]</span>{% endif %}</button>
-    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1">Cart <span data-edge-count="cart">{{ cart.item_count }}</span></button>
-    <button type="button" role="tab" id="edge-tab-try" aria-controls="edge-pane-try" aria-selected="false" data-edge-tab="try" tabindex="-1">Try-on <span data-edge-count="try">0</span></button>
+    <button type="button" role="tab" id="edge-tab-filter" aria-controls="edge-pane-filter" aria-selected="false" data-edge-tab="filter" tabindex="-1">Filter</button>
+    <button type="button" role="tab" id="edge-tab-cart" aria-controls="edge-pane-cart" aria-selected="false" data-edge-tab="cart" tabindex="-1">Cart [<span data-edge-count="cart">{{ cart.item_count }}</span>]</button>
+    <button type="button" role="tab" id="edge-tab-try" aria-controls="edge-pane-try" aria-selected="false" data-edge-tab="try" tabindex="-1">Try-on [<span data-edge-count="try">0</span>]</button>
   </div>
 
   <div class="edge-panes">
@@ -159,7 +159,7 @@
               -%}
               <div class="edge-group" data-edge-group>
                 <button type="button" class="edge-group__h" aria-expanded="false" data-edge-group-toggle>
-                  <span>{{ label }}{% if n_active > 0 %} [{{ n_active }}]{% endif %}</span>
+                  <span>&lt;{{ label }}&gt;{% if n_active > 0 %} [{{ n_active }}]{% endif %}</span>
                   <span class="edge-group__s" aria-hidden="true">+</span>
                 </button>
                 <ul class="edge-group__list" hidden>
@@ -173,7 +173,7 @@
                         {% if v.count == 0 and v.active == false %}disabled{% endif %}
                       >
                         <span><span class="edge-opt__box" aria-hidden="true">{% if v.active %}[x]{% else %}[ ]{% endif %}</span> {{ v.label }}</span>
-                        <span class="edge-opt__c">{{ v.count }}</span>
+                        <span class="edge-opt__c">[{{ v.count }}]</span>
                       </button>
                     </li>
                   {%- endfor -%}
@@ -182,7 +182,7 @@
             {%- endfor -%}
           </form>
           <div class="edge-foot" data-edge-foot="filter">
-            <button type="button" class="edge-pill edge-pill--primary" data-edge-close>Show {{ results_count }} pieces</button>
+            <button type="button" class="edge-pill edge-pill--primary" data-edge-close>Show [{{ results_count }}] pieces</button>
             <a class="edge-link" href="{{ collection.url | default: routes.search_url }}{% if template.name == 'search' %}?q={{ search.terms | escape }}{% endif %}" data-edge-clear>Clear all</a>
           </div>
         {%- else -%}

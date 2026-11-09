@@ -26,7 +26,7 @@
         "grid": 4,
         "rows": 12,
         "grid_mobile": "2",
-        "product_grid_gap": 6,
+        "product_grid_gap": 0,
         "product_grid_side_margin": 0,
         "infinite_scroll": true,
         "back_to_top": true,
