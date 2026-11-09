@@ -39,7 +39,7 @@ html.edge-locked { overflow: hidden; }
 }
 
 /* ---- Rail ---- */
-.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 1px solid var(--vellum-edge);
+.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 0; }
 .edge-rail__group { display: flex; flex-direction: column; align-items: center; gap: 28px; }
 .edge-rail__v { writing-mode: vertical-rl; transform: rotate(180deg); min-width: 44px; padding: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -57,7 +57,7 @@ html.edge-locked { overflow: hidden; }
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
 .edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
 .edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
-  border-right: 1px solid var(--vellum-edge);
+  border-right: 0;
   display: flex; flex-direction: column; top: 0; bottom: 0; max-height: 100vh; max-height: 100dvh; transition: transform 0.2s ease-out; }
 .edge-panel[data-tab='cart'] { bottom: auto; }
 .edge-panel[data-tab='try'] { top: auto; bottom: 0; }
@@ -128,7 +128,7 @@ html.edge-locked { overflow: hidden; }
 .edge-body .edge-empty { padding: 0; }
 
 /* ---- Search ---- */
-.edge-search { position: fixed; z-index: 55; left: var(--rail-w); right: 0; top: 0; height: var(--strip-h); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-bottom: 1px solid var(--vellum-edge);
+.edge-search { position: fixed; z-index: 55; left: var(--rail-w); right: 0; top: 0; height: var(--strip-h); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-bottom: 0;
   display: flex; align-items: center; gap: 12px; padding: 0 var(--gut); }
 .edge-search__l { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-search__i { flex: 1 1 auto; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--ink); height: 44px; padding: 0 !important; outline: none; }
@@ -146,7 +146,7 @@ html.edge-locked { overflow: hidden; }
 
 /* Desktop: search lives in the sidebar window, same width as the panel */
 @media (min-width: 768px) {
-  .edge-search { right: auto; width: var(--panel-w); height: auto; flex-wrap: wrap; align-content: flex-start; padding: 0; border-bottom: 0; border-right: 1px solid var(--vellum-edge); max-height: 100vh; overflow-y: auto; }
+  .edge-search { right: auto; width: var(--panel-w); height: auto; flex-wrap: wrap; align-content: flex-start; padding: 0; border-bottom: 0; border-right: 0; max-height: 100vh; overflow-y: auto; }
   .edge-search__l { padding-left: var(--gut); }
   .edge-search__x { padding-right: var(--gut) !important; }
   .edge-search__i { height: 56px; }
