@@ -13,7 +13,7 @@
   const panel = $('[data-edge-panel]');
   if (!panel) return;
   const scrim = $('[data-edge-scrim]');
-  const plus = $('[data-edge-toggle]');
+  const plus = $('[data-edge-open="menu"]') || $('[data-edge-search]') || $('[data-edge-open="cart"]');
   const bar = $('[data-edge-searchbar]');
   const input = $('[data-edge-input]');
   const results = $('[data-edge-results]');
@@ -84,12 +84,11 @@
   function syncTriggers() {
     const railEl = $('[data-edge-rail]');
     if (railEl) railEl.classList.toggle('is-open', isOpen);
-    plus.textContent = isOpen ? '×' : '+';
-    plus.setAttribute('aria-label', isOpen ? 'Close panel' : 'Open menu');
-    plus.setAttribute('aria-expanded', isOpen);
-    $$('[data-edge-open="cart"], [data-edge-open="try"]', $('[data-edge-rail]')).forEach((b) =>
-      b.setAttribute('aria-expanded', isOpen && panel.dataset.tab === b.dataset.edgeOpen)
-    );
+    $$('[data-edge-open]', $('[data-edge-rail]')).forEach((b) => {
+      const on = isOpen && panel.dataset.tab === b.dataset.edgeOpen;
+      b.setAttribute('aria-expanded', on);
+      b.classList.toggle('is-active', on);
+    });
   }
 
   let pinned = false;
@@ -443,12 +442,10 @@
     const t = e.target;
     const open = t.closest('[data-edge-open]');
     if (open) {
+      // no x button any more: the open button closes the panel again
+      if (isOpen && pinned && panel.dataset.tab === open.dataset.edgeOpen) return closePanel();
       pin();
       return openPanel(open.dataset.edgeOpen, open);
-    }
-    if (t.closest('[data-edge-toggle]')) {
-      if (isOpen && !pinned) return pin();
-      return isOpen ? closePanel() : openPanel('menu', plus);
     }
     if (t.closest('[data-edge-search]')) return openSearch(t.closest('[data-edge-search]'));
     if (t.closest('[data-edge-search-close]')) {

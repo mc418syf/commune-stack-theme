@@ -68,10 +68,9 @@
 
 <nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}" data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
   <div class="edge-rail__group">
-    {%- if show_cart != false -%}
-    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
-      <span class="edge-dot" aria-hidden="true"></span>
-      <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
+    {%- if tab_menu != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="menu" aria-haspopup="dialog" aria-expanded="false" aria-label="Menu">
+      <span>Menu</span>
     </button>
     {%- endif -%}
     {%- if show_search != false -%}
@@ -79,8 +78,13 @@
       <span data-edge-search-label>Search</span>
     </button>
     {%- endif -%}
+    {%- if show_cart != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
+      <span class="edge-dot" aria-hidden="true"></span>
+      <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
+    </button>
+    {%- endif -%}
   </div>
-  <button type="button" class="edge-rail__plus" data-edge-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Menu and filter">+</button>
   <div class="edge-rail__group">
   </div>
   <noscript>
