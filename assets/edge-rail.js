@@ -100,10 +100,11 @@
       panel.classList.add('is-entering');
       scrim.classList.add('is-entering');
       void panel.offsetWidth;
-      requestAnimationFrame(() => {
+      // setTimeout, not requestAnimationFrame: rAF is paused in background tabs and would leave the panel off screen
+      setTimeout(() => {
         panel.classList.remove('is-entering');
         scrim.classList.remove('is-entering');
-      });
+      }, 20);
     }
     if (pinned) document.documentElement.classList.add('edge-locked');
     setTab(tab);
