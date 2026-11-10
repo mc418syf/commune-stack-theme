@@ -12,7 +12,8 @@
   endfor
   assign brand_html = ''
   if brand_name != ''
-    assign brand_collection = collections[brand_name | handleize]
+    assign brand_handle = brand_name | handleize
+    assign brand_collection = collections[brand_handle]
     if brand_collection and brand_collection.description != blank
       assign brand_html = brand_collection.description
     endif
