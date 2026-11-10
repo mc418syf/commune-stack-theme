@@ -199,7 +199,13 @@
 
   document.addEventListener('click', (e) => {
     const note = e.target.closest('.brand-note');
-    if (note && !e.target.closest('a')) note.classList.toggle('is-open');
+    if (note && !e.target.closest('a')) {
+      // in the gallery the open note covers the image instead of pushing it: the holder keeps the closed height
+      const holder = note.closest('.plp-gallery__brand');
+      if (holder && !note.classList.contains('is-open')) holder.style.height = holder.offsetHeight + 'px';
+      note.classList.toggle('is-open');
+      if (holder && !note.classList.contains('is-open')) holder.style.height = '';
+    }
     if (e.target.closest('[data-plp-toggle]')) return setMode(mode() === 'gallery' ? 'grid' : 'gallery');
     const b = e.target.closest('[data-plp-view]');
     if (b) setMode(b.dataset.plpView);
@@ -221,4 +227,4 @@
   if (saved === 'gallery') setMode('gallery');
   else syncToggle();
 })();
-/* brand note v2 */
+/* brand note v3 */

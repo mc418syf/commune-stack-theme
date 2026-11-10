@@ -1,4 +1,4 @@
-/* gallery v22 */
+/* gallery v23 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -72,7 +72,7 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 .plp-gallery__brand:empty { display: none; }
 @media (max-width: 767px) {
   .brand-note { margin: 0 var(--gut, 16px) 10px; }
-  .plp-gallery__brand { position: static; order: -1; flex: none; width: auto; padding: 0 var(--gut, 16px) 8px; }
+  .plp-gallery__brand { position: relative; z-index: 3; order: -1; flex: none; width: auto; padding: 0 var(--gut, 16px) 8px; }
 }
 /* the collection description often starts with the brand name as a heading: the note already shows it */
 .brand-note__d > h1:first-child, .brand-note__d > h2:first-child, .brand-note__d > h3:first-child { display: none; }
@@ -87,3 +87,8 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 
 /* For now the brand description is shown in gallery view only (the grid keeps its copy hidden) */
 #results .brand-note { display: none; }
+
+/* Phones: an opened note lies over the image (scrolls if long) instead of squeezing it */
+@media (max-width: 767px) {
+  .plp-gallery__brand .brand-note.is-open { position: absolute; left: var(--gut, 16px); right: var(--gut, 16px); top: 0; max-height: calc(100vh - var(--strip-h, 56px) - 120px); max-height: calc(100dvh - var(--strip-h, 56px) - 120px); overflow-y: auto; background: rgba(244, 243, 239, 0.94); -webkit-overflow-scrolling: touch; }
+}
