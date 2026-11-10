@@ -879,6 +879,15 @@
         "default": "600"
       },
       {
+        "type": "range",
+        "id": "tracking_hero",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 2
+      },
+      {
         "type": "header",
         "content": "Section heading"
       },
@@ -922,6 +931,15 @@
           }
         ],
         "default": "600"
+      },
+      {
+        "type": "range",
+        "id": "tracking_head",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 10
       },
       {
         "type": "header",
@@ -968,6 +986,15 @@
         "default": "600"
       },
       {
+        "type": "range",
+        "id": "tracking_mark",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 32
+      },
+      {
         "type": "header",
         "content": "Tabs and description heading"
       },
@@ -1010,6 +1037,15 @@
           }
         ],
         "default": "600"
+      },
+      {
+        "type": "range",
+        "id": "tracking_tab",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 4
       },
       {
         "type": "header",
@@ -1057,6 +1093,15 @@
         "default": "600"
       },
       {
+        "type": "range",
+        "id": "tracking_name",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 10
+      },
+      {
         "type": "header",
         "content": "Price"
       },
@@ -1101,6 +1146,15 @@
         "default": "400"
       },
       {
+        "type": "range",
+        "id": "tracking_price",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 0
+      },
+      {
         "type": "header",
         "content": "Nav, labels, tags, filters"
       },
@@ -1133,6 +1187,15 @@
           }
         ],
         "default": "400"
+      },
+      {
+        "type": "range",
+        "id": "tracking_label",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 8
       },
       {
         "type": "header",
@@ -1170,6 +1233,15 @@
         "default": "400"
       },
       {
+        "type": "range",
+        "id": "tracking_body",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 0
+      },
+      {
         "type": "header",
         "content": "Buttons"
       },
@@ -1203,6 +1275,15 @@
           }
         ],
         "default": "500"
+      },
+      {
+        "type": "range",
+        "id": "tracking_button",
+        "label": "Letter spacing (1/100 em)",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "default": 8
       }
     ]
   },
