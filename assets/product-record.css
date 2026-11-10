@@ -134,3 +134,6 @@
 
 /* Add to cart sits right under the record list; the space between them is "Space between the list and the buttons" in the product section */
 .product-strip .add-to-cart-container { margin-top: 0 !important; }
+
+/* The button itself says "Added to cart", so the extra confirmation message (which pushed everything down) is not shown on the product page */
+.product-strip [x-show="addedToCart"] { display: none !important; }
