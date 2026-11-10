@@ -120,8 +120,14 @@
         "label": "Type scale",
         "info": "Commune compact replaces the theme's 1.25x scale with clean steps of 9 / 10 / 12 / 14 / 16 / 18 / 24 / 32 / 40 / 48 / 64 / 80 / 96 px (at a 12px base). Headings, body text, buttons and labels all follow it.",
         "options": [
-          { "value": "default", "label": "Theme default (1.25x scale)" },
-          { "value": "commune", "label": "Commune compact (clean steps)" }
+          {
+            "value": "default",
+            "label": "Theme default (1.25x scale)"
+          },
+          {
+            "value": "commune",
+            "label": "Commune compact (clean steps)"
+          }
         ],
         "default": "default"
       },
@@ -659,10 +665,22 @@
         "label": "Brand and title weight: product page, header",
         "info": "Brand and title use the heading font. The weight is loaded from that font, so it is a real weight, not a faux bold.",
         "options": [
-          { "value": "400", "label": "Regular" },
-          { "value": "500", "label": "Medium" },
-          { "value": "600", "label": "Semibold" },
-          { "value": "700", "label": "Bold" }
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
         ],
         "default": "600"
       },
@@ -671,10 +689,22 @@
         "id": "product_name_weight_card",
         "label": "Brand and title weight: product cards",
         "options": [
-          { "value": "400", "label": "Regular" },
-          { "value": "500", "label": "Medium" },
-          { "value": "600", "label": "Semibold" },
-          { "value": "700", "label": "Bold" }
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
         ],
         "default": "400"
       },
@@ -684,11 +714,26 @@
         "label": "Buttons and tabs weight",
         "info": "The theme font has only Regular and Bold, so the two in-between looks thicken Regular with a fine outline. They look the same on every device.",
         "options": [
-          { "value": "400", "label": "Regular" },
-          { "value": "450", "label": "In between: light" },
-          { "value": "500", "label": "In between: medium" },
-          { "value": "600", "label": "Semibold (renders as Bold)" },
-          { "value": "700", "label": "Bold" }
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "450",
+            "label": "In between: light"
+          },
+          {
+            "value": "500",
+            "label": "In between: medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold (renders as Bold)"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
         ],
         "default": "500"
       },
@@ -749,10 +794,22 @@
         "label": "Letter spacing",
         "info": "Applies to the vendor, title and price together so they match.",
         "options": [
-          { "value": "-0.04em", "label": "Tighter" },
-          { "value": "-0.025em", "label": "Tight (like the headings)" },
-          { "value": "0em", "label": "Normal" },
-          { "value": "0.03em", "label": "Wide" }
+          {
+            "value": "-0.04em",
+            "label": "Tighter"
+          },
+          {
+            "value": "-0.025em",
+            "label": "Tight (like the headings)"
+          },
+          {
+            "value": "0em",
+            "label": "Normal"
+          },
+          {
+            "value": "0.03em",
+            "label": "Wide"
+          }
         ],
         "default": "-0.025em"
       },
@@ -766,6 +823,386 @@
         "unit": "px",
         "default": 10,
         "info": "Typically 2px smaller than the vendor and title."
+      }
+    ]
+  },
+  {
+    "name": "Font sizes",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Size, weight and letter spacing of each text style. Line heights follow the size. Mobile sizes apply below 768px. Letter spacing is in hundredths of an em: 10 means 0.10em. Sizes go down to 4px."
+      },
+      {
+        "type": "header",
+        "content": "Hero / display"
+      },
+      {
+        "type": "range",
+        "id": "size_hero_desktop",
+        "label": "Size, desktop",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 64,
+        "info": "Large display headings."
+      },
+      {
+        "type": "range",
+        "id": "size_hero_mobile",
+        "label": "Size, mobile",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 40
+      },
+      {
+        "type": "select",
+        "id": "weight_hero",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "header",
+        "content": "Section heading"
+      },
+      {
+        "type": "range",
+        "id": "size_head_desktop",
+        "label": "Size, desktop",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 28,
+        "info": "Section titles such as \"You may also like\"."
+      },
+      {
+        "type": "range",
+        "id": "size_head_mobile",
+        "label": "Size, mobile",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 22
+      },
+      {
+        "type": "select",
+        "id": "weight_head",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "header",
+        "content": "Wordmark"
+      },
+      {
+        "type": "range",
+        "id": "size_mark_desktop",
+        "label": "Size, desktop",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "size_mark_mobile",
+        "label": "Size, mobile",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 18
+      },
+      {
+        "type": "select",
+        "id": "weight_mark",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "header",
+        "content": "Tabs and description heading"
+      },
+      {
+        "type": "range",
+        "id": "size_tab_desktop",
+        "label": "Size, desktop",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "size_tab_mobile",
+        "label": "Size, mobile",
+        "min": 4,
+        "max": 96,
+        "step": 1,
+        "unit": "px",
+        "default": 18
+      },
+      {
+        "type": "select",
+        "id": "weight_tab",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "header",
+        "content": "Product name (brand and title)"
+      },
+      {
+        "type": "range",
+        "id": "size_name_desktop",
+        "label": "Size, desktop",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 16,
+        "info": "Product page and cart. Product cards are smaller by the card offset in Product text."
+      },
+      {
+        "type": "range",
+        "id": "size_name_mobile",
+        "label": "Size, mobile",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 14
+      },
+      {
+        "type": "select",
+        "id": "weight_name",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "600"
+      },
+      {
+        "type": "header",
+        "content": "Price"
+      },
+      {
+        "type": "range",
+        "id": "size_price_desktop",
+        "label": "Size, desktop",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "size_price_mobile",
+        "label": "Size, mobile",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 12
+      },
+      {
+        "type": "select",
+        "id": "weight_price",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "400"
+      },
+      {
+        "type": "header",
+        "content": "Nav, labels, tags, filters"
+      },
+      {
+        "type": "range",
+        "id": "size_label",
+        "label": "Size",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 11
+      },
+      {
+        "type": "select",
+        "id": "weight_label",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "400"
+      },
+      {
+        "type": "header",
+        "content": "Body, description and record column"
+      },
+      {
+        "type": "range",
+        "id": "size_body",
+        "label": "Size",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 13,
+        "info": "The product description and the record list always use this size."
+      },
+      {
+        "type": "select",
+        "id": "weight_body",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "400"
+      },
+      {
+        "type": "header",
+        "content": "Buttons"
+      },
+      {
+        "type": "range",
+        "id": "size_button",
+        "label": "Size",
+        "min": 4,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 14,
+        "info": "Button text. The button height grows with it."
+      },
+      {
+        "type": "select",
+        "id": "weight_button",
+        "label": "Weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          }
+        ],
+        "default": "500"
       }
     ]
   },
