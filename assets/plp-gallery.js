@@ -21,6 +21,9 @@
   let next = null;
   let loading = false;
   let ticking = false;
+  let lead = false; // true while the feed has a copy of the last slide in front and of the first slide behind (so it can loop)
+  let settleTimer = 0;
+  let pendingUrl = null; // the product to start on when the gallery opens
 
   const read = (el) => {
     const d = el.dataset;
@@ -61,9 +64,9 @@
     });
   }
 
-  function slideHTML(it, i) {
-    const eager = i < 2 ? 'eager' : 'lazy';
-    return '<article class="plp-slide" data-i="' + i + '">' +
+  function slideHTML(it, i, clone) {
+    const eager = i < 2 || clone ? 'eager' : 'lazy';
+    return '<article class="plp-slide' + (clone ? ' plp-slide--clone' : '') + '"' + (clone ? ' aria-hidden="true"' : '') + ' data-i="' + i + '">' +
       '<a class="plp-slide__img" href="' + esc(it.url) + '"><img src="' + esc(it.image) + '" alt="' + esc(it.vendor + ' ' + it.title) + '" loading="' + eager + '" decoding="async"></a></article>';
   }
 
@@ -93,13 +96,58 @@
     return feed.clientHeight || 1;
   }
 
+  const pos = (i) => i + (lead ? 1 : 0);
+
+  // jumps must not be pulled back by scroll snapping
+  function noSnap(fn) {
+    feed.style.scrollSnapType = 'none';
+    fn();
+    setTimeout(() => { feed.style.scrollSnapType = ''; }, 60);
+  }
+
+  // Once every page is loaded the feed loops: the last slide is repeated before the first and the first after the last
+  function ends() {
+    const want = !next && items.length > 1;
+    if (!feed || want === lead) return;
+    noSnap(() => {
+      if (want) {
+        feed.insertAdjacentHTML('afterbegin', slideHTML(items[items.length - 1], items.length - 1, true));
+        feed.insertAdjacentHTML('beforeend', slideHTML(items[0], 0, true));
+        feed.scrollTop += slideHeight();
+      } else {
+        $$('.plp-slide--clone', feed).forEach((c) => c.remove());
+        feed.scrollTop -= slideHeight();
+      }
+    });
+    lead = want;
+  }
+
+  // When the scrolling stops on a repeated slide, jump to the real one (same picture, so nobody sees it)
+  function settle() {
+    if (!lead || !feed) return;
+    const h = slideHeight();
+    const p = Math.round(feed.scrollTop / h);
+    if (Math.abs(feed.scrollTop - p * h) > 2) return;
+    if (p === 0) noSnap(() => { feed.scrollTop = items.length * h; });
+    else if (p === items.length + 1) noSnap(() => { feed.scrollTop = h; });
+  }
+
   function onScroll() {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(settle, 140);
     if (ticking) return;
     ticking = true;
     // a timer, not requestAnimationFrame: rAF stops in background tabs
     setTimeout(() => {
       ticking = false;
-      const i = Math.max(0, Math.min(items.length - 1, Math.round(feed.scrollTop / slideHeight())));
+      const p = Math.round(feed.scrollTop / slideHeight());
+      let i = lead ? p - 1 : p;
+      if (lead) {
+        if (i < 0) i = items.length - 1;
+        else if (i >= items.length) i = 0;
+      } else {
+        i = Math.max(0, Math.min(items.length - 1, i));
+      }
       if (i !== index) {
         index = i;
         markCurrent();
@@ -109,8 +157,13 @@
   }
 
   function go(i) {
-    if (i < 0 || i >= items.length) return;
-    feed.scrollTo({ top: i * slideHeight(), behavior: reduce ? 'auto' : 'smooth' });
+    if (!items.length) return;
+    let p = -1;
+    if (i < 0) p = lead ? 0 : -1;
+    else if (i >= items.length) p = lead ? items.length + 1 : -1;
+    else p = pos(i);
+    if (p < 0) return;
+    feed.scrollTo({ top: p * slideHeight(), behavior: reduce ? 'auto' : 'smooth' });
   }
 
   async function more() {
@@ -133,6 +186,7 @@
       next = null;
     }
     loading = false;
+    ends();
   }
 
   async function add(i, btn) {
@@ -167,12 +221,19 @@
     renderBrand();
     items = collect(document);
     next = nextIn(document);
+    if (pendingUrl) {
+      const k = items.findIndex((it) => it.url === pendingUrl);
+      if (k > -1) index = k;
+      pendingUrl = null;
+    }
     index = Math.min(index, Math.max(0, items.length - 1));
-    feed.innerHTML = items.map(slideHTML).join('');
-    thumbs.innerHTML = items.map(thumbHTML).join('');
+    lead = false;
+    feed.innerHTML = items.map((it, i) => slideHTML(it, i)).join('');
+    thumbs.innerHTML = items.map((it, i) => thumbHTML(it, i)).join('');
+    ends();
     // the feed has a height only once the gallery is displayed
     setTimeout(() => {
-      feed.scrollTop = index * slideHeight();
+      noSnap(() => { feed.scrollTop = pos(index) * slideHeight(); });
       markCurrent();
     }, 30);
     if (index >= items.length - 6) more();
@@ -189,12 +250,35 @@
     });
   }
 
-  function setMode(m) {
+  // the grid product nearest the middle of the screen: the one the visitor is looking at
+  function gridUrl() {
+    let best = null;
+    let bd = Infinity;
+    $$('#results ul.collection-list [data-plp-item]').forEach((t) => {
+      const r = t.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const d = Math.hypot(r.left + r.width / 2 - window.innerWidth / 2, r.top + r.height / 2 - window.innerHeight / 2);
+      if (d < bd) { bd = d; best = t; }
+    });
+    return best ? best.dataset.plpUrl : null;
+  }
+
+  function setMode(m, startup) {
+    const was = mode();
+    let url = null;
+    if (!startup && m !== was) url = was === 'grid' ? gridUrl() : (items[index] && items[index].url) || null;
     html.classList.toggle('plp-gallery-on', m === 'gallery');
     try { localStorage.setItem(KEY, m); } catch (_) {}
-    if (m === 'gallery') open();
+    if (m === 'gallery') {
+      pendingUrl = url;
+      open();
+      window.scrollTo(0, 0);
+    } else {
+      const tile = url && $$('#results ul.collection-list [data-plp-item]').find((t) => t.dataset.plpUrl === url);
+      if (tile) tile.scrollIntoView({ block: 'center', behavior: 'instant' });
+      else window.scrollTo(0, 0);
+    }
     syncToggle();
-    window.scrollTo(0, 0);
   }
 
   document.addEventListener('click', (e) => {
@@ -215,7 +299,7 @@
     if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
     if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
   });
-  window.addEventListener('resize', () => { if (mode() === 'gallery' && feed) feed.scrollTop = index * slideHeight(); });
+  window.addEventListener('resize', () => { if (mode() === 'gallery' && feed) feed.scrollTop = pos(index) * slideHeight(); });
   // filters, sold-out switch and sorting swap the results: rebuild the gallery from them
   document.addEventListener('plp:results-updated', () => {
     syncToggle();
@@ -224,7 +308,7 @@
 
   let saved = null;
   try { saved = localStorage.getItem(KEY); } catch (_) {}
-  if (saved === 'gallery') setMode('gallery');
+  if (saved === 'gallery') setMode('gallery', true);
   else syncToggle();
 })();
-/* brand note v4 */
+/* brand note v5 */
