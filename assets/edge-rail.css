@@ -308,3 +308,10 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 @media (max-width: 767px) {
   .edge-rail { padding-bottom: calc(44px + env(safe-area-inset-bottom)); }
 }
+
+/* Menu window: visible dividers between the menu, footer links and newsletter; tighter newsletter and social spacing */
+.edge-panel .edge-rule { border-top: 1px solid rgba(17, 17, 17, 0.22); margin: 8px var(--gut); }
+.edge-panel .edge-news { padding: 0 var(--gut); }
+.edge-panel .edge-news__l { margin-bottom: 0; }
+.edge-panel .edge-social { margin: 0; padding: 0 calc(var(--gut) - 8px) 2px; }
+.edge-panel .edge-footlinks a { min-height: 26px; }
