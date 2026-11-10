@@ -729,6 +729,7 @@
         "type": "color",
         "id": "gallery_info_bg",
         "label": "Gallery view: product info background",
+        "info": "The info card under the image in the PLP gallery view.",
         "default": "#ffffff"
       },
       {
