@@ -275,4 +275,5 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-pill {
   height: var(--add-to-cart-button-height, 44px) !important; min-height: var(--add-to-cart-button-height, 44px) !important;
   font-size: var(--button-size, 14px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important; line-height: 1 !important;
+  border-radius: var(--button-border-radius, 9999px) !important; /* Theme settings > Buttons > Style */
 }
