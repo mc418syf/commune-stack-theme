@@ -56,8 +56,6 @@
     root.addEventListener('click', (e) => {
       const t = e.target.closest('.plp-thumb');
       if (t) return go(Number(t.dataset.i));
-      const n = e.target.closest('.brand-note');
-      if (n) n.classList.toggle('is-open');
       const b = e.target.closest('[data-pg-add]');
       if (b) return add(index, b);
     });
@@ -200,6 +198,8 @@
   }
 
   document.addEventListener('click', (e) => {
+    const note = e.target.closest('.brand-note');
+    if (note && !e.target.closest('a')) note.classList.toggle('is-open');
     if (e.target.closest('[data-plp-toggle]')) return setMode(mode() === 'gallery' ? 'grid' : 'gallery');
     const b = e.target.closest('[data-plp-view]');
     if (b) setMode(b.dataset.plpView);

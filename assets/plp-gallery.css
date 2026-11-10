@@ -1,4 +1,4 @@
-/* gallery v15 */
+/* gallery v16 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -73,9 +73,14 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 @media (max-width: 767px) {
   .brand-note { margin: 0 var(--gut, 16px) 10px; }
   .plp-gallery__brand { position: static; order: -1; flex: none; width: auto; padding: 0 var(--gut, 16px) 8px; }
-  .plp-gallery__brand .brand-note { cursor: pointer; }
-  .plp-gallery__brand .brand-note:not(.is-open) .brand-note__d { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 }
 /* the collection description often starts with the brand name as a heading: the note already shows it */
 .brand-note__d > h1:first-child, .brand-note__d > h2:first-child, .brand-note__d > h3:first-child { display: none; }
 .brand-note__d h1, .brand-note__d h2, .brand-note__d h3, .brand-note__d h4 { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--body-size, 12px); line-height: var(--body-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; margin: 6px 0 2px; }
+
+/* Long descriptions show a few lines; click to read all */
+.brand-note { cursor: pointer; }
+.brand-note:not(.is-open) .brand-note__d { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.brand-note::after { content: 'More +'; display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B66; }
+.brand-note.is-open::after { content: 'Less \2212'; }
+.plp-gallery__brand .brand-note.is-open { max-height: calc(100vh - var(--strip-h, 56px) - 120px); overflow-y: auto; }
