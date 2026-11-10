@@ -1,4 +1,4 @@
-/* gallery v7 */
+/* gallery v8 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -21,7 +21,7 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 .plp-slide__img img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; background: #E6E5DF; }
 
 /* The info card is fixed in place; only the images scroll. It uses the product page sizes (name and price tokens). */
-.plp-gallery__info { position: absolute; right: var(--gut, 24px); bottom: 28px; width: 260px; box-sizing: border-box; padding: 14px 14px 18px; display: flex; flex-direction: column; gap: 6px; background: var(--gallery-info-bg, #fff); }
+.plp-gallery__info { position: absolute; right: var(--gut, 24px); bottom: 28px; width: 260px; box-sizing: border-box; padding: 14px 14px 18px; display: flex; flex-direction: column; gap: 6px; background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
 .plp-gallery__name { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; text-align: left; }
 .plp-gallery__vendor, .plp-gallery__title { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 14px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
 .plp-gallery__price { font-family: var(--font-mono); font-weight: var(--price-weight, 400); font-size: var(--price-size, 12px); line-height: var(--price-lh, 16px); letter-spacing: var(--price-ls, 0); color: var(--ink); }
@@ -41,6 +41,6 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 @media (max-width: 767px) {
   .plp-gallery__thumbs { display: none; }
   .plp-slide { padding-bottom: 0; }
-  .plp-gallery__info { position: static; flex: none; width: auto; padding: 12px var(--gut, 16px) calc(28px + env(safe-area-inset-bottom)); background: var(--gallery-info-bg, #fff); }
+  .plp-gallery__info { position: static; flex: none; width: auto; padding: 12px var(--gut, 16px) calc(28px + env(safe-area-inset-bottom)); background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
 }
 @media (prefers-reduced-motion: reduce) { .plp-gallery__feed { scroll-behavior: auto; } }
