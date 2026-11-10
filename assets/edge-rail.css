@@ -346,5 +346,5 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 @media (min-width: 768px) {
   .edge-search { padding-top: calc((var(--edge-win-h, 56px) - 56px) / 2); }
   .edge-search .edge-search__field { margin-bottom: calc(10px + (var(--edge-win-h, 56px) - 56px) / 2); }
-  .edge-search .edge-search__x { align-self: flex-start; margin-top: calc(6px + (var(--edge-win-h, 56px) - 56px) / 2); }
+  .edge-search .edge-search__x { align-self: flex-start; margin-top: 6px; }
 }
