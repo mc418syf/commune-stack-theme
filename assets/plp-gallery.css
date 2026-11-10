@@ -1,4 +1,4 @@
-/* gallery v14 */
+/* gallery v15 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -76,3 +76,6 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   .plp-gallery__brand .brand-note { cursor: pointer; }
   .plp-gallery__brand .brand-note:not(.is-open) .brand-note__d { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 }
+/* the collection description often starts with the brand name as a heading: the note already shows it */
+.brand-note__d > h1:first-child, .brand-note__d > h2:first-child, .brand-note__d > h3:first-child { display: none; }
+.brand-note__d h1, .brand-note__d h2, .brand-note__d h3, .brand-note__d h4 { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--body-size, 12px); line-height: var(--body-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; margin: 6px 0 2px; }
