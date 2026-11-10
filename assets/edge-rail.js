@@ -554,9 +554,10 @@
       clearTimeout(leaveTimer);
       if (e.target.closest('[data-edge-search]')) return;
       const o = e.target.closest('[data-edge-open]');
-      const tab = o ? o.dataset.edgeOpen : 'menu';
+      if (!o) return; // blank space on the rail does not open anything: only hovering a label does
+      const tab = o.dataset.edgeOpen;
       if (isOpen && (pinned || panel.dataset.tab === tab)) return;
-      openPanel(tab, o || plus, true);
+      openPanel(tab, o, true);
     });
     rail.addEventListener('mouseleave', () => {
       overRail = false;
