@@ -172,7 +172,7 @@
     $$('[data-plp-view]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.plpView === mode()));
     const next = mode() === 'gallery' ? 'grid' : 'gallery';
     $$('[data-plp-toggle]').forEach((b) => {
-      $$('[data-ico]', b).forEach((i) => { i.hidden = i.dataset.ico !== next; });
+      $$('[data-ico]', b).forEach((i) => { i.toggleAttribute('hidden', i.dataset.ico !== next); });
       b.setAttribute('aria-label', 'Switch to ' + next + ' view');
       b.title = next === 'gallery' ? 'Gallery view' : 'Grid view';
     });
