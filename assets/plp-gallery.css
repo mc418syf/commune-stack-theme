@@ -11,18 +11,21 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 .plp-gallery__feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; scrollbar-width: none; outline: none; }
 .plp-gallery__feed::-webkit-scrollbar { display: none; }
 
+.plp-gallery__main { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.plp-gallery__main .plp-gallery__feed { flex: 1 1 auto; }
+
 .plp-slide { position: relative; box-sizing: border-box; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; align-items: center; justify-content: center; padding: 8px var(--gut, 24px); }
 .plp-slide__img { display: flex; align-items: center; justify-content: center; max-width: 100%; height: 100%; }
 .plp-slide__img img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; background: #E6E5DF; }
 
-/* The info card uses the product page sizes: name and price tokens from Theme settings > Font sizes */
-.plp-slide__info { position: absolute; right: var(--gut, 24px); bottom: 12px; width: 260px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 6px; background: var(--paper, #F4F3EF); }
-.plp-slide__name { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; text-align: left; }
-.plp-slide__vendor, .plp-slide__title { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 14px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
-.plp-slide__price { font-family: var(--font-mono); font-weight: var(--price-weight, 400); font-size: var(--price-size, 12px); line-height: var(--price-lh, 16px); letter-spacing: var(--price-ls, 0); color: var(--ink); }
-.plp-slide__add { margin-top: 6px; width: 100%; box-sizing: border-box; height: var(--add-to-cart-button-height, 44px); display: flex; align-items: center; justify-content: center; border-radius: var(--button-border-radius, 9999px); cursor: pointer; }
-.plp-slide__add[hidden] { display: none; }
-.plp-slide__add:disabled { opacity: 0.6; cursor: default; }
+/* The info card is fixed in place; only the images scroll. It uses the product page sizes (name and price tokens). */
+.plp-gallery__info { position: absolute; right: var(--gut, 24px); bottom: 12px; width: 260px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 6px; background: var(--paper, #F4F3EF); }
+.plp-gallery__name { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; text-align: left; }
+.plp-gallery__vendor, .plp-gallery__title { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 14px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
+.plp-gallery__price { font-family: var(--font-mono); font-weight: var(--price-weight, 400); font-size: var(--price-size, 12px); line-height: var(--price-lh, 16px); letter-spacing: var(--price-ls, 0); color: var(--ink); }
+/* the theme's standard button (same classes as Add to cart on the product page); only the width is set here */
+.plp-gallery__add { margin-top: 6px; width: 100%; box-sizing: border-box; min-height: var(--add-to-cart-button-height, 44px); display: flex; align-items: center; justify-content: center; border-radius: var(--button-border-radius, 9999px); cursor: pointer; }
+.plp-gallery__add:disabled { opacity: 0.6; cursor: default; }
 
 .plp-gallery__thumbs { flex: none; display: flex; gap: 6px; overflow-x: auto; padding: 8px var(--gut, 24px) 14px; scrollbar-width: none; }
 .plp-gallery__thumbs::-webkit-scrollbar { display: none; }
@@ -30,11 +33,12 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 .plp-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .plp-thumb:hover { opacity: 0.85; }
 .plp-thumb[aria-current='true'] { opacity: 1; border-color: var(--ink); }
-.plp-thumb:focus-visible, .plp-slide__add:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.plp-thumb:focus-visible, .plp-gallery__add:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 
+/* Phones: no thumbnails; the info card sits under the images and stays put */
 @media (max-width: 767px) {
-  .plp-slide { flex-direction: column; align-items: stretch; justify-content: flex-start; padding-bottom: 0; }
-  .plp-slide__img { flex: 1 1 auto; min-height: 0; height: auto; }
-  .plp-slide__info { position: static; flex: none; width: auto; padding: 12px 0 8px; background: none; }
+  .plp-gallery__thumbs { display: none; }
+  .plp-slide { padding-bottom: 0; }
+  .plp-gallery__info { position: static; flex: none; width: auto; padding: 12px var(--gut, 16px) 14px; background: none; }
 }
 @media (prefers-reduced-motion: reduce) { .plp-gallery__feed { scroll-behavior: auto; } }

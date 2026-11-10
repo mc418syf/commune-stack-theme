@@ -14,6 +14,7 @@
   let root = null;
   let feed = null;
   let thumbs = null;
+  let info = null;
   let items = [];
   let index = 0;
   let next = null;
@@ -41,28 +42,35 @@
     root = document.createElement('section');
     root.className = 'plp-gallery';
     root.setAttribute('aria-label', 'Gallery');
-    root.innerHTML = '<div class="plp-gallery__feed" data-pg-feed tabindex="0" aria-label="Products"></div>' +
+    root.innerHTML = '<div class="plp-gallery__main"><div class="plp-gallery__feed" data-pg-feed tabindex="0" aria-label="Products"></div>' +
+      '<div class="plp-gallery__info" data-pg-info aria-live="polite"></div></div>' +
       '<div class="plp-gallery__thumbs" data-pg-thumbs role="listbox" aria-label="All products"></div>';
     results.parentNode.insertBefore(root, results);
     feed = $('[data-pg-feed]', root);
     thumbs = $('[data-pg-thumbs]', root);
+    info = $('[data-pg-info]', root);
     feed.addEventListener('scroll', onScroll, { passive: true });
     root.addEventListener('click', (e) => {
       const t = e.target.closest('.plp-thumb');
       if (t) return go(Number(t.dataset.i));
       const b = e.target.closest('[data-pg-add]');
-      if (b) return add(Number(b.closest('.plp-slide').dataset.i), b);
+      if (b) return add(index, b);
     });
   }
 
   function slideHTML(it, i) {
     const eager = i < 2 ? 'eager' : 'lazy';
     return '<article class="plp-slide" data-i="' + i + '">' +
-      '<a class="plp-slide__img" href="' + esc(it.url) + '"><img src="' + esc(it.image) + '" alt="' + esc(it.vendor + ' ' + it.title) + '" loading="' + eager + '" decoding="async"></a>' +
-      '<div class="plp-slide__info"><a class="plp-slide__name" href="' + esc(it.url) + '"><span class="plp-slide__vendor">' + esc(it.vendor) + '</span><span class="plp-slide__title">' + esc(it.title) + '</span></a>' +
-      '<div class="plp-slide__price">' + esc(it.available ? it.price : 'Sold out') + '</div>' +
-      (it.available ? '<button type="button" class="theme-button plp-slide__add" data-pg-add>' + (it.single ? 'Add to cart' : 'Choose size') + '</button>' : '') +
-      '</div></article>';
+      '<a class="plp-slide__img" href="' + esc(it.url) + '"><img src="' + esc(it.image) + '" alt="' + esc(it.vendor + ' ' + it.title) + '" loading="' + eager + '" decoding="async"></a></article>';
+  }
+
+  // The info card does not scroll: it always shows the product that is on screen
+  function renderInfo() {
+    const it = items[index];
+    if (!info || !it) return;
+    info.innerHTML = '<a class="plp-gallery__name" href="' + esc(it.url) + '"><span class="plp-gallery__vendor">' + esc(it.vendor) + '</span><span class="plp-gallery__title">' + esc(it.title) + '</span></a>' +
+      '<div class="plp-gallery__price">' + esc(it.available ? it.price : 'Sold out') + '</div>' +
+      (it.available ? '<button type="button" class="add-to-cart theme-button plp-gallery__add" data-pg-add>' + (it.single ? 'Add to cart' : 'Choose size') + '</button>' : '');
   }
 
   function thumbHTML(it, i) {
@@ -70,6 +78,7 @@
   }
 
   function markCurrent() {
+    renderInfo();
     $$('.plp-thumb', thumbs).forEach((b) => {
       const on = Number(b.dataset.i) === index;
       b.setAttribute('aria-current', on);
