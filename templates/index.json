@@ -49,7 +49,7 @@
           "type": "asset",
           "settings": {
             "media_type": "image",
-            "image": "shopify://shop_images/N.HoolywoodAW03_DressDoor_OffsetZipSweatercommune3.jpg",
+            "image": "shopify://shop_images/DSC06008.jpg",
             "heading": "",
             "heading_size": "text-heading-standard",
             "subheading": "",
@@ -61,7 +61,7 @@
             "text_horizontal": "center",
             "button_label": "Shop All",
             "button_style": "link",
-            "button_color": "#292929",
+            "button_color": "#F2F3F4",
             "link": "shopify://collections/all"
           }
         },
@@ -81,7 +81,7 @@
             "text_horizontal": "center",
             "button_label": "Book a Visit",
             "button_style": "link",
-            "button_color": "",
+            "button_color": "#0D0D0D",
             "link": ""
           }
         }
