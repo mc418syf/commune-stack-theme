@@ -1,4 +1,4 @@
-/* gallery v20 */
+/* gallery v21 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -23,7 +23,7 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 /* The info card is fixed in place; only the images scroll. It uses the product page sizes (name and price tokens). */
 .plp-gallery__info { position: absolute; right: var(--gut, 24px); bottom: 28px; width: 260px; box-sizing: border-box; padding: 14px 14px 18px; display: flex; flex-direction: column; gap: 6px; background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
 .plp-gallery__name { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; text-align: left; }
-.plp-gallery__vendor, .plp-gallery__title { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 14px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
+.plp-gallery__vendor, .plp-gallery__title { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: calc(var(--name-size, 16px) - var(--product-card-offset, 2px)); line-height: calc(var(--name-lh, 20px) - var(--product-card-offset, 2px)); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
 .plp-gallery__price { font-family: var(--font-mono); font-weight: var(--price-weight, 400); font-size: var(--price-size, 12px); line-height: var(--price-lh, 16px); letter-spacing: var(--price-ls, 0); color: var(--ink); }
 /* the theme's standard button (same classes as Add to cart on the product page); only the width is set here */
 .plp-gallery__add { margin-top: 6px; width: 100%; box-sizing: border-box; display: flex; justify-content: center; padding: 8px 4px; min-height: 0; cursor: pointer; }
