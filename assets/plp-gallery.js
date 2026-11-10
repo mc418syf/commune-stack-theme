@@ -15,6 +15,7 @@
   let feed = null;
   let thumbs = null;
   let info = null;
+  let brand = null;
   let items = [];
   let index = 0;
   let next = null;
@@ -43,16 +44,20 @@
     root.className = 'plp-gallery';
     root.setAttribute('aria-label', 'Gallery');
     root.innerHTML = '<div class="plp-gallery__main"><div class="plp-gallery__feed" data-pg-feed tabindex="0" aria-label="Products"></div>' +
+      '<div class="plp-gallery__brand" data-pg-brand></div>' +
       '<div class="plp-gallery__info" data-pg-info aria-live="polite"></div></div>' +
       '<div class="plp-gallery__thumbs" data-pg-thumbs role="listbox" aria-label="All products"></div>';
     results.parentNode.insertBefore(root, results);
     feed = $('[data-pg-feed]', root);
     thumbs = $('[data-pg-thumbs]', root);
     info = $('[data-pg-info]', root);
+    brand = $('[data-pg-brand]', root);
     feed.addEventListener('scroll', onScroll, { passive: true });
     root.addEventListener('click', (e) => {
       const t = e.target.closest('.plp-thumb');
       if (t) return go(Number(t.dataset.i));
+      const n = e.target.closest('.brand-note');
+      if (n) n.classList.toggle('is-open');
       const b = e.target.closest('[data-pg-add]');
       if (b) return add(index, b);
     });
@@ -151,9 +156,17 @@
     }
   }
 
+  // The brand description (when one brand is selected) is rendered with the results; the gallery shows a copy of it
+  function renderBrand() {
+    if (!brand) return;
+    const n = $('#results [data-brand-note]');
+    brand.innerHTML = n ? n.outerHTML : '';
+  }
+
   function open() {
     build();
     if (!root) return;
+    renderBrand();
     items = collect(document);
     next = nextIn(document);
     index = Math.min(index, Math.max(0, items.length - 1));

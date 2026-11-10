@@ -389,6 +389,7 @@
         x-html-if-set="resultsHTML"
         :class="{ 'opacity-10' : loading }"
       >
+        {%- render 'brand-note' -%}
         {%- if collection.products.size > 0 -%}
           {%- liquid
             assign grid_gap = section.settings.product_grid_gap | default: 0

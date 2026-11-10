@@ -1,0 +1,26 @@
+{%- comment -%}
+  Brand description. When exactly one brand (vendor) is selected in the filters, shows that brand's name and the description
+  of the collection with the same handle (for example the collection "ann-demeulemeester" for the vendor "Ann Demeulemeester").
+  Nothing is shown when no brand, or several brands, are selected, or when the collection has no description.
+{%- endcomment -%}
+{%- liquid
+  assign brand_name = ''
+  for f in collection.filters
+    if f.param_name == 'filter.p.vendor' and f.active_values.size == 1
+      assign brand_name = f.active_values.first.value
+    endif
+  endfor
+  assign brand_html = ''
+  if brand_name != ''
+    assign brand_collection = collections[brand_name | handleize]
+    if brand_collection and brand_collection.description != blank
+      assign brand_html = brand_collection.description
+    endif
+  endif
+-%}
+{%- if brand_html != '' -%}
+  <div class="brand-note" data-brand-note>
+    <p class="brand-note__n">{{ brand_name }}</p>
+    <div class="brand-note__d">{{ brand_html }}</div>
+  </div>
+{%- endif -%}
