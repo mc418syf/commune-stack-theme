@@ -295,3 +295,11 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* Search window edge matches the other side windows: nothing (the scaled phone field, results) can poke past the right edge or leave a ghost box, and the left edge meets the rail exactly */
 .edge-search { overflow-x: clip; border: 0 !important; box-shadow: none !important; clip-path: inset(0 0 -100vh calc(-1 * var(--rail-w))); }
 .edge-search__x { flex: none; }
+
+/* Search field: magnifier icon and an underline, with the same side padding as the rest of the window */
+.edge-search__field { position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; height: 36px; margin: 10px 4px 10px var(--gut); border-bottom: 1px solid var(--ink); overflow: hidden; color: var(--ink); }
+.edge-search__ic { flex: none; width: 12px; height: 12px; }
+.edge-search .edge-search__i { height: 100% !important; padding: 0 !important; flex: 1 1 auto; }
+@media (max-width: 767px) {
+  .edge-search .edge-search__i { flex: none !important; width: calc(2 * (100% - 20px)); margin-right: calc(-1 * (100% - 20px)); }
+}

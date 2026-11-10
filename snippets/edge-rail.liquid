@@ -305,7 +305,10 @@
 </section>
 
 <form class="edge-search" action="{{ routes.search_url }}" method="get" role="search" data-edge-searchbar hidden>
-  <input id="edge-search-input" class="edge-search__i" type="search" name="q" placeholder="Name, designer, category" autocomplete="off" data-edge-input aria-label="Search">
+  <div class="edge-search__field">
+    <svg class="edge-search__ic" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" focusable="false"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.4 10.4 14.5 14.5" stroke-linecap="round"/></svg>
+    <input id="edge-search-input" class="edge-search__i" type="search" name="q" placeholder="Name, designer, category" autocomplete="off" data-edge-input aria-label="Search">
+  </div>
   <input type="hidden" name="options[prefix]" value="last">
   <button type="button" class="edge-search__x" data-edge-search-close aria-label="Close search">×</button>
   <div class="edge-search__r" data-edge-results aria-live="polite"></div>
