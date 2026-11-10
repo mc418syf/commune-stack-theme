@@ -1,4 +1,4 @@
-/* gallery v9 */
+/* gallery v10 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -45,8 +45,9 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 }
 @media (prefers-reduced-motion: reduce) { .plp-gallery__feed { scroll-behavior: auto; } }
 
-/* Rail button that switches between Grid and Gallery; the icon shows the view you would get */
-.edge-rail__view { width: 24px; min-height: 44px; padding: 0 !important; display: flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; color: var(--gray); }
+/* Rail button that switches between Grid and Gallery: the word View with the icon of the view you would get above it */
+.edge-rail__view { background: none; border: 0; cursor: pointer; color: var(--gray); }
 .edge-rail__view:hover { color: var(--ink); }
+.edge-rail__view svg { flex: none; }
 .edge-rail__view svg[hidden] { display: none; }
 .edge-rail__view:focus-visible { outline: 2px solid var(--orange); outline-offset: -2px; }
