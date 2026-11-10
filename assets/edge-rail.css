@@ -320,7 +320,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-search .edge-search__i { font-size: 11px !important; }
 @media (max-width: 767px) { .edge-search .edge-search__i { font-size: 22px !important; } }
 
-/* Search results follow the product card: vendor and title in the name style, price under them, 2px smaller than before, tighter */
+/* Search results follow the product card: vendor and title in the name style, price at the right, 2px smaller than before, tighter */
 .edge-res { min-height: 0; gap: 10px; padding: 6px 0; align-items: flex-start; }
 .edge-res__img { width: 40px; height: 50px; }
 .edge-res__txt { gap: 0; }
@@ -330,5 +330,5 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase; color: var(--ink) !important;
 }
 .edge-res .edge-res__p {
-  margin-top: 2px; font-size: calc(var(--price-size, 13px) - 2px) !important; line-height: calc(var(--price-lh, 17px) - 2px) !important; color: var(--ink);
+  margin: 0 0 0 auto; flex: none; white-space: nowrap; font-size: calc(var(--price-size, 13px) - 2px) !important; line-height: calc(var(--price-lh, 17px) - 2px) !important; color: var(--ink);
 }

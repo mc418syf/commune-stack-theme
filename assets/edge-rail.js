@@ -228,8 +228,8 @@
             '<a class="edge-row edge-res" href="' + esc(p.url) + '"><span class="edge-res__img">' +
             (p.image ? '<img src="' + esc(p.image) + '" alt="" loading="lazy">' : '') + '</span><span class="edge-res__txt">' +
             (p.vendor ? '<span class="edge-res__v">' + esc(p.vendor) + '</span>' : '') +
-            '<span class="edge-res__n">' + esc(p.title) + '</span>' +
-            '<span class="edge-res__p">' + esc(money(parseFloat(p.price) * 100, cur)) + '</span></span></a>'
+            '<span class="edge-res__n">' + esc(p.title) + '</span></span>' +
+            '<span class="edge-res__p">' + esc(money(parseFloat(p.price) * 100, cur)) + '</span></a>'
         )
         .join('');
     }
