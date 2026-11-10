@@ -888,6 +888,16 @@
         "default": 2
       },
       {
+        "type": "range",
+        "id": "lineheight_hero",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 95
+      },
+      {
         "type": "header",
         "content": "Section heading"
       },
@@ -940,6 +950,16 @@
         "max": 40,
         "step": 1,
         "default": 10
+      },
+      {
+        "type": "range",
+        "id": "lineheight_head",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 109
       },
       {
         "type": "header",
@@ -995,6 +1015,16 @@
         "default": 32
       },
       {
+        "type": "range",
+        "id": "lineheight_mark",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 122
+      },
+      {
         "type": "header",
         "content": "Tabs and description heading"
       },
@@ -1046,6 +1076,16 @@
         "max": 40,
         "step": 1,
         "default": 4
+      },
+      {
+        "type": "range",
+        "id": "lineheight_tab",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 122
       },
       {
         "type": "header",
@@ -1102,6 +1142,16 @@
         "default": 10
       },
       {
+        "type": "range",
+        "id": "lineheight_name",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 129
+      },
+      {
         "type": "header",
         "content": "Price"
       },
@@ -1155,6 +1205,16 @@
         "default": 0
       },
       {
+        "type": "range",
+        "id": "lineheight_price",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 134
+      },
+      {
         "type": "header",
         "content": "Nav, labels, tags, filters"
       },
@@ -1196,6 +1256,16 @@
         "max": 40,
         "step": 1,
         "default": 8
+      },
+      {
+        "type": "range",
+        "id": "lineheight_label",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 127
       },
       {
         "type": "header",
@@ -1242,6 +1312,16 @@
         "default": 0
       },
       {
+        "type": "range",
+        "id": "lineheight_body",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 162
+      },
+      {
         "type": "header",
         "content": "Buttons"
       },
@@ -1284,6 +1364,16 @@
         "max": 40,
         "step": 1,
         "default": 8
+      },
+      {
+        "type": "range",
+        "id": "lineheight_button",
+        "label": "Line height",
+        "min": 90,
+        "max": 180,
+        "step": 1,
+        "unit": "%",
+        "default": 123
       }
     ]
   },
