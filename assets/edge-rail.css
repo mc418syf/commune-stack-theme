@@ -341,3 +341,10 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rail__group { gap: 0; }
 .edge-rail .edge-rail__v { padding: 14px 0 !important; }
 .edge-rail__sep { margin: 14px 0; }
+
+/* Desktop: the Search bar spans the same height as the Search label, with the field centred in it */
+@media (min-width: 768px) {
+  .edge-search { padding-top: calc((var(--edge-win-h, 56px) - 56px) / 2); }
+  .edge-search .edge-search__field { margin-bottom: calc(10px + (var(--edge-win-h, 56px) - 56px) / 2); }
+  .edge-search .edge-search__x { align-self: flex-start; margin-top: calc(6px + (var(--edge-win-h, 56px) - 56px) / 2); }
+}

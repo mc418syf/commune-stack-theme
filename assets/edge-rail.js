@@ -197,7 +197,9 @@
     const sb = $('[data-edge-search]');
     if (sb) {
       const r = sb.getBoundingClientRect();
-      bar.style.setProperty('--edge-win-top', Math.max(0, Math.round(r.top + r.height / 2 - 28)) + 'px');
+      // the bar covers the same stretch as the Search label (padding included), like the other windows
+      bar.style.setProperty('--edge-win-top', Math.max(0, Math.round(r.top)) + 'px');
+      bar.style.setProperty('--edge-win-h', Math.round(r.height) + 'px');
     }
     bar.hidden = false;
     syncJoin();
