@@ -39,7 +39,7 @@
     "links_show_arrow": true,
     "links_show_underline": true,
     "button_color": "accent_background",
-    "button_style": "rounded",
+    "button_style": "square",
     "spacing": "none",
     "fill_image_to_border_edge": true,
     "border_width": 0,
