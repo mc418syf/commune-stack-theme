@@ -62,11 +62,11 @@
     "product_card_size_offset": 2,
     "product_info_letterspacing": "0.1em",
     "product_price_size": 11,
-    "size_head_desktop": 14,
-    "size_head_mobile": 12,
+    "size_head_desktop": 12,
+    "size_head_mobile": 11,
     "size_mark_desktop": 14,
     "size_mark_mobile": 12,
-    "size_name": 14,
+    "size_name": 12,
     "size_price": 11,
     "size_label": 11,
     "size_body": 11,
@@ -112,9 +112,9 @@
     "color_schemes": {
       "scheme1": {
         "settings": {
-          "background": "#F4F3EF",
+          "background": "#f4f3ef",
           "text": "#111111",
-          "accent": "#F4F3EF",
+          "accent": "#f4f3ef",
           "accent_contrast": "#111111",
           "secondary": "#6b6b66"
         }
