@@ -84,7 +84,8 @@
   function onScroll() {
     if (ticking) return;
     ticking = true;
-    requestAnimationFrame(() => {
+    // a timer, not requestAnimationFrame: rAF stops in background tabs
+    setTimeout(() => {
       ticking = false;
       const i = Math.max(0, Math.min(items.length - 1, Math.round(feed.scrollTop / slideHeight())));
       if (i !== index) {
@@ -92,7 +93,7 @@
         markCurrent();
         if (index >= items.length - 6) more();
       }
-    });
+    }, 16);
   }
 
   function go(i) {
@@ -150,10 +151,10 @@
     feed.innerHTML = items.map(slideHTML).join('');
     thumbs.innerHTML = items.map(thumbHTML).join('');
     // the feed has a height only once the gallery is displayed
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       feed.scrollTop = index * slideHeight();
       markCurrent();
-    });
+    }, 30);
     if (index >= items.length - 6) more();
   }
 
