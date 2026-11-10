@@ -353,7 +353,7 @@ PLP product card
 
       <div class="product-tile-price {{ price_class }}">
         {% if sold_out %}
-          <span class="text-scheme-secondary">{{- product.price | money -}}</span><span class="edge-soldout text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</span>
+          <span class="text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</span>
         {% else %}
           {% if on_sale and sold_out != true %}
             <s class="block lg:inline">

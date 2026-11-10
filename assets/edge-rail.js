@@ -146,9 +146,7 @@
     if (pinned) document.documentElement.classList.add('edge-locked');
     setTab(tab);
     if (!wasOpen && !hover) {
-      const pane = $('[data-edge-pane]:not([hidden])', panel);
-      const first = pane && pane.querySelector('a[href], button:not([disabled]), input');
-      (first || panel).focus({ preventScroll: true });
+      panel.focus({ preventScroll: true });
     }
   }
 

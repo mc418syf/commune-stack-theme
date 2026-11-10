@@ -46,7 +46,7 @@ html.edge-locked { overflow: hidden; }
 .edge-rail__v:hover { color: var(--ink); }
 .edge-noscript { display: none; }
 .edge-rail button:focus-visible, .edge-panel button:focus-visible, .edge-panel a:focus-visible,
-.edge-search button:focus-visible, .edge-search input:focus-visible, .edge-switch:focus-visible, .edge-summary:focus-visible {
+.edge-search button:focus-visible, .edge-switch:focus-visible, .edge-summary:focus-visible {
   outline: 2px solid var(--orange); outline-offset: 2px;
 }
 
@@ -211,7 +211,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-news__row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--ink); }
 .edge-news__row input { flex: 1; min-width: 0; height: 36px; border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; outline: none;
   font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--ink); }
-.edge-news__row input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.edge-news__row input:focus-visible { outline: none; }
 .edge-news__row button { min-height: 36px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
 .edge-news__ok, .edge-news__err { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-social { list-style: none; margin: auto 0 0; padding: 0 calc(var(--gut) - 8px) 4px; display: flex; flex-wrap: wrap; gap: 0; }
@@ -265,3 +265,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   pointer-events: none;
 }
 .edge-search__r { max-height: calc(100vh - var(--edge-win-top, 0px) - 56px); overflow-y: auto; }
+
+/* The window takes focus when it opens, without a ring; the search input shows its caret instead */
+.edge-panel:focus, .edge-search input:focus, .edge-search input:focus-visible { outline: none; }
+/* 16px inputs on phones, so iOS does not zoom in when the search or newsletter field is focused */
+@media (max-width: 767px) { .edge-search__i, .edge-news__row input { font-size: 16px !important; } }

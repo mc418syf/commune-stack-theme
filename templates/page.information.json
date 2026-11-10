@@ -60,6 +60,7 @@
       "settings": {
         "title": "",
         "heading_font": "font-heading",
+        "layout": "columns",
         "heading_font_size": "text-heading-standard",
         "expanded_content_max_width": "",
         "color_scheme": ""

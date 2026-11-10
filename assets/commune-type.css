@@ -246,16 +246,3 @@ hr, .border-gridline-color { border-color: var(--rule); }
 
 /* The product description fills its column, so Theme editor > Product information columns controls its width */
 .product-strip .product-desc__body, .product-strip .record-lede { max-width: none; }
-
-/* Desktop product cards: 2px smaller than the sizes above (name, vendor and price) */
-@media (min-width: 768px) {
-  .product-tile-meta,
-  .product-tile-vendor, .product-tile-title, .product-tile-vendor a, .product-tile-title a {
-    font-size: calc(var(--name-size) - var(--product-card-offset, 2px) - 2px);
-    line-height: calc(var(--name-lh) - var(--product-card-offset, 2px) - 2px);
-  }
-  .product-tile-price, .product-tile-price * {
-    font-size: calc(var(--price-size) - var(--product-card-offset, 2px) - 2px);
-    line-height: calc(var(--price-lh) - var(--product-card-offset, 2px) - 2px);
-  }
-}

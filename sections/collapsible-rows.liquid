@@ -15,6 +15,27 @@
     -%}
   {% endif %}
 
+  {%- if section.settings.layout == 'columns' -%}
+    <div class="info-rows px-section-horizontal-spacing">
+      {%- for block in section.blocks -%}
+        <article class="info-row" {{ block.shopify_attributes }}>
+          <h2 class="info-row__title">{{ block.settings.title }}</h2>
+          <div class="info-row__body rte">{{ block.settings.expanded_content }}</div>
+        </article>
+      {%- endfor -%}
+    </div>
+    <style>
+      .info-rows { padding-top: 8px; padding-bottom: 24px; }
+      .info-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 20px 0; border-top: 1px dashed var(--rule-dashed); }
+      .info-row:first-child { border-top: 0; }
+      .info-row__title { margin: 0; font-family: var(--font-display); font-weight: var(--head-weight, 600); font-size: var(--head-size); line-height: var(--head-lh); letter-spacing: var(--head-ls); text-transform: uppercase; }
+      .info-row__body { min-width: 0; }
+      .info-row__body > :first-child { margin-top: 0; }
+      @media (min-width: 768px) {
+        .info-row { grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); column-gap: 48px; padding: 28px 0; }
+      }
+    </style>
+  {%- else -%}
   <ul>
     {% for block in section.blocks %}
       <li {{ block.shopify_attributes }}>
@@ -30,6 +51,7 @@
       </li>
     {% endfor %}
   </ul>
+  {%- endif -%}
 </section>
 
 {% schema %}
@@ -48,6 +70,22 @@
       "id": "title",
       "label": "Heading",
       "default": "Collapsible rows"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "accordion",
+          "label": "Accordion (tap a title to open it)"
+        },
+        {
+          "value": "columns",
+          "label": "Columns: title left, details right; stacked on mobile"
+        }
+      ],
+      "default": "accordion"
     },
     {
       "type": "select",
