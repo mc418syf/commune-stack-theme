@@ -137,3 +137,14 @@
 
 /* The button itself says "Added to cart", so the extra confirmation message (which pushed everything down) is not shown on the product page */
 .product-strip [x-show="addedToCart"] { display: none !important; }
+
+/* Pickup availability under Add to cart: IBM Plex Mono at the button text size */
+.pickup-availability-preview, .pickup-availability-preview *, .pickup-availability-preview .theme-link,
+.pickup-availability-preview h2, .pickup-availability-preview small, .pickup-availability-preview button {
+  font-family: var(--font-mono) !important;
+  font-size: var(--button-size, 13px) !important;
+  line-height: calc(var(--button-size, 13px) * var(--cfg-button-lh, 1.23)) !important;
+  font-weight: var(--button-weight, 400) !important;
+  letter-spacing: var(--button-ls, 0.08em) !important;
+}
+.pickup-availability-preview h2, .pickup-availability-preview button { text-transform: uppercase; }
