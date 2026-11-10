@@ -221,3 +221,4 @@
   if (saved === 'gallery') setMode('gallery');
   else syncToggle();
 })();
+/* brand note v2 */
