@@ -109,6 +109,7 @@
         "[data-product-media-container] .mx-1.mt-2.grid {margin-top: 0.5rem !important;}"
       ],
       "settings": {
+        "mobile_images_per_screen": "1",
         "mobile_slide_over": true,
         "mobile_slide_overlap": 60,
         "desktop_media_width": "two-thirds",
@@ -121,7 +122,7 @@
         "info_desc_gap": 32,
         "info_padding_x_desktop": 32,
         "info_padding_y_desktop": 32,
-        "info_padding_x_mobile": 20,
+        "info_padding_x_mobile": 16,
         "info_padding_y_mobile": 20,
         "two_media_per_row": true,
         "first_media_full_width": false,
