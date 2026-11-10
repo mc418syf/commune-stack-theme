@@ -161,15 +161,7 @@ html.edge-locked { overflow: hidden; }
 }
 #results .collection-list .product-tile-meta > div { width: auto !important; padding: 0 !important; margin: 0 !important; text-align: left !important; }
 #results .collection-list .product-tile-vendor { margin: 0 !important; }
-@media (min-width: 768px) {
-  #results .collection-list .product-tile-meta {
-    position: absolute; left: 12px; bottom: 12px; z-index: 11; max-width: calc(100% - 24px); box-sizing: border-box;
-    background: var(--paper); padding: 8px 10px !important; opacity: 0; transition: opacity 0.15s; pointer-events: none;
-  }
-  #results .collection-list .group:hover .product-tile-meta,
-  #results .collection-list .group:focus-within .product-tile-meta { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) { #results .collection-list .product-tile-meta { transition: none; } }
+/* Name and price sit under the image on every screen size */
 
 .product-card--sold-out { opacity: 0.55; }
 .product-card--sold-out .line-through { text-decoration: none; }

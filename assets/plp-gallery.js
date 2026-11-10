@@ -1,19 +1,24 @@
 /**
- * PLP gallery view. The grid's own cards carry the data (data-plp-*), so the gallery needs no extra requests
- * except the next pages of the listing, which it loads itself as you reach the end of the thumbnails.
+ * PLP gallery view: a snap-scrolling feed, one product per screen. Scrolling (wheel, trackpad or swipe), the arrow keys or a
+ * thumbnail moves to another product. The grid's own cards carry the data (data-plp-*); the gallery only fetches
+ * the next pages of the listing, as you get near the end.
  */
 (function () {
   const KEY = 'commune_plp_view';
   const html = document.documentElement;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   let root = null;
+  let feed = null;
+  let thumbs = null;
   let items = [];
   let index = 0;
   let next = null;
   let loading = false;
+  let ticking = false;
 
   const read = (el) => {
     const d = el.dataset;
@@ -36,54 +41,63 @@
     root = document.createElement('section');
     root.className = 'plp-gallery';
     root.setAttribute('aria-label', 'Gallery');
-    root.innerHTML =
-      '<div class="plp-gallery__stage">' +
-      '<a class="plp-gallery__img" data-pg-link href="#"><img data-pg-img alt=""></a>' +
-      '<div class="plp-gallery__info"><a class="plp-gallery__name" data-pg-name href="#"></a>' +
-      '<div class="plp-gallery__price" data-pg-price></div>' +
-      '<button type="button" class="theme-button plp-gallery__add" data-pg-add>Add to cart</button></div></div>' +
-      '<div class="plp-gallery__thumbs" data-pg-thumbs role="listbox" aria-label="Products"></div>';
+    root.innerHTML = '<div class="plp-gallery__feed" data-pg-feed tabindex="0" aria-label="Products"></div>' +
+      '<div class="plp-gallery__thumbs" data-pg-thumbs role="listbox" aria-label="All products"></div>';
     results.parentNode.insertBefore(root, results);
+    feed = $('[data-pg-feed]', root);
+    thumbs = $('[data-pg-thumbs]', root);
+    feed.addEventListener('scroll', onScroll, { passive: true });
     root.addEventListener('click', (e) => {
       const t = e.target.closest('.plp-thumb');
-      if (t) return select(Number(t.dataset.i));
-      if (e.target.closest('[data-pg-add]')) return add();
+      if (t) return go(Number(t.dataset.i));
+      const b = e.target.closest('[data-pg-add]');
+      if (b) return add(Number(b.closest('.plp-slide').dataset.i), b);
     });
   }
 
-  function thumbsHTML(from) {
-    return items.slice(from).map((it, k) =>
-      '<button type="button" class="plp-thumb" role="option" data-i="' + (from + k) + '" aria-label="' + esc(it.vendor + ' ' + it.title) + '" aria-current="false"><img src="' + esc(it.thumb) + '" alt="" loading="lazy"></button>'
-    ).join('');
+  function slideHTML(it, i) {
+    const eager = i < 2 ? 'eager' : 'lazy';
+    return '<article class="plp-slide" data-i="' + i + '">' +
+      '<a class="plp-slide__img" href="' + esc(it.url) + '"><img src="' + esc(it.image) + '" alt="' + esc(it.vendor + ' ' + it.title) + '" loading="' + eager + '" decoding="async"></a>' +
+      '<div class="plp-slide__info"><a class="plp-slide__name" href="' + esc(it.url) + '"><span class="plp-slide__vendor">' + esc(it.vendor) + '</span><span class="plp-slide__title">' + esc(it.title) + '</span></a>' +
+      '<div class="plp-slide__price">' + esc(it.available ? it.price : 'Sold out') + '</div>' +
+      (it.available ? '<button type="button" class="theme-button plp-slide__add" data-pg-add>' + (it.single ? 'Add to cart' : 'Choose size') + '</button>' : '') +
+      '</div></article>';
   }
 
-  function render() {
-    if (!root || !items.length) return;
-    const it = items[index];
-    $('[data-pg-img]', root).src = it.image;
-    $('[data-pg-img]', root).alt = it.vendor + ' ' + it.title;
-    $('[data-pg-link]', root).href = it.url;
-    const name = $('[data-pg-name]', root);
-    name.href = it.url;
-    name.innerHTML = '<span class="plp-gallery__vendor">' + esc(it.vendor) + '</span><span class="plp-gallery__title">' + esc(it.title) + '</span>';
-    $('[data-pg-price]', root).textContent = it.available ? it.price : 'Sold out';
-    const add = $('[data-pg-add]', root);
-    add.hidden = !it.available;
-    add.textContent = it.single ? 'Add to cart' : 'Choose size';
-    add.disabled = false;
-    $$('.plp-thumb', root).forEach((b) => {
+  function thumbHTML(it, i) {
+    return '<button type="button" class="plp-thumb" role="option" data-i="' + i + '" aria-label="' + esc(it.vendor + ' ' + it.title) + '" aria-current="false"><img src="' + esc(it.thumb) + '" alt="" loading="lazy"></button>';
+  }
+
+  function markCurrent() {
+    $$('.plp-thumb', thumbs).forEach((b) => {
       const on = Number(b.dataset.i) === index;
       b.setAttribute('aria-current', on);
-      if (on) b.scrollIntoView({ inline: 'center', block: 'nearest' });
+      if (on) thumbs.scrollTo({ left: b.offsetLeft - thumbs.clientWidth / 2 + b.offsetWidth / 2, behavior: reduce ? 'auto' : 'smooth' });
     });
-    [index + 1, index - 1].forEach((k) => { if (items[k]) new Image().src = items[k].image; });
   }
 
-  function select(i) {
+  function slideHeight() {
+    return feed.clientHeight || 1;
+  }
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const i = Math.max(0, Math.min(items.length - 1, Math.round(feed.scrollTop / slideHeight())));
+      if (i !== index) {
+        index = i;
+        markCurrent();
+        if (index >= items.length - 6) more();
+      }
+    });
+  }
+
+  function go(i) {
     if (i < 0 || i >= items.length) return;
-    index = i;
-    render();
-    if (index >= items.length - 6) more();
+    feed.scrollTo({ top: i * slideHeight(), behavior: reduce ? 'auto' : 'smooth' });
   }
 
   async function more() {
@@ -100,18 +114,18 @@
       const from = items.length;
       items = items.concat(fresh);
       next = nextIn(doc);
-      $('[data-pg-thumbs]', root).insertAdjacentHTML('beforeend', thumbsHTML(from));
+      feed.insertAdjacentHTML('beforeend', fresh.map((it, k) => slideHTML(it, from + k)).join(''));
+      thumbs.insertAdjacentHTML('beforeend', fresh.map((it, k) => thumbHTML(it, from + k)).join(''));
     } catch (_) {
       next = null;
     }
     loading = false;
   }
 
-  async function add() {
-    const it = items[index];
+  async function add(i, btn) {
+    const it = items[i];
     if (!it || !it.available) return;
     if (!it.single) { location.href = it.url; return; }
-    const btn = $('[data-pg-add]', root);
     btn.disabled = true;
     try {
       const res = await fetch('/cart/add.js', {
@@ -121,10 +135,9 @@
       if (!res.ok) throw new Error('add failed');
       document.dispatchEvent(new CustomEvent('edge:cart-added'));
       btn.textContent = 'Added';
-      setTimeout(() => { if (items[index] === it) btn.textContent = 'Add to cart'; btn.disabled = false; }, 1500);
+      setTimeout(() => { btn.textContent = 'Add to cart'; btn.disabled = false; }, 1500);
     } catch (_) {
       btn.textContent = 'Sold out';
-      btn.disabled = true;
     }
   }
 
@@ -134,8 +147,13 @@
     items = collect(document);
     next = nextIn(document);
     index = Math.min(index, Math.max(0, items.length - 1));
-    $('[data-pg-thumbs]', root).innerHTML = thumbsHTML(0);
-    render();
+    feed.innerHTML = items.map(slideHTML).join('');
+    thumbs.innerHTML = items.map(thumbHTML).join('');
+    // the feed has a height only once the gallery is displayed
+    requestAnimationFrame(() => {
+      feed.scrollTop = index * slideHeight();
+      markCurrent();
+    });
     if (index >= items.length - 6) more();
   }
 
@@ -157,9 +175,10 @@
   });
   document.addEventListener('keydown', (e) => {
     if (mode() !== 'gallery' || e.target.closest('input, textarea, select, [contenteditable]')) return;
-    if (e.key === 'ArrowRight') { select(index + 1); e.preventDefault(); }
-    if (e.key === 'ArrowLeft') { select(index - 1); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
   });
+  window.addEventListener('resize', () => { if (mode() === 'gallery' && feed) feed.scrollTop = index * slideHeight(); });
   // filters, sold-out switch and sorting swap the results: rebuild the gallery from them
   document.addEventListener('plp:results-updated', () => {
     syncToggle();
