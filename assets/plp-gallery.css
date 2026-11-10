@@ -1,4 +1,4 @@
-/* gallery v11 */
+/* gallery v12 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -53,4 +53,4 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 .edge-rail__view:focus-visible { outline: 2px solid var(--orange); outline-offset: -2px; }
 
 /* Dashed divider (secondary colour) between Menu, Search and Filter and the View button */
-.edge-rail__sep { flex: none; width: 12px; height: 0; border-top: 1px dashed var(--gray); }
+.edge-rail__sep { flex: none; width: 12px; height: 0; border-top: 1px dashed #6B6B66; }
