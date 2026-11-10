@@ -433,6 +433,7 @@
       );
       if (push !== false) history.pushState({ edge: true }, '', url);
       syncLocalSwitch();
+      document.dispatchEvent(new CustomEvent('plp:results-updated'));
       setGroup(gi < 0 ? 0 : gi);
       if (focusPath && focusPath[0] > -1) {
         const g = $$('[data-edge-group]')[focusPath[0]];
@@ -584,6 +585,11 @@
   });
   // the Cart window changes height as its lines load: keep the join on the Cart label
   if (window.ResizeObserver) new ResizeObserver(syncJoin).observe(panel);
+
+  // the PLP gallery adds a product to the cart: show it in the Cart window
+  document.addEventListener('edge:cart-added', () => {
+    refreshCart().then(() => openPanel('cart', $('[data-edge-open="cart"]') || plus));
+  });
 
   /* ---------- init ---------- */
   restoreLocalSwitch();

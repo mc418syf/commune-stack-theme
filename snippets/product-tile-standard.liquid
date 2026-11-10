@@ -120,7 +120,20 @@ PLP product card
   endif
 -%}
 
+{%- capture plp_price -%}
+  {%- if settings.currency_code_enabled == true -%}{{ product.price | money_with_currency }}{%- else -%}{{ product.price | money }}{%- endif -%}
+{%- endcapture -%}
 <div
+  data-plp-item
+  data-plp-url="{{ product.url }}"
+  data-plp-title="{{ product.title | escape }}"
+  data-plp-vendor="{{ product.vendor | escape }}"
+  data-plp-price="{{ plp_price | strip | escape }}"
+  data-plp-image="{{ product.featured_media.preview_image | image_url: width: 1600 }}"
+  data-plp-thumb="{{ product.featured_media.preview_image | image_url: width: 240 }}"
+  data-plp-variant="{{ product.selected_or_first_available_variant.id }}"
+  data-plp-single="{{ product.has_only_default_variant }}"
+  data-plp-available="{{ product.available }}"
   class="group relative flex h-full flex-col text-center hover:text-scheme-accent{% if sold_out %} product-card--sold-out{% endif %}"
   {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}
     x-data="{ currentSwatchVariantId: '{{ product.selected_or_first_available_variant.id }}', productUrl: '{{ product.url }}' }"

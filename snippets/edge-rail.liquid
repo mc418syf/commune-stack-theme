@@ -54,7 +54,14 @@
 -%}
 
 <div class="edge-strip__inner">
-  <div class="edge-strip__left"></div>
+  <div class="edge-strip__left">
+    {%- if on_plp and template.name == 'collection' -%}
+      <div class="edge-view" role="group" aria-label="View">
+        <button type="button" data-plp-view="grid" aria-pressed="true">Grid</button>
+        <button type="button" data-plp-view="gallery" aria-pressed="false">Gallery</button>
+      </div>
+    {%- endif -%}
+  </div>
   <div class="edge-strip__logo">{{ header_logo }}</div>
   <div class="edge-strip__right">
     {%- if on_plp and active_total > 0 -%}
