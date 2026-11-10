@@ -6,7 +6,8 @@
 
 .plp-gallery { display: none; }
 html.plp-gallery-on #results { display: none !important; }
-html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-sizing: border-box; height: 100vh; height: 100dvh; padding-top: var(--strip-h, 56px); background: rgb(var(--color-scheme-background)); }
+/* Fixed to the screen (right of the rail), so margins on the collection section cannot push it off the bottom */
+html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-sizing: border-box; position: fixed; z-index: 20; top: 0; right: 0; bottom: 0; left: var(--rail-w, 0px); padding-top: var(--strip-h, 56px); padding-bottom: env(safe-area-inset-bottom); background: rgb(var(--color-scheme-background)); }
 
 .plp-gallery__feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; scrollbar-width: none; outline: none; }
 .plp-gallery__feed::-webkit-scrollbar { display: none; }
