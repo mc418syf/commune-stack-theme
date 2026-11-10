@@ -269,3 +269,9 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   font-size: var(--button-size, 14px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important; line-height: 1 !important;
   border-radius: var(--button-border-radius, 9999px) !important; /* Theme settings > Buttons > Style */
 }
+
+/* Search text is 8px. On phones the field stays 16px (iOS zooms into smaller inputs) and is drawn at half size */
+.edge-search__i { font-size: 8px !important; }
+@media (max-width: 767px) {
+  .edge-search__i { font-size: 16px !important; flex: none !important; width: calc(2 * (100% - 56px)); margin-right: calc(-1 * (100% - 56px)); transform: scale(0.5); transform-origin: left center; }
+}
