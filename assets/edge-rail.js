@@ -290,10 +290,10 @@
     const host = $('[data-edge-list="cart"]');
     if (!host || !cart) return;
     if (!cart.items.length) {
-      host.innerHTML = tryItems().length ? '' : '<div class="edge-body"><p class="edge-empty">Your cart is empty.</p></div>';
+      host.innerHTML = tryItems().length ? '' : '<h3 class="edge-sec__h">Cart [0]</h3><div class="edge-body"><p class="edge-empty">Your cart is empty.</p></div>';
       return;
     }
-    host.innerHTML = '<div class="edge-body">' +
+    host.innerHTML = '<h3 class="edge-sec__h">Cart [' + cart.item_count + ']</h3><div class="edge-body">' +
       cart.items
         .map((i, n) =>
           lineHTML(

@@ -270,3 +270,9 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel:focus, .edge-search input:focus, .edge-search input:focus-visible { outline: none; }
 /* 16px inputs on phones, so iOS does not zoom in when the search or newsletter field is focused */
 @media (max-width: 767px) { .edge-search__i, .edge-news__row input { font-size: 16px !important; } }
+
+/* Checkout and Book a fitting are the theme's standard button size (the Add to cart size from Theme settings) */
+.edge-panel .edge-pill {
+  height: var(--add-to-cart-button-height, 44px) !important; min-height: var(--add-to-cart-button-height, 44px) !important;
+  font-size: var(--button-size, 14px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important; line-height: 1 !important;
+}
