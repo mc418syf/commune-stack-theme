@@ -70,7 +70,7 @@
     if (!info || !it) return;
     info.innerHTML = '<a class="plp-gallery__name" href="' + esc(it.url) + '"><span class="plp-gallery__vendor">' + esc(it.vendor) + '</span><span class="plp-gallery__title">' + esc(it.title) + '</span></a>' +
       '<div class="plp-gallery__price">' + esc(it.available ? it.price : 'Sold out') + '</div>' +
-      (it.available ? '<button type="button" class="add-to-cart theme-button plp-gallery__add" data-pg-add>' + (it.single ? 'Add to cart' : 'Choose size') + '</button>' : '');
+      '';
   }
 
   function thumbHTML(it, i) {

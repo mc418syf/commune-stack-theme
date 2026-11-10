@@ -726,6 +726,12 @@
         "default": 2
       },
       {
+        "type": "color",
+        "id": "gallery_info_bg",
+        "label": "Gallery view: product info background",
+        "default": "#ffffff"
+      },
+      {
         "type": "range",
         "id": "recommendation_card_size_offset",
         "label": "Recommended products: extra size reduction",
