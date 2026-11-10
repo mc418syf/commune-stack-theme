@@ -1,0 +1,93 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+-%}
+
+<section
+  class="overflow-hidden border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+>
+  {% if section.settings.title != '' %}
+    {%- render 'section-title',
+      title: section.settings.title,
+      section_color: section_color
+    -%}
+  {% endif %}
+
+  <div class="info-rows px-section-horizontal-spacing">
+    {%- for block in section.blocks -%}
+      <article class="info-row" {{ block.shopify_attributes }}>
+        <h2 class="info-row__title">{{ block.settings.title }}</h2>
+        <div class="info-row__body rte">{{ block.settings.expanded_content }}</div>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  .info-rows { padding-top: 8px; padding-bottom: 24px; }
+  .info-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 20px 0; border-top: 1px dashed var(--rule-dashed); }
+  .info-row:first-child { border-top: 0; }
+  .info-row__title { margin: 0; font-family: var(--font-display); font-weight: var(--head-weight, 600); font-size: var(--head-size); line-height: var(--head-lh); letter-spacing: var(--head-ls); text-transform: uppercase; }
+  .info-row__body { min-width: 0; }
+  .info-row__body > :first-child { margin-top: 0; }
+  @media (min-width: 768px) {
+    .info-row { grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr); column-gap: 48px; padding: 28px 0; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Information columns",
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": ""
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Row",
+      "type": "row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "expanded_content",
+          "label": "Details",
+          "default": "<p>Use this text to share information about your brand with your customers.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Information columns",
+      "blocks": [
+        { "type": "row" },
+        { "type": "row" },
+        { "type": "row" }
+      ]
+    }
+  ]
+}
+{% endschema %}
