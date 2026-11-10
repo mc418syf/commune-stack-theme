@@ -131,3 +131,6 @@
 }
 .product-strip .product-desc__body *,
 .product-strip .record-lede * { font-size: inherit; line-height: inherit; }
+
+/* Add to cart sits right under the record list; the space between them is "Space between the list and the buttons" in the product section */
+.product-strip .add-to-cart-container { margin-top: 0 !important; }

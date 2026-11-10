@@ -733,6 +733,13 @@
         "default": "#ffffff"
       },
       {
+        "type": "color",
+        "id": "gallery_bg",
+        "label": "Gallery view: page background",
+        "info": "Used only while the PLP gallery view is on; other views keep the colour scheme background.",
+        "default": "#dddddd"
+      },
+      {
         "type": "range",
         "id": "recommendation_card_size_offset",
         "label": "Recommended products: extra size reduction",

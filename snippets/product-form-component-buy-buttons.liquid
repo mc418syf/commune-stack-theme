@@ -110,7 +110,7 @@
     {%- endif -%}
 
     <div
-      class="add-to-cart-container {% unless quick_buy %} max-w-2xl mt-8{% endunless %}"
+      class="add-to-cart-container {% unless quick_buy %} max-w-2xl{% endunless %}"
     >
       {%- liquid
         unless quick_buy
@@ -151,7 +151,7 @@
           <template x-if="currentVariant">
             <span>
               <template x-if="currentVariantAvailable">
-                <span>
+                <span x-text="addedToCart ? {{ 'Added to cart' | json }} : {{ 'products.product.add_to_cart' | t | json }}">
                   {{- 'products.product.add_to_cart' | t -}}
                 </span>
               </template>
