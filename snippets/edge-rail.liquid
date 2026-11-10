@@ -55,12 +55,6 @@
 
 <div class="edge-strip__inner">
   <div class="edge-strip__left">
-    {%- if on_plp and template.name == 'collection' -%}
-      <div class="edge-view" role="group" aria-label="View">
-        <button type="button" data-plp-view="grid" aria-pressed="true">Grid</button>
-        <button type="button" data-plp-view="gallery" aria-pressed="false">Gallery</button>
-      </div>
-    {%- endif -%}
   </div>
   <div class="edge-strip__logo">{{ header_logo }}</div>
   <div class="edge-strip__right">
@@ -89,6 +83,12 @@
     {%- if on_plp and tab_filter != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="filter" aria-haspopup="dialog" aria-expanded="false" aria-label="Filter">
       <span>Filter{% if active_total > 0 %} [{{ active_total }}]{% endif %}</span>
+    </button>
+    {%- endif -%}
+    {%- if on_plp and template.name == 'collection' -%}
+    <button type="button" class="edge-rail__view" data-plp-toggle aria-label="Switch to gallery view" title="Gallery view">
+      <svg data-ico="gallery" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false"><rect x="3" y="1" width="8" height="12"/></svg>
+      <svg data-ico="grid" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false" hidden><rect x="1" y="1" width="5" height="5"/><rect x="8" y="1" width="5" height="5"/><rect x="1" y="8" width="5" height="5"/><rect x="8" y="8" width="5" height="5"/></svg>
     </button>
     {%- endif -%}
   </div>

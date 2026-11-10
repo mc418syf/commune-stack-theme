@@ -167,8 +167,15 @@
     if (index >= items.length - 6) more();
   }
 
+  // The rail button shows the view you would switch to: the gallery icon in grid view, the grid icon in gallery view
   function syncToggle() {
     $$('[data-plp-view]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.plpView === mode()));
+    const next = mode() === 'gallery' ? 'grid' : 'gallery';
+    $$('[data-plp-toggle]').forEach((b) => {
+      $$('[data-ico]', b).forEach((i) => { i.hidden = i.dataset.ico !== next; });
+      b.setAttribute('aria-label', 'Switch to ' + next + ' view');
+      b.title = next === 'gallery' ? 'Gallery view' : 'Grid view';
+    });
   }
 
   function setMode(m) {
@@ -180,6 +187,7 @@
   }
 
   document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-plp-toggle]')) return setMode(mode() === 'gallery' ? 'grid' : 'gallery');
     const b = e.target.closest('[data-plp-view]');
     if (b) setMode(b.dataset.plpView);
   });
