@@ -275,3 +275,23 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 @media (max-width: 767px) {
   .edge-search__i { font-size: 16px !important; flex: none !important; width: calc(2 * (100% - 56px)); margin-right: calc(-1 * (100% - 56px)); transform: scale(0.5); transform-origin: left center; }
 }
+
+/* All panel buttons use the slim product-page button: Add to cart black, Try in-store outlined, shape from Theme settings > Buttons > Style */
+.edge-panel .edge-pill, .edge-panel .edge-pill--primary, .edge-panel .edge-pill--secondary {
+  height: auto !important; min-height: 0 !important; padding: 8px 4px !important; box-sizing: border-box;
+  font-family: var(--font-mono) !important; text-transform: uppercase;
+  font-size: var(--button-size, 13px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important;
+  line-height: calc(var(--button-size, 13px) * var(--cfg-button-lh, 1.23)) !important;
+  border-radius: var(--button-border-radius, 0) !important;
+}
+.edge-panel .edge-pill--primary { background: var(--ink) !important; border: 1px solid var(--ink) !important; color: var(--paper) !important; }
+.edge-panel .edge-pill--primary:hover { background: var(--orange) !important; border-color: var(--orange) !important; color: var(--ink) !important; }
+.edge-panel .edge-pill--secondary { background: transparent !important; border: 1px solid var(--ink) !important; color: var(--ink) !important; }
+/* Hide sold out: same 8px circle and 9px text as the other filter values */
+.edge-switchrow .edge-switch { min-height: 30px; gap: 8px; font-size: 9px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+.edge-switchrow .edge-switch i { width: 8px; height: 8px; }
+.edge-switchrow .edge-switch span { font-size: 9px; }
+
+/* Search window edge matches the other side windows: nothing (the scaled phone field, results) can poke past the right edge or leave a ghost box, and the left edge meets the rail exactly */
+.edge-search { overflow-x: clip; border: 0 !important; box-shadow: none !important; clip-path: inset(0 0 -100vh calc(-1 * var(--rail-w))); }
+.edge-search__x { flex: none; }

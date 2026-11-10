@@ -99,7 +99,7 @@
       refreshCart();
       renderTry();
     }
-    if (tab === 'filter') ensureGroupOpen();
+    if (tab === 'filter') setGroup(-1);
     syncTriggers();
     syncJoin();
   }
@@ -434,7 +434,7 @@
       if (push !== false) history.pushState({ edge: true }, '', url);
       syncLocalSwitch();
       document.dispatchEvent(new CustomEvent('plp:results-updated'));
-      setGroup(gi < 0 ? 0 : gi);
+      setGroup(gi);
       if (focusPath && focusPath[0] > -1) {
         const g = $$('[data-edge-group]')[focusPath[0]];
         const el = g && $$('.edge-opt', g)[focusPath[1]];

@@ -144,7 +144,7 @@
       });
       if (!res.ok) throw new Error('add failed');
       document.dispatchEvent(new CustomEvent('edge:cart-added'));
-      btn.textContent = 'Added';
+      btn.textContent = 'Added to cart';
       setTimeout(() => { btn.textContent = 'Add to cart'; btn.disabled = false; }, 1500);
     } catch (_) {
       btn.textContent = 'Sold out';
