@@ -23,7 +23,7 @@
         "price": {
           "type": "price",
           "settings": {
-            "text_size": "text-heading-secondary"
+            "text_size": "text-base"
           }
         },
         "variant_picker": {
