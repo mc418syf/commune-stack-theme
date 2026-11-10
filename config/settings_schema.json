@@ -836,7 +836,7 @@
         "id": "lineheight_hero",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 95
@@ -901,7 +901,7 @@
         "id": "lineheight_head",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 109
@@ -965,7 +965,7 @@
         "id": "lineheight_mark",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 122
@@ -1029,7 +1029,7 @@
         "id": "lineheight_tab",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 122
@@ -1094,7 +1094,7 @@
         "id": "lineheight_name",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 129
@@ -1158,7 +1158,7 @@
         "id": "lineheight_price",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 134
@@ -1212,7 +1212,7 @@
         "id": "lineheight_label",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 127
@@ -1267,7 +1267,7 @@
         "id": "lineheight_body",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 162
@@ -1322,7 +1322,7 @@
         "id": "lineheight_button",
         "label": "Line height",
         "min": 90,
-        "max": 220,
+        "max": 190,
         "step": 1,
         "unit": "%",
         "default": 123
