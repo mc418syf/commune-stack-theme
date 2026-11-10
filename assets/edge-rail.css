@@ -335,3 +335,9 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* Newsletter block: 10px above, 4px below, same side padding */
 .edge-panel .edge-news { padding: 10px var(--gut) 4px; }
+
+/* Rail labels have padding above and below the text (not at the sides); the space between labels comes from it.
+   When a label is open, the window's joined box starts where that padding starts. */
+.edge-rail__group { gap: 0; }
+.edge-rail .edge-rail__v { padding: 14px 0 !important; }
+.edge-rail__sep { margin: 14px 0; }

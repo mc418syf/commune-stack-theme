@@ -78,8 +78,8 @@
     if (!el || !btn) return;
     const b = btn.getBoundingClientRect();
     const p = el.getBoundingClientRect();
-    const top = Math.max(0, b.top - 6 - p.top);
-    const bottom = Math.min(p.height, b.bottom + 6 - p.top);
+    const top = Math.max(0, b.top - p.top);
+    const bottom = Math.min(p.height, b.bottom - p.top);
     el.style.setProperty('--edge-join-top', Math.round(top) + 'px');
     el.style.setProperty('--edge-join-h', Math.max(0, Math.round(bottom - top)) + 'px');
   }
