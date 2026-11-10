@@ -227,4 +227,4 @@
   if (saved === 'gallery') setMode('gallery');
   else syncToggle();
 })();
-/* brand note v3 */
+/* brand note v4 */
