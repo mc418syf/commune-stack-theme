@@ -824,11 +824,10 @@
       {
         "type": "range",
         "id": "tracking_hero",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 2
       },
       {
@@ -889,11 +888,10 @@
       {
         "type": "range",
         "id": "tracking_head",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 10
       },
       {
@@ -953,11 +951,10 @@
       {
         "type": "range",
         "id": "tracking_mark",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 32
       },
       {
@@ -1017,11 +1014,10 @@
       {
         "type": "range",
         "id": "tracking_tab",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 4
       },
       {
@@ -1082,11 +1078,10 @@
       {
         "type": "range",
         "id": "tracking_name",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 10
       },
       {
@@ -1146,11 +1141,10 @@
       {
         "type": "range",
         "id": "tracking_price",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 0
       },
       {
@@ -1200,11 +1194,10 @@
       {
         "type": "range",
         "id": "tracking_label",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 8
       },
       {
@@ -1255,11 +1248,10 @@
       {
         "type": "range",
         "id": "tracking_body",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 0
       },
       {
@@ -1310,11 +1302,10 @@
       {
         "type": "range",
         "id": "tracking_button",
-        "label": "Letter spacing",
+        "label": "Letter spacing (1/100 em)",
         "min": 0,
         "max": 40,
         "step": 1,
-        "unit": "/100em",
         "default": 8
       },
       {
