@@ -774,7 +774,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Size, weight and letter spacing of each text style. Line heights follow the size. Mobile sizes apply below 768px. Letter spacing is in hundredths of an em: 10 means 0.10em."
+        "content": "Size, weight and letter spacing of each text style. Line heights follow the size. Mobile sizes apply below 768px. Letter spacing is in hundredths of an em: 10 means 0.10em. Sizes go down to 4px."
       },
       {
         "type": "header",
