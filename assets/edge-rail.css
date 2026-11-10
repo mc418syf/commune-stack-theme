@@ -332,3 +332,6 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-res .edge-res__p {
   margin: 0 0 0 auto; flex: none; white-space: nowrap; font-size: calc(var(--price-size, 13px) - 2px) !important; line-height: calc(var(--price-lh, 17px) - 2px) !important; color: var(--ink);
 }
+
+/* Newsletter block: 10px above, 4px below, same side padding */
+.edge-panel .edge-news { padding: 10px var(--gut) 4px; }

@@ -1,4 +1,4 @@
-/* gallery v12 */
+/* gallery v13 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 .edge-view { display: flex; gap: 14px; }
@@ -54,3 +54,9 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 
 /* Dashed divider (secondary colour) between Menu, Search and Filter and the View button */
 .edge-rail__sep { flex: none; width: 12px; height: 0; border-top: 1px dashed #6B6B66; }
+
+/* Gallery view paints one solid background everywhere (page, header strip area, image area, thumbnail row), so no light line shows between the parts */
+html.plp-gallery-on, html.plp-gallery-on body { background: var(--gallery-bg, #DDDDDD) !important; }
+html.plp-gallery-on .plp-gallery__main, html.plp-gallery-on .plp-gallery__feed, html.plp-gallery-on .plp-gallery__thumbs, html.plp-gallery-on .plp-slide { background: var(--gallery-bg, #DDDDDD); }
+html.plp-gallery-on .plp-gallery { gap: 0; border: 0; }
+html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
