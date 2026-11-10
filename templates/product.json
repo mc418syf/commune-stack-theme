@@ -73,7 +73,7 @@
           "type": "buy_buttons",
           "settings": {
             "enable_payment_button": false,
-            "show_pickup_availability": false,
+            "show_pickup_availability": true,
             "show_gift_card_recipient": false,
             "show_try_on_button": true,
             "try_on_button_label": "Try In-Store"
