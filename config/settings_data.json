@@ -112,9 +112,9 @@
     "color_schemes": {
       "scheme1": {
         "settings": {
-          "background": "#DDDDDD",
+          "background": "#F4F3EF",
           "text": "#111111",
-          "accent": "#ff5a1f",
+          "accent": "#F4F3EF",
           "accent_contrast": "#111111",
           "secondary": "#6b6b66"
         }
