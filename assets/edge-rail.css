@@ -315,3 +315,20 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-news__l { margin-bottom: 0; }
 .edge-panel .edge-social { margin: 0; padding: 0 calc(var(--gut) - 8px) 2px; }
 .edge-panel .edge-footlinks a { min-height: 26px; }
+
+/* Search: typed text is the same size as the Search label (11px). On phones the field stays 22px, drawn at half size, so iOS does not zoom */
+.edge-search .edge-search__i { font-size: 11px !important; }
+@media (max-width: 767px) { .edge-search .edge-search__i { font-size: 22px !important; } }
+
+/* Search results follow the product card: vendor and title in the name style, price under them, 2px smaller than before, tighter */
+.edge-res { min-height: 0; gap: 10px; padding: 6px 0; align-items: flex-start; }
+.edge-res__img { width: 40px; height: 50px; }
+.edge-res__txt { gap: 0; }
+.edge-res .edge-res__v, .edge-res .edge-res__n {
+  font-family: var(--font-display) !important; font-weight: var(--name-weight, 600) !important;
+  font-size: calc(var(--name-size, 16px) - 2px) !important; line-height: calc(var(--name-lh, 20px) - 2px) !important;
+  letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase; color: var(--ink) !important;
+}
+.edge-res .edge-res__p {
+  margin-top: 2px; font-size: calc(var(--price-size, 13px) - 2px) !important; line-height: calc(var(--price-lh, 17px) - 2px) !important; color: var(--ink);
+}
