@@ -86,6 +86,7 @@
 
 <div class="edge-strip__inner">
   <div class="edge-strip__left">
+    {%- unless template.name == 'index' or template.name == 'product' -%}
     <button type="button" class="plp-trigger" data-plp-trigger aria-expanded="false" aria-controls="plp-fp">
       <span class="plp-trigger__t" data-plp-trigger-label>
         {%- if on_plp -%}
@@ -100,6 +101,7 @@
         {%- endif -%}
       </span>
     </button>
+    {%- endunless -%}
   </div>
   <div class="edge-strip__logo">{{ header_logo }}</div>
   <div class="edge-strip__right"></div>

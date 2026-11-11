@@ -259,7 +259,7 @@
     {% sections 'header-group' %}
     {% render 'header-group-support' %}
 
-    {% render 'plp-filter-panel' %}
+    {% unless template.name == 'index' or template.name == 'product' %}{% render 'plp-filter-panel' %}{% endunless %}
 
     <main id="MainContent">
       {{ content_for_layout }}

@@ -233,6 +233,12 @@
     }
   }
 
+  function thumb(p) {
+    const src = p.image || (p.featured_image && p.featured_image.url) || '';
+    if (!src) return '';
+    return '<img src="' + esc(src + (src.indexOf('?') > -1 ? '&' : '?') + 'width=120') + '" alt="" width="40" height="50" loading="lazy">';
+  }
+
   function render(products) {
     if (!box) return;
     if (products === null) box.innerHTML = '';
@@ -241,7 +247,7 @@
       box.innerHTML = products
         .map(
           (p) =>
-            '<a class="plp-r" href="' + esc(p.url) + '"><span class="plp-r__n">' + esc([p.vendor, p.title].filter(Boolean).join(' ')) +
+            '<a class="plp-r" href="' + esc(p.url) + '"><span class="plp-r__i">' + thumb(p) + '</span><span class="plp-r__n">' + esc([p.vendor, p.title].filter(Boolean).join(' ')) +
             '</span><span class="plp-r__p">' + esc(money(parseFloat(p.price) * 100)) + '</span></a>'
         )
         .join('');

@@ -93,11 +93,13 @@
 
 .plp-s__r:empty { display: none; }
 .plp-r {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; min-height: 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; min-height: 28px;
   border-bottom: 1px dashed var(--pf-dash); text-decoration: none; color: var(--pf-ink);
   font-size: 9px; line-height: 13px; letter-spacing: 0.02em; text-transform: uppercase; font-variant-numeric: tabular-nums;
 }
-.plp-r__n { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.plp-r__i { flex: none; width: 40px; height: 50px; margin: 6px 0; background: #E6E5DF; overflow: hidden; }
+.plp-r__i img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.plp-r__n { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .plp-r__p { flex: none; color: var(--pf-gray); }
 .plp-r--none { color: var(--pf-gray); border-bottom: 0; }
 .plp-r:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 0; }

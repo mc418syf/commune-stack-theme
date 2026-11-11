@@ -89,3 +89,6 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 @media (max-width: 767px) {
   .plp-gallery__brand .brand-note.is-open { position: absolute; left: var(--gut, 16px); right: var(--gut, 16px); top: 0; max-height: calc(100vh - var(--strip-h, 56px) - 120px); max-height: calc(100dvh - var(--strip-h, 56px) - 120px); overflow-y: auto; background: rgba(244, 243, 239, 0.94); -webkit-overflow-scrolling: touch; }
 }
+
+/* Gallery view: the filter bar (top strip) is the same paper as the PLP and the filter panel, not the gallery grey */
+html.plp-gallery-on .edge-strip { background: var(--paper, #F4F3EF); }
