@@ -1,8 +1,9 @@
-/* plp filter v2 */
+/* plp filter v3 */
 /**
  * Filter and search panel (snippets/plp-filter-panel.liquid), the top-left trigger and the sidebar "In stock" switch.
- * - The trigger opens the panel downward; Esc, a click outside or the trigger again closes it.
- * - Every choice applies live: the URL is rebuilt here (Designer allows one value, Category and Gender several),
+ * - The trigger opens the panel: a left-docked column on desktop (the page moves right, a click in the grid keeps it open),
+ *   a drop-down under the top bar on phones (a click outside closes it). Esc or the trigger again closes it on both.
+ * - Every choice applies live: the URL is rebuilt here (Designer and Sort allow one value, Category and Gender several),
  *   the page is fetched (debounced, the previous request is cancelled) and the grid, the lists, the trigger text,
  *   the piece count and the switch are swapped in. history.pushState keeps the URL shareable and the back button working.
  * - Search uses /search/suggest.json (up to 4 products).
@@ -29,13 +30,24 @@
   const trigger = () => $('[data-plp-trigger]');
 
   /* ---------- open / close ---------- */
-  // The panel animates max-height; its real height is measured (it changes with the lists and the search results)
+  const desktop = window.matchMedia('(min-width: 768px)');
+
+  // Desktop: the panel animates its width (CSS) and the gallery view moves right by that width.
+  // Phones: the panel animates max-height; its real height is measured (it changes with the lists and the search results).
   function size() {
+    if (desktop.matches) {
+      fp.style.maxHeight = '';
+      const w = parseFloat(getComputedStyle(fp).getPropertyValue('--pf-w')) || 342;
+      html.style.setProperty('--plp-panel-w', isOpen ? w + 'px' : '0px');
+      html.style.setProperty('--plp-panel-h', '0px');
+      return;
+    }
     const h = inner.offsetHeight;
     fp.style.maxHeight = isOpen ? h + 'px' : '0px';
     const gap = $('.plp-fp__gap', fp);
     // the gallery view (a fixed overlay) moves down by the part of the panel that is not the top bar's own room
     html.style.setProperty('--plp-panel-h', isOpen ? Math.max(0, h - (gap ? gap.offsetHeight : 0)) + 'px' : '0px');
+    html.style.setProperty('--plp-panel-w', '0px');
   }
 
   function setOpen(v, restoreFocus) {
@@ -62,6 +74,7 @@
 
   if (window.ResizeObserver) new ResizeObserver(size).observe(inner);
   window.addEventListener('resize', size);
+  if (desktop.addEventListener) desktop.addEventListener('change', size);
 
   /* ---------- filter: build the URL, fetch, swap ---------- */
   function wanted() {
@@ -77,6 +90,14 @@
     const param = btn.dataset.param;
     const value = btn.dataset.value;
     const on = btn.getAttribute('aria-pressed') === 'true';
+    if (btn.hasAttribute('data-plp-sort')) {
+      u.searchParams.delete('sort_by');
+      if (value) u.searchParams.set('sort_by', value);
+      $$('[data-plp-sort]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      u.searchParams.delete('page');
+      target = u;
+      return schedule(150);
+    }
     const others = u.searchParams.getAll(param).filter((x) => x !== value);
     u.searchParams.delete(param);
     if (btn.hasAttribute('data-single')) {
@@ -136,8 +157,10 @@
     const ncols = $('[data-plp-cols]', doc);
     if (cols && ncols) {
       const top = cols.scrollTop;
+      const tops = $$('[data-plp-col]', cols).map((c) => c.scrollTop);
       cols.innerHTML = ncols.innerHTML;
       cols.scrollTop = top;
+      $$('[data-plp-col]', cols).forEach((c, i) => { c.scrollTop = tops[i] || 0; });
     }
     const lab = $('[data-plp-trigger-label]');
     const nlab = $('[data-plp-trigger-label]', doc);
@@ -146,6 +169,9 @@
     const n = $('[data-plp-n]');
     const nn = $('[data-plp-n]', doc);
     if (n && nn) n.textContent = nn.textContent;
+    const sn = $('[data-plp-sortnote]');
+    const nsn = $('[data-plp-sortnote]', doc);
+    if (sn && nsn) sn.textContent = nsn.textContent;
 
     const sw = $('[data-plp-stock]');
     const nsw = $('[data-plp-stock]', doc);
@@ -287,8 +313,8 @@
       if (q) q.focus();
       return;
     }
-    // a click anywhere else outside the panel closes it (the view switch is part of browsing, so it keeps the panel open)
-    if (isOpen && t.isConnected && !fp.contains(t) && !t.closest('[data-plp-toggle]')) setOpen(false);
+    // Phones: a click anywhere else outside the panel closes it. Desktop: the panel is docked beside the grid and stays open.
+    if (isOpen && !desktop.matches && t.isConnected && !fp.contains(t) && !t.closest('[data-plp-toggle]') && !t.closest('[data-plp-stock]')) setOpen(false);
   });
 
   document.addEventListener('keydown', (e) => {

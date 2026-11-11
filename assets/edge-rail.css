@@ -231,8 +231,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rail .edge-rail__v { padding: 14px 0 !important; }
 .edge-rail__sep { margin: 14px 0; }
 
-/* Phones: the filter button and the logo sit 12px from the screen edges */
+/* Phones: the filter button sits 12px from the left edge and the logo at the right edge, 12px in */
 @media (max-width: 767px) {
   .edge-strip__left { left: 12px; }
-  .edge-strip[data-logo='right'] .edge-strip__logo { right: 12px; }
+  .edge-strip[data-logo] .edge-strip__logo { position: absolute; left: auto; right: 12px; top: 0; bottom: 0; }
 }

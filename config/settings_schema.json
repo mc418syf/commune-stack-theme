@@ -1378,6 +1378,22 @@
     ]
   },
   {
+    "name": "Filter",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The Gender group of the collection filter reads one product metafield. Change the name here if the metafield is called something else."
+      },
+      {
+        "type": "text",
+        "id": "plp_gender_metafield",
+        "label": "Gender: product metafield (namespace.key)",
+        "info": "It must also be added as a filter in Search & Discovery. Until then the Gender group shows its heading and no values.",
+        "default": "custom.gender"
+      }
+    ]
+  },
+  {
     "name": "Quick buy drawer",
     "settings": [
       {

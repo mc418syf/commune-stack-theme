@@ -1,9 +1,11 @@
 {%- comment -%}
-  Filter panel. Opens downward under the top bar and pushes the page down (see assets/plp-filter.css).
-  On collection and search pages it holds search, the archive list (Designer on the left; Category and Gender on the right) and a footer row.
-  On every other page it holds only search.
-  Designer = vendor, Category = the Category_ tags, Gender = the mens / womens tags (all set up in Shopify Search & Discovery).
-  assets/plp-filter.js applies each change live and keeps the URL in sync. Without JavaScript the panel is a plain GET form.
+  Filter and search panel (assets/plp-filter.css, assets/plp-filter.js).
+  Collection pages: search, then the archive list (Designer on the left; Category, Gender and Sort stacked on the right) and a footer row.
+    Desktop: a left-docked full-height column that pushes the grid to the right. Mobile: expands downward under the top bar.
+  Every other page: search only.
+  Designer = vendor. Category = the filter labelled Category in Search & Discovery (the Category_ tags). Sort = sort_by.
+  Gender = the product metafield named once in Theme settings > Filter (default custom.gender); Search & Discovery calls its parameter filter.p.m.<namespace>.<key>.
+  Without JavaScript the panel is a plain GET form.
 {%- endcomment -%}
 {%- liquid
   assign filter_source = nil
@@ -13,15 +15,15 @@
     assign filter_source = collection.filters
     assign form_action = collection.url
     assign pieces = collection.products_count
-  elsif template.name == 'search'
-    assign filter_source = search.filters
-    assign pieces = search.results_count
   endif
 
   assign has_filters = false
   if filter_source != blank
     assign has_filters = true
   endif
+
+  assign gender_meta = settings.plp_gender_metafield | default: 'custom.gender'
+  assign gender_param = 'filter.p.m.' | append: gender_meta
 
   assign f_des = nil
   assign f_cat = nil
@@ -32,10 +34,10 @@
       assign fl = f.label | downcase
       if f.param_name == 'filter.p.vendor'
         assign f_des = f
+      elsif f.param_name == gender_param
+        assign f_gen = f
       elsif fl contains 'categ' or f.param_name == 'filter.p.product_type'
         assign f_cat = f
-      elsif fl contains 'gender'
-        assign f_gen = f
       elsif f.param_name == 'filter.v.availability'
         assign avail_value = f.values | where: 'value', '1' | first
         if avail_value.active
@@ -45,11 +47,21 @@
     endfor
   endif
 
-  assign clear_url = form_action
-  if template.name == 'search'
-    assign q_enc = search.terms | url_encode
-    assign clear_url = routes.search_url | append: '?q=' | append: q_enc
+  comment
+    Sort: Default (the collection's own order, no sort_by in the URL) and four fixed choices.
+  endcomment
+  assign sort_values = ',created-descending,created-ascending,price-ascending,price-descending' | split: ','
+  assign sort_names = 'Default|Newest|Oldest|Price, low to high|Price, high to low' | split: '|'
+  assign sort_now = collection.sort_by
+  if sort_now == blank or sort_now == collection.default_sort_by
+    assign sort_now = ''
   endif
+  assign sort_note = ''
+  for sv in sort_values
+    if sv == sort_now and sort_now != ''
+      assign sort_note = sort_names[forloop.index0]
+    endif
+  endfor
 -%}
 
 <section
@@ -80,22 +92,15 @@
 
       {%- if has_filters -%}
         <form class="plp-f" action="{{ form_action }}" method="get" data-plp-filters>
-          {%- if template.name == 'search' -%}
-            <input type="hidden" name="q" value="{{ search.terms | escape }}">
-          {%- endif -%}
-          {%- assign sort_now = collection.sort_by | default: search.sort_by -%}
-          {%- if sort_now != blank -%}
-            <input type="hidden" name="sort_by" value="{{ sort_now | escape }}">
-          {%- endif -%}
           {%- if avail_on -%}
             <input type="hidden" name="filter.v.availability" value="1">
           {%- endif -%}
 
           <div class="plp-f__cols plp-f__js" data-plp-cols>
-            {%- if f_des != blank -%}
-              <div class="plp-f__c plp-f__c--des">
-                <h3 class="plp-h" id="plp-h-des">&lt;Designer&gt;</h3>
-                <div class="plp-f__list plp-f__list--des" role="group" aria-labelledby="plp-h-des">
+            <div class="plp-f__c plp-f__c--des" tabindex="0" role="region" aria-label="Designers" data-plp-col>
+              <h3 class="plp-h" id="plp-h-des">&lt;Designer&gt;</h3>
+              <div class="plp-f__list" role="group" aria-labelledby="plp-h-des">
+                {%- if f_des != blank -%}
                   {%- assign vals = f_des.values | sort_natural: 'label' -%}
                   {%- for v in vals -%}
                     {%- capture lbl -%}{%- render 'plp-value-label', kind: 'designer', label: v.label -%}{%- endcapture -%}
@@ -111,68 +116,86 @@
                     >
                       <span class="plp-o__m" aria-hidden="true"></span>
                       <span class="plp-o__l">{{ lbl | strip }}</span>
-                      <span class="plp-o__c">[{{ v.count }}]</span>
+                      <span class="plp-o__c">{{ v.count }}</span>
+                    </button>
+                  {%- endfor -%}
+                {%- endif -%}
+              </div>
+            </div>
+
+            <div class="plp-f__c plp-f__c--rest" tabindex="0" role="region" aria-label="Category, gender and sort" data-plp-col>
+              {%- if f_cat != blank -%}
+                <h3 class="plp-h plp-h--rule" id="plp-h-cat">&lt;Category&gt;</h3>
+                <div class="plp-f__list" role="group" aria-labelledby="plp-h-cat">
+                  {%- assign vals = f_cat.values | sort_natural: 'label' -%}
+                  {%- for v in vals -%}
+                    {%- capture lbl -%}{%- render 'plp-value-label', kind: 'category', label: v.label -%}{%- endcapture -%}
+                    <button
+                      type="button"
+                      class="plp-o plp-o--multi"
+                      aria-pressed="{{ v.active }}"
+                      data-plp-opt
+                      data-param="{{ v.param_name }}"
+                      data-value="{{ v.value | escape }}"
+                      {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
+                    >
+                      <span class="plp-o__m" aria-hidden="true"></span>
+                      <span class="plp-o__l">{{ lbl | strip }}</span>
+                      <span class="plp-o__c">{{ v.count }}</span>
                     </button>
                   {%- endfor -%}
                 </div>
-              </div>
-            {%- endif -%}
+              {%- endif -%}
 
-            {%- if f_cat != blank or f_gen != blank -%}
-              <div class="plp-f__c plp-f__c--rest">
-                {%- if f_cat != blank -%}
-                  <h3 class="plp-h plp-h--rule" id="plp-h-cat">&lt;Category&gt;</h3>
-                  <div class="plp-f__list" role="group" aria-labelledby="plp-h-cat">
-                    {%- assign vals = f_cat.values | sort_natural: 'label' -%}
-                    {%- for v in vals -%}
-                      {%- capture lbl -%}{%- render 'plp-value-label', kind: 'category', label: v.label -%}{%- endcapture -%}
-                      <button
-                        type="button"
-                        class="plp-o plp-o--multi"
-                        aria-pressed="{{ v.active }}"
-                        data-plp-opt
-                        data-param="{{ v.param_name }}"
-                        data-value="{{ v.value | escape }}"
-                        {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
-                      >
-                        <span class="plp-o__m" aria-hidden="true"></span>
-                        <span class="plp-o__l">{{ lbl | strip }}</span>
-                        <span class="plp-o__c">[{{ v.count }}]</span>
-                      </button>
-                    {%- endfor -%}
-                  </div>
-                {%- endif -%}
+              {%- comment -%} Gender is always drawn; its values appear once the metafield is a filter in Search & Discovery {%- endcomment -%}
+              <h3 class="plp-h plp-h--rule" id="plp-h-gen" data-plp-gender-param="{{ gender_param | escape }}">&lt;Gender&gt;</h3>
+              <div class="plp-f__list" role="group" aria-labelledby="plp-h-gen">
                 {%- if f_gen != blank -%}
-                  <h3 class="plp-h plp-h--rule plp-h--gender" id="plp-h-gen">&lt;Gender&gt;</h3>
-                  <div class="plp-f__list" role="group" aria-labelledby="plp-h-gen">
-                    {%- assign vals = f_gen.values | sort_natural: 'label' -%}
-                    {%- for v in vals -%}
-                      {%- capture lbl -%}{%- render 'plp-value-label', kind: 'gender', label: v.label -%}{%- endcapture -%}
-                      <button
-                        type="button"
-                        class="plp-o plp-o--multi"
-                        aria-pressed="{{ v.active }}"
-                        data-plp-opt
-                        data-param="{{ v.param_name }}"
-                        data-value="{{ v.value | escape }}"
-                        {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
-                      >
-                        <span class="plp-o__m" aria-hidden="true"></span>
-                        <span class="plp-o__l">{{ lbl | strip }}</span>
-                        <span class="plp-o__c">[{{ v.count }}]</span>
-                      </button>
-                    {%- endfor -%}
-                  </div>
+                  {%- assign vals = f_gen.values | sort_natural: 'label' -%}
+                  {%- for v in vals -%}
+                    {%- capture lbl -%}{%- render 'plp-value-label', kind: 'gender', label: v.label -%}{%- endcapture -%}
+                    <button
+                      type="button"
+                      class="plp-o plp-o--multi"
+                      aria-pressed="{{ v.active }}"
+                      data-plp-opt
+                      data-param="{{ v.param_name }}"
+                      data-value="{{ v.value | escape }}"
+                      {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
+                    >
+                      <span class="plp-o__m" aria-hidden="true"></span>
+                      <span class="plp-o__l">{{ lbl | strip }}</span>
+                      <span class="plp-o__c">{{ v.count }}</span>
+                    </button>
+                  {%- endfor -%}
                 {%- endif -%}
               </div>
-            {%- endif -%}
+
+              <h3 class="plp-h" id="plp-h-sort">&lt;Sort&gt;</h3>
+              <div class="plp-f__list" role="group" aria-labelledby="plp-h-sort">
+                {%- for sv in sort_values -%}
+                  <button
+                    type="button"
+                    class="plp-o plp-o--single"
+                    aria-pressed="{% if sv == sort_now %}true{% else %}false{% endif %}"
+                    data-plp-opt
+                    data-plp-sort
+                    data-param="sort_by"
+                    data-value="{{ sv }}"
+                  >
+                    <span class="plp-o__m" aria-hidden="true"></span>
+                    <span class="plp-o__l">{{ sort_names[forloop.index0] }}</span>
+                  </button>
+                {%- endfor -%}
+              </div>
+            </div>
           </div>
 
           {%- comment -%} No JavaScript: the same choices as plain inputs and a visible submit button {%- endcomment -%}
           <noscript>
             <style>
               .plp-f__js { display: none !important; }
-              .plp-fp { max-height: none !important; opacity: 1 !important; visibility: visible !important; }
+              .plp-fp { max-width: none !important; max-height: none !important; opacity: 1 !important; visibility: visible !important; }
             </style>
             <div class="plp-f__plain">
               {%- assign pairs = 'des,cat,gen' | split: ',' -%}
@@ -199,18 +222,24 @@
                     {%- assign vals = pf.values | sort_natural: 'label' -%}
                     {%- for v in vals -%}
                       {%- capture lbl -%}{%- render 'plp-value-label', kind: pk, label: v.label -%}{%- endcapture -%}
-                      <label class="plp-o"><input type="{{ pt }}" name="{{ v.param_name }}" value="{{ v.value | escape }}"{% if v.active %} checked{% endif %}> {{ lbl | strip }} [{{ v.count }}]</label>
+                      <label class="plp-o"><input type="{{ pt }}" name="{{ v.param_name }}" value="{{ v.value | escape }}"{% if v.active %} checked{% endif %}> {{ lbl | strip }} {{ v.count }}</label>
                     {%- endfor -%}
                   </fieldset>
                 {%- endif -%}
               {%- endfor -%}
+              <fieldset class="plp-f__fs">
+                <legend class="plp-h">&lt;Sort&gt;</legend>
+                {%- for sv in sort_values -%}
+                  <label class="plp-o"><input type="radio" name="sort_by" value="{{ sv }}"{% if sv == sort_now %} checked{% endif %}> {{ sort_names[forloop.index0] }}</label>
+                {%- endfor -%}
+              </fieldset>
               <button type="submit" class="plp-f__submit">Apply</button>
             </div>
           </noscript>
 
           <div class="plp-f__foot">
-            <a class="plp-f__clear" href="{{ clear_url }}" data-plp-clear>Clear all</a>
-            <span class="plp-f__n" role="status" aria-live="polite"><span data-plp-n>{{ pieces }}</span> pieces</span>
+            <a class="plp-f__clear" href="{{ collection.url }}" data-plp-clear>Clear all</a>
+            <span class="plp-f__n" role="status" aria-live="polite">[<span data-plp-n>{{ pieces }}</span>] pieces<span data-plp-sortnote>{% if sort_note != '' %} · {{ sort_note }}{% endif %}</span></span>
           </div>
         </form>
       {%- endif -%}

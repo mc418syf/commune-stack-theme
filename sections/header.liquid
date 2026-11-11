@@ -87,11 +87,12 @@
     --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
     --vellum-text: rgba({{ vellum_rgb }}, {{ text_alpha }});
     --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
-    --strip-h: {{ section.settings.strip_height | default: 56 }}px;
+    --strip-h: {{ section.settings.strip_height_mobile | default: 41 }}px;
   }
   @media (min-width: 768px) {
     :root {
       --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
+      --strip-h: {{ section.settings.strip_height | default: 56 }}px;
       --panel-w: {{ section.settings.panel_width | default: 380 }}px;
     }
   }
@@ -277,6 +278,16 @@
       "unit": "px",
       "label": "Logo strip height",
       "default": 56
+    },
+    {
+      "type": "range",
+      "id": "strip_height_mobile",
+      "min": 32,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "label": "Logo strip height, mobile",
+      "default": 41
     },
     {
       "type": "checkbox",

@@ -15,9 +15,14 @@
   assign filter_source = nil
   if template.name == 'collection'
     assign filter_source = collection.filters
-  elsif template.name == 'search'
-    assign filter_source = search.filters
   endif
+
+  comment
+    Gender is a product metafield. Its name lives in one place: Theme settings > Filter > Gender (default custom.gender).
+    Search & Discovery names the filter parameter filter.p.m.<namespace>.<key>.
+  endcomment
+  assign gender_meta = settings.plp_gender_metafield | default: 'custom.gender'
+  assign gender_param = 'filter.p.m.' | append: gender_meta
 
   assign on_plp = false
   if filter_source != blank
@@ -41,7 +46,7 @@
         assign kind = 'designer'
       elsif fl contains 'categ' or f.param_name == 'filter.p.product_type'
         assign kind = 'category'
-      elsif fl contains 'gender'
+      elsif f.param_name == gender_param
         assign kind = 'gender'
       endif
       if kind != ''
