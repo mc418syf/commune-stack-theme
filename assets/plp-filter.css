@@ -186,3 +186,11 @@
 @media (max-width: 767px) {
   .plp-t__d, .plp-t__d--sel { color: #111111; }
 }
+
+/* Desktop: no right padding, so the search line and the dashed rules run into the panel's right border */
+@media (min-width: 768px) {
+  .plp-s, .plp-f__cols { padding-right: 0; }
+  .plp-s__ic { margin-right: 12px; padding-left: 8px; }
+  .plp-s__x { margin-right: 6px; }
+  .plp-r { padding-right: 12px; }
+}
