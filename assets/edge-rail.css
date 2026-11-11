@@ -247,3 +247,21 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   .edge-strip__left { left: 12px; }
   .edge-strip[data-logo] .edge-strip__logo { position: absolute; left: auto; right: 12px; top: 0; bottom: 0; }
 }
+
+/* Cart window spacing: tighter, like the product page. Brand-to-title and title-to-price use the same theme-wide gaps as the product page and the cards
+   (Theme settings > Product text); the rest of the spacing is reduced to a compact 12 / 8 / 4 scale. */
+.edge-panel .edge-body { padding: 12px var(--gut) 12px; }
+.edge-panel .edge-line { gap: 12px; padding-bottom: 0; }
+.edge-panel .edge-line + .edge-line { margin-top: 12px; }
+.edge-panel .edge-line__txt { gap: 0; }
+.edge-panel .edge-line__vendor { margin-bottom: var(--product-vendor-title-gap, 6px); }
+.edge-panel .edge-line__ref { margin-top: 2px; }
+.edge-panel .edge-line__price { margin-top: var(--product-title-price-gap, 6px); }
+.edge-panel .edge-line__act { gap: 16px; margin-top: 2px; }
+.edge-panel .edge-line__act button { min-height: 32px; }
+.edge-panel .edge-sec { margin-top: 0; }
+.edge-panel .edge-sec__h { padding: 12px var(--gut) 0; }
+.edge-panel .edge-sec .edge-body { padding-top: 8px; }
+.edge-panel .edge-ledger { padding: 6px 0; margin-top: 4px; }
+.edge-panel .edge-body .edge-foot { padding-top: 12px; }
+
