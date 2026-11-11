@@ -53,9 +53,18 @@
   .plp-fp__gap { display: none; }
   .plp-fp__sheet { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
   /* the grid (and the rest of the page) moves right by the panel's width */
-  html.plp-fp-used body { transition: padding-left 0.24s ease-out; }
   html.plp-fp-open body { padding-left: calc(var(--rail-w, 0px) + var(--pf-w, 342px)); }
+  /* Gallery view: the padding itself eases (its listing is hidden, so nothing heavy re-lays out) */
+  html.plp-gallery-on.plp-fp-used body { transition: padding-left 0.24s ease-out; }
+  /* Grid view: the new width is applied at once and the page only slides into place with a transform. Easing the padding made
+     every product tile and image re-lay out on every frame, which showed as juddering. */
+  html:not(.plp-gallery-on).plp-fp-used body { overflow-x: clip; }
+  html:not(.plp-gallery-on).plp-fp-open #MainContent { animation: plp-main-in 0.24s ease-out; }
+  html:not(.plp-gallery-on).plp-fp-used:not(.plp-fp-open) #MainContent { animation: plp-main-out 0.24s ease-out; }
+  @keyframes plp-main-in { from { transform: translateX(calc(-1 * var(--pf-w, 342px))); } to { transform: none; } }
+  @keyframes plp-main-out { from { transform: translateX(var(--pf-w, 342px)); } to { transform: none; } }
 }
+@media (prefers-reduced-motion: reduce) { #MainContent { animation: none !important; } }
 
 /* ---- Phones: drops down over the page (nothing underneath moves or squeezes). The sheet starts at the very top of the screen,
    so the top bar sits on the same paper as the panel while it is open. ---- */
