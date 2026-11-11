@@ -51,7 +51,6 @@
         "accent_text_color": "#c23b05",
         "rail_width_desktop": 24,
         "rail_width_mobile": 24,
-        "panel_width": 342,
         "strip_height": 44,
         "strip_height_mobile": 40,
         "strip_sticky": true,

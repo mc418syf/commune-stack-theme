@@ -51,7 +51,7 @@
   .plp-fp[data-open] { max-width: var(--pf-w); transition: max-width 0.24s ease-out, opacity 0.24s ease-out, visibility 0s; }
   .plp-fp__in { width: var(--pf-w); height: 100%; }
   .plp-fp__gap { display: none; }
-  .plp-fp__sheet { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; border-right: 1px solid var(--pf-line); }
+  .plp-fp__sheet { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
   /* the grid (and the rest of the page) moves right by the panel's width */
   html.plp-fp-used body { transition: padding-left 0.24s ease-out; }
   html.plp-fp-open body { padding-left: calc(var(--rail-w, 0px) + var(--pf-w, 342px)); }
@@ -124,7 +124,7 @@
 
 .plp-h {
   position: sticky; top: 0; z-index: 1; margin: 0; padding: 0; background: var(--pf-paper);
-  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 500; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-ink);
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 10px; font-weight: 500; line-height: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-ink);
 }
 .plp-f__c > .plp-h:first-child { padding-bottom: 6px; }
 .plp-h--rule { padding-bottom: 6px; border-bottom: 1px dashed var(--pf-dash); }

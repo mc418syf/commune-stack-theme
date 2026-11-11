@@ -95,7 +95,7 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 @media (min-width: 768px) {
   html.plp-gallery-on .edge-strip::before {
     content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--rail-w, 0px); width: var(--pf-w, 342px); max-width: 0; opacity: 0; box-sizing: border-box;
-    background: var(--paper, #F4F3EF); border-right: 1px solid var(--pf-line, #D9D8D2); pointer-events: none;
+    background: var(--paper, #F4F3EF); pointer-events: none;
     transition: max-width 0.24s ease-out, opacity 0.24s ease-out;
   }
   html.plp-gallery-on.plp-fp-open .edge-strip::before { max-width: var(--pf-w, 342px); opacity: 1; }

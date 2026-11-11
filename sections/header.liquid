@@ -93,8 +93,19 @@
     :root {
       --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
       --strip-h: {{ section.settings.strip_height | default: 56 }}px;
-      --panel-w: {{ section.settings.panel_width | default: 342 }}px;
-      --pf-w: {{ section.settings.panel_width | default: 342 }}px;
+    }
+  }
+  /* Menu, Cart and Filter are as wide as one product card (grid gap 6px): a quarter of the page at 1024px and up, half of it between 768 and 1023px */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    :root {
+      --pf-w: max(280px, calc((100vw - var(--rail-w) - 6px) / 2));
+      --panel-w: var(--pf-w);
+    }
+  }
+  @media (min-width: 1024px) {
+    :root {
+      --pf-w: max(280px, calc((100vw - var(--rail-w) - 18px) / 4));
+      --panel-w: var(--pf-w);
     }
   }
 {% endstyle %}
@@ -258,17 +269,6 @@
       "unit": "px",
       "label": "Rail width, mobile",
       "default": 36
-    },
-    {
-      "type": "range",
-      "id": "panel_width",
-      "min": 282,
-      "max": 562,
-      "step": 10,
-      "unit": "px",
-      "label": "Menu, cart and filter width, desktop",
-      "default": 342,
-      "info": "On mobile the panel fills the screen beside the rail."
     },
     {
       "type": "range",
