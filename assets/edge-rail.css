@@ -32,7 +32,7 @@ html.edge-locked { overflow: hidden; }
 .edge-rail__v:hover { color: var(--ink); }
 .edge-noscript { display: none; }
 .edge-rail button:focus-visible, .edge-panel button:focus-visible, .edge-panel a:focus-visible {
-  outline: 2px solid var(--orange); outline-offset: 2px;
+  outline: 1px solid var(--ink, #111111); outline-offset: 2px;
 }
 
 /* ---- Scrim + panel ---- */

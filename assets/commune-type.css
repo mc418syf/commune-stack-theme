@@ -189,7 +189,7 @@ a:hover, a:focus-visible { text-decoration: underline; text-decoration-color: va
 em, i, .italic { font-style: normal; }
 
 /* ---- Focus ring ---- */
-:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: 2px; }
 
 /* ---- Rules ---- */
 hr, .border-gridline-color { border-color: var(--rule); }

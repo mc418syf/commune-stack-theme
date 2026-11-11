@@ -1,4 +1,4 @@
-/* plp filter v6 */
+/* plp filter v7 */
 /* Filter and search panel, the top-left trigger and the sidebar "In stock" switch.
    Values follow the "Filter, left panel, desktop" and "Filter, archive list, mobile" designs. Everything in the panel and the trigger is 9px
    on purpose, below the site's usual 11px; the sidebar labels stay 11px. Colours marked "brief" are the literal values from the design. */
@@ -27,8 +27,7 @@
 .plp-t__d { color: var(--pf-ink); }
 .plp-t__d--sel { color: var(--pf-dark); }
 .plp-t__r { color: var(--pf-gray); }
-.plp-trigger:hover .plp-t__d, .plp-trigger:hover .plp-t__r { color: var(--pf-hover); }
-.plp-trigger:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: 2px; }
+.plp-trigger:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 2px; }
 @media (max-width: 767px) { .plp-trigger { max-width: 170px; } }
 
 /* ---- Panel shell ---- */
@@ -90,8 +89,7 @@
   background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--pf-ink);
 }
 .plp-s__x[hidden] { display: none; }
-.plp-s__x:hover { color: var(--pf-hover); }
-.plp-s__x:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: -4px; }
+.plp-s__x:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -4px; }
 
 .plp-s__r:empty { display: none; }
 .plp-r {
@@ -102,13 +100,13 @@
 .plp-r__n { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .plp-r__p { flex: none; color: var(--pf-gray); }
 .plp-r--none { color: var(--pf-gray); border-bottom: 0; }
-.plp-r:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: 0; }
+.plp-r:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 0; }
 
 /* ---- Archive list: Designer on the left; Category, Gender and Sort stacked on the right. Each column scrolls on its own and keeps its headers in view. ---- */
 .plp-f { margin: 0; }
 .plp-f__cols { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 0 20px; align-items: stretch; box-sizing: border-box; padding: 18px 12px 0; }
 .plp-f__c { min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--pf-dash) transparent; }
-.plp-f__c:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: -2px; }
+.plp-f__c:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -2px; }
 /* Desktop: the columns fill the docked panel */
 @media (min-width: 768px) {
   .plp-f { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
@@ -144,7 +142,7 @@
 /* the count is a footnote mark straight after the name: 7px, gray, raised about 4px, 3px from the name */
 .plp-o__c { flex: none; margin-left: 3px; position: relative; top: -4px; font-size: 7px; line-height: 1; font-weight: 400; letter-spacing: 0; color: var(--pf-gray); }
 .plp-o[aria-disabled='true'] { cursor: default; }
-.plp-o:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: -2px; }
+.plp-o:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -2px; }
 
 /* Footer: one thin row, about 24px high */
 .plp-f__foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; min-height: 24px; padding: 0 12px; border-top: 1px dashed var(--pf-dash); }
@@ -152,8 +150,7 @@
   display: inline-flex; align-items: center; font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--pf-ink); text-decoration: underline; text-underline-offset: 3px;
 }
-.plp-f__clear:hover { color: var(--pf-hover); }
-.plp-f__clear:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: 2px; }
+.plp-f__clear:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 2px; }
 .plp-f__n { font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-gray); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* No JavaScript: plain inputs and a visible submit button */
@@ -171,4 +168,16 @@
 .edge-rail__stock { color: var(--ink); cursor: pointer; }
 .edge-rail__dot { display: inline-block; flex: none; box-sizing: border-box; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--ink); background: transparent; }
 .edge-rail__stock[aria-checked='true'] .edge-rail__dot { background: #111111; }
-.edge-rail__stock:focus-visible { outline: 2px solid var(--orange); outline-offset: -2px; }
+.edge-rail__stock:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+
+/* Orange is only a mouse-hover colour (trigger, Clear all, the search ×); a tap on a phone never leaves it behind */
+@media (hover: hover) and (pointer: fine) {
+  .plp-trigger:hover .plp-t__d, .plp-trigger:hover .plp-t__r { color: var(--pf-hover); }
+  .plp-s__x:hover { color: var(--pf-hover); }
+  .plp-f__clear:hover { color: var(--pf-hover); }
+}
+
+/* Phones: the selected designer in the trigger is full ink (#111111) */
+@media (max-width: 767px) {
+  .plp-t__d, .plp-t__d--sel { color: #111111; }
+}
