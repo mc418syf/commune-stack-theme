@@ -631,6 +631,10 @@
 {% endif %}
 
 {% style %}
+/* description under the title: three quarters of the page on desktop (overrides the 56ch limit on .rte) */
+@media (min-width: 768px) {
+  .collection-page-title ~ .rte { max-width: none !important; width: 75% !important; }
+}
 @media (max-width: 1023px) {
   .collection-page-title {
     font-weight: 700;
