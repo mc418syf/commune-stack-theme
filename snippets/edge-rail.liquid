@@ -103,6 +103,11 @@
     </button>
     {%- endunless -%}
   </div>
+  {%- if on_plp and template.name != 'index' and template.name != 'product' -%}
+  <button type="button" class="plp-strip-x" data-plp-close aria-label="Close filter">
+    <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><path d="M2 2 12 12M12 2 2 12" stroke-linecap="round"/></svg>
+  </button>
+  {%- endif -%}
   <div class="edge-strip__logo">{{ header_logo }}</div>
   <div class="edge-strip__right"></div>
 </div>

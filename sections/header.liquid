@@ -93,7 +93,8 @@
     :root {
       --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
       --strip-h: {{ section.settings.strip_height | default: 56 }}px;
-      --panel-w: {{ section.settings.panel_width | default: 380 }}px;
+      --panel-w: {{ section.settings.panel_width | default: 342 }}px;
+      --pf-w: {{ section.settings.panel_width | default: 342 }}px;
     }
   }
 {% endstyle %}
@@ -261,12 +262,12 @@
     {
       "type": "range",
       "id": "panel_width",
-      "min": 280,
-      "max": 560,
+      "min": 282,
+      "max": 562,
       "step": 10,
       "unit": "px",
-      "label": "Panel and search width, desktop",
-      "default": 380,
+      "label": "Menu, cart and filter width, desktop",
+      "default": 342,
       "info": "On mobile the panel fills the screen beside the rail."
     },
     {

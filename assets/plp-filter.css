@@ -198,3 +198,18 @@
   .plp-s__x { margin-right: 6px; }
   .plp-r { padding-right: 12px; }
 }
+
+/* Close: on desktop it sits in the top bar on the same line as the <Filter> title, at the right end of the panel; on phones it stays in the footer */
+.plp-strip-x { display: none; }
+@media (min-width: 768px) {
+  .plp-f__x { display: none; }
+  .plp-strip-x {
+    position: absolute; top: 0; bottom: 0; left: calc(var(--rail-w, 0px) + var(--pf-w, 342px) - 42px); width: 36px; box-sizing: border-box; padding: 0;
+    display: flex; align-items: center; justify-content: center; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--ink, #111111);
+    opacity: 0; visibility: hidden; transition: opacity 0.24s ease-out, visibility 0s linear 0.24s;
+  }
+  html.plp-fp-open .plp-strip-x { opacity: 1; visibility: visible; transition: opacity 0.24s ease-out, visibility 0s; }
+  .edge-strip[data-sticky='true'] .plp-strip-x { left: calc(var(--pf-w, 342px) - 42px); }
+  .plp-strip-x:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -6px; }
+}
+@media (hover: hover) and (pointer: fine) { .plp-strip-x:hover { color: var(--orange-ink, #C23B05); } }
