@@ -136,7 +136,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-news__l { display: block; margin-bottom: 4px; color: var(--gray); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
 .edge-news__row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--ink); }
 .edge-news__row input { flex: 1; min-width: 0; height: 36px; border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; outline: none;
-  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--ink); }
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.02em; color: var(--ink); }
 .edge-news__row input:focus-visible { outline: none; }
 .edge-news__row button { min-height: 36px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
 .edge-news__ok, .edge-news__err { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
@@ -201,7 +201,11 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* The window takes focus when it opens, without a ring */
 .edge-panel:focus { outline: none; }
 /* 16px inputs on phones, so iOS does not zoom in when the newsletter field is focused */
-@media (max-width: 767px) { .edge-news__row input { font-size: 16px !important; } }
+/* Phone: iOS zooms the page when a field's text is under 16px. The field is set at 16px and scaled to 11px (16 x 0.6875), so it looks like the label and does not zoom */
+@media (max-width: 767px) {
+  .edge-news__row { display: grid; grid-template-columns: 1fr auto; }
+  .edge-news__row input { flex: none; width: 145.4545%; height: 52px; font-size: 16px !important; transform: scale(0.6875); transform-origin: 0 50%; }
+}
 
 /* Checkout and Book a fitting are the theme's standard button size (the Add to cart size from Theme settings) */
 .edge-panel .edge-pill {
