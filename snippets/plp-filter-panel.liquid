@@ -104,6 +104,8 @@
                   {%- assign vals = f_des.values | sort_natural: 'label' -%}
                   {%- for v in vals -%}
                     {%- capture lbl -%}{%- render 'plp-value-label', kind: 'designer', label: v.label -%}{%- endcapture -%}
+                    {%- comment -%} Brand page = the collection whose handle is the designer name (ISSEY MIYAKE -> issey-miyake). {%- endcomment -%}
+                    {%- assign brand_col = collections[v.value | handleize] -%}
                     <button
                       type="button"
                       class="plp-o plp-o--single"
@@ -112,6 +114,7 @@
                       data-single
                       data-param="{{ v.param_name }}"
                       data-value="{{ v.value | escape }}"
+                      {% if brand_col.handle != blank %}data-brand-url="{{ brand_col.url }}"{% endif %}
                       {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
                     >
                       <span class="plp-o__m" aria-hidden="true"></span>

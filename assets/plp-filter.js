@@ -98,6 +98,17 @@
     }
     const others = u.searchParams.getAll(param).filter((x) => x !== value);
     u.searchParams.delete(param);
+    if (btn.hasAttribute('data-single') && btn.dataset.brandUrl) {
+      // choosing a designer opens that brand's own page (own URL for SEO); other filters and sort carry over
+      const keep = new URL(btn.dataset.brandUrl, location.origin);
+      if (!on) {
+        u.searchParams.delete(param);
+        u.searchParams.forEach((val, key) => { if (key !== 'q') keep.searchParams.append(key, val); });
+        keep.searchParams.delete('page');
+        window.location.href = keep.pathname + keep.search;
+        return;
+      }
+    }
     if (btn.hasAttribute('data-single')) {
       // one designer at a time: a new choice replaces the old one, the chosen one again clears it
       if (!on) u.searchParams.set(param, value);
@@ -345,4 +356,17 @@
     }
   } catch (_) {}
   size();
+
+  /* An old or shared filter link (?filter.p.vendor=X) moves to the brand's own page when that page exists. */
+  (function toBrandPage() {
+    const sel = $$('[data-plp-opt][data-single][aria-pressed="true"][data-brand-url]');
+    const u = new URL(location.href);
+    if (sel.length !== 1 || u.searchParams.getAll(sel[0].dataset.param).length !== 1) return;
+    const to = new URL(sel[0].dataset.brandUrl, location.origin);
+    if (to.pathname === u.pathname) return;
+    u.searchParams.delete(sel[0].dataset.param);
+    u.searchParams.delete('page');
+    u.searchParams.forEach((v, k) => to.searchParams.append(k, v));
+    location.replace(to.pathname + to.search);
+  })();
 })();
