@@ -1,4 +1,4 @@
-/* plp filter v1 */
+/* plp filter v2 */
 /* Filter and search panel, the top-left trigger and the sidebar "In stock" switch.
    Values follow the "Filter, archive list" design (desktop 1440, mobile 390). Everything in the panel and the trigger is 9px on purpose,
    below the site's usual 11px; the sidebar labels stay 11px. Colours marked "brief" are the literal values from the design. */
@@ -40,10 +40,11 @@
 .plp-fp__gap { height: var(--strip-h, 56px); }   /* room for the top bar */
 .plp-fp__sheet { background: var(--pf-paper); border-bottom: 1px solid var(--pf-line); }
 
-/* Collection pages already leave room for the top bar above the grid; the panel brings its own while it is open */
-#MainContent .collection { transition: margin-top 0.24s ease-out; }
+/* Collection pages already leave room for the top bar above the grid; the panel brings its own while it is open.
+   The margin only animates once the panel has been used (the section's own margin arrives after the first paint and must not slide in). */
 html.plp-fp-open #MainContent .collection { margin-top: 0 !important; }
-@media (prefers-reduced-motion: reduce) { #MainContent .collection { transition: none; } }
+html.plp-fp-used #MainContent .collection { transition: margin-top 0.24s ease-out; }
+@media (prefers-reduced-motion: reduce) { html.plp-fp-used #MainContent .collection { transition: none; } }
 
 /* Gallery view is a fixed overlay: the panel floats over it and the gallery moves down by the panel's height */
 html.plp-gallery-on .plp-fp { position: fixed; top: 0; left: var(--rail-w, 0px); right: 0; z-index: 12; }

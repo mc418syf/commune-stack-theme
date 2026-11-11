@@ -1,4 +1,4 @@
-/* plp filter v1 */
+/* plp filter v2 */
 /**
  * Filter and search panel (snippets/plp-filter-panel.liquid), the top-left trigger and the sidebar "In stock" switch.
  * - The trigger opens the panel downward; Esc, a click outside or the trigger again closes it.
@@ -41,6 +41,7 @@
   function setOpen(v, restoreFocus) {
     if (v === isOpen) return;
     isOpen = v;
+    html.classList.add('plp-fp-used');
     fp.toggleAttribute('data-open', v);
     fp.toggleAttribute('inert', !v);
     html.classList.toggle('plp-fp-open', v);
