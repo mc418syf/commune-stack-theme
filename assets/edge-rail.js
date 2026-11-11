@@ -216,6 +216,23 @@
       '<div class="edge-foot"><a class="edge-pill edge-pill--primary" href="/checkout">Checkout</a></div></div>';
   }
 
+  // "Book a fitting" goes straight to the Calendly page. The answer to the second question lists the pieces as "Brand Title (Size)".
+  const CAL_BASE = 'https://calendly.com/commune237/showroomappointment';
+  function calendlyUrl(items) {
+    const params = new URLSearchParams();
+    const pieces = items
+      .map((i) => [i.vendor, i.title].filter(Boolean).join(' ') + (i.variantTitle && !/default title/i.test(i.variantTitle) ? ' (' + i.variantTitle + ')' : ''))
+      .join(', ');
+    if (pieces) params.set('a2', pieces);
+    const rail = document.querySelector('[data-edge-rail]');
+    if (rail && rail.dataset.customerEmail) {
+      if (rail.dataset.customerName) params.set('name', rail.dataset.customerName);
+      params.set('email', rail.dataset.customerEmail);
+    }
+    const q = params.toString();
+    return CAL_BASE + (q ? '?' + q : '');
+  }
+
   function renderTry() {
     const host = $('[data-edge-list="try"]');
     if (!host) return;
@@ -237,7 +254,7 @@
           )
         )
         .join('') +
-      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="/pages/book">Book a fitting</a></div></div>';
+      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="' + esc(calendlyUrl(items)) + '">Book a fitting</a></div></div>';
   }
 
   async function cartChange(line, qty) {

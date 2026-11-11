@@ -1,9 +1,0 @@
-{
-  "sections": {
-    "try-on-list": {
-      "type": "try-on-list-page",
-      "settings": {}
-    }
-  },
-  "order": ["try-on-list"]
-}

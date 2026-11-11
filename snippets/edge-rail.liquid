@@ -174,7 +174,7 @@
 </div>
 
 <div class="edge-rail__bg" aria-hidden="true"></div>
-<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}" data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
+<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}"{% if customer %} data-customer-name="{{ customer.first_name | append: ' ' | append: customer.last_name | strip | escape }}" data-customer-email="{{ customer.email | escape }}"{% endif %} data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
   <div class="edge-rail__group">
     {%- if tab_menu != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="menu" aria-haspopup="dialog" aria-expanded="false" aria-label="Menu">
