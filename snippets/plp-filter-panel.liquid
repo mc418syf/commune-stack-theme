@@ -105,7 +105,8 @@
                   {%- for v in vals -%}
                     {%- capture lbl -%}{%- render 'plp-value-label', kind: 'designer', label: v.label -%}{%- endcapture -%}
                     {%- comment -%} Brand page = the collection whose handle is the designer name (ISSEY MIYAKE -> issey-miyake). {%- endcomment -%}
-                    {%- assign brand_col = collections[v.value | handleize] -%}
+                    {%- assign brand_col = collections[v.label | handleize] -%}
+                    {%- unless brand_col.handle != blank -%}{%- assign brand_col = collections[v.value | handleize] -%}{%- endunless -%}
                     <button
                       type="button"
                       class="plp-o plp-o--single"

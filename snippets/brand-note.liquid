@@ -7,13 +7,19 @@
   assign brand_name = ''
   for f in collection.filters
     if f.param_name == 'filter.p.vendor' and f.active_values.size == 1
-      assign brand_name = f.active_values.first.value
+      comment
+        A grouped filter value (for example ISSEY MIYAKE = Haat + Pleats Please + ...) can have an internal value, so the label is used as well
+      endcomment
+      assign brand_name = f.active_values.first.label
+      assign brand_value = f.active_values.first.value
     endif
   endfor
   assign brand_html = ''
   if brand_name != ''
-    assign brand_handle = brand_name | handleize
-    assign brand_collection = collections[brand_handle]
+    assign brand_collection = collections[brand_name | handleize]
+    unless brand_collection.handle != blank
+      assign brand_collection = collections[brand_value | handleize]
+    endunless
     if brand_collection and brand_collection.description != blank
       assign brand_html = brand_collection.description
     endif
