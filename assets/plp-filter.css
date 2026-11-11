@@ -1,4 +1,4 @@
-/* plp filter v4 */
+/* plp filter v5 */
 /* Filter and search panel, the top-left trigger and the sidebar "In stock" switch.
    Values follow the "Filter, left panel, desktop" and "Filter, archive list, mobile" designs. Everything in the panel and the trigger is 9px
    on purpose, below the site's usual 11px; the sidebar labels stay 11px. Colours marked "brief" are the literal values from the design. */
@@ -57,23 +57,17 @@
   html.plp-fp-open body { padding-left: calc(var(--rail-w, 0px) + var(--pf-w, 342px)); }
 }
 
-/* ---- Phones: expands downward under the top bar and pushes the page down ---- */
+/* ---- Phones: drops down over the page (nothing underneath moves or squeezes). The sheet starts at the very top of the screen,
+   so the top bar sits on the same paper as the panel while it is open. ---- */
 @media (max-width: 767px) {
   .plp-fp {
-    position: relative; z-index: 1; max-height: 0;
+    position: fixed; z-index: 25; top: 0; left: var(--rail-w, 0px); right: 0; max-height: 0;
     transition: max-height 0.24s ease-out, opacity 0.24s ease-out, visibility 0s linear 0.24s;
   }
   .plp-fp[data-open] { transition: max-height 0.24s ease-out, opacity 0.24s ease-out, visibility 0s; }
-  .plp-fp__gap { height: var(--strip-h, 41px); }   /* room for the top bar */
+  .plp-fp__gap { height: var(--strip-h, 41px); background: var(--pf-paper); }   /* the top bar's own row, same paper */
   .plp-fp__sheet { border-bottom: 1px solid var(--pf-line); }
-  /* Collection pages already leave room for the top bar above the grid; the panel brings its own while it is open.
-     The margin only animates once the panel has been used (the section's own margin arrives after the first paint and must not slide in). */
-  html.plp-fp-open #MainContent .collection { margin-top: 0 !important; }
-  html.plp-fp-used #MainContent .collection { transition: margin-top 0.24s ease-out; }
-  /* Gallery view is a fixed overlay: the panel floats over it and the gallery moves down by the panel's height */
-  html.plp-gallery-on .plp-fp { position: fixed; top: 0; left: var(--rail-w, 0px); right: 0; z-index: 12; }
 }
-@media (max-width: 767px) and (prefers-reduced-motion: reduce) { html.plp-fp-used #MainContent .collection { transition: none; } }
 
 /* ---- Search row (top of the panel, stays put while the lists scroll) ---- */
 .plp-s { flex: none; margin: 0; padding: 6px 12px 0; }
@@ -109,21 +103,19 @@
 .plp-r--none { color: var(--pf-gray); border-bottom: 0; }
 .plp-r:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: 0; }
 
-/* ---- Archive list: Designer on the left; Category, Gender and Sort stacked on the right ---- */
+/* ---- Archive list: Designer on the left; Category, Gender and Sort stacked on the right. Each column scrolls on its own and keeps its headers in view. ---- */
 .plp-f { margin: 0; }
-.plp-f__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: start; box-sizing: border-box; padding: 18px 12px 0; }
-.plp-f__c { min-width: 0; }
-
-/* Desktop: each column scrolls on its own and its headers stay in view */
+.plp-f__cols { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 0 20px; align-items: stretch; box-sizing: border-box; padding: 18px 12px 0; }
+.plp-f__c { min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--pf-dash) transparent; }
+.plp-f__c:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: -2px; }
+/* Desktop: the columns fill the docked panel */
 @media (min-width: 768px) {
   .plp-f { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
-  .plp-f__cols { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
-  .plp-f__c { min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--pf-dash) transparent; }
-  .plp-f__c:focus-visible { outline: 2px solid var(--pf-hover); outline-offset: -2px; }
+  .plp-f__cols { flex: 1 1 auto; min-height: 0; }
 }
-/* Phones: one scroll area for both columns */
+/* Phones: a fixed height (the row needs one to let the columns scroll) */
 @media (max-width: 767px) {
-  .plp-f__cols { max-height: 520px; padding-bottom: 6px; overflow-y: auto; overscroll-behavior: contain; }
+  .plp-f__cols { height: 520px; height: min(520px, 60vh); height: min(520px, 60dvh); padding-bottom: 6px; }
 }
 
 .plp-h {

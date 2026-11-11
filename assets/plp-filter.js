@@ -1,8 +1,8 @@
-/* plp filter v3 */
+/* plp filter v4 */
 /**
  * Filter and search panel (snippets/plp-filter-panel.liquid), the top-left trigger and the sidebar "In stock" switch.
  * - The trigger opens the panel: a left-docked column on desktop (the page moves right, a click in the grid keeps it open),
- *   a drop-down under the top bar on phones (a click outside closes it). Esc or the trigger again closes it on both.
+ *   a sheet that drops down over the page on phones (a click outside closes it; nothing underneath moves). Esc or the trigger again closes it on both.
  * - Every choice applies live: the URL is rebuilt here (Designer and Sort allow one value, Category and Gender several),
  *   the page is fetched (debounced, the previous request is cancelled) and the grid, the lists, the trigger text,
  *   the piece count and the switch are swapped in. history.pushState keeps the URL shareable and the back button working.
@@ -33,7 +33,7 @@
   const desktop = window.matchMedia('(min-width: 768px)');
 
   // Desktop: the panel animates its width (CSS) and the gallery view moves right by that width.
-  // Phones: the panel animates max-height; its real height is measured (it changes with the lists and the search results).
+  // Phones: the sheet animates max-height; its real height is measured (it changes with the search results).
   function size() {
     if (desktop.matches) {
       fp.style.maxHeight = '';
@@ -42,11 +42,9 @@
       html.style.setProperty('--plp-panel-h', '0px');
       return;
     }
-    const h = inner.offsetHeight;
-    fp.style.maxHeight = isOpen ? h + 'px' : '0px';
-    const gap = $('.plp-fp__gap', fp);
-    // the gallery view (a fixed overlay) moves down by the part of the panel that is not the top bar's own room
-    html.style.setProperty('--plp-panel-h', isOpen ? Math.max(0, h - (gap ? gap.offsetHeight : 0)) + 'px' : '0px');
+    fp.style.maxHeight = isOpen ? inner.offsetHeight + 'px' : '0px';
+    // the sheet lies over the page and the gallery, so neither makes room for it
+    html.style.setProperty('--plp-panel-h', '0px');
     html.style.setProperty('--plp-panel-w', '0px');
   }
 
