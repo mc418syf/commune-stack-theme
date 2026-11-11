@@ -151,7 +151,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 @media (prefers-reduced-motion: reduce) { .edge-panel { transition: none !important; } }
 
 /* The Cart button and tab disappear while the cart and the try-on list are both empty */
-.edge-rail [hidden], /* Cart window: the try-on lines sit under the cart lines */
+.edge-rail [hidden] { display: none !important; }
+/* Cart window: the try-on lines sit under the cart lines */
 .edge-sec { border-top: 1px solid var(--rule); margin-top: 8px; }
 .edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-sec .edge-body { padding-top: 12px; }
@@ -176,10 +177,19 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* Light divider lines show between the Menu sections and above Try-on in the Cart window */
 .edge-foot { border-top: 0 !important; }
 
-/* Product titles in the Cart window: bold, in the product card's name style */
+/* Product text in the Cart window (brand, title, price) uses the product card's sizes and style; desktop cards are a further 2px smaller (commune-type.css) */
 .edge-panel .edge-line__name {
-  font-family: var(--font-display) !important; font-weight: 600 !important; font-size: var(--name-size, 13px) !important;
-  line-height: var(--name-lh, 18px) !important; letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase !important;
+  font-family: var(--font-display) !important; font-weight: var(--name-weight, 600) !important; letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase !important;
+  font-size: calc(var(--name-size, 14px) - var(--product-card-offset, 2px)) !important; line-height: calc(var(--name-lh, 18px) - var(--product-card-offset, 2px)) !important;
+}
+.edge-line__vendor, .edge-line__title { display: block; }
+.edge-panel .edge-line__price {
+  font-family: var(--font-mono); font-weight: var(--price-weight, 400); letter-spacing: var(--price-ls, 0em); color: var(--ink);
+  font-size: calc(var(--price-size, 12px) - var(--product-card-offset, 2px)); line-height: calc(var(--price-lh, 16px) - var(--product-card-offset, 2px));
+}
+@media (min-width: 768px) {
+  .edge-panel .edge-line__name { font-size: calc(var(--name-size, 14px) - var(--product-card-offset, 2px) - 2px) !important; line-height: calc(var(--name-lh, 18px) - var(--product-card-offset, 2px) - 2px) !important; }
+  .edge-panel .edge-line__price { font-size: calc(var(--price-size, 12px) - var(--product-card-offset, 2px) - 2px); line-height: calc(var(--price-lh, 16px) - var(--product-card-offset, 2px) - 2px); }
 }
 
 /* The sheet joins the rail only along the open button: that label and its window share a colour,

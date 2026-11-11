@@ -184,7 +184,8 @@
     return (
       '<div class="edge-line"><a class="edge-line__img" href="' + esc(o.url) + '" tabindex="-1" aria-hidden="true">' +
       (o.image ? '<img src="' + esc(o.image) + '" alt="" loading="lazy">' : '') + '</a><div class="edge-line__txt">' +
-      '<a class="edge-line__name" href="' + esc(o.url) + '">' + esc(o.title) + '</a>' +
+      '<a class="edge-line__name" href="' + esc(o.url) + '">' + (o.vendor ? '<span class="edge-line__vendor">' + esc(o.vendor) + '</span>' : '') +
+      '<span class="edge-line__title">' + esc(o.title) + '</span></a>' +
       '<div class="edge-line__ref">' + o.ref + '</div>' +
       '<div class="edge-line__price">' + esc(o.price) + '</div>' +
       '<div class="edge-line__act"><button type="button" data-edge-act="move" data-list="' + list + '" data-idx="' + idx + '">' + moveLabel +
@@ -204,7 +205,7 @@
         .map((i, n) =>
           lineHTML(
             {
-              url: i.url, image: i.image, title: i.product_title,
+              url: i.url, image: i.image, vendor: i.vendor, title: i.product_title,
               ref: lineRef(i.sku, i.variant_title) + (i.quantity > 1 ? ' · ×' + i.quantity : ''),
               price: money(i.final_line_price, cart.currency),
             },
@@ -249,12 +250,12 @@
       items
         .map((i, n) =>
           lineHTML(
-            { url: i.url, image: i.image, title: [i.vendor, i.title].filter(Boolean).join(' '), ref: lineRef(i.sku, i.variantTitle), price: i.price },
+            { url: i.url, image: i.image, vendor: i.vendor, title: i.title, ref: lineRef(i.sku, i.variantTitle), price: i.price },
             'try', n, 'Move to cart'
           )
         )
         .join('') +
-      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="' + esc(calendlyUrl(items)) + '">Book a fitting</a></div></div>';
+      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="' + esc(calendlyUrl(items)) + '" target="_blank" rel="noopener">Book a fitting</a></div></div>';
   }
 
   async function cartChange(line, qty) {
