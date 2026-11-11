@@ -90,11 +90,15 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   .plp-gallery__brand .brand-note.is-open { position: absolute; left: var(--gut, 16px); right: var(--gut, 16px); top: 0; max-height: calc(100vh - var(--strip-h, 56px) - 120px); max-height: calc(100dvh - var(--strip-h, 56px) - 120px); overflow-y: auto; background: rgba(244, 243, 239, 0.94); -webkit-overflow-scrolling: touch; }
 }
 
-/* Gallery view, desktop, filter open: the part of the top bar above the panel is the panel's paper (the rest of the header keeps the gallery grey) */
+/* Gallery view, desktop: the part of the top bar above the filter panel is the panel's paper (the rest of the header keeps the gallery grey).
+   It opens and closes with the same width, opacity and timing as the panel itself (plp-filter.css), so the two stay in step. */
 @media (min-width: 768px) {
-  html.plp-gallery-on.plp-fp-open .edge-strip::before {
-    content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--rail-w, 0px); width: var(--pf-w, 342px); box-sizing: border-box;
+  html.plp-gallery-on .edge-strip::before {
+    content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--rail-w, 0px); width: var(--pf-w, 342px); max-width: 0; opacity: 0; box-sizing: border-box;
     background: var(--paper, #F4F3EF); border-right: 1px solid var(--pf-line, #D9D8D2); pointer-events: none;
+    transition: max-width 0.24s ease-out, opacity 0.24s ease-out;
   }
-  html.plp-gallery-on.plp-fp-open .edge-strip[data-sticky='true']::before { left: 0; }
+  html.plp-gallery-on.plp-fp-open .edge-strip::before { max-width: var(--pf-w, 342px); opacity: 1; }
+  html.plp-gallery-on .edge-strip[data-sticky='true']::before { left: 0; }
 }
+@media (prefers-reduced-motion: reduce) { html.plp-gallery-on .edge-strip::before { transition: none; } }

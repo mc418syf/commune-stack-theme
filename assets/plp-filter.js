@@ -300,6 +300,7 @@
     if (!t || !t.closest) return;
 
     if (t.closest('[data-plp-trigger]')) return setOpen(!isOpen);
+    if (t.closest('[data-plp-close]')) return setOpen(false, true);
 
     const opt = t.closest('[data-plp-opt]');
     if (opt) {

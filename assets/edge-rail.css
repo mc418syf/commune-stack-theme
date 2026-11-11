@@ -3,7 +3,7 @@
    Rail 40px desktop / 36px mobile; panel 380px / calc(100vw - 36px); gutters 24px / 16px; breakpoint = theme md (768px). */
 
 :root { --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 36px; --panel-w: calc(100vw - var(--rail-w)); --strip-h: 56px; --gut: 16px; }
-@media (min-width: 768px) { :root { --rail-w: 40px; --panel-w: 380px; --gut: 24px; } }
+@media (min-width: 768px) { :root { --rail-w: 40px; --panel-w: var(--pf-w, 342px); --gut: 24px; } }
 
 body { padding-left: var(--rail-w); }
 html.edge-locked { overflow: hidden; }

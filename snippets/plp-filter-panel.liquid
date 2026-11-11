@@ -239,7 +239,12 @@
 
           <div class="plp-f__foot">
             <a class="plp-f__clear" href="{{ collection.url }}" data-plp-clear>Clear all</a>
-            <span class="plp-f__n" role="status" aria-live="polite">[<span data-plp-n>{{ pieces }}</span>] pieces<span data-plp-sortnote>{% if sort_note != '' %} · {{ sort_note }}{% endif %}</span></span>
+            <span class="plp-f__end">
+              <span class="plp-f__n" role="status" aria-live="polite">[<span data-plp-n>{{ pieces }}</span>] pieces<span data-plp-sortnote>{% if sort_note != '' %} · {{ sort_note }}{% endif %}</span></span>
+              <button type="button" class="plp-f__x" data-plp-close aria-label="Close filter">
+                <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><path d="M2 2 12 12M12 2 2 12" stroke-linecap="round"/></svg>
+              </button>
+            </span>
           </div>
         </form>
       {%- endif -%}

@@ -156,6 +156,9 @@
   color: var(--pf-ink); text-decoration: underline; text-underline-offset: 3px;
 }
 .plp-f__clear:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 2px; }
+.plp-f__end { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.plp-f__x { flex: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 28px; height: 28px; margin: -2px -6px -2px 0; padding: 0; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--pf-ink); }
+.plp-f__x:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -4px; }
 .plp-f__n { font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-gray); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* No JavaScript: plain inputs and a visible submit button */
@@ -180,6 +183,7 @@
   .plp-trigger:hover .plp-t__d, .plp-trigger:hover .plp-t__r { color: var(--pf-hover); }
   .plp-s__x:hover { color: var(--pf-hover); }
   .plp-f__clear:hover { color: var(--pf-hover); }
+  .plp-f__x:hover { color: var(--pf-hover); }
 }
 
 /* Phones: the selected designer in the trigger is full ink (#111111) */
