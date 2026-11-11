@@ -8,7 +8,7 @@
 body { padding-left: var(--rail-w); }
 html.edge-locked { overflow: hidden; }
 
-/* ---- Top strip: switch left, logo centred, filter summary right. No rule under it. ---- */
+/* ---- Top strip: filter button left (see plp-filter.css), logo centred or at a side. No rule under it. ---- */
 .edge-strip { position: absolute; top: 0; left: 0; right: 0; z-index: 30; height: var(--strip-h); background: transparent; }
 .edge-strip__inner { position: relative; height: var(--strip-h); display: flex; align-items: center; justify-content: center; padding: 0 var(--gut); }
 .edge-strip__left, .edge-strip__right { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; min-width: 0; }
@@ -18,26 +18,12 @@ html.edge-locked { overflow: hidden; }
 .edge-strip__logo a { padding: 0; }
 .edge-strip__logo img { max-height: calc(var(--strip-h) - 14px); width: auto; max-width: var(--logo-max-width, 120px); object-fit: contain; }
 
-.edge-switch, .edge-summary, .edge-rail button, .edge-panel button, .edge-search button {
+.edge-rail button, .edge-panel button {
   font: inherit; color: inherit; background: none; border: 0; border-radius: 0; padding: 0; cursor: pointer; text-align: inherit;
 }
-.edge-switch, .edge-summary, .edge-rail__v, .edge-search__x, .edge-link, .edge-pill {
+.edge-rail__v, .edge-pill {
   font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; line-height: 14px;
 }
-.edge-switch { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; white-space: nowrap; }
-.edge-switch i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--ink); display: inline-block; flex: none; box-sizing: border-box; }
-.edge-switch[aria-checked='true'] i { background: var(--ink); }
-.edge-switch__m, .edge-summary__m { display: inline; }
-.edge-switch__d, .edge-summary__d { display: none; }
-.edge-summary { color: var(--orange-ink); min-height: 44px; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
-.edge-summary:hover { color: var(--orange-ink); }
-@media (min-width: 768px) {
-  .edge-switch { gap: 10px; }
-  .edge-switch__m, .edge-summary__m { display: none; }
-  .edge-switch__d, .edge-summary__d { display: inline; }
-  .edge-summary { max-width: 360px; }
-}
-
 /* ---- Rail ---- */
 .edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 0; }
@@ -45,14 +31,13 @@ html.edge-locked { overflow: hidden; }
 .edge-rail__v { writing-mode: vertical-rl; transform: rotate(180deg); min-width: 44px; padding: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .edge-rail__v:hover { color: var(--ink); }
 .edge-noscript { display: none; }
-.edge-rail button:focus-visible, .edge-panel button:focus-visible, .edge-panel a:focus-visible,
-.edge-search button:focus-visible, .edge-switch:focus-visible, .edge-summary:focus-visible {
+.edge-rail button:focus-visible, .edge-panel button:focus-visible, .edge-panel a:focus-visible {
   outline: 2px solid var(--orange); outline-offset: 2px;
 }
 
 /* ---- Scrim + panel ---- */
 .edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
-.edge-scrim[hidden], .edge-panel[hidden], .edge-search[hidden] { display: none; }
+.edge-scrim[hidden], .edge-panel[hidden] { display: none; }
 .edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   border-right: 0;
   display: flex; flex-direction: column; top: var(--edge-win-top, 0px); bottom: auto; max-height: calc(100vh - var(--edge-win-top, 0px)); max-height: calc(100dvh - var(--edge-win-top, 0px)); transition: clip-path 0.2s ease-out;
@@ -68,8 +53,6 @@ html.edge-locked { overflow: hidden; }
 .edge-panes { padding-top: 8px; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .edge-panes > [data-edge-pane] { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
 .edge-panes > [hidden] { display: none; }
-[data-edge-filters] { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
-.edge-filters { flex: 1 1 auto; overflow-y: auto; padding: 0 var(--gut); }
 
 /* Menu */
 .edge-menu { list-style: none; margin: 0; padding: 0 var(--gut); }
@@ -77,22 +60,7 @@ html.edge-locked { overflow: hidden; }
 .edge-row__n { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; color: var(--gray); width: 20px; flex: none; }
 .edge-row__l { font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 20px; letter-spacing: 0.10em; text-transform: uppercase; }
 .edge-row__c { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--gray); margin-left: auto; }
-.edge-panel a:hover, .edge-search a:hover { text-decoration: none; }
-
-/* Filter */
-.edge-group__h { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 40px; padding: 0 !important; border-bottom: 1px dashed var(--rule-dashed) !important;
-  font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
-.edge-group__list { list-style: none; margin: 0; padding: 0; }
-.edge-group__list[hidden] { display: none; }
-.edge-opt { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 30px; padding: 0 0 0 4px !important; border-bottom: 0 !important;
-  font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gray); font-variant-numeric: tabular-nums; }
-.edge-opt[aria-pressed='true'] { color: var(--ink); }
-.edge-opt:hover { color: var(--ink); }
-.edge-opt:disabled { opacity: 0.45; cursor: default; }
-.edge-opt__c { color: var(--gray); font-size: 9px; }
-.edge-opt__l { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
-.edge-opt__box { width: 8px; height: 8px; flex: none; border-radius: 50%; border: 1px solid currentColor; box-sizing: border-box; display: inline-block; }
-.edge-opt[aria-pressed='true'] .edge-opt__box { background: currentColor; }
+.edge-panel a:hover { text-decoration: none; }
 
 /* Footer, buttons */
 .edge-foot { flex: none; display: flex; flex-direction: column; gap: 4px; padding: 12px var(--gut) 16px; border-top: 1px solid var(--rule); }
@@ -100,9 +68,6 @@ html.edge-locked { overflow: hidden; }
 .edge-pill { display: flex; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; height: 44px; border-radius: 9999px !important; font-weight: 500; text-decoration: none; color: var(--ink); }
 .edge-pill--primary { background: var(--orange) !important; border: 1px solid var(--orange) !important; }
 .edge-pill--secondary { border: 1px solid var(--ink) !important; background: transparent; }
-.edge-link { align-self: center; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
-.edge-link:hover { color: var(--ink); }
-[data-edge-foot='filter'] .edge-link { font-size: 9px; line-height: 12px; min-height: 28px; }
 
 /* Cart + try-on lines */
 .edge-body { padding: 20px var(--gut) 16px; display: flex; flex-direction: column; }
@@ -121,32 +86,6 @@ html.edge-locked { overflow: hidden; }
 .edge-empty { margin: 0; padding: 20px var(--gut); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
 .edge-body .edge-empty { padding: 0; }
 
-/* ---- Search ---- */
-.edge-search { position: fixed; z-index: 55; left: var(--rail-w); right: 0; top: var(--edge-win-top, 0px); height: var(--strip-h); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-bottom: 0;
-  display: flex; align-items: center; gap: 12px; padding: 0 var(--gut); }
-.edge-search__l { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
-.edge-search__i { flex: 1 1 auto; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--ink); height: 44px; padding: 0 !important; outline: none; }
-.edge-search__x { min-height: 44px; white-space: nowrap; }
-.edge-search__r { position: absolute; left: 0; top: 100%; width: min(var(--panel-w), 100%); box-sizing: border-box; padding: 0 var(--gut); background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
-.edge-search__r:empty { display: none; }
-.edge-search__r .edge-empty { padding: 16px 0; }
-.edge-res { min-height: 84px; gap: 14px; padding: 10px 0; align-items: center; }
-.edge-res__img { width: 48px; height: 60px; flex: none; background: #E6E5DF; overflow: hidden; }
-.edge-res__img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; display: block; }
-.edge-res__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.edge-res__v { font-family: var(--font-mono); font-size: var(--label-size, 11px); line-height: 14px; letter-spacing: var(--label-ls, 0.08em); text-transform: uppercase; color: var(--gray); }
-.edge-res__n { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 13px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; color: var(--ink); }
-.edge-res__p { font-family: var(--font-mono); font-size: var(--price-size, 11px); line-height: var(--price-lh, 16px); color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-
-/* Desktop: search lives in the sidebar window, same width as the panel */
-@media (min-width: 768px) {
-  .edge-search { right: auto; width: var(--panel-w); height: auto; flex-wrap: wrap; align-content: flex-start; padding: 0; border-bottom: 0; border-right: 0; }
-  .edge-search__l { padding-left: var(--gut); }
-  .edge-search__x { padding-right: var(--gut) !important; }
-  .edge-search__i { height: 56px; }
-  .edge-search__r { position: static; flex: 0 0 100%; width: 100%; border-top: 1px solid var(--rule); }
-  .edge-search__r:empty { display: none; }
-}
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root { --vellum: rgba(244, 243, 239, 0.94); }
 }
@@ -170,25 +109,16 @@ html.edge-locked { overflow: hidden; }
 html.edge-busy #results { opacity: 0.4; transition: opacity 0.15s; }
 html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { display: none; }
 
-/* filter option text: 9px (needs the panel prefix to beat the shared button reset) */
-.edge-panel .edge-opt, .edge-panel .edge-opt__c, .edge-panel .edge-opt__l { font-size: 9px !important; line-height: 12px !important; letter-spacing: 0.04em !important; }
-
 /* Sticky logo strip (Header > Sticky logo strip): transparent, sits over the page and stays while scrolling; only the logo and summary take clicks */
 .edge-strip[data-sticky='true'] { position: fixed; left: var(--rail-w); right: 0; background: transparent; pointer-events: none; }
 .edge-strip[data-sticky='true'] a, .edge-strip[data-sticky='true'] button { pointer-events: auto; }
-/* the rail, panel, scrim and search live inside the strip element; they must keep taking clicks */
-.edge-strip[data-sticky='true'] .edge-rail, .edge-strip[data-sticky='true'] .edge-panel, .edge-strip[data-sticky='true'] .edge-scrim, .edge-strip[data-sticky='true'] .edge-search { pointer-events: auto; }
-.edge-switchrow { flex: none; padding: 0 var(--gut); border-top: 1px solid var(--rule); border-bottom: 1px dashed var(--rule-dashed); }
-.edge-switchrow .edge-switch { min-height: 44px; width: 100%; gap: 10px; }
+/* the rail, panel and scrim live inside the strip element; they must keep taking clicks */
+.edge-strip[data-sticky='true'] .edge-rail, .edge-strip[data-sticky='true'] .edge-panel, .edge-strip[data-sticky='true'] .edge-scrim { pointer-events: auto; }
 
 /* Logo sits at the left of the page (Header > Logo position) */
 .edge-strip[data-logo='left'] .edge-strip__logo { position: absolute; left: var(--gut); top: 0; bottom: 0; }
 .edge-strip[data-logo='right'] .edge-strip__logo { position: absolute; right: var(--gut); top: 0; bottom: 0; }
 .edge-strip[data-logo='right'] .edge-strip__right { right: auto; left: var(--gut); justify-content: flex-start; }
-
-/* Search bar: no <Search> label, input starts at the gutter; close is a bare × */
-@media (min-width: 768px) { .edge-search__i { padding-left: var(--gut) !important; } }
-.edge-search__x { font-size: 16px !important; letter-spacing: 0 !important; min-width: 44px; }
 
 /* ---- Menu tab: items, footer links, newsletter, social ---- */
 .edge-menu .edge-row { border-bottom: 0; }
@@ -232,15 +162,15 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* One sheet: the rail strip, the window behind its label and the window itself share the same layers */
 .edge-rail { background: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-.edge-rail__bg, .edge-panel, .edge-search {
+.edge-rail__bg, .edge-panel {
   background: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)), var(--vellum-layer, var(--vellum));
   -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
 }
 .edge-rail__bg { position: fixed; z-index: 45; left: 0; top: 0; bottom: 0; width: var(--rail-w); pointer-events: none; }
-.edge-panes, .edge-search__r { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.edge-panes { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
-/* Light divider lines show between the Menu sections and above Try-on in the Cart window; Filter and Search stay line-free */
-.edge-foot, .edge-switchrow, .edge-search__r { border-top: 0 !important; }
+/* Light divider lines show between the Menu sections and above Try-on in the Cart window */
+.edge-foot { border-top: 0 !important; }
 
 /* Product titles in the Cart window: bold, in the product card's name style */
 .edge-panel .edge-line__name {
@@ -250,30 +180,23 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* The sheet joins the rail only along the open button: that label and its window share a colour,
    the rest of the rail keeps its own. The join is sized by JS (--edge-join-top / --edge-join-h). */
-.edge-panel::before, .edge-search::before {
+.edge-panel::before {
   content: ''; position: absolute; left: calc(-1 * var(--rail-w)); top: var(--edge-join-top, 0px); width: var(--rail-w); height: var(--edge-join-h, 0px);
   background: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)), var(--vellum-layer, var(--vellum));
   -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
   pointer-events: none;
 }
-.edge-search__r { max-height: calc(100vh - var(--edge-win-top, 0px) - 56px); overflow-y: auto; }
 
-/* The window takes focus when it opens, without a ring; the search input shows its caret instead */
-.edge-panel:focus, .edge-search input:focus, .edge-search input:focus-visible { outline: none; }
-/* 16px inputs on phones, so iOS does not zoom in when the search or newsletter field is focused */
-@media (max-width: 767px) { .edge-search__i, .edge-news__row input { font-size: 16px !important; } }
+/* The window takes focus when it opens, without a ring */
+.edge-panel:focus { outline: none; }
+/* 16px inputs on phones, so iOS does not zoom in when the newsletter field is focused */
+@media (max-width: 767px) { .edge-news__row input { font-size: 16px !important; } }
 
 /* Checkout and Book a fitting are the theme's standard button size (the Add to cart size from Theme settings) */
 .edge-panel .edge-pill {
   height: var(--add-to-cart-button-height, 44px) !important; min-height: var(--add-to-cart-button-height, 44px) !important;
   font-size: var(--button-size, 14px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important; line-height: 1 !important;
   border-radius: var(--button-border-radius, 9999px) !important; /* Theme settings > Buttons > Style */
-}
-
-/* Search text is 8px. On phones the field stays 16px (iOS zooms into smaller inputs) and is drawn at half size */
-.edge-search__i { font-size: 8px !important; }
-@media (max-width: 767px) {
-  .edge-search__i { font-size: 16px !important; flex: none !important; width: calc(2 * (100% - 56px)); margin-right: calc(-1 * (100% - 56px)); transform: scale(0.5); transform-origin: left center; }
 }
 
 /* All panel buttons use the slim product-page button: Add to cart black, Try in-store outlined, shape from Theme settings > Buttons > Style */
@@ -287,23 +210,6 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-pill--primary { background: var(--ink) !important; border: 1px solid var(--ink) !important; color: var(--paper) !important; }
 .edge-panel .edge-pill--primary:hover { background: var(--orange) !important; border-color: var(--orange) !important; color: var(--ink) !important; }
 .edge-panel .edge-pill--secondary { background: transparent !important; border: 1px solid var(--ink) !important; color: var(--ink) !important; }
-/* Hide sold out: same 8px circle and 9px text as the other filter values */
-.edge-switchrow .edge-switch { min-height: 30px; gap: 8px; font-size: 9px; line-height: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
-.edge-switchrow .edge-switch i { width: 8px; height: 8px; }
-.edge-switchrow .edge-switch span { font-size: 9px; }
-
-/* Search window edge matches the other side windows: nothing (the scaled phone field, results) can poke past the right edge or leave a ghost box, and the left edge meets the rail exactly */
-.edge-search { overflow-x: clip; border: 0 !important; box-shadow: none !important; clip-path: inset(0 0 -100vh calc(-1 * var(--rail-w))); }
-.edge-search__x { flex: none; }
-
-/* Search field: magnifier icon and an underline, with the same side padding as the rest of the window */
-.edge-search__field { position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; height: 36px; margin: 10px 4px 10px var(--gut); border-bottom: 1px solid var(--ink); overflow: hidden; color: var(--ink); }
-.edge-search__ic { flex: none; width: 12px; height: 12px; }
-.edge-search .edge-search__i { height: 100% !important; padding: 0 !important; flex: 1 1 auto; }
-@media (max-width: 767px) {
-  .edge-search .edge-search__i { flex: none !important; width: calc(2 * (100% - 20px)); margin-right: calc(-1 * (100% - 20px)); }
-}
-
 /* Phones: lift the bottom labels (Cart, Try-on) clear of the screen edge, rounded corners and browser bars */
 @media (max-width: 767px) {
   .edge-rail { padding-bottom: calc(44px + env(safe-area-inset-bottom)); }
@@ -316,23 +222,6 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-social { margin: 0; padding: 0 calc(var(--gut) - 8px) 2px; }
 .edge-panel .edge-footlinks a { min-height: 26px; }
 
-/* Search: typed text is the same size as the Search label (11px). On phones the field stays 22px, drawn at half size, so iOS does not zoom */
-.edge-search .edge-search__i { font-size: 11px !important; }
-@media (max-width: 767px) { .edge-search .edge-search__i { font-size: 22px !important; } }
-
-/* Search results follow the product card: vendor and title in the name style, price at the right, 2px smaller than before, tighter */
-.edge-res { min-height: 0; gap: 10px; padding: 6px 0; align-items: flex-start; }
-.edge-res__img { width: 40px; height: 50px; }
-.edge-res__txt { gap: 0; }
-.edge-res .edge-res__v, .edge-res .edge-res__n {
-  font-family: var(--font-display) !important; font-weight: var(--name-weight, 600) !important;
-  font-size: calc(var(--name-size, 16px) - 2px) !important; line-height: calc(var(--name-lh, 20px) - 2px) !important;
-  letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase; color: var(--ink) !important;
-}
-.edge-res .edge-res__p {
-  margin: 0 0 0 auto; flex: none; white-space: nowrap; font-size: calc(var(--price-size, 13px) - 2px) !important; line-height: calc(var(--price-lh, 17px) - 2px) !important; color: var(--ink);
-}
-
 /* Newsletter block: 10px above, 4px below, same side padding */
 .edge-panel .edge-news { padding: 10px var(--gut) 4px; }
 
@@ -342,9 +231,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rail .edge-rail__v { padding: 14px 0 !important; }
 .edge-rail__sep { margin: 14px 0; }
 
-/* Desktop: the Search bar spans the same height as the Search label, with the field centred in it */
-@media (min-width: 768px) {
-  .edge-search { padding-top: calc((var(--edge-win-h, 56px) - 56px) / 2); }
-  .edge-search .edge-search__field { margin-bottom: calc(10px + (var(--edge-win-h, 56px) - 56px) / 2); }
-  .edge-search .edge-search__x { align-self: flex-start; margin-top: 6px; }
+/* Phones: the filter button and the logo sit 12px from the screen edges */
+@media (max-width: 767px) {
+  .edge-strip__left { left: 12px; }
+  .edge-strip[data-logo='right'] .edge-strip__logo { right: 12px; }
 }

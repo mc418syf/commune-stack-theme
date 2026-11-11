@@ -1,5 +1,6 @@
 {%- comment -%}
-  Edge rail: left rail, top strip (switch · logo · filter summary), tools panel (Menu / Filter / Cart / Try-on) and search bar.
+  Edge rail: left rail (Menu, View, In stock, Cart), top strip (filter button · logo) and tools panel (Menu / Cart / Try-on).
+  The filter and search panel itself is snippets/plp-filter-panel.liquid.
   Cart and Try-on lines are drawn by assets/edge-rail.js from /cart.js and $store.tryOnList.
   Params: header_logo (captured logo markup)
 {%- endcomment -%}
@@ -7,10 +8,7 @@
 {%- liquid
   assign cfg = section.settings
   assign show_cart = cfg.show_cart
-  assign show_search = cfg.show_search
-  assign show_switch = cfg.show_stock_switch
   assign tab_menu = cfg.tab_menu
-  assign tab_filter = cfg.tab_filter
   assign tab_cart = cfg.tab_cart
   assign rail_menu = linklists[section.settings.edge_menu]
 
@@ -26,45 +24,79 @@
     assign on_plp = true
   endif
 
-  assign results_count = collection.products_count
-  if template.name == 'search'
-    assign results_count = search.results_count
-  endif
-
-  assign active_total = 0
-  assign summary = ''
+  comment
+    Text of the filter button at the top left: <FILTER>, or the selected designer, followed by the selected categories and genders.
+  endcomment
+  assign t_designer = ''
+  assign t_cat = ''
+  assign t_gen = ''
   assign avail_value = nil
   if on_plp
     for f in filter_source
+      assign fl = f.label | downcase
+      assign kind = ''
       if f.param_name == 'filter.v.availability'
         assign avail_value = f.values | where: 'value', '1' | first
+      elsif f.param_name == 'filter.p.vendor'
+        assign kind = 'designer'
+      elsif fl contains 'categ' or f.param_name == 'filter.p.product_type'
+        assign kind = 'category'
+      elsif fl contains 'gender'
+        assign kind = 'gender'
       endif
-      if f.type != 'price_range' and f.param_name != 'filter.v.availability'
+      if kind != ''
         for v in f.active_values
-          assign active_total = active_total | plus: 1
-          if summary == ''
-            assign summary = v.label
+          capture lbl
+            render 'plp-value-label', kind: kind, label: v.label
+          endcapture
+          if kind == 'designer'
+            assign t_designer = lbl
+          elsif kind == 'category'
+            if t_cat == ''
+              assign t_cat = lbl
+            else
+              assign t_cat = t_cat | append: ' / ' | append: lbl
+            endif
           else
-            assign summary = summary | append: ' · ' | append: v.label
+            if t_gen == ''
+              assign t_gen = lbl
+            else
+              assign t_gen = t_gen | append: ' / ' | append: lbl
+            endif
           endif
         endfor
       endif
     endfor
   endif
+  assign t_rest = t_cat
+  if t_gen != ''
+    if t_rest != ''
+      assign t_rest = t_rest | append: ' / ' | append: t_gen
+    else
+      assign t_rest = t_gen
+    endif
+  endif
 -%}
 
 <div class="edge-strip__inner">
   <div class="edge-strip__left">
+    <button type="button" class="plp-trigger" data-plp-trigger aria-expanded="false" aria-controls="plp-fp">
+      <span class="plp-trigger__t" data-plp-trigger-label>
+        {%- if on_plp -%}
+          {%- if t_designer != '' -%}
+            <span class="plp-t__d plp-t__d--sel">&lt;{{ t_designer | escape }}&gt;</span>
+          {%- else -%}
+            <span class="plp-t__d">&lt;Filter&gt;</span>
+          {%- endif -%}
+          {%- if t_rest != '' -%}<span class="plp-t__r"> {{ t_rest | escape }}</span>{%- endif -%}
+        {%- else -%}
+          <span class="plp-t__d">&lt;Search&gt;</span>
+        {%- endif -%}
+      </span>
+    </button>
   </div>
   <div class="edge-strip__logo">{{ header_logo }}</div>
-  <div class="edge-strip__right">
-    {%- if on_plp and active_total > 0 -%}
-      <button type="button" class="edge-summary" data-edge-open="filter">
-        <span class="edge-summary__d">&lt;{{ summary | escape }}&gt;</span>
-        <span class="edge-summary__m">Filter [{{ active_total }}]</span>
-      </button>
-    {%- endif -%}
-  </div>
+  <div class="edge-strip__right"></div>
 </div>
 
 <div class="edge-rail__bg" aria-hidden="true"></div>
@@ -75,22 +107,27 @@
       <span>Menu</span>
     </button>
     {%- endif -%}
-    {%- if show_search != false -%}
-    <button type="button" class="edge-rail__v" data-edge-search aria-label="Search">
-      <span data-edge-search-label>Search</span>
-    </button>
-    {%- endif -%}
-    {%- if on_plp and tab_filter != false -%}
-    <button type="button" class="edge-rail__v" data-edge-open="filter" aria-haspopup="dialog" aria-expanded="false" aria-label="Filter">
-      <span>Filter{% if active_total > 0 %} [{{ active_total }}]{% endif %}</span>
-    </button>
-    {%- endif -%}
-    {%- if on_plp and template.name == 'collection' -%}
+    {%- if on_plp -%}
     <span class="edge-rail__sep" aria-hidden="true"></span>
+    {%- if template.name == 'collection' -%}
     <button type="button" class="edge-rail__v edge-rail__view" data-plp-toggle aria-label="Switch to gallery view" title="Gallery view">
       <span>View</span>
       <svg data-ico="gallery" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false"><rect x="3" y="1" width="8" height="12"/></svg>
       <svg data-ico="grid" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false" hidden><rect x="1" y="1" width="5" height="5"/><rect x="8" y="1" width="5" height="5"/><rect x="1" y="8" width="5" height="5"/><rect x="8" y="8" width="5" height="5"/></svg>
+    </button>
+    {%- endif -%}
+    {%- comment -%} With the Availability filter on in Search & Discovery the switch uses filter.v.availability (in the URL); without it, it hides sold-out cards on the page. {%- endcomment -%}
+    <button
+      type="button"
+      class="edge-rail__v edge-rail__stock"
+      role="switch"
+      aria-checked="{% if avail_value %}{{ avail_value.active }}{% else %}false{% endif %}"
+      aria-label="Hide sold out"
+      data-plp-stock
+      {% if avail_value %}data-param="filter.v.availability" data-value="1"{% else %}data-plp-stock-local{% endif %}
+    >
+      <span>In stock</span>
+      <i class="edge-rail__dot" aria-hidden="true"></i>
     </button>
     {%- endif -%}
   </div>
@@ -199,103 +236,6 @@
       {%- endif -%}
     </div>
 
-    <div role="region" id="edge-pane-filter" aria-label="Filter" data-edge-pane="filter" hidden>
-      <div data-edge-filters>
-        {%- if on_plp -%}
-          <form class="edge-filters" data-edge-filter-form onsubmit="return false">
-            {%- for f in filter_source -%}
-              {%- if f.type == 'price_range' or f.param_name == 'filter.v.availability' -%}{%- continue -%}{%- endif -%}
-              {%- liquid
-                assign label = f.label
-                assign label_down = f.label | downcase
-                if label_down == 'vendor' or label_down == 'brand' or label_down == 'designers' or label_down == 'designer'
-                  assign label = 'Designer'
-                elsif label_down == 'product type' or label_down == 'type'
-                  assign label = 'Category'
-                endif
-                assign n_active = f.active_values.size
-              -%}
-              <div class="edge-group" data-edge-group>
-                <button type="button" class="edge-group__h" aria-expanded="false" data-edge-group-toggle>
-                  <span>&lt;{{ label }}&gt;{% if n_active > 0 %} [{{ n_active }}]{% endif %}</span>
-                  <span class="edge-group__s" aria-hidden="true">+</span>
-                </button>
-                <ul class="edge-group__list" hidden>
-                  {%- for v in f.values -%}
-                    <li>
-                      <button
-                        type="button"
-                        class="edge-opt"
-                        aria-pressed="{{ v.active }}"
-                        data-edge-url="{% if v.active %}{{ v.url_to_remove }}{% else %}{{ v.url_to_add }}{% endif %}"
-                        {% if v.count == 0 and v.active == false %}disabled{% endif %}
-                      >
-                        <span class="edge-opt__l"><span class="edge-opt__box" aria-hidden="true"></span>{{ v.label }}</span>
-                        <span class="edge-opt__c">[{{ v.count }}]</span>
-                      </button>
-                    </li>
-                  {%- endfor -%}
-                </ul>
-              </div>
-            {%- endfor -%}
-            {%- liquid
-              if template.name == 'search'
-                assign sort_opts = search.sort_options
-                assign cur_sort = search.sort_by | default: search.default_sort_by
-              else
-                assign sort_opts = collection.sort_options
-                assign cur_sort = collection.sort_by | default: collection.default_sort_by
-              endif
-            -%}
-            {%- if sort_opts.size > 0 -%}
-              <div class="edge-group" data-edge-group>
-                <button type="button" class="edge-group__h" aria-expanded="false" data-edge-group-toggle>
-                  <span>&lt;Sort by&gt;</span>
-                  <span class="edge-group__s" aria-hidden="true">+</span>
-                </button>
-                <ul class="edge-group__list" hidden>
-                  {%- for o in sort_opts -%}
-                    <li>
-                      <button type="button" class="edge-opt" aria-pressed="{% if o.value == cur_sort %}true{% else %}false{% endif %}" data-edge-sort="{{ o.value }}">
-                        <span class="edge-opt__l"><span class="edge-opt__box" aria-hidden="true"></span>{{ o.name }}</span>
-                      </button>
-                    </li>
-                  {%- endfor -%}
-                </ul>
-              </div>
-            {%- endif -%}
-          </form>
-          <div class="edge-switchrow">
-    {%- if show_switch != false -%}
-      {%- comment -%} With the Availability filter enabled in Search & Discovery the switch uses filter.v.availability; without it, it hides sold-out cards on the page. {%- endcomment -%}
-      <button
-        type="button"
-        class="edge-switch"
-        role="switch"
-        {% if avail_value %}
-          aria-checked="{{ avail_value.active }}"
-          data-edge-switch
-          data-url-add="{{ avail_value.url_to_add }}"
-          data-url-remove="{{ avail_value.url_to_remove }}"
-        {% else %}
-          aria-checked="false"
-          data-edge-switch-local
-        {% endif %}
-      >
-        <i aria-hidden="true"></i>
-        <span>Hide sold out</span>
-      </button>
-    {%- endif -%}
-          </div>
-          <div class="edge-foot" data-edge-foot="filter">
-            <a class="edge-link" href="{{ collection.url | default: routes.search_url }}{% if template.name == 'search' %}?q={{ search.terms | escape }}{% endif %}" data-edge-clear>Clear all</a>
-          </div>
-        {%- else -%}
-          <p class="edge-empty">Filters appear on collection pages. <a class="edge-link" href="/collections/all">Browse the shop</a></p>
-        {%- endif -%}
-      </div>
-    </div>
-
     <div role="region" id="edge-pane-cart" aria-label="Cart" data-edge-pane="cart" hidden>
       <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
       <section class="edge-sec" data-edge-try-sec aria-label="Try-on" hidden>
@@ -305,13 +245,3 @@
     </div>
   </div>
 </section>
-
-<form class="edge-search" action="{{ routes.search_url }}" method="get" role="search" data-edge-searchbar hidden>
-  <div class="edge-search__field">
-    <svg class="edge-search__ic" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" focusable="false"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.4 10.4 14.5 14.5" stroke-linecap="round"/></svg>
-    <input id="edge-search-input" class="edge-search__i" type="search" name="q" autocomplete="off" data-edge-input aria-label="Search">
-  </div>
-  <input type="hidden" name="options[prefix]" value="last">
-  <button type="button" class="edge-search__x" data-edge-search-close aria-label="Close search">×</button>
-  <div class="edge-search__r" data-edge-results aria-live="polite"></div>
-</form>

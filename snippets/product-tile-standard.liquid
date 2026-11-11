@@ -365,9 +365,7 @@ PLP product card
       {%- endunless -%}
 
       <div class="product-tile-price {{ price_class }}">
-        {% if sold_out %}
-          <span class="text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</span>
-        {% else %}
+        {% comment %} A sold-out piece keeps its price; "Sold out" follows it and the card is dimmed (see .product-card--sold-out) {% endcomment %}
           {% if on_sale and sold_out != true %}
             <s class="block lg:inline">
               <span class="sr-only">{{- 'products.product.regular_price' | t -}}</span>
@@ -413,7 +411,9 @@ PLP product card
               <span>{%- if settings.currency_code_enabled == true -%}{{- product.price | money_with_currency -}}{%- else -%}{{- product.price | money -}}{%- endif -%}</span>
             {% endif %}
           {% endif %}
-        {% endif %}
+        {%- if sold_out -%}
+          <span class="edge-soldout text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</span>
+        {%- endif -%}
 
         {% assign unit_price_variant = product.first_available_variant %}
         {% if unit_price_variant.unit_price %}

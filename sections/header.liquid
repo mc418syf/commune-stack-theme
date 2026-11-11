@@ -64,7 +64,7 @@
   assign vellum_rgb = section.settings.vellum_color | default: '#F4F3EF' | color_to_rgb | remove: 'rgb(' | remove: ')'
 -%}
 {% style %}
-  .edge-rail, .edge-panel, .edge-search, .edge-strip {
+  .edge-rail, .edge-panel, .edge-strip, .plp-fp {
     --paper: {{ section.settings.vellum_color | default: '#F4F3EF' }};
     --ink: {{ section.settings.ink_color | default: '#111111' }};
     --gray: {{ section.settings.muted_color | default: '#6B6B66' }};
@@ -317,26 +317,8 @@
     },
     {
       "type": "checkbox",
-      "id": "show_search",
-      "label": "Search button",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_stock_switch",
-      "label": "Hide sold out switch (collections)",
-      "default": true
-    },
-    {
-      "type": "checkbox",
       "id": "tab_menu",
       "label": "Menu button",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "tab_filter",
-      "label": "Filter button (collection pages)",
       "default": true
     },
     {

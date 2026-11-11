@@ -241,7 +241,6 @@
 
   // The rail button shows the view you would switch to: the gallery icon in grid view, the grid icon in gallery view
   function syncToggle() {
-    $$('[data-plp-view]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.plpView === mode()));
     const next = mode() === 'gallery' ? 'grid' : 'gallery';
     $$('[data-plp-toggle]').forEach((b) => {
       $$('[data-ico]', b).forEach((i) => { i.toggleAttribute('hidden', i.dataset.ico !== next); });
@@ -291,8 +290,6 @@
       if (holder && !note.classList.contains('is-open')) holder.style.height = '';
     }
     if (e.target.closest('[data-plp-toggle]')) return setMode(mode() === 'gallery' ? 'grid' : 'gallery');
-    const b = e.target.closest('[data-plp-view]');
-    if (b) setMode(b.dataset.plpView);
   });
   document.addEventListener('keydown', (e) => {
     if (mode() !== 'gallery' || e.target.closest('input, textarea, select, [contenteditable]')) return;
