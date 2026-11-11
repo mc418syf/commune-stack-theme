@@ -93,10 +93,11 @@
     const here = new URLSearchParams(location.search);
     ['preview_theme_id', '_fd', 'pb', '_ab', '_bt'].forEach((k) => { if (here.has(k)) to.searchParams.set(k, here.get(k)); });
     const res = await fetch(to.pathname + to.search, { headers: { Accept: 'text/html' }, credentials: 'same-origin' });
-    if (!res.ok) return '';
+    if (!res.ok) { console.warn('[plp] designer list: ' + to.pathname + to.search + ' answered ' + res.status); return ''; }
     const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
     const list = $('.plp-f__c--des .plp-f__list', doc);
     const out = list ? list.innerHTML : '';
+    if (!out) console.warn('[plp] designer list: no Designer list found in ' + to.pathname + to.search + ' (preview parameters sent: ' + (to.search || 'none') + ')');
     try { if (out) sessionStorage.setItem(ALL_KEY, out); } catch (_) {}
     return out;
   }
@@ -105,7 +106,7 @@
     try {
       const out = await allDesignersHTML();
       const list = $('.plp-f__c--des .plp-f__list');
-      if (!out || !list) return;
+      if (!out || !list) { if (out && !list) console.warn('[plp] designer list: panel has no Designer list to fill'); return; }
       const top = list.parentElement.scrollTop;
       list.innerHTML = out;
       $$('[data-plp-opt][data-single]', list).forEach((b) => {
@@ -114,7 +115,7 @@
         b.removeAttribute('aria-disabled');
       });
       list.parentElement.scrollTop = top;
-    } catch (_) { /* keep the list the page came with */ }
+    } catch (err) { console.warn('[plp] designer list failed', err); /* keep the list the page came with */ }
   }
 
   function pick(btn) {
