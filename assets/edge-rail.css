@@ -277,3 +277,14 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-legal { padding: 4px var(--gut) 14px; }
 .edge-panel .edge-legal a { font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); text-decoration: underline; text-underline-offset: 3px; }
 .edge-panel .edge-legal a:hover { color: var(--ink); }
+/* Menu footer row: 26px tall, address right under it */
+.edge-panel .edge-bottom { height: 26px; }
+.edge-panel .edge-bottom .edge-social { padding: 0 calc(var(--gut) - 4px) 0 0; }
+.edge-panel .edge-bottom .edge-social a { width: 28px; min-height: 26px; }
+.edge-panel .edge-bottom + .edge-legal { padding-top: 0; }
+
+/* Menu footer links in Barlow Condensed, like the brand names; the newsletter and the copyright/address stay in mono.
+   No rule under the newsletter, its own underline is the divider */
+.edge-panel .edge-footlinks a { font-family: var(--font-display); font-weight: 500; letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; font-size: 13px; line-height: 16px; }
+.edge-panel .edge-news { margin-bottom: 10px; }
+.edge-panel .edge-bottom { margin-top: auto; }

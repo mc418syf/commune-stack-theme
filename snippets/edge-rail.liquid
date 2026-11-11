@@ -310,7 +310,7 @@
       {%- endif -%}
       {%- if social_html contains '<li>' or legal_line != blank -%}
         {%- assign has_bottom = true -%}
-        <hr class="edge-rule" style="margin-top: auto;">
+        {%- unless cfg.menu_newsletter != false -%}<hr class="edge-rule">{%- endunless -%}
         <div class="edge-bottom">
           {%- if legal_line != blank -%}<p class="edge-bottom__l">{{ legal_line | escape }}</p>{%- endif -%}
           {%- if social_html contains '<li>' -%}<ul class="edge-social" style="margin-top: 0;">{{ social_html }}</ul>{%- endif -%}
