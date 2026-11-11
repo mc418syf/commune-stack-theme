@@ -308,17 +308,22 @@
           {%- endfor -%}
         {%- endcapture -%}
       {%- endif -%}
-      {%- if social_html contains '<li>' or legal_address != blank -%}
+      {%- if social_html contains '<li>' or legal_line != blank -%}
         {%- assign has_bottom = true -%}
         <hr class="edge-rule" style="margin-top: auto;">
         <div class="edge-bottom">
+          {%- if legal_line != blank -%}<p class="edge-bottom__l">{{ legal_line | escape }}</p>{%- endif -%}
           {%- if social_html contains '<li>' -%}<ul class="edge-social" style="margin-top: 0;">{{ social_html }}</ul>{%- endif -%}
-          {%- if legal_address != blank -%}<p class="edge-bottom__a">{{ legal_address | escape }}</p>{%- endif -%}
         </div>
       {%- endif -%}
-      {%- if legal_line != blank -%}
+      {%- if legal_address != blank -%}
+        {%- assign address_link = cfg.menu_legal_address_link -%}
+        {%- if address_link == blank -%}
+          {%- assign address_q = legal_address | url_encode -%}
+          {%- assign address_link = 'https://www.google.com/maps/search/?api=1&query=' | append: address_q -%}
+        {%- endif -%}
         <div class="edge-legal"{% unless has_bottom %} style="margin-top: auto;"{% endunless %}>
-          <p>{{ legal_line | escape }}</p>
+          <a href="{{ address_link }}" target="_blank" rel="noopener">{{ legal_address | escape }}</a>
         </div>
       {%- endif -%}
     </div>

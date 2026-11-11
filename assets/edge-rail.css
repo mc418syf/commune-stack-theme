@@ -57,9 +57,9 @@ html.edge-locked { overflow: hidden; }
 /* Menu */
 .edge-menu { list-style: none; margin: 0; padding: 0 var(--gut); }
 .edge-row { display: flex; align-items: center; gap: 12px; min-height: 40px; border-bottom: 1px dashed var(--rule-dashed); color: var(--ink); text-decoration: none; }
-.edge-row__n { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; color: var(--gray); width: 20px; flex: none; }
+.edge-row__n { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); color: var(--gray); width: 20px; flex: none; }
 .edge-row__l { font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 20px; letter-spacing: 0.10em; text-transform: uppercase; }
-.edge-row__c { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--gray); margin-left: auto; }
+.edge-row__c { font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--body-ls, 0em); color: var(--gray); margin-left: auto; }
 .edge-panel a:hover { text-decoration: none; }
 
 /* Footer, buttons */
@@ -76,14 +76,14 @@ html.edge-locked { overflow: hidden; }
 .edge-line__img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; display: block; }
 .edge-line__txt { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .edge-line__name { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 13px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; color: var(--ink); text-decoration: none; }
-.edge-line__ref { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-line__ref { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
 .edge-line__price { font-family: var(--font-mono); font-size: var(--price-size, 11px); line-height: var(--price-lh, 16px); color: var(--gray); font-variant-numeric: tabular-nums; }
 .edge-line__act { display: flex; gap: 20px; }
-.edge-line__act button { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; color: var(--ink); }
+.edge-line__act button { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; color: var(--ink); }
 .edge-line__act button:hover { color: var(--ink); }
 .edge-ledger { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; margin-top: 8px; border-top: 1px dashed var(--rule-dashed); border-bottom: 1px dashed var(--rule-dashed);
   font-family: var(--font-mono); font-size: 11px; line-height: 20px; letter-spacing: 0.02em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
-.edge-empty { margin: 0; padding: 20px var(--gut); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-empty { margin: 0; padding: 20px var(--gut); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
 .edge-body .edge-empty { padding: 0; }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -130,16 +130,16 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rule { border: 0; border-top: 1px solid var(--rule); margin: 10px var(--gut); flex: none; }
 .edge-footlinks { list-style: none; margin: 0; padding: 0 var(--gut); }
 .edge-footlinks a { display: flex; align-items: center; min-height: 28px; color: var(--gray); text-decoration: none;
-  font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+  font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; }
 .edge-footlinks a:hover { color: var(--ink); }
 .edge-news { padding: 2px var(--gut) 4px; }
-.edge-news__l { display: block; margin-bottom: 4px; color: var(--gray); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+.edge-news__l { display: block; margin-bottom: 4px; color: var(--gray); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; }
 .edge-news__row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--ink); }
 .edge-news__row input { flex: 1; min-width: 0; height: 36px; border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; outline: none;
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.02em; color: var(--ink); }
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--body-ls, 0em); color: var(--ink); }
 .edge-news__row input:focus-visible { outline: none; }
-.edge-news__row button { min-height: 36px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
-.edge-news__ok, .edge-news__err { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-news__row button { min-height: 36px; font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
+.edge-news__ok, .edge-news__err { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
 .edge-social { list-style: none; margin: auto 0 0; padding: 0 calc(var(--gut) - 8px) 4px; display: flex; flex-wrap: wrap; gap: 0; }
 .edge-social a { display: inline-flex; align-items: center; justify-content: center; width: 36px; min-height: 36px; color: var(--ink); text-decoration: none; }
 .edge-social a:hover { color: var(--gray); }
@@ -154,7 +154,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-rail [hidden] { display: none !important; }
 /* Cart window: the try-on lines sit under the cart lines */
 .edge-sec { border-top: 1px solid var(--rule); margin-top: 8px; }
-.edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
 .edge-sec .edge-body { padding-top: 12px; }
 
 /* While a window is open, the other rail labels go quiet so the open one reads as selected */
@@ -270,9 +270,10 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-body .edge-foot { padding-top: 12px; }
 
 
-/* Menu footer: social icons and address on one line, copyright below, small secondary-colour text */
+/* Menu footer: copyright on the left with the social icons on the right, the address (a link) at the very bottom */
 .edge-panel .edge-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .edge-panel .edge-bottom .edge-social { flex: none; }
-.edge-panel .edge-bottom__a { margin: 0; padding: 0 var(--gut) 0 0; text-align: right; font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-panel .edge-bottom__l { margin: 0; padding: 0 0 0 var(--gut); font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
 .edge-panel .edge-legal { padding: 4px var(--gut) 14px; }
-.edge-panel .edge-legal p { margin: 0; font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-panel .edge-legal a { font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); text-decoration: underline; text-underline-offset: 3px; }
+.edge-panel .edge-legal a:hover { color: var(--ink); }
