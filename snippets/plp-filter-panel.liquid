@@ -110,7 +110,7 @@
                       {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
                     >
                       <span class="plp-o__m" aria-hidden="true"></span>
-                      <span class="plp-o__l">{{ lbl }}</span>
+                      <span class="plp-o__l">{{ lbl | strip }}</span>
                       <span class="plp-o__c">[{{ v.count }}]</span>
                     </button>
                   {%- endfor -%}
@@ -136,7 +136,7 @@
                         {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
                       >
                         <span class="plp-o__m" aria-hidden="true"></span>
-                        <span class="plp-o__l">{{ lbl }}</span>
+                        <span class="plp-o__l">{{ lbl | strip }}</span>
                         <span class="plp-o__c">[{{ v.count }}]</span>
                       </button>
                     {%- endfor -%}
@@ -158,7 +158,7 @@
                         {% if v.count == 0 and v.active == false %}aria-disabled="true"{% endif %}
                       >
                         <span class="plp-o__m" aria-hidden="true"></span>
-                        <span class="plp-o__l">{{ lbl }}</span>
+                        <span class="plp-o__l">{{ lbl | strip }}</span>
                         <span class="plp-o__c">[{{ v.count }}]</span>
                       </button>
                     {%- endfor -%}
@@ -199,7 +199,7 @@
                     {%- assign vals = pf.values | sort_natural: 'label' -%}
                     {%- for v in vals -%}
                       {%- capture lbl -%}{%- render 'plp-value-label', kind: pk, label: v.label -%}{%- endcapture -%}
-                      <label class="plp-o"><input type="{{ pt }}" name="{{ v.param_name }}" value="{{ v.value | escape }}"{% if v.active %} checked{% endif %}> {{ lbl }} [{{ v.count }}]</label>
+                      <label class="plp-o"><input type="{{ pt }}" name="{{ v.param_name }}" value="{{ v.value | escape }}"{% if v.active %} checked{% endif %}> {{ lbl | strip }} [{{ v.count }}]</label>
                     {%- endfor -%}
                   </fieldset>
                 {%- endif -%}

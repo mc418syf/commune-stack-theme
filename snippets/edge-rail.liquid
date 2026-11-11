@@ -49,6 +49,7 @@
           capture lbl
             render 'plp-value-label', kind: kind, label: v.label
           endcapture
+          assign lbl = lbl | strip
           if kind == 'designer'
             assign t_designer = lbl
           elsif kind == 'category'
