@@ -61,7 +61,7 @@
             "text_horizontal": "center",
             "button_label": "Shop All",
             "button_style": "link",
-            "button_color": "#F2F3F4",
+            "button_color": "#f2f3f4",
             "link": "shopify://collections/all"
           }
         },
@@ -81,8 +81,8 @@
             "text_horizontal": "center",
             "button_label": "Book a Visit",
             "button_style": "link",
-            "button_color": "#0D0D0D",
-            "link": ""
+            "button_color": "#0d0d0d",
+            "link": "https://calendly.com/commune237/showroomappointment"
           }
         }
       },
