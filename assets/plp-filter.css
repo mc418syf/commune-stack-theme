@@ -1,7 +1,9 @@
-/* plp filter v3 */
+/* plp filter v4 */
 /* Filter and search panel, the top-left trigger and the sidebar "In stock" switch.
    Values follow the "Filter, left panel, desktop" and "Filter, archive list, mobile" designs. Everything in the panel and the trigger is 9px
    on purpose, below the site's usual 11px; the sidebar labels stay 11px. Colours marked "brief" are the literal values from the design. */
+
+:root { --pf-w: 342px; }   /* brief: desktop panel width (also read by the page, which moves right by it) */
 
 .plp-fp, .plp-trigger {
   --pf-paper: var(--paper, #F4F3EF);
@@ -12,7 +14,6 @@
   --pf-line: #D9D8D2;   /* brief: panel and search lines */
   --pf-dash: #CFCDC6;   /* brief: dashed rules, scrollbars */
   --pf-hover: var(--orange-ink, #C23B05);
-  --pf-w: 342px;        /* brief: desktop panel width */
 }
 
 /* ---- Trigger (top left of the strip) ---- */
@@ -53,7 +54,7 @@
   .plp-fp__sheet { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; border-right: 1px solid var(--pf-line); }
   /* the grid (and the rest of the page) moves right by the panel's width */
   html.plp-fp-used body { transition: padding-left 0.24s ease-out; }
-  html.plp-fp-open body { padding-left: calc(var(--rail-w, 0px) + var(--pf-w)); }
+  html.plp-fp-open body { padding-left: calc(var(--rail-w, 0px) + var(--pf-w, 342px)); }
 }
 
 /* ---- Phones: expands downward under the top bar and pushes the page down ---- */
