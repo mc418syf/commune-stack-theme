@@ -177,7 +177,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 /* Light divider lines show between the Menu sections and above Try-on in the Cart window */
 .edge-foot { border-top: 0 !important; }
 
-/* Product text in the Cart window (brand, title, price) uses the product card's sizes and style; desktop cards are a further 2px smaller (commune-type.css) */
+/* Product text in the Cart window (brand, title, price) uses exactly the product card's sizes and style (commune-type.css): the type scale for the device minus the card offset from Theme settings > Product text */
 .edge-panel .edge-line__name {
   font-family: var(--font-display) !important; font-weight: var(--name-weight, 600) !important; letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase !important;
   font-size: calc(var(--name-size, 14px) - var(--product-card-offset, 2px)) !important; line-height: calc(var(--name-lh, 18px) - var(--product-card-offset, 2px)) !important;
@@ -187,10 +187,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   font-family: var(--font-mono); font-weight: var(--price-weight, 400); letter-spacing: var(--price-ls, 0em); color: var(--ink);
   font-size: calc(var(--price-size, 12px) - var(--product-card-offset, 2px)); line-height: calc(var(--price-lh, 16px) - var(--product-card-offset, 2px));
 }
-@media (min-width: 768px) {
-  .edge-panel .edge-line__name { font-size: calc(var(--name-size, 14px) - var(--product-card-offset, 2px) - 2px) !important; line-height: calc(var(--name-lh, 18px) - var(--product-card-offset, 2px) - 2px) !important; }
-  .edge-panel .edge-line__price { font-size: calc(var(--price-size, 12px) - var(--product-card-offset, 2px) - 2px); line-height: calc(var(--price-lh, 16px) - var(--product-card-offset, 2px) - 2px); }
-}
+
 
 /* The sheet joins the rail only along the open button: that label and its window share a colour,
    the rest of the rail keeps its own. The join is sized by JS (--edge-join-top / --edge-join-h). */

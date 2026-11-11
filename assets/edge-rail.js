@@ -21,13 +21,22 @@
   let isOpen = false;
 
   /* ---------- money ---------- */
+  // Prices follow the visitor's region: the currency is the cart's (Shopify Markets), then Shopify.currency.active, then CAD.
+  // Shown like the product cards: "$750 CAD" (cents only when there are some).
   function money(cents, currency) {
+    const cur = currency || (window.Shopify && window.Shopify.currency && window.Shopify.currency.active) || 'CAD';
+    const amount = Number(cents || 0) / 100;
+    const whole = Math.abs(amount - Math.round(amount)) < 0.005;
     try {
-      return new Intl.NumberFormat('en-CA', { style: 'currency', currency: currency || 'CAD' }).format(cents / 100);
+      return new Intl.NumberFormat('en-CA', {
+        style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol',
+        minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2,
+      }).format(amount) + ' ' + cur;
     } catch (_) {
-      return '$' + (cents / 100).toFixed(2);
+      return '$' + (whole ? Math.round(amount) : amount.toFixed(2)) + ' ' + cur;
     }
   }
+  window.communeMoney = money;
 
   /* ---------- counts ---------- */
   const counts = { cart: Number((railRoot() || {}).dataset ? railRoot().dataset.cartCount : 0) || 0, try: 0 };
@@ -213,7 +222,7 @@
           )
         )
         .join('') +
-      '<div class="edge-ledger"><span>Subtotal</span><span>&lt;' + esc(money(cart.items_subtotal_price, cart.currency)) + ' ' + esc(cart.currency) + '&gt;</span></div>' +
+      '<div class="edge-ledger"><span>Subtotal</span><span>&lt;' + esc(money(cart.items_subtotal_price, cart.currency)) + '&gt;</span></div>' +
       '<div class="edge-foot"><a class="edge-pill edge-pill--primary" href="/checkout">Checkout</a></div></div>';
   }
 

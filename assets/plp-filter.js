@@ -225,6 +225,7 @@
   let sCtrl = null;
 
   function money(cents) {
+    if (typeof window.communeMoney === 'function') return window.communeMoney(cents);
     const cur = (window.Shopify && window.Shopify.currency && window.Shopify.currency.active) || 'CAD';
     try {
       return new Intl.NumberFormat('en-CA', { style: 'currency', currency: cur }).format(cents / 100);
