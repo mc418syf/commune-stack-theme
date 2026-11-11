@@ -269,3 +269,10 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-ledger { padding: 6px 0; margin-top: 4px; }
 .edge-panel .edge-body .edge-foot { padding-top: 12px; }
 
+
+/* Menu footer: social icons and address on one line, copyright below, small secondary-colour text */
+.edge-panel .edge-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.edge-panel .edge-bottom .edge-social { flex: none; }
+.edge-panel .edge-bottom__a { margin: 0; padding: 0 var(--gut) 0 0; text-align: right; font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }
+.edge-panel .edge-legal { padding: 4px var(--gut) 14px; }
+.edge-panel .edge-legal p { margin: 0; font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); }

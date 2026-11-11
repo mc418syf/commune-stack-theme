@@ -271,6 +271,10 @@
           {%- endform -%}
         </div>
       {%- endif -%}
+      {%- assign legal_line = cfg.menu_legal_line -%}
+      {%- assign legal_address = cfg.menu_legal_address -%}
+      {%- assign has_bottom = false -%}
+      {%- capture social_html -%}{%- endcapture -%}
       {%- if cfg.menu_social != false -%}
         {%- assign social_accounts = 'Instagram, Facebook, X, TikTok, YouTube, Pinterest, Threads, Whatsapp, Discord, Tumblr, Snapchat, LinkedIn, Messenger, Email' | split: ', ' -%}
         {%- capture social_html -%}
@@ -303,10 +307,19 @@
             {%- endif -%}
           {%- endfor -%}
         {%- endcapture -%}
-        {%- if social_html contains '<li>' -%}
-          <hr class="edge-rule" style="margin-top: auto;">
-          <ul class="edge-social" style="margin-top: 0;">{{ social_html }}</ul>
-        {%- endif -%}
+      {%- endif -%}
+      {%- if social_html contains '<li>' or legal_address != blank -%}
+        {%- assign has_bottom = true -%}
+        <hr class="edge-rule" style="margin-top: auto;">
+        <div class="edge-bottom">
+          {%- if social_html contains '<li>' -%}<ul class="edge-social" style="margin-top: 0;">{{ social_html }}</ul>{%- endif -%}
+          {%- if legal_address != blank -%}<p class="edge-bottom__a">{{ legal_address | escape }}</p>{%- endif -%}
+        </div>
+      {%- endif -%}
+      {%- if legal_line != blank -%}
+        <div class="edge-legal"{% unless has_bottom %} style="margin-top: auto;"{% endunless %}>
+          <p>{{ legal_line | escape }}</p>
+        </div>
       {%- endif -%}
     </div>
 
