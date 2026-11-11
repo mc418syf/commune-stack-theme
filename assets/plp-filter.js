@@ -98,10 +98,14 @@
     const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
     return root.replace(/\/?$/, '/') + 'collections/all';
   };
+  const stockOn = () => { const s = $('[data-plp-stock]'); return !!s && s.getAttribute('aria-checked') === 'true'; };
   async function allDesignersHTML() {
-    try { const c = sessionStorage.getItem(ALL_KEY); if (c) return c; } catch (_) {}
+    // With "In stock" on, the All page is asked for its in-stock counts, so designers with nothing in stock can be left out
+    const key = ALL_KEY + (stockOn() ? ':in' : '');
+    try { const c = sessionStorage.getItem(key); if (c) return c; } catch (_) {}
     // An unpublished theme is only served with its preview parameters, otherwise the live theme answers (it has no designer list)
     const to = new URL(allUrl(), location.origin);
+    if (stockOn()) to.searchParams.set('filter.v.availability', '1');
     const here = new URLSearchParams(location.search);
     ['preview_theme_id', '_fd', 'pb', '_ab', '_bt'].forEach((k) => { if (here.has(k)) to.searchParams.set(k, here.get(k)); });
     const res = await fetch(to.pathname + to.search, { headers: { Accept: 'text/html' }, credentials: 'same-origin' });
@@ -110,7 +114,7 @@
     const list = $('.plp-f__c--des .plp-f__list', doc);
     const out = list ? list.innerHTML : '';
     if (!out) console.warn('[plp] designer list: no Designer list found in ' + to.pathname + to.search + ' (preview parameters sent: ' + (to.search || 'none') + ')');
-    try { if (out) sessionStorage.setItem(ALL_KEY, out); } catch (_) {}
+    try { if (out) sessionStorage.setItem(key, out); } catch (_) {}
     return out;
   }
   async function applyAllDesigners() {
@@ -126,6 +130,8 @@
         const here = !!b.dataset.brandUrl && b.dataset.brandUrl === location.pathname;
         b.setAttribute('aria-pressed', String(here));
         b.removeAttribute('aria-disabled');
+        const c = b.querySelector('.plp-o__c');
+        if (stockOn() && !here && c && parseInt(c.textContent, 10) === 0) b.remove(); // nothing in stock: not offered
       });
       list.parentElement.scrollTop = top;
     } catch (err) { console.warn('[plp] designer list failed', err); /* keep the list the page came with */ }

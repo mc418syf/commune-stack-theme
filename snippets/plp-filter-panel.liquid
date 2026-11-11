@@ -104,6 +104,8 @@
                 {%- if f_des != blank -%}
                   {%- assign vals = f_des.values | sort_natural: 'label' -%}
                   {%- for v in vals -%}
+                    {%- comment -%} In stock only: a designer with nothing in stock is not offered {%- endcomment -%}
+                    {%- if avail_on and v.count == 0 and v.active == false -%}{%- continue -%}{%- endif -%}
                     {%- capture lbl -%}{%- render 'plp-value-label', kind: 'designer', label: v.label -%}{%- endcapture -%}
                     {%- comment -%} Brand page = the collection whose handle is the designer name (ISSEY MIYAKE -> issey-miyake). {%- endcomment -%}
                     {%- assign brand_col = collections[v.label | handleize] -%}
