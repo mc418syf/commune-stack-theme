@@ -231,10 +231,10 @@
 @media (min-width: 768px) {
   .plp-strip-s {
     display: flex; align-items: center; gap: 6px; box-sizing: border-box; height: 28px; overflow: hidden; margin-left: 0; border-bottom: 1px solid var(--pf-line, #D9D8D2);
-    width: clamp(160px, 26vw, 360px); max-width: 0; opacity: 0; visibility: hidden; border-bottom-color: transparent;
+    width: var(--strip-s-w, clamp(160px, 26vw, 360px)); max-width: 0; opacity: 0; visibility: hidden; border-bottom-color: transparent;
     transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s linear 0.24s;
   }
-  .plp-strip-s.is-open { max-width: clamp(160px, 26vw, 360px); opacity: 1; visibility: visible; margin-left: 16px; border-bottom-color: var(--pf-line, #D9D8D2); transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s; }
+  .plp-strip-s.is-open { max-width: var(--strip-s-w, clamp(160px, 26vw, 360px)); opacity: 1; visibility: visible; margin-left: 16px; border-bottom-color: var(--pf-line, #D9D8D2); transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s; }
   .plp-strip-s.is-open:focus-within { border-bottom-color: var(--ink, #111111); }
   .plp-strip-s__x { display: none; }
 }

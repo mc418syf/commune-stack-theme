@@ -113,7 +113,7 @@
         <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.4 10.4 14.5 14.5" stroke-linecap="round"/></svg>
       </button>
       <label class="plp-sr" for="plp-strip-q">Search</label>
-      <input id="plp-strip-q" class="plp-strip-s__q" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <input id="plp-strip-q" class="plp-strip-s__q" type="search" name="q" value="{{ search.terms | escape }}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
       <button type="button" class="plp-strip-s__x" data-strip-search-close aria-label="Close search">
         <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><path d="M2 2 12 12M12 2 2 12" stroke-linecap="round"/></svg>
       </button>
@@ -123,13 +123,33 @@
         if (window.__plpStripSearch) return;
         window.__plpStripSearch = true;
         function form() { return document.getElementById('plp-strip-s'); }
+        function fit() {
+          var f = form(), t = document.querySelector('[data-strip-search-toggle]');
+          if (!f || !t || window.innerWidth < 768) return;
+          var left = t.getBoundingClientRect().right + 16;
+          var li = document.querySelector('#results ul.collection-list > li');
+          var right = li ? li.getBoundingClientRect().right : 0;
+          if (!right) right = left + 280;
+          else if (right < left + 160) right = left + 160;
+          var logo = document.querySelector('.edge-strip__logo');
+          if (logo) { var lr = logo.getBoundingClientRect(); if (lr.width && lr.left - 16 > left + 160) right = Math.min(right, lr.left - 16); }
+          f.style.setProperty('--strip-s-w', Math.round(right - left) + 'px');
+        }
         function set(open) {
           var f = form(), t = document.querySelector('[data-strip-search-toggle]');
           if (!f || !t) return;
+          if (open) fit();
           f.classList.toggle('is-open', open);
           t.setAttribute('aria-expanded', String(open));
-          if (open) f.querySelector('input[type="search"]').focus();
+          if (open) {
+            var q = f.querySelector('input[type="search"]');
+            var end = function () { var n = q.value.length; try { q.setSelectionRange(n, n); } catch (e) {} };
+            q.focus();
+            end();
+            setTimeout(end, 0);
+          }
         }
+        window.addEventListener('resize', function () { var f = form(); if (f && f.classList.contains('is-open')) fit(); });
         document.addEventListener('click', function (e) {
           var t = e.target.closest && e.target.closest('[data-strip-search-toggle]');
           if (t) { var f = form(); return set(!(f && f.classList.contains('is-open'))); }
