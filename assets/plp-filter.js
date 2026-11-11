@@ -396,7 +396,8 @@
     }
   } catch (_) {}
   size();
-  (window.requestIdleCallback || setTimeout)(applyAllDesigners, 200);
+  if (window.requestIdleCallback) window.requestIdleCallback(applyAllDesigners, { timeout: 1500 });
+  else setTimeout(applyAllDesigners, 200);
 
   /* An old or shared filter link (?filter.p.vendor=X) moves to the brand's own page when that page exists. */
   (function toBrandPage() {
