@@ -214,19 +214,35 @@
 }
 @media (hover: hover) and (pointer: fine) { .plp-strip-x:hover { color: var(--orange-ink, #C23B05); } }
 
-/* Search results page, desktop: the search field sits on the same line as the <Search> title in the top bar and takes the width up to the logo */
+/* Search results page: clicking <Search> in the top bar opens the field in place, on the same line (no panel). Desktop: it grows to the right of the title.
+   Phones: it covers the top bar row. */
 .plp-strip-s { display: none; }
-@media (min-width: 768px) {
-  .plp-strip-s { display: flex; align-items: center; gap: 8px; box-sizing: border-box; width: clamp(120px, 22vw, 280px); height: 28px; margin-left: 16px; border-bottom: 1px solid var(--pf-line, #D9D8D2); }
-  .plp-strip-s:focus-within { border-bottom-color: var(--ink, #111111); }
-  .plp-strip-s__q {
-    flex: 1 1 auto; min-width: 0; height: 28px; margin: 0; padding: 0 !important; border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none;
-    -webkit-appearance: none; appearance: none;
-    font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink, #111111);
-  }
-  .plp-strip-s__q::placeholder { color: var(--gray, #6B6B66); opacity: 1; }
-  .plp-strip-s__q::-webkit-search-cancel-button, .plp-strip-s__q::-webkit-search-decoration { -webkit-appearance: none; display: none; }
-  .plp-strip-s__go { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 28px; padding: 0; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--ink, #111111); }
-  .plp-strip-s__go:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+.plp-strip-st:hover .plp-t__d { color: var(--orange-ink, #C23B05); }
+.plp-trigger + .plp-strip-st { margin-left: 16px; }
+.plp-strip-s__q {
+  flex: 1 1 auto; min-width: 0; height: 28px; margin: 0; padding: 0 !important; border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none;
+  -webkit-appearance: none; appearance: none;
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink, #111111);
 }
-@media (hover: hover) and (pointer: fine) { .plp-strip-s__go:hover { color: var(--orange-ink, #C23B05); } }
+.plp-strip-s__q::placeholder { color: var(--gray, #6B6B66); opacity: 1; }
+.plp-strip-s__q::-webkit-search-cancel-button, .plp-strip-s__q::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.plp-strip-s__go, .plp-strip-s__x { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 28px; padding: 0; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--ink, #111111); }
+.plp-strip-s__go:focus-visible, .plp-strip-s__x:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+@media (min-width: 768px) {
+  .plp-strip-s {
+    display: flex; align-items: center; gap: 6px; box-sizing: border-box; height: 28px; overflow: hidden; margin-left: 0; border-bottom: 1px solid var(--pf-line, #D9D8D2);
+    width: clamp(160px, 26vw, 360px); max-width: 0; opacity: 0; visibility: hidden; border-bottom-color: transparent;
+    transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s linear 0.24s;
+  }
+  .plp-strip-s.is-open { max-width: clamp(160px, 26vw, 360px); opacity: 1; visibility: visible; margin-left: 16px; border-bottom-color: var(--pf-line, #D9D8D2); transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s; }
+  .plp-strip-s.is-open:focus-within { border-bottom-color: var(--ink, #111111); }
+  .plp-strip-s__x { display: none; }
+}
+@media (max-width: 767px) {
+  .plp-strip-s.is-open {
+    display: flex; align-items: center; gap: 6px; position: fixed; z-index: 35; top: 0; left: var(--rail-w, 0px); right: 0; height: var(--strip-h, 44px); box-sizing: border-box; padding: 0 var(--gut, 16px) 0 calc(var(--gut, 16px) - 6px);
+    background: var(--paper, #F4F3EF);
+  }
+}
+@media (prefers-reduced-motion: reduce) { .plp-strip-s, .plp-strip-s.is-open { transition: none; } }
+@media (hover: hover) and (pointer: fine) { .plp-strip-s__go:hover, .plp-strip-s__x:hover { color: var(--orange-ink, #C23B05); } }

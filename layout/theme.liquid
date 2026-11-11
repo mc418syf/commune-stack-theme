@@ -247,7 +247,7 @@
     {{ 'commune-type.css' | asset_url | stylesheet_tag }}
     {{ 'edge-rail.css' | asset_url | stylesheet_tag }}
     {{ 'plp-filter.css' | asset_url | stylesheet_tag }}
-    {% if template.name == 'collection' %}{{ 'plp-gallery.css' | asset_url | stylesheet_tag }}{% endif %}
+    {% if template.name == 'collection' or template.name == 'search' %}{{ 'plp-gallery.css' | asset_url | stylesheet_tag }}{% endif %}
     <meta name="google-site-verification" content="A5GAnSvB4HIADbrD586ctJWZ8CEMSPC9Yg26HksS3Os" />
   </head>
   <!-- REMOVED: custom-hide-logo-on-scroll script (caused half-logo glitch on page navigation) -->
@@ -302,7 +302,7 @@
     <script src="{{ 'try-on-list.js' | asset_url }}" defer></script>
     <script src="{{ 'edge-rail.js' | asset_url }}" defer></script>
     <script src="{{ 'plp-filter.js' | asset_url }}" defer></script>
-    {% if template.name == 'collection' %}<script src="{{ 'plp-gallery.js' | asset_url }}" defer></script>{% endif %}
+    {% if template.name == 'collection' or template.name == 'search' %}<script src="{{ 'plp-gallery.js' | asset_url }}" defer></script>{% endif %}
 
     <script
       src="{{ 'alpine.bundle.js' | asset_url }}"
