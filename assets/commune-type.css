@@ -61,7 +61,7 @@ body {
 .rte, .rte p, .rte li { font-size: var(--body-size); line-height: var(--body-lh); }
 .rte { max-width: 56ch; }
 /* collection / brand description under the title: three quarters of the page on desktop */
-@media (min-width: 1024px) { .collection-page-title ~ .rte { max-width: none; width: 75%; } }
+@media (min-width: 768px) { .collection-page-title ~ .rte { max-width: none; width: 75%; } }
 
 /* ---- Hero / display and section head ---- */
 .text-heading-feature, .text-heading-secondary {
