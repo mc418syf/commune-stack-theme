@@ -59,7 +59,6 @@ html.plp-gallery-on .plp-gallery { gap: 0; border: 0; }
 html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 
 /* Brand description: shown above the grid when one brand is selected; in gallery view it sits top left over the image area */
-@media (min-width: 768px) { .brand-note { max-width: 75%; } }
 .brand-note { box-sizing: border-box; margin: 0 var(--gut, 24px) 12px; padding: 10px 12px; max-width: 640px; background: var(--vellum-layer, var(--vellum, rgba(244, 243, 239, 0.66))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); color: var(--ink); }
 .brand-note__n { margin: 0; font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: calc(var(--name-size, 16px) - var(--product-card-offset, 2px)); line-height: calc(var(--name-lh, 20px) - var(--product-card-offset, 2px)); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
 .brand-note__d { margin-top: 4px; font-family: var(--font-mono); font-size: var(--body-size, 12px); line-height: var(--body-lh, 18px); letter-spacing: 0; text-transform: none; }
@@ -67,6 +66,8 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
 .brand-note__d > :last-child { margin-bottom: 0; }
 .plp-gallery__brand { position: absolute; z-index: 2; left: var(--gut, 24px); top: 12px; width: 300px; }
 .plp-gallery__brand .brand-note { margin: 0; max-width: none; }
+/* grid view on desktop: the note spans three quarters of the page (gallery view keeps its own small box above) */
+@media (min-width: 768px) { html:not(.plp-gallery-on) .brand-note { max-width: 75%; } }
 .plp-gallery__brand:empty { display: none; }
 @media (max-width: 767px) {
   .brand-note { margin: 0 var(--gut, 16px) 10px; }
