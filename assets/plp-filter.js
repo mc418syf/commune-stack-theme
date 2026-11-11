@@ -83,6 +83,36 @@
     timer = setTimeout(commit, ms);
   }
 
+  /* On a brand collection page the Designer list shows every designer (taken from the All page) and works as navigation */
+  const ALL_KEY = 'plp-all-designers:v1';
+  const onBrandPage = () => !!fp.dataset.plpCollection && fp.dataset.plpCollection !== 'all';
+  async function allDesignersHTML() {
+    try { const c = sessionStorage.getItem(ALL_KEY); if (c) return c; } catch (_) {}
+    const res = await fetch('/collections/all', { headers: { Accept: 'text/html' } });
+    if (!res.ok) return '';
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+    const list = $('.plp-f__c--des .plp-f__list', doc);
+    const out = list ? list.innerHTML : '';
+    try { if (out) sessionStorage.setItem(ALL_KEY, out); } catch (_) {}
+    return out;
+  }
+  async function applyAllDesigners() {
+    if (!onBrandPage()) return;
+    try {
+      const out = await allDesignersHTML();
+      const list = $('.plp-f__c--des .plp-f__list');
+      if (!out || !list) return;
+      const top = list.parentElement.scrollTop;
+      list.innerHTML = out;
+      $$('[data-plp-opt][data-single]', list).forEach((b) => {
+        const here = !!b.dataset.brandUrl && b.dataset.brandUrl === location.pathname;
+        b.setAttribute('aria-pressed', String(here));
+        b.removeAttribute('aria-disabled');
+      });
+      list.parentElement.scrollTop = top;
+    } catch (_) { /* keep the list the page came with */ }
+  }
+
   function pick(btn) {
     const u = wanted();
     const param = btn.dataset.param;
@@ -98,6 +128,15 @@
     }
     const others = u.searchParams.getAll(param).filter((x) => x !== value);
     u.searchParams.delete(param);
+    if (btn.hasAttribute('data-single') && onBrandPage()) {
+      // the designer list is a menu here: another brand opens its own page, the current one goes back to All
+      const to = new URL(on ? '/collections/all' : (btn.dataset.brandUrl || '/collections/all'), location.origin);
+      u.searchParams.delete(param);
+      u.searchParams.forEach((val, key) => { if (key !== 'q' && key !== 'page') to.searchParams.append(key, val); });
+      if (!on && !btn.dataset.brandUrl) to.searchParams.set(param, value);
+      window.location.href = to.pathname + to.search;
+      return;
+    }
     if (btn.hasAttribute('data-single') && btn.dataset.brandUrl) {
       // choosing a designer opens that brand's own page (own URL for SEO); other filters and sort carry over
       const keep = new URL(btn.dataset.brandUrl, location.origin);
@@ -191,6 +230,7 @@
       if (again) again.focus({ preventScroll: true });
     }
     size();
+    applyAllDesigners();
   }
 
   async function load(url, push) {
@@ -356,6 +396,7 @@
     }
   } catch (_) {}
   size();
+  (window.requestIdleCallback || setTimeout)(applyAllDesigners, 200);
 
   /* An old or shared filter link (?filter.p.vendor=X) moves to the brand's own page when that page exists. */
   (function toBrandPage() {

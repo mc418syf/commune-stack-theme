@@ -68,6 +68,7 @@
   class="plp-fp"
   id="plp-fp"
   data-plp-fp
+  {% if template.name == 'collection' %}data-plp-collection="{{ collection.handle }}"{% endif %}
   {% unless has_filters %}data-plp-search-only{% endunless %}
   aria-label="{% if has_filters %}Filter{% else %}Search{% endif %}"
   inert
