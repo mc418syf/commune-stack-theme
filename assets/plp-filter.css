@@ -106,11 +106,9 @@
 .plp-f { margin: 0; }
 .plp-f__cols { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 0 20px; align-items: stretch; box-sizing: border-box; padding: 18px 12px 0; }
 .plp-f__c { min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-/* Scrollbar: 3px wide, square. Chrome and Safari ignore ::-webkit-scrollbar once scrollbar-width or scrollbar-color is set, so those are Firefox-only. */
-.plp-f__c::-webkit-scrollbar { width: 3px; }
-.plp-f__c::-webkit-scrollbar-track { background: transparent; }
-.plp-f__c::-webkit-scrollbar-thumb { background: var(--pf-dash); border-radius: 0; }
-@supports not selector(::-webkit-scrollbar) { .plp-f__c { scrollbar-width: thin; scrollbar-color: var(--pf-dash) transparent; } }
+/* No visible scrollbar; the columns still scroll with the wheel, trackpad, touch and keyboard */
+.plp-f__c { scrollbar-width: none; -ms-overflow-style: none; }
+.plp-f__c::-webkit-scrollbar { display: none; }
 .plp-f__c:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -2px; }
 /* Desktop: the columns fill the docked panel */
 @media (min-width: 768px) {
