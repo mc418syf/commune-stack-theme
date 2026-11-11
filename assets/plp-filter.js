@@ -85,11 +85,23 @@
 
   /* On a brand collection page the Designer list shows every designer (taken from the All page) and works as navigation */
   const ALL_KEY = 'plp-all-designers:v1';
-  const onBrandPage = () => !!fp.dataset.plpCollection && fp.dataset.plpCollection !== 'all';
+  // The collection comes from the page address as well (not only from the panel's attribute), including market prefixes like /en-ca
+  const collectionHandle = () => {
+    const m = location.pathname.match(/\/collections\/([^/?#]+)/);
+    return (m && decodeURIComponent(m[1])) || fp.dataset.plpCollection || '';
+  };
+  const onBrandPage = () => {
+    const h = collectionHandle();
+    return !!h && h !== 'all' && h !== 'vendors' && h !== 'types';
+  };
+  const allUrl = () => {
+    const root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+    return root.replace(/\/?$/, '/') + 'collections/all';
+  };
   async function allDesignersHTML() {
     try { const c = sessionStorage.getItem(ALL_KEY); if (c) return c; } catch (_) {}
     // An unpublished theme is only served with its preview parameters, otherwise the live theme answers (it has no designer list)
-    const to = new URL('/collections/all', location.origin);
+    const to = new URL(allUrl(), location.origin);
     const here = new URLSearchParams(location.search);
     ['preview_theme_id', '_fd', 'pb', '_ab', '_bt'].forEach((k) => { if (here.has(k)) to.searchParams.set(k, here.get(k)); });
     const res = await fetch(to.pathname + to.search, { headers: { Accept: 'text/html' }, credentials: 'same-origin' });
@@ -103,6 +115,7 @@
   }
   async function applyAllDesigners() {
     if (!onBrandPage()) return;
+    console.info('[plp] designer list: brand page "' + collectionHandle() + '", loading all designers');
     try {
       const out = await allDesignersHTML();
       const list = $('.plp-f__c--des .plp-f__list');
@@ -135,7 +148,7 @@
     u.searchParams.delete(param);
     if (btn.hasAttribute('data-single') && onBrandPage()) {
       // the designer list is a menu here: another brand opens its own page, the current one goes back to All
-      const to = new URL(on ? '/collections/all' : (btn.dataset.brandUrl || '/collections/all'), location.origin);
+      const to = new URL(on ? allUrl() : (btn.dataset.brandUrl || allUrl()), location.origin);
       u.searchParams.delete(param);
       u.searchParams.forEach((val, key) => { if (key !== 'q' && key !== 'page') to.searchParams.append(key, val); });
       if (!on && !btn.dataset.brandUrl) to.searchParams.set(param, value);
