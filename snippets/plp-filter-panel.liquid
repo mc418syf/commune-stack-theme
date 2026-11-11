@@ -136,6 +136,11 @@
                 <div class="plp-f__list" role="group" aria-labelledby="plp-h-cat">
                   {%- assign vals = f_cat.values | sort_natural: 'label' -%}
                   {%- for v in vals -%}
+                    {%- comment -%} A tag filter lists every tag of the store: only the Category_ ones are categories {%- endcomment -%}
+                    {%- if f_cat.param_name == 'filter.p.tag' -%}
+                      {%- assign tag_start = v.label | strip | slice: 0, 9 | downcase -%}
+                      {%- if tag_start != 'category_' -%}{%- continue -%}{%- endif -%}
+                    {%- endif -%}
                     {%- capture lbl -%}{%- render 'plp-value-label', kind: 'category', label: v.label -%}{%- endcapture -%}
                     <button
                       type="button"
