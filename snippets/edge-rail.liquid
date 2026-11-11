@@ -101,6 +101,16 @@
         {%- endif -%}
       </span>
     </button>
+    {%- if template.name == 'search' -%}
+    <form class="plp-strip-s" action="{{ routes.search_url }}" method="get" role="search">
+      <input type="hidden" name="options[prefix]" value="last">
+      <label class="plp-sr" for="plp-strip-q">Search</label>
+      <input id="plp-strip-q" class="plp-strip-s__q" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button type="submit" class="plp-strip-s__go" aria-label="Search">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.4 10.4 14.5 14.5" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+    {%- endif -%}
     {%- endunless -%}
   </div>
   {%- if on_plp and template.name != 'index' and template.name != 'product' -%}
@@ -120,7 +130,7 @@
       <span>Menu</span>
     </button>
     {%- endif -%}
-    {%- if on_plp -%}
+    {%- if on_plp or template.name == 'search' -%}
     <span class="edge-rail__sep" aria-hidden="true"></span>
     {%- if template.name == 'collection' -%}
     <button type="button" class="edge-rail__v edge-rail__view" data-plp-toggle aria-label="Switch to gallery view" title="Gallery view">

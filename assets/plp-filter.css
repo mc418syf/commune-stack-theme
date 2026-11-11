@@ -213,3 +213,20 @@
   .plp-strip-x:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -6px; }
 }
 @media (hover: hover) and (pointer: fine) { .plp-strip-x:hover { color: var(--orange-ink, #C23B05); } }
+
+/* Search results page, desktop: the search field sits on the same line as the <Search> title in the top bar and takes the width up to the logo */
+.plp-strip-s { display: none; }
+@media (min-width: 768px) {
+  .plp-strip-s { display: flex; align-items: center; gap: 8px; box-sizing: border-box; width: clamp(120px, 22vw, 280px); height: 28px; margin-left: 16px; border-bottom: 1px solid var(--pf-line, #D9D8D2); }
+  .plp-strip-s:focus-within { border-bottom-color: var(--ink, #111111); }
+  .plp-strip-s__q {
+    flex: 1 1 auto; min-width: 0; height: 28px; margin: 0; padding: 0 !important; border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none;
+    -webkit-appearance: none; appearance: none;
+    font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink, #111111);
+  }
+  .plp-strip-s__q::placeholder { color: var(--gray, #6B6B66); opacity: 1; }
+  .plp-strip-s__q::-webkit-search-cancel-button, .plp-strip-s__q::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+  .plp-strip-s__go { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 28px; padding: 0; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--ink, #111111); }
+  .plp-strip-s__go:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+}
+@media (hover: hover) and (pointer: fine) { .plp-strip-s__go:hover { color: var(--orange-ink, #C23B05); } }
