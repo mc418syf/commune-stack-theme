@@ -134,7 +134,7 @@
       url.searchParams.set('page', p);
       pages.push(url.pathname + url.search);
     }
-    // Two requests at a time, each retried once, so a slow connection or rate limit does not drop pages
+    // Three requests at a time, each retried once, so a slow connection or rate limit does not drop pages
     const fetchWithRetry = (u) => fetchPage(u).catch(() => new Promise((r) => setTimeout(r, 400)).then(() => fetchPage(u))).catch(() => null);
     const docs = new Array(pages.length).fill(null);
     let cursor = 0;
@@ -144,7 +144,7 @@
         docs[i] = await fetchWithRetry(pages[i]);
       }
     };
-    await Promise.all([worker(), worker()]);
+    await Promise.all([worker(), worker(), worker()]);
     for (let i = 0; i < docs.length; i++) {
       if (!docs[i]) break; // stop at the first missing page so the list never has a hole
       append(feed.grid, docs[i], feed.last + 1);
@@ -290,11 +290,13 @@
     let moved = false;
     const mark = () => { moved = true; };
     ['wheel', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, mark, { once: true, passive: true }));
-    if (document.readyState !== 'complete') {
-      await Promise.race([new Promise((r) => addEventListener('load', r, { once: true })), sleep(3000)]);
-    }
+    // Not the whole page 'load' (that waits for every image and third-party script): the fonts, briefly, then the images by the saved spot
+    if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, sleep(400)]);
+    scrollToSaved(saved);
     for (let pass = 0; pass < 2 && !moved; pass++) {
-      await imagesReady(imagesNearViewport(), 1200);
+      const imgs = imagesNearViewport().filter((img) => !img.complete);
+      if (!imgs.length) break;
+      await imagesReady(imgs, 500);
       if (moved) break;
       scrollToSaved(saved);
       await Promise.race([new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))), sleep(120)]);
