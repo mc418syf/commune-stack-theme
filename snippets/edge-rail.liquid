@@ -93,6 +93,9 @@
         {%- if on_plp -%}
           {%- if t_designer != '' -%}
             <span class="plp-t__d plp-t__d--sel">&lt;{{ t_designer | escape }}&gt;</span>
+          {%- elsif template.name == 'collection' and collection.handle != 'all' and collection.title != blank -%}
+            {%- comment -%} On a brand (or any other real) collection page the title says where you are {%- endcomment -%}
+            <span class="plp-t__d plp-t__d--sel">&lt;{{ collection.title | escape }}&gt;</span>
           {%- else -%}
             <span class="plp-t__d">&lt;Filter&gt;</span>
           {%- endif -%}
