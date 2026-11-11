@@ -88,7 +88,11 @@
   const onBrandPage = () => !!fp.dataset.plpCollection && fp.dataset.plpCollection !== 'all';
   async function allDesignersHTML() {
     try { const c = sessionStorage.getItem(ALL_KEY); if (c) return c; } catch (_) {}
-    const res = await fetch('/collections/all', { headers: { Accept: 'text/html' } });
+    // An unpublished theme is only served with its preview parameters, otherwise the live theme answers (it has no designer list)
+    const to = new URL('/collections/all', location.origin);
+    const here = new URLSearchParams(location.search);
+    ['preview_theme_id', '_fd', 'pb', '_ab', '_bt'].forEach((k) => { if (here.has(k)) to.searchParams.set(k, here.get(k)); });
+    const res = await fetch(to.pathname + to.search, { headers: { Accept: 'text/html' }, credentials: 'same-origin' });
     if (!res.ok) return '';
     const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
     const list = $('.plp-f__c--des .plp-f__list', doc);
