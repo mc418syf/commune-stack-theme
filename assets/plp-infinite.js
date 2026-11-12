@@ -65,7 +65,7 @@
   // Pages already fetched in this tab are kept for a few minutes (only the product list and the next link, not the whole page),
   // so coming back from a product does not download them all again
   const PAGE_TTL = 10 * 60 * 1000;
-  const cacheKey = (href) => 'plp-page:v2:' + withPreview(href);
+  const cacheKey = (href) => 'plp-page:v3:' + withPreview(href);
   function readCached(href) {
     try {
       const hit = JSON.parse(sessionStorage.getItem(cacheKey(href)));

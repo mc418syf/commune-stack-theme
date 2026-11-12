@@ -192,6 +192,8 @@ PLP product card
           <div class="lg:hidden relative" id="plp-{{ section.id }}-{{ product.id }}">
             <ul class="plp-snap-track">
               {% for idstr in ordered_ids %}
+                {%- assign slide_loading = 'lazy' -%}
+                {%- if forloop.first -%}{%- assign slide_loading = loading -%}{%- endif -%}
                 {%- assign mid = idstr | plus: 0 -%}
                 {%- assign media = images_only | where: 'id', mid | first -%}
                 {% if media %}
@@ -199,10 +201,11 @@ PLP product card
                     <a href="{{ product.url }}">
                       <div class="relative" style="padding-top: {{ 1 | divided_by: _ratio | times: 100 }}%;">
                         {% render 'image-fit',
+                  widths: '350, 450, 750, 960, 1280',
                           image: media,
                           sizes: sizes,
                           preload: preload,
-                          loading: loading,
+                          loading: slide_loading,
                           contain: _contain
                         %}
                       </div>
@@ -241,6 +244,7 @@ PLP product card
             <div class="relative" style="padding-top: {{ 1 | divided_by: ratio | times: 100 }}%;">
               {% if product.featured_media != blank %}
                 {% render 'image-fit',
+                  widths: '350, 450, 750, 960, 1280',
                   image: product.featured_media,
                   sizes: sizes,
                   preload: preload,
@@ -271,6 +275,7 @@ PLP product card
 
           {% if output_second_image %}
             {% render 'image-fit',
+                  widths: '350, 450, 750, 960, 1280',
               image: product.media[1].preview_image,
               contain: contain,
               sizes: sizes,
@@ -302,6 +307,7 @@ PLP product card
                 }"
               >
                 {% render 'image-fit',
+                  widths: '350, 450, 750, 960, 1280',
                   image: variant.featured_media.preview_image,
                   contain: object_contain_grid,
                   sizes: sizes,
