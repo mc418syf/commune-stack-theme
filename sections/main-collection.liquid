@@ -185,6 +185,34 @@
   </section>
 {%- endif -%}
 
+{%- comment -%} Styles first: everything that positions the grid must be known before the grid is painted (no jump while loading) {%- endcomment -%}
+{{ 'plp-infinite.css' | asset_url | stylesheet_tag }}
+{% style %}
+/* The template's "Custom CSS" (.collection {margin-top: 40px}) is printed by Shopify after the section, so on a slow
+   connection the product grid was painted at the top and then jumped down. The same offset is declared here, before the
+   markup; the Custom CSS still wins if it is changed later. */
+{% if template.suffix == blank %}#shopify-section-{{ section.id }} .collection { margin-top: 40px; }{% endif %}
+/* description under the title: three quarters of the page on desktop (overrides the 56ch limit on .rte) */
+@media (min-width: 768px) {
+  .collection-description { max-width: none !important; width: 75% !important; margin-bottom: 32px; }
+}
+/* phones: a long description shows five lines, tap to read the rest; more room above the product grid */
+@media (max-width: 767px) {
+  .collection-description[data-desc-clamp] { margin-bottom: 20px; }
+  #results { padding-top: 12px; }
+  .collection-description[data-desc-clamp]:not(.is-open) { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+  .collection-description[data-desc-clamp].is-long { cursor: pointer; }
+  .collection-description[data-desc-clamp].is-long::after { content: 'Read more +'; display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B66; }
+  .collection-description[data-desc-clamp].is-long.is-open::after { content: 'Read less \2212'; }
+}
+@media (max-width: 1023px) {
+  .collection-page-title {
+    font-weight: 700;
+    font-size: calc(var(--font-body-size, 16px) + 2pt);
+  }
+}
+{% endstyle %}
+
 <div
   id="plp-config"
   data-infinite="{{ section.settings.infinite_scroll }}"
@@ -222,6 +250,12 @@
     @keydown.escape.document="onEscape"
   >
     <div data-plp-head>
+    {%- if hide_title -%}
+      {%- comment -%} The visible title is switched off in the theme editor: keep a heading for search engines and screen readers {%- endcomment -%}
+      <h1 class="sr-only">
+        {%- if collection.handle == 'all' -%}{{ shop.name }} &ndash; {% endif -%}{{ collection.title }}
+      </h1>
+    {%- endif -%}
     {%- if show_heading_container -%}
       <div class="grid grid-flow-row-dense grid-cols-1 gap-gutter overflow-hidden bg-gridline-color lg:grid-cols-12">
         {% if show_image and collection.image %}
@@ -607,7 +641,6 @@
   {% endunless %}
 {% endif %}
 
-{{ 'plp-infinite.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'plp-infinite.js' | asset_url }}" defer></script>
 
 {% unless request.design_mode %}
@@ -657,27 +690,6 @@
   })();
 </script>
 
-{% style %}
-/* description under the title: three quarters of the page on desktop (overrides the 56ch limit on .rte) */
-@media (min-width: 768px) {
-  .collection-description { max-width: none !important; width: 75% !important; margin-bottom: 32px; }
-}
-/* phones: a long description shows five lines, tap to read the rest; more room above the product grid */
-@media (max-width: 767px) {
-  .collection-description[data-desc-clamp] { margin-bottom: 20px; }
-  #results { padding-top: 12px; }
-  .collection-description[data-desc-clamp]:not(.is-open) { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-  .collection-description[data-desc-clamp].is-long { cursor: pointer; }
-  .collection-description[data-desc-clamp].is-long::after { content: 'Read more +'; display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B66; }
-  .collection-description[data-desc-clamp].is-long.is-open::after { content: 'Read less \2212'; }
-}
-@media (max-width: 1023px) {
-  .collection-page-title {
-    font-weight: 700;
-    font-size: calc(var(--font-body-size, 16px) + 2pt);
-  }
-}
-{% endstyle %}
 
 {% schema %}
 {
