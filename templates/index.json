@@ -97,7 +97,7 @@
         "mobile_ratio": "2 / 3",
         "height_mobile": 85,
         "gap": 0,
-        "snap": "mobile",
+        "snap": "off",
         "color_scheme": "scheme1"
       }
     },

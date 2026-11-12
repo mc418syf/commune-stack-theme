@@ -657,9 +657,11 @@
 @media (min-width: 768px) {
   .collection-description { max-width: none !important; width: 75% !important; }
 }
-/* phones: a long description shows three lines, tap to read the rest */
+/* phones: a long description shows five lines, tap to read the rest; more room above the product grid */
 @media (max-width: 767px) {
-  .collection-description[data-desc-clamp]:not(.is-open) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .collection-description[data-desc-clamp] { margin-bottom: 20px; }
+  #results { padding-top: 12px; }
+  .collection-description[data-desc-clamp]:not(.is-open) { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
   .collection-description[data-desc-clamp].is-long { cursor: pointer; }
   .collection-description[data-desc-clamp].is-long::after { content: 'Read more +'; display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B66; }
   .collection-description[data-desc-clamp].is-long.is-open::after { content: 'Read less \2212'; }
