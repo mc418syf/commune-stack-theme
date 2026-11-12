@@ -130,7 +130,7 @@
         "always_show_product_featured_media_first": true,
         "single_variant_mode": true,
         "enable_variant_media": false,
-        "enable_image_zoom": true,
+        "enable_image_zoom": false,
         "enable_video_looping": false,
         "max_width_of_content": "w-full",
         "color_scheme": "",
