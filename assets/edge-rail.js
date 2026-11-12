@@ -358,6 +358,14 @@
   document.body.addEventListener('baseline:cart:afteradditem', () => {
     refreshCart().then(() => openPanel('cart', $('[data-edge-open="cart"]') || plus));
   });
+  /* PDP: once the piece is added the button reads "Added to cart"; pressing it opens the cart instead of adding another */
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest && e.target.closest('#addToCartButton');
+    if (!btn || !/added to cart/i.test(btn.textContent || '')) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    refreshCart().then(() => openPanel('cart', $('[data-edge-open="cart"]') || plus));
+  }, true);
   window.addEventListener('open-try-on', () => openPanel('cart', $('[data-edge-open="cart"]') || plus));
   window.addEventListener('storage', renderTry);
 

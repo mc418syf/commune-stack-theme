@@ -694,6 +694,8 @@ document.addEventListener('alpine:init', () => {
         const value = el.value.trim();
 
         this[`option${position}`] = value;
+        // another size or colour: the button offers Add to cart again
+        this.addedToCart = false;
       },
       lockOptionChangeHandler() {
         this.optionChangesThisKeypress++;
