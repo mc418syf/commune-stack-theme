@@ -26,6 +26,13 @@
       assign brand_html = brand_collection.description
     endif
   endif
+  comment
+    No brand picked in the filter: gallery view shows the collection's own description (grid view already shows it in the page header)
+  endcomment
+  if brand_html == '' and collection.handle != 'all' and collection.description != blank
+    assign brand_name = collection.title
+    assign brand_html = collection.description
+  endif
 -%}
 {%- if brand_html != '' -%}
   <div class="brand-note" data-brand-note>
