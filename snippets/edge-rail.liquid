@@ -213,6 +213,20 @@
     <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
       <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
     </button>
+    <script>
+      /* paint the last known total before first paint, so the label does not flip (e.g. [1] to [2]) when a page opens */
+      (function () {
+        try {
+          var n = localStorage.getItem('commune_cart_total');
+          if (n === null) return;
+          var b = document.currentScript.previousElementSibling;
+          if (!b) return;
+          var c = b.querySelector('[data-edge-count="total"]');
+          if (c) c.textContent = n;
+          b.hidden = n === '0';
+        } catch (e) {}
+      })();
+    </script>
     {%- endif -%}
   </div>
   <noscript>

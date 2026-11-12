@@ -48,6 +48,8 @@
     if (kind in counts) counts[kind] = n;
     $$('[data-edge-count="' + kind + '"]').forEach((el) => (el.textContent = n));
     $$('[data-edge-count="total"]').forEach((el) => (el.textContent = counts.cart + counts.try));
+    // remembered so the next page paints the right number at once (the server only knows the cart, not the try-on list)
+    try { localStorage.setItem('commune_cart_total', String(counts.cart + counts.try)); } catch (e) { /* private mode */ }
     syncCartVisibility();
   }
   function syncCartVisibility() {
