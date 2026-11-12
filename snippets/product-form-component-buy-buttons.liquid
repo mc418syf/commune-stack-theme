@@ -131,7 +131,8 @@
         {% unless quick_buy %}
           :class="
             {
-              'opacity-50 cursor-not-allowed after:content-none': !currentVariantAvailable
+              'opacity-50 cursor-not-allowed after:content-none': !currentVariantAvailable,
+              'is-added': addedToCart
             }
           "
           :disabled="!currentVariantAvailable || loading"

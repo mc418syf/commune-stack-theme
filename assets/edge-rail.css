@@ -288,3 +288,6 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-footlinks a { font-family: var(--font-display); font-weight: 500; letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; font-size: 13px; line-height: 16px; }
 .edge-panel .edge-news { margin-bottom: 10px; }
 .edge-panel .edge-bottom { margin-top: auto; }
+
+/* PDP: after the piece is in the cart the button turns grey ("Added to cart") */
+#addToCartButton.is-added { background-color: var(--gray, #6B6B66) !important; border-color: var(--gray, #6B6B66) !important; color: #fff !important; }
