@@ -456,6 +456,27 @@
     refreshCart().then(() => openPanel('cart', $('[data-edge-open="cart"]') || plus));
   });
 
+  /* ---------- PDP: <Back> named after the listing the visitor came from ---------- */
+  (function backButton() {
+    const b = $('[data-edge-back]');
+    if (!b) return;
+    let last = null;
+    try { last = JSON.parse(sessionStorage.getItem('plp-last')); } catch (_) { /* storage blocked */ }
+    const label = b.querySelector('.plp-t__d');
+    if (last && last.url && label) label.textContent = '<' + (last.label || 'All') + '>';
+    b.addEventListener('click', () => {
+      if (last && last.url) {
+        let ref = '';
+        try { const r = new URL(document.referrer); ref = r.pathname + r.search; } catch (_) { /* no referrer */ }
+        // coming straight from that listing: go back in history, so it opens at the product that was clicked
+        if (ref === last.url && history.length > 1) { history.back(); return; }
+        window.location.href = last.url;
+        return;
+      }
+      window.location.href = b.dataset.fallback || '/collections/all';
+    });
+  })();
+
   /* ---------- init ---------- */
   setCount('try', tryItems().length);
   fetch('/cart.js', { headers: { Accept: 'application/json' } })

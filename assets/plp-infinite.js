@@ -409,6 +409,13 @@
   document.addEventListener('click', (e) => {
     const link = e.target.closest && e.target.closest('#results ' + PRODUCT_LINK);
     if (!link) return;
+    // the product page offers a way back, named after this listing
+    try {
+      const lab = document.querySelector('[data-plp-trigger-label] .plp-t__d');
+      let name = ((lab && lab.textContent) || '').trim().replace(/^</, '').replace(/>$/, '');
+      if (!name || /^filter$/i.test(name)) name = 'All';
+      sessionStorage.setItem('plp-last', JSON.stringify({ url: location.pathname + location.search, label: name }));
+    } catch (e) { /* storage blocked */ }
     const li = link.closest('li');
     write({
       anchor: { href: productPath(link), top: Math.round(li ? li.getBoundingClientRect().top : 0), page: li ? Number(li.dataset.plpPage) || undefined : undefined },

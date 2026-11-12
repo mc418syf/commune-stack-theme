@@ -86,6 +86,12 @@
 
 <div class="edge-strip__inner">
   <div class="edge-strip__left">
+    {%- if template.name == 'product' -%}
+      {%- comment -%} Back to the listing the visitor came from; the label is filled from the saved listing (edge-rail.js) {%- endcomment -%}
+      <button type="button" class="plp-trigger edge-back" data-edge-back data-fallback="{{ routes.all_products_collection_url }}">
+        <span class="plp-trigger__t"><span class="plp-t__d">&lt;All&gt;</span></span>
+      </button>
+    {%- endif -%}
     {%- unless template.name == 'index' or template.name == 'product' -%}
     {%- unless template.name == 'search' and on_plp == false -%}
     <button type="button" class="plp-trigger" data-plp-trigger aria-expanded="false" aria-controls="plp-fp">
