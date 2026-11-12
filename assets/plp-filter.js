@@ -84,7 +84,7 @@
   }
 
   /* On a brand collection page the Designer list shows every designer (taken from the All page) and works as navigation */
-  const ALL_KEY = 'plp-all-designers:v1';
+  const ALL_KEY = 'plp-all-designers:v2';
   // The collection comes from the page address as well (not only from the panel's attribute), including market prefixes like /en-ca
   const collectionHandle = () => {
     const m = location.pathname.match(/\/collections\/([^/?#]+)/);
