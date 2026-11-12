@@ -102,7 +102,7 @@
               <h3 class="plp-h" id="plp-h-des">&lt;Designer&gt;</h3>
               <div class="plp-f__list" role="group" aria-labelledby="plp-h-des">
                 {%- if f_des != blank -%}
-                  {%- assign vals = f_des.values | sort_natural: 'label' -%}
+                  {%- assign vals = f_des.values -%}
                   {%- for v in vals -%}
                     {%- comment -%} In stock only: a designer with nothing in stock is not offered {%- endcomment -%}
                     {%- if avail_on and v.count == 0 and v.active == false -%}{%- continue -%}{%- endif -%}
@@ -138,7 +138,7 @@
               {%- if f_cat != blank -%}
                 <h3 class="plp-h" id="plp-h-cat">&lt;Category&gt;</h3>
                 <div class="plp-f__list" role="group" aria-labelledby="plp-h-cat">
-                  {%- comment -%} Category and gender keep the order set in Search & Discovery; only designers are alphabetical {%- endcomment -%}
+                  {%- comment -%} Designer, category and gender keep the order set in Search & Discovery {%- endcomment -%}
                   {%- assign vals = f_cat.values -%}
                   {%- comment -%} A tag filter lists every tag of the store: when Category_ tags are among the values, only those are categories {%- endcomment -%}
                   {%- assign has_cat_tags = false -%}
@@ -241,7 +241,7 @@
                 {%- if pf != blank -%}
                   <fieldset class="plp-f__fs">
                     <legend class="plp-h">&lt;{{ pk | capitalize }}&gt;</legend>
-                    {%- if pk == 'designer' -%}{%- assign vals = pf.values | sort_natural: 'label' -%}{%- else -%}{%- assign vals = pf.values -%}{%- endif -%}
+                    {%- assign vals = pf.values -%}
                     {%- for v in vals -%}
                       {%- capture lbl -%}{%- render 'plp-value-label', kind: pk, label: v.label -%}{%- endcapture -%}
                       <label class="plp-o"><input type="{{ pt }}" name="{{ v.param_name }}" value="{{ v.value | escape }}"{% if v.active %} checked{% endif %}> {{ lbl | strip }} {{ v.count }}</label>
