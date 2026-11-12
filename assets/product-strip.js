@@ -19,6 +19,7 @@
     let lastX = 0;
     let lastT = 0;
     let velocity = 0; // scroll pixels per millisecond
+    let expected = list.scrollLeft; // where our own writes left the strip: a scroll anywhere else came from the trackpad
 
     const max = () => Math.max(0, list.scrollWidth - list.clientWidth);
     const clamp = (v) => Math.min(max(), Math.max(0, v));
@@ -27,10 +28,12 @@
       const diff = target - list.scrollLeft;
       if (Math.abs(diff) < 0.5) {
         list.scrollLeft = target;
+        expected = list.scrollLeft;
         frame = 0;
         return;
       }
       list.scrollLeft += REDUCED.matches ? diff : diff * EASE;
+      expected = list.scrollLeft;
       frame = requestAnimationFrame(tick);
     }
     const glideTo = (value) => {
@@ -40,12 +43,23 @@
 
     // Scrolling that did not come from us (trackpad, keyboard, scrollbar): follow it
     list.addEventListener('scroll', () => {
-      if (!frame && !down) target = list.scrollLeft;
+      if (Math.abs(list.scrollLeft - expected) > 2) {
+        // the trackpad moved it: stop any glide still heading for an older target (it would pull the strip back)
+        cancelAnimationFrame(frame); frame = 0;
+        target = list.scrollLeft;
+        expected = list.scrollLeft;
+      } else if (!frame && !down) target = list.scrollLeft;
     }, { passive: true });
 
     // Mouse wheel (vertical) glides the strip sideways. A trackpad's own sideways swipe stays native.
     list.addEventListener('wheel', (e) => {
-      if (!DESKTOP.matches || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      if (!DESKTOP.matches) return;
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) {
+        // a sideways swipe is native: let go of any glide started by an earlier up/down wheel tick
+        cancelAnimationFrame(frame); frame = 0;
+        target = list.scrollLeft; expected = list.scrollLeft;
+        return;
+      }
       const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
       const base = frame ? target : list.scrollLeft;
       const atStart = base <= 0 && delta < 0;
@@ -72,6 +86,7 @@
       if (!moved && Math.abs(dx) < 5) return;
       if (!moved) { moved = true; list.classList.add('is-dragging'); }
       list.scrollLeft = startLeft - dx;
+      expected = list.scrollLeft;
       const dt = Math.max(1, e.timeStamp - lastT);
       velocity = velocity * 0.7 + (-(e.clientX - lastX) / dt) * 0.3;
       lastX = e.clientX; lastT = e.timeStamp;
@@ -106,7 +121,7 @@
         e.preventDefault();
         cancelAnimationFrame(frame); frame = 0;
         list.scrollLeft = clamp(list.scrollLeft + e.deltaX);
-        target = list.scrollLeft;
+        target = list.scrollLeft; expected = list.scrollLeft;
       }, { passive: false });
     }
 
