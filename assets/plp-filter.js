@@ -197,6 +197,18 @@
 
   function clearAll() {
     const u = wanted();
+    if (onBrandPage()) {
+      // A brand page IS the designer filter: clearing means going back to All (sort and the in-stock switch carry over).
+      // Dropping only the filter parameters left the visitor on the brand page, where the designer list marked the brand again.
+      const to = new URL(allUrl(), location.origin);
+      u.searchParams.forEach((val, key) => {
+        if (key.indexOf('filter.p.') === 0 || key === 'q' || key === 'page') return;
+        to.searchParams.append(key, val);
+      });
+      $$('[data-plp-opt]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      target = to;
+      return commit();
+    }
     Array.from(u.searchParams.keys()).forEach((k) => {
       if (k.indexOf('filter.p.') === 0) u.searchParams.delete(k);
     });
