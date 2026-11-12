@@ -136,9 +136,10 @@
 
             <div class="plp-f__c plp-f__c--rest" tabindex="0" role="region" aria-label="Category, gender and sort" data-plp-col>
               {%- if f_cat != blank -%}
-                <h3 class="plp-h plp-h--rule" id="plp-h-cat">&lt;Category&gt;</h3>
+                <h3 class="plp-h" id="plp-h-cat">&lt;Category&gt;</h3>
                 <div class="plp-f__list" role="group" aria-labelledby="plp-h-cat">
-                  {%- assign vals = f_cat.values | sort_natural: 'label' -%}
+                  {%- comment -%} Category and gender keep the order set in Search & Discovery; only designers are alphabetical {%- endcomment -%}
+                  {%- assign vals = f_cat.values -%}
                   {%- comment -%} A tag filter lists every tag of the store: when Category_ tags are among the values, only those are categories {%- endcomment -%}
                   {%- assign has_cat_tags = false -%}
                   {%- for v in vals -%}
@@ -172,7 +173,7 @@
               <h3 id="plp-h-gen" data-plp-gender-param="{{ gender_param | escape }}" style="position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Gender</h3>
               <div class="plp-f__list" role="group" aria-labelledby="plp-h-gen" style="margin-top:14px">
                 {%- if f_gen != blank -%}
-                  {%- assign vals = f_gen.values | sort_natural: 'label' -%}
+                  {%- assign vals = f_gen.values -%}
                   {%- for v in vals -%}
                     {%- capture lbl -%}{%- render 'plp-value-label', kind: 'gender', label: v.label -%}{%- endcapture -%}
                     <button
@@ -240,7 +241,7 @@
                 {%- if pf != blank -%}
                   <fieldset class="plp-f__fs">
                     <legend class="plp-h">&lt;{{ pk | capitalize }}&gt;</legend>
-                    {%- assign vals = pf.values | sort_natural: 'label' -%}
+                    {%- if pk == 'designer' -%}{%- assign vals = pf.values | sort_natural: 'label' -%}{%- else -%}{%- assign vals = pf.values -%}{%- endif -%}
                     {%- for v in vals -%}
                       {%- capture lbl -%}{%- render 'plp-value-label', kind: pk, label: v.label -%}{%- endcapture -%}
                       <label class="plp-o"><input type="{{ pt }}" name="{{ v.param_name }}" value="{{ v.value | escape }}"{% if v.active %} checked{% endif %}> {{ lbl | strip }} {{ v.count }}</label>
