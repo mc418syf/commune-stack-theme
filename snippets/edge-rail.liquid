@@ -177,7 +177,7 @@
 </div>
 
 <div class="edge-rail__bg" aria-hidden="true"></div>
-<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}"{% if customer %} data-customer-name="{{ customer.first_name | append: ' ' | append: customer.last_name | strip | escape }}" data-customer-email="{{ customer.email | escape }}"{% endif %} data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
+<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}"{% if customer %} data-customer-name="{{ customer.first_name | append: ' ' | append: customer.last_name | strip | escape }}" data-customer-email="{{ customer.email | escape }}"{% endif %} data-book-label="{{ cfg.book_button_label | default: 'Book a visit' | escape }}" data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
   <div class="edge-rail__group">
     {%- if tab_menu != false -%}
     <button type="button" class="edge-rail__v" data-edge-open="menu" aria-haspopup="dialog" aria-expanded="false" aria-label="Menu">
@@ -234,14 +234,11 @@
             <li>
               <a class="edge-row" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
                 <span class="edge-row__l">{{ link.title }}</span>
-                {%- if forloop.first and link.url contains '/collections' -%}
-                  <span class="edge-row__c">[{{ collections.all.products_count }}]</span>
-                {%- endif -%}
               </a>
             </li>
           {%- endfor -%}
         {%- else -%}
-          <li><a class="edge-row" href="/collections/all"><span class="edge-row__l">Shop</span><span class="edge-row__c">[{{ collections.all.products_count }}]</span></a></li>
+          <li><a class="edge-row" href="/collections/all"><span class="edge-row__l">Shop</span></a></li>
           <li><a class="edge-row" href="/pages/book"><span class="edge-row__l">Appointment</span></a></li>
           <li><a class="edge-row" href="/pages/information"><span class="edge-row__l">Information</span></a></li>
           <li><a class="edge-row" href="{{ routes.account_url }}"><span class="edge-row__l">Customer information</span></a></li>

@@ -243,6 +243,11 @@
     return CAL_BASE + (q ? '?' + q : '');
   }
 
+  function bookLabel() {
+    const rail = document.querySelector('[data-edge-rail]');
+    return (rail && rail.dataset.bookLabel) || 'Book a visit';
+  }
+
   function renderTry() {
     const host = $('[data-edge-list="try"]');
     if (!host) return;
@@ -264,7 +269,7 @@
           )
         )
         .join('') +
-      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="' + esc(calendlyUrl(items)) + '" target="_blank" rel="noopener">Book a fitting</a></div></div>';
+      '<div class="edge-foot"><a class="edge-pill edge-pill--secondary" href="' + esc(calendlyUrl(items)) + '" target="_blank" rel="noopener">' + esc(bookLabel()) + '</a></div></div>';
   }
 
   async function cartChange(line, qty) {
