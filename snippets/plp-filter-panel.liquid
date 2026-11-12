@@ -34,7 +34,7 @@
       assign fl = f.label | downcase
       if f.param_name == 'filter.p.vendor'
         assign f_des = f
-      elsif f.param_name == gender_param
+      elsif f.param_name == gender_param or fl contains 'gender' or f.param_name contains 'gender'
         assign f_gen = f
       elsif fl contains 'categ' or f.param_name == 'filter.p.product_type'
         assign f_cat = f
@@ -135,9 +135,14 @@
                 <h3 class="plp-h plp-h--rule" id="plp-h-cat">&lt;Category&gt;</h3>
                 <div class="plp-f__list" role="group" aria-labelledby="plp-h-cat">
                   {%- assign vals = f_cat.values | sort_natural: 'label' -%}
+                  {%- comment -%} A tag filter lists every tag of the store: when Category_ tags are among the values, only those are categories {%- endcomment -%}
+                  {%- assign has_cat_tags = false -%}
                   {%- for v in vals -%}
-                    {%- comment -%} A tag filter lists every tag of the store: only the Category_ ones are categories {%- endcomment -%}
-                    {%- if f_cat.param_name == 'filter.p.tag' -%}
+                    {%- assign tag_start = v.label | strip | slice: 0, 9 | downcase -%}
+                    {%- if tag_start == 'category_' -%}{%- assign has_cat_tags = true -%}{%- break -%}{%- endif -%}
+                  {%- endfor -%}
+                  {%- for v in vals -%}
+                    {%- if has_cat_tags -%}
                       {%- assign tag_start = v.label | strip | slice: 0, 9 | downcase -%}
                       {%- if tag_start != 'category_' -%}{%- continue -%}{%- endif -%}
                     {%- endif -%}
