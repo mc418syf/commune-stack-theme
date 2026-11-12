@@ -90,6 +90,26 @@
     addEventListener('pointerup', end);
     addEventListener('pointercancel', end);
 
+    // A two-finger sideways swipe moves the strip from anywhere in the product block (for example with the pointer left on the description)
+    const block = list.closest('.product-strip');
+    if (block) {
+      block.addEventListener('wheel', (e) => {
+        if (!DESKTOP.matches || e.defaultPrevented || e.ctrlKey) return;
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        if (list.contains(e.target)) return; // already scrolls natively
+        // leave anything that scrolls sideways itself (a table, a text field) alone
+        for (let el = e.target; el && el !== block; el = el.parentElement) {
+          if (el.scrollWidth > el.clientWidth + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) return;
+        }
+        const base = frame ? target : list.scrollLeft;
+        if ((e.deltaX < 0 && base <= 0) || (e.deltaX > 0 && base >= max() - 1)) return; // at the ends the page keeps its own gesture
+        e.preventDefault();
+        cancelAnimationFrame(frame); frame = 0;
+        list.scrollLeft = clamp(list.scrollLeft + e.deltaX);
+        target = list.scrollLeft;
+      }, { passive: false });
+    }
+
     // Arrow keys work wherever the focus is (for example after clicking the description), not only after clicking an image
     document.addEventListener('keydown', (e) => {
       if (!DESKTOP.matches || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
