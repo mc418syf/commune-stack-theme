@@ -90,6 +90,20 @@
     addEventListener('pointerup', end);
     addEventListener('pointercancel', end);
 
+    // Arrow keys work wherever the focus is (for example after clicking the description), not only after clicking an image
+    document.addEventListener('keydown', (e) => {
+      if (!DESKTOP.matches || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const t = e.target;
+      if (t && t.closest && t.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], [data-edge-panel]')) return;
+      if (!list.isConnected || list.getClientRects().length === 0) return;
+      const step = Math.max(240, list.clientWidth * 0.6) * (e.key === 'ArrowLeft' ? -1 : 1);
+      const base = frame ? target : list.scrollLeft;
+      if ((step < 0 && base <= 0) || (step > 0 && base >= max() - 1)) return;
+      e.preventDefault();
+      glideTo(base + step);
+    });
+
     // A drag must not open the zoom on the image underneath
     list.addEventListener('click', (e) => {
       if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
