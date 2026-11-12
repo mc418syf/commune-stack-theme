@@ -275,7 +275,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 .edge-panel .edge-bottom .edge-social { flex: none; }
 .edge-panel .edge-bottom__l { margin: 0; padding: 0 0 0 var(--gut); font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
 .edge-panel .edge-legal { padding: 4px var(--gut) 14px; }
-.edge-panel .edge-legal a { font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); text-decoration: underline; text-underline-offset: 3px; }
+.edge-panel .edge-legal a { font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); text-decoration: none; }
 .edge-panel .edge-legal a:hover { color: var(--ink); }
 /* Menu footer row: 26px tall, address right under it */
 .edge-panel .edge-bottom { height: 26px; }
