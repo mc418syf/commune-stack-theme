@@ -151,7 +151,7 @@
           <template x-if="currentVariant">
             <span>
               <template x-if="currentVariantAvailable">
-                <span x-text="addedToCart ? {{ 'Added to cart' | json }} : {{ 'products.product.add_to_cart' | t | json }}">
+                <span x-text="addedToCart ? {{ 'Added to cart' | json | escape }} : {{ 'products.product.add_to_cart' | t | json | escape }}">
                   {{- 'products.product.add_to_cart' | t -}}
                 </span>
               </template>
