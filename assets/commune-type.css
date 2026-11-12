@@ -170,15 +170,34 @@ h1, h2, h3, .text-heading-standard {
   border-color: var(--ink);
   color: var(--paper);
 }
-.theme-button:hover:not(:disabled), .add-to-cart:hover:not(:disabled), #addToCartButton:hover:not(:disabled) {
-  background-color: var(--orange);
-  border-color: var(--orange);
-  color: var(--ink);
+/* Orange only where there is a real pointer to hover with. A touch screen keeps ":hover" on a button after it is tapped,
+   which left the button orange until the visitor tapped somewhere else. */
+@media (hover: hover) and (pointer: fine) {
+  .theme-button:hover:not(:disabled), .add-to-cart:hover:not(:disabled), #addToCartButton:hover:not(:disabled) {
+    background-color: var(--orange);
+    border-color: var(--orange);
+    color: var(--ink);
+  }
 }
 .theme-button--secondary, [data-try-on-pdp] {
   background-color: transparent;
   border: 1px solid var(--ink);
   color: var(--ink);
+}
+/* Touch screens: a tapped button keeps its normal colours (this also overrides the theme's own accent hover) */
+@media (hover: none), (pointer: coarse) {
+  .theme-button:hover:not(:disabled):not(.is-added):not(.theme-button--secondary):not([data-try-on-pdp]),
+  .add-to-cart:hover:not(:disabled):not(.is-added):not(.theme-button--secondary):not([data-try-on-pdp]),
+  #addToCartButton:hover:not(:disabled):not(.is-added) {
+    background-color: var(--ink) !important;
+    border-color: var(--ink) !important;
+    color: var(--paper) !important;
+  }
+  .theme-button--secondary:hover:not(:disabled), [data-try-on-pdp]:hover:not(:disabled) {
+    background-color: transparent !important;
+    border-color: var(--ink) !important;
+    color: var(--ink) !important;
+  }
 }
 
 /* ---- Inputs ---- */

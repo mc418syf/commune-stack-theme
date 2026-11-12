@@ -387,9 +387,39 @@
   });
 
   /* PDP: Add to cart opens the Cart tab, Try in-store opens the Try-on tab */
-  document.body.addEventListener('baseline:cart:afteradditem', () => {
-    refreshCart().then(() => openPanel('cart', $('[data-edge-open="cart"]') || plus));
+  // The answer to "add" already describes the new line: show it at once, then confirm against the real cart in the background
+  // (before, the Cart tab waited for a second request to /cart.js)
+  function mergeAdded(res) {
+    if (!cart || !Array.isArray(cart.items) || !res) return false;
+    const added = Array.isArray(res.items) ? res.items : res.variant_id ? [res] : [];
+    if (!added.length) return false;
+    added.forEach((line) => {
+      const at = cart.items.findIndex((i) => i.key === line.key);
+      if (at > -1) cart.items[at] = line;
+      else cart.items.unshift(line);
+    });
+    cart.item_count = cart.items.reduce((n, i) => n + (i.quantity || 0), 0);
+    cart.items_subtotal_price = cart.items.reduce((n, i) => n + (i.final_line_price || 0), 0);
+    return true;
+  }
+  document.body.addEventListener('baseline:cart:afteradditem', (e) => {
+    const opener = () => openPanel('cart', $('[data-edge-open="cart"]') || plus);
+    if (mergeAdded(e.detail && e.detail.response)) {
+      setCount('cart', cart.item_count);
+      renderCart();
+      opener();
+      refreshCart();
+    } else {
+      refreshCart().then(opener);
+    }
   });
+  // The cart number goes up the moment the button is pressed (capture phase: the product form stops this event on its way up).
+  // If the shop refuses the add (sold out meanwhile), the real cart is read again and the number goes back.
+  document.addEventListener('baseline:productform:loading', (e) => {
+    const q = e.target && e.target.querySelector ? e.target.querySelector('[name="quantity"]') : null;
+    setCount('cart', counts.cart + Math.max(1, Number(q && q.value) || 1));
+  }, true);
+  document.addEventListener('baseline:productform:error', () => { refreshCart(); }, true);
   /* PDP: once the piece is added the button reads "Added to cart"; pressing it opens the cart instead of adding another */
   document.addEventListener('click', (e) => {
     const btn = e.target.closest && e.target.closest('#addToCartButton');

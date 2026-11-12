@@ -225,7 +225,7 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   border-radius: var(--button-border-radius, 0) !important;
 }
 .edge-panel .edge-pill--primary { background: var(--ink) !important; border: 1px solid var(--ink) !important; color: var(--paper) !important; }
-.edge-panel .edge-pill--primary:hover { background: var(--orange) !important; border-color: var(--orange) !important; color: var(--ink) !important; }
+@media (hover: hover) and (pointer: fine) { .edge-panel .edge-pill--primary:hover { background: var(--orange) !important; border-color: var(--orange) !important; color: var(--ink) !important; } }
 .edge-panel .edge-pill--secondary { background: transparent !important; border: 1px solid var(--ink) !important; color: var(--ink) !important; }
 /* Phones: lift the bottom labels (Cart, Try-on) clear of the screen edge, rounded corners and browser bars */
 @media (max-width: 767px) {

@@ -723,7 +723,8 @@ document.addEventListener('alpine:init', () => {
 
           this.loading = true;
           this.errorMessage = null;
-          this.addedToCart = false;
+          // Show the result at once; the request to the cart runs in the background and an error puts the button back
+          this.addedToCart = true;
         });
 
         this.$root.addEventListener('baseline:productform:success', (event) => {
@@ -746,6 +747,7 @@ document.addEventListener('alpine:init', () => {
 
             this.errorMessage =
               event.detail.message || window.theme.strings.cartError;
+            this.addedToCart = false;
 
             this.quantity = Number(
               this.$root.querySelector('[name="quantity"]').getAttribute('min')
