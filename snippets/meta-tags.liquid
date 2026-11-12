@@ -61,6 +61,8 @@
 {%- liquid
   assign sd_description = page_description | default: shop.description
 -%}
+{%- comment -%} A closing brace inside a Liquid string ends the tag early on Shopify, so the search URL pattern is captured as plain text {%- endcomment -%}
+{%- capture sd_search_template -%}{{ shop.url }}{{ routes.search_url }}?q={search_term_string}{%- endcapture -%}
 {%- if request.page_type == 'index' -%}
   <script type="application/ld+json">
     {
@@ -100,7 +102,7 @@
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": {{ shop.url | append: routes.search_url | append: '?q={search_term_string}' | json }}
+              "urlTemplate": {{ sd_search_template | json }}
             },
             "query-input": "required name=search_term_string"
           }
