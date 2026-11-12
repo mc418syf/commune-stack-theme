@@ -83,8 +83,9 @@
     timer = setTimeout(commit, ms);
   }
 
-  // false: choosing a designer filters the page in place (no jump to the brand's own page, no redirect of old filter links)
-  const BRAND_REDIRECT = false;
+  // true: choosing a designer opens that brand's own page (swapped in place, address bar shows the brand URL), and old filter links move to it
+  // false: it filters the All page instead (no brand URL, no redirect of old filter links)
+  const BRAND_REDIRECT = true;
 
   /* On a brand collection page the Designer list shows every designer (taken from the All page) and works as navigation */
   const ALL_KEY = 'plp-all-designers:v2';
@@ -173,8 +174,8 @@
         u.searchParams.delete(param);
         u.searchParams.forEach((val, key) => { if (key !== 'q') keep.searchParams.append(key, val); });
         keep.searchParams.delete('page');
-        window.location.href = keep.pathname + keep.search;
-        return;
+        target = keep;
+        return commit();
       }
     }
     if (btn.hasAttribute('data-single')) {
