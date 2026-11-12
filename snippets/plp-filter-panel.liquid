@@ -165,8 +165,8 @@
               {%- endif -%}
 
               {%- comment -%} Gender is always drawn; its values appear once the metafield is a filter in Search & Discovery {%- endcomment -%}
-              <h3 class="plp-h plp-h--rule" id="plp-h-gen" data-plp-gender-param="{{ gender_param | escape }}">&lt;Gender&gt;</h3>
-              <div class="plp-f__list" role="group" aria-labelledby="plp-h-gen">
+              <h3 id="plp-h-gen" data-plp-gender-param="{{ gender_param | escape }}" style="position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Gender</h3>
+              <div class="plp-f__list" role="group" aria-labelledby="plp-h-gen" style="margin-top:14px">
                 {%- if f_gen != blank -%}
                   {%- assign vals = f_gen.values | sort_natural: 'label' -%}
                   {%- for v in vals -%}
