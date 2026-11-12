@@ -62,10 +62,35 @@
     return a ? a.getAttribute('href') : null;
   };
 
+  // Pages already fetched in this tab are kept for a few minutes (only the product list and the next link, not the whole page),
+  // so coming back from a product does not download them all again
+  const PAGE_TTL = 10 * 60 * 1000;
+  const cacheKey = (href) => 'plp-page:' + withPreview(href);
+  function readCached(href) {
+    try {
+      const hit = JSON.parse(sessionStorage.getItem(cacheKey(href)));
+      if (hit && Date.now() - hit.t < PAGE_TTL) return new DOMParser().parseFromString(hit.h, 'text/html');
+    } catch (e) { /* storage blocked */ }
+    return null;
+  }
+  function writeCached(href, doc) {
+    try {
+      const list = doc.querySelector('#results ul.collection-list');
+      if (!list) return;
+      const next = nextHrefIn(doc);
+      const h = '<div id="results">' + list.outerHTML + (next ? '<div data-plp-pagination><a rel="next" href="' + next.replace(/"/g, '&quot;') + '"></a></div>' : '') + '</div>';
+      sessionStorage.setItem(cacheKey(href), JSON.stringify({ t: Date.now(), h: h }));
+    } catch (e) { /* storage full or blocked: just not cached */ }
+  }
+
   async function fetchPage(href) {
+    const cached = readCached(href);
+    if (cached) return cached;
     const res = await fetch(withPreview(href), { credentials: 'same-origin' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    return new DOMParser().parseFromString(await res.text(), 'text/html');
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+    writeCached(href, doc);
+    return doc;
   }
 
   function append(target, doc, page) {
@@ -134,7 +159,7 @@
       url.searchParams.set('page', p);
       pages.push(url.pathname + url.search);
     }
-    // Three requests at a time, each retried once, so a slow connection or rate limit does not drop pages
+    // Five requests at a time, each retried once, so a slow connection or rate limit does not drop pages
     const fetchWithRetry = (u) => fetchPage(u).catch(() => new Promise((r) => setTimeout(r, 400)).then(() => fetchPage(u))).catch(() => null);
     const docs = new Array(pages.length).fill(null);
     let cursor = 0;
@@ -144,7 +169,7 @@
         docs[i] = await fetchWithRetry(pages[i]);
       }
     };
-    await Promise.all([worker(), worker(), worker()]);
+    await Promise.all([worker(), worker(), worker(), worker(), worker()]);
     for (let i = 0; i < docs.length; i++) {
       if (!docs[i]) break; // stop at the first missing page so the list never has a hole
       append(feed.grid, docs[i], feed.last + 1);
@@ -261,7 +286,7 @@
         else feed.grid.querySelectorAll('li[data-plp-ghost="1"][data-plp-page="' + p + '"]').forEach((g) => g.remove());
       }
     };
-    await Promise.all([worker(), worker(), worker()]);
+    await Promise.all([worker(), worker(), worker(), worker(), worker()]);
 
     feed.last = saved.lastPage;
     feed.next = docs[saved.lastPage] ? nextHrefIn(docs[saved.lastPage]) : (saved.layout && saved.layout.next) || null;
