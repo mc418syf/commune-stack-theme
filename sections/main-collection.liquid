@@ -221,6 +221,7 @@
     data-color-scheme="{{ section_color }}"
     @keydown.escape.document="onEscape"
   >
+    <div data-plp-head>
     {%- if show_heading_container -%}
       <div class="grid grid-flow-row-dense grid-cols-1 gap-gutter overflow-hidden bg-gridline-color lg:grid-cols-12">
         {% if show_image and collection.image %}
@@ -250,6 +251,7 @@
         </div>
       </div>
     {%- endif -%}
+    </div>
 
     {%- if show_scrolling_text and scrolling_text_position == 'under_title' -%}
       <aside
@@ -632,9 +634,9 @@
 
 <script>
   (function () {
-    var d = document.querySelector('[data-desc-clamp]');
-    if (!d) return;
     function check() {
+      var d = document.querySelector('[data-desc-clamp]');
+      if (!d) return;
       if (window.innerWidth > 767) { d.classList.remove('is-long'); return; }
       var open = d.classList.contains('is-open');
       d.classList.remove('is-open');
@@ -642,13 +644,16 @@
       d.classList.toggle('is-long', long);
       if (open && long) d.classList.add('is-open');
     }
-    d.addEventListener('click', function (e) {
-      if (e.target.closest('a')) return;
+    document.addEventListener('click', function (e) {
+      var d = e.target.closest && e.target.closest('[data-desc-clamp]');
+      if (!d || e.target.closest('a')) return;
       if (d.classList.contains('is-long')) d.classList.toggle('is-open');
     });
     check();
     window.addEventListener('load', check);
     window.addEventListener('resize', check);
+    // the header is replaced when a designer is chosen on a brand page
+    document.addEventListener('plp:results-updated', check);
   })();
 </script>
 

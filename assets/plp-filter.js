@@ -162,8 +162,9 @@
       u.searchParams.delete(param);
       u.searchParams.forEach((val, key) => { if (key !== 'q' && key !== 'page') to.searchParams.append(key, val); });
       if (!on && !brandUrl) to.searchParams.set(param, value);
-      window.location.href = to.pathname + to.search;
-      return;
+      // swapped in place (the panel stays open, no page flash); the address bar still changes
+      target = to;
+      return commit();
     }
     if (BRAND_REDIRECT && btn.hasAttribute('data-single') && btn.dataset.brandUrl) {
       // choosing a designer opens that brand's own page (own URL for SEO); other filters and sort carry over
@@ -229,6 +230,12 @@
     const nres = $('#results', doc);
     if (res && nres) res.innerHTML = nres.innerHTML;
 
+    // the page header (collection description) and the tab title belong to the collection, which can change here
+    const head = $('[data-plp-head]');
+    const nhead = $('[data-plp-head]', doc);
+    if (head && nhead) head.innerHTML = nhead.innerHTML;
+    if (doc.title) document.title = doc.title;
+
     const cols = $('[data-plp-cols]');
     const ncols = $('[data-plp-cols]', doc);
     if (cols && ncols) {
@@ -258,7 +265,6 @@
       if (again) again.focus({ preventScroll: true });
     }
     size();
-    applyAllDesigners();
   }
 
   async function load(url, push) {
@@ -270,8 +276,11 @@
       const res = await fetch(url, { headers: { Accept: 'text/html' }, signal: ctrl.signal });
       const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
       if (mine !== seq) return;
+      const pathBefore = location.pathname;
       swap(doc);
       if (push && url !== location.pathname + location.search) history.pushState({ plp: true }, '', url);
+      if (location.pathname !== pathBefore) window.scrollTo(0, 0);
+      applyAllDesigners(); // after the address has changed, so it knows which page it is on
       target = null;
       document.dispatchEvent(new CustomEvent('plp:results-updated'));
     } catch (err) {
