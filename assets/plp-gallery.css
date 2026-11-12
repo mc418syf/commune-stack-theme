@@ -1,4 +1,4 @@
-/* gallery v30 */
+/* gallery v31 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 
@@ -135,4 +135,10 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   /* nothing else of the page takes part in the scroll */
   html.plp-gallery-on #filterable.collection { margin: 0 !important; padding: 0 !important; border: 0; }
   html.plp-gallery-on [data-plp-head], html.plp-gallery-on .shopify-section-group-footer-group, html.plp-gallery-on .plp-top { display: none !important; }
+}
+
+/* Phones, gallery view: the filter sheet (and the top bar row above it) uses the gallery grey instead of the paper colour */
+@media (max-width: 767px) {
+  html.plp-gallery-on .plp-fp { --pf-paper: var(--gallery-bg, #DDDDDD); }
+  html.plp-gallery-on .plp-strip-s.is-open { background: var(--gallery-bg, #DDDDDD); }
 }
