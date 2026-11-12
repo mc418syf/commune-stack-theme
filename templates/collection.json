@@ -25,7 +25,7 @@
         "description_color_scheme": "scheme1",
         "product_tile_type": "standard",
         "grid": 4,
-        "rows": 12,
+        "rows": 10,
         "grid_mobile": "2",
         "product_grid_gap": 6,
         "product_grid_side_margin": 0,

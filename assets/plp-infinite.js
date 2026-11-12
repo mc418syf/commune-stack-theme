@@ -65,7 +65,7 @@
   // Pages already fetched in this tab are kept for a few minutes (only the product list and the next link, not the whole page),
   // so coming back from a product does not download them all again
   const PAGE_TTL = 10 * 60 * 1000;
-  const cacheKey = (href) => 'plp-page:' + withPreview(href);
+  const cacheKey = (href) => 'plp-page:v2:' + withPreview(href);
   function readCached(href) {
     try {
       const hit = JSON.parse(sessionStorage.getItem(cacheKey(href)));
@@ -422,6 +422,13 @@
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') write({ y: Math.round(scrollY), lastPage: feed.last || startPage(), layout: captureLayout() }, true);
   });
+  // A tile swiped to its second image (phones) must not stay there when the page is shown again from the back button
+  const resetTiles = () => document.querySelectorAll('.plp-snap-track').forEach((t) => {
+    if (t.scrollLeft) { t.style.scrollBehavior = 'auto'; t.scrollLeft = 0; }
+  });
+  addEventListener('pagehide', resetTiles);
+  addEventListener('pageshow', (e) => { if (e.persisted) resetTiles(); });
+
   addEventListener('pageshow', (e) => {
     if (!e.persisted || !feed.grid) return;
     const saved = read();
