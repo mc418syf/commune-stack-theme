@@ -25,7 +25,7 @@
 }
 .plp-trigger__t { display: block; min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .plp-t__d { color: var(--pf-ink); }
-.plp-t__d--sel { color: var(--pf-dark); }
+.plp-t__d--sel { color: var(--pf-ink); }
 .plp-t__r { color: var(--pf-gray); }
 .plp-trigger:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 2px; }
 @media (max-width: 767px) { .plp-trigger { max-width: 170px; } }
