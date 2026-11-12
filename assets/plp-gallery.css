@@ -1,4 +1,4 @@
-/* gallery v26 */
+/* gallery v27 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 
@@ -108,3 +108,26 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   html.plp-gallery-on .edge-strip[data-sticky='true']::before { left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { html.plp-gallery-on .edge-strip::before { transition: none; } }
+
+/* ---- Phones: the gallery scrolls with the page ----
+   A mobile browser hides its address bar and toolbar only when the page itself scrolls. So on phones the feed is not a
+   scrolling box of its own: each product is one screen of the page, the page snaps from one to the next, and the name
+   card, the header strip and the brand note are fixed to the screen. (plp-gallery.js reads the page scroll here.) */
+@media (max-width: 767px) {
+  html.plp-gallery-on { scroll-snap-type: y mandatory; }
+  html.plp-gallery-on .plp-gallery { position: static; display: block; padding: 0; }
+  html.plp-gallery-on .plp-gallery__main { display: block; }
+  html.plp-gallery-on .plp-gallery__feed { overflow: visible; scroll-snap-type: none; }
+  /* One slide is as tall as the screen with the browser bars hidden. While the bars are still showing, the extra room
+     under the photo (100lvh - 100dvh) keeps the photo clear of the name card; it shrinks to nothing as the bars slide away. */
+  html.plp-gallery-on .plp-slide { height: 100vh; padding: var(--strip-h, 56px) 0 var(--pg-info-h, 110px); }
+  @supports (height: 100lvh) {
+    html.plp-gallery-on .plp-slide { height: 100lvh; padding-bottom: calc(var(--pg-info-h, 110px) + 100lvh - 100dvh); }
+  }
+  html.plp-gallery-on .plp-gallery__info { position: fixed; z-index: 11; left: var(--rail-w, 0px); right: 0; bottom: 0; }
+  html.plp-gallery-on .plp-gallery__brand { position: fixed; z-index: 12; top: var(--strip-h, 56px); left: var(--rail-w, 0px); right: 0; }
+  html.plp-gallery-on .edge-strip { position: fixed; left: var(--rail-w, 0px); right: 0; }
+  /* nothing else of the page takes part in the scroll */
+  html.plp-gallery-on #filterable.collection { margin: 0 !important; padding: 0 !important; border: 0; }
+  html.plp-gallery-on [data-plp-head], html.plp-gallery-on .shopify-section-group-footer-group, html.plp-gallery-on .plp-top { display: none !important; }
+}

@@ -56,6 +56,7 @@
     info = $('[data-pg-info]', root);
     brand = $('[data-pg-brand]', root);
     feed.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', () => { if (mode() === 'gallery' && pageMode()) onScroll(); }, { passive: true });
     root.addEventListener('click', (e) => {
       const t = e.target.closest('.plp-thumb');
       if (t) return go(Number(t.dataset.i));
@@ -77,6 +78,8 @@
     info.innerHTML = '<a class="plp-gallery__name" href="' + esc(it.url) + '"><span class="plp-gallery__vendor">' + esc(it.vendor) + '</span><span class="plp-gallery__title">' + esc(it.title) + '</span></a>' +
       '<div class="plp-gallery__price">' + esc(it.available ? it.price : 'Sold out') + '</div>' +
       '';
+    // phones: the card is fixed at the bottom of the screen; every slide keeps that much room free under its photo
+    if (root) root.style.setProperty('--pg-info-h', info.offsetHeight + 'px');
   }
 
   function thumbHTML(it, i) {
@@ -92,7 +95,24 @@
     });
   }
 
+  // Phones: the gallery scrolls with the page itself instead of inside its own box. A mobile browser only hides its
+  // address bar and toolbar when the page scrolls, so this is what makes the gallery go full screen after the first swipe.
+  const pageMq = window.matchMedia('(max-width: 767px)');
+  const pageMode = () => pageMq.matches;
+  const feedTop = () => feed.getBoundingClientRect().top + window.scrollY; // where the first slide starts on the page
+  const getTop = () => (pageMode() ? window.scrollY - feedTop() : feed.scrollTop);
+  const setTop = (v) => { if (pageMode()) window.scrollTo(0, feedTop() + v); else feed.scrollTop = v; };
+  const smoothTo = (v) => {
+    const o = { top: (pageMode() ? feedTop() : 0) + v, behavior: reduce ? 'auto' : 'smooth' };
+    if (pageMode()) window.scrollTo(o); else feed.scrollTo(o);
+  };
+  const snapEl = () => (pageMode() ? html : feed);
+
   function slideHeight() {
+    if (pageMode()) {
+      const s = feed.querySelector('.plp-slide');
+      return (s && s.offsetHeight) || window.innerHeight || 1;
+    }
     return feed.clientHeight || 1;
   }
 
@@ -100,9 +120,10 @@
 
   // jumps must not be pulled back by scroll snapping
   function noSnap(fn) {
-    feed.style.scrollSnapType = 'none';
+    const el = snapEl();
+    el.style.scrollSnapType = 'none';
     fn();
-    setTimeout(() => { feed.style.scrollSnapType = ''; }, 60);
+    setTimeout(() => { el.style.scrollSnapType = ''; }, 60);
   }
 
   // Once every page is loaded the feed loops: the last slide is repeated before the first and the first after the last
@@ -113,10 +134,10 @@
       if (want) {
         feed.insertAdjacentHTML('afterbegin', slideHTML(items[items.length - 1], items.length - 1, true));
         feed.insertAdjacentHTML('beforeend', slideHTML(items[0], 0, true));
-        feed.scrollTop += slideHeight();
+        setTop(getTop() + slideHeight());
       } else {
         $$('.plp-slide--clone', feed).forEach((c) => c.remove());
-        feed.scrollTop -= slideHeight();
+        setTop(getTop() - slideHeight());
       }
     });
     lead = want;
@@ -126,10 +147,11 @@
   function settle() {
     if (!lead || !feed) return;
     const h = slideHeight();
-    const p = Math.round(feed.scrollTop / h);
-    if (Math.abs(feed.scrollTop - p * h) > 2) return;
-    if (p === 0) noSnap(() => { feed.scrollTop = items.length * h; });
-    else if (p === items.length + 1) noSnap(() => { feed.scrollTop = h; });
+    const top = getTop();
+    const p = Math.round(top / h);
+    if (Math.abs(top - p * h) > 2) return;
+    if (p === 0) noSnap(() => { setTop(items.length * h); });
+    else if (p === items.length + 1) noSnap(() => { setTop(h); });
   }
 
   function onScroll() {
@@ -140,7 +162,7 @@
     // a timer, not requestAnimationFrame: rAF stops in background tabs
     setTimeout(() => {
       ticking = false;
-      const p = Math.round(feed.scrollTop / slideHeight());
+      const p = Math.round(getTop() / slideHeight());
       let i = lead ? p - 1 : p;
       if (lead) {
         if (i < 0) i = items.length - 1;
@@ -163,7 +185,7 @@
     else if (i >= items.length) p = lead ? items.length + 1 : -1;
     else p = pos(i);
     if (p < 0) return;
-    feed.scrollTo({ top: p * slideHeight(), behavior: reduce ? 'auto' : 'smooth' });
+    smoothTo(p * slideHeight());
   }
 
   async function more() {
@@ -233,7 +255,7 @@
     ends();
     // the feed has a height only once the gallery is displayed
     setTimeout(() => {
-      noSnap(() => { feed.scrollTop = pos(index) * slideHeight(); });
+      noSnap(() => { setTop(pos(index) * slideHeight()); });
       markCurrent();
     }, 30);
     if (index >= items.length - 6) more();
@@ -296,7 +318,14 @@
     if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
     if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
   });
-  window.addEventListener('resize', () => { if (mode() === 'gallery' && feed) feed.scrollTop = pos(index) * slideHeight(); });
+  // A phone fires "resize" every time its toolbar hides or shows; only a real change of width (rotation) needs repositioning there
+  let lastW = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (mode() !== 'gallery' || !feed) return;
+    if (pageMode() && window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
+    noSnap(() => { setTop(pos(index) * slideHeight()); });
+  });
   // filters, sold-out switch and sorting swap the results: rebuild the gallery from them
   document.addEventListener('plp:results-updated', () => {
     syncToggle();
