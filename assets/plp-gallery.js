@@ -252,6 +252,7 @@
     const h = pageMode() && brand.firstElementChild && !brand.querySelector('.brand-note.is-open') ? brand.offsetHeight : null;
     if (h !== null) root.style.setProperty('--pg-brand-h', h + 'px');
     else if (!pageMode() || !brand.firstElementChild) root.style.setProperty('--pg-brand-h', '0px');
+    root.classList.toggle('has-brand', !!brand.firstElementChild);
   }
 
   function open() {

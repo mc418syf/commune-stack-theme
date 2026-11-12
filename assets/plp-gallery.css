@@ -1,4 +1,4 @@
-/* gallery v29 */
+/* gallery v30 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 
@@ -126,6 +126,9 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   @supports (height: 100lvh) {
     html.plp-gallery-on .plp-slide { height: 100lvh; padding-bottom: calc(var(--pg-info-h, 110px) + 100lvh - 100svh); }
   }
+  /* With a brand note above, the photo sits at the bottom of its space (against the name card), leaving the gap under the note:
+     centred, it would touch the note and the hanger would look cut off by it. */
+  html.plp-gallery-on .plp-gallery.has-brand .plp-slide__img { align-items: flex-end; }
   html.plp-gallery-on .plp-gallery__info { position: fixed; z-index: 11; left: var(--rail-w, 0px); right: 0; bottom: 0; }
   html.plp-gallery-on .plp-gallery__brand { position: fixed; z-index: 12; top: var(--strip-h, 56px); left: var(--rail-w, 0px); right: 0; }
   html.plp-gallery-on .edge-strip { position: fixed; left: var(--rail-w, 0px); right: 0; }
