@@ -180,7 +180,36 @@
     }
     setCount('cart', cart.item_count);
     renderCart();
+    syncAddButton();
   }
+
+  // PDP: the button reads "Added to cart" whenever the chosen variant is already in the cart (also after a reload)
+  function productData(btn) {
+    let el = btn;
+    while (el) {
+      el = el.parentElement && el.parentElement.closest('[x-data]');
+      if (!el) break;
+      try {
+        const d = window.Alpine && window.Alpine.$data(el);
+        if (d && 'addedToCart' in d) return d;
+      } catch (_) { /* not ready */ }
+    }
+    return null;
+  }
+  function syncAddButton() {
+    const btn = $('#addToCartButton');
+    if (!btn || !cart || !cart.items) return;
+    const data = productData(btn);
+    if (!data) return;
+    const form = btn.closest('form');
+    const idEl = form && form.querySelector('[name="id"]');
+    const vid = idEl ? Number(idEl.value) : 0;
+    data.addedToCart = !!vid && cart.items.some((i) => i.variant_id === vid);
+  }
+  document.addEventListener('change', (e) => {
+    if (e.target.closest && e.target.closest('form[action*="/cart/add"]')) setTimeout(syncAddButton, 150);
+  });
+  document.addEventListener('alpine:initialized', () => setTimeout(syncAddButton, 0));
 
   function lineRef(sku, variantTitle) {
     const parts = [];
@@ -280,6 +309,7 @@
     cart = await res.json();
     setCount('cart', cart.item_count);
     renderCart();
+    syncAddButton();
   }
 
   async function onAction(btn) {
@@ -428,7 +458,7 @@
   setCount('try', tryItems().length);
   fetch('/cart.js', { headers: { Accept: 'application/json' } })
     .then((r) => r.json())
-    .then((c) => { cart = c; setCount('cart', c.item_count); })
+    .then((c) => { cart = c; setCount('cart', c.item_count); syncAddButton(); })
     .catch(() => {});
 
   document.addEventListener('alpine:initialized', () => {
