@@ -1,4 +1,4 @@
-/* gallery v25 */
+/* gallery v26 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 
@@ -37,7 +37,11 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
 /* Phones: no thumbnails; the info card sits under the images and stays put */
 @media (max-width: 767px) {
   .plp-gallery__thumbs { display: none; }
-  .plp-slide { padding-bottom: 0; }
+  /* The photo fills the whole image area, edge to edge. A 3:4 photo is narrower than the area is tall, so "contain" left
+     empty bands above and below it; "cover" trims a little off the left and right instead. */
+  .plp-slide { padding: 0; }
+  .plp-slide__img { width: 100%; }
+  .plp-slide__img img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
   .plp-gallery__info { position: static; flex: none; width: auto; padding: 12px var(--gut, 16px) calc(28px + env(safe-area-inset-bottom)); background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
 }
 @media (prefers-reduced-motion: reduce) { .plp-gallery__feed { scroll-behavior: auto; } }
