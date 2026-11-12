@@ -1,4 +1,4 @@
-/* gallery v28 */
+/* gallery v29 */
 /* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
    each with a small info card and Add to cart, and every product as a thumbnail row below */
 
@@ -40,8 +40,9 @@ html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-si
   /* The photo is the same size as a product tile in the one-per-row phone listing: the full width, in a 3:4 box (the listing's
      "natural" size setting uses 0.75). The rest of the screen is padding around it (see the page-scroll block below). */
   .plp-slide { padding: 0; }
-  .plp-slide__img { width: 100%; height: auto; max-height: 100%; }
-  .plp-slide__img img { width: 100%; height: auto; max-width: none; max-height: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+  .plp-slide__img { width: 100%; height: 100%; }
+  /* full width in a 3:4 box; when the brand note takes room above, the photo shrinks in proportion (never cropped, never covered) */
+  .plp-slide__img img { width: auto; height: auto; max-width: 100%; max-height: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
   .plp-gallery__info { position: static; flex: none; width: auto; padding: 12px var(--gut, 16px) calc(28px + env(safe-area-inset-bottom)); background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
 }
 @media (prefers-reduced-motion: reduce) { .plp-gallery__feed { scroll-behavior: auto; } }
@@ -121,7 +122,7 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   /* One slide is as tall as the screen with the browser bars hidden (lvh). The photo keeps the size it has with the bars showing
      (svh minus the header strip and the name card) and never changes while the bars slide away: the extra height
      (100lvh - 100svh) is padding under the photo, so the screen is full without resizing the picture. */
-  html.plp-gallery-on .plp-slide { height: 100vh; padding: var(--strip-h, 56px) 0 var(--pg-info-h, 110px); }
+  html.plp-gallery-on .plp-slide { height: 100vh; padding: calc(var(--strip-h, 56px) + var(--pg-brand-h, 0px)) 0 var(--pg-info-h, 110px); }
   @supports (height: 100lvh) {
     html.plp-gallery-on .plp-slide { height: 100lvh; padding-bottom: calc(var(--pg-info-h, 110px) + 100lvh - 100svh); }
   }

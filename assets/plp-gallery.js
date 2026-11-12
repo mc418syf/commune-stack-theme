@@ -242,6 +242,16 @@
     if (!brand) return;
     const n = $('#results [data-brand-note]');
     brand.innerHTML = n ? n.outerHTML : '';
+    syncBrandH();
+  }
+
+  // Phones: the brand note is fixed under the header strip, so every slide keeps that much room free above its photo
+  // (the note never covers a product). An opened note lies over the photo while it is being read, as before.
+  function syncBrandH() {
+    if (!root || !brand) return;
+    const h = pageMode() && brand.firstElementChild && !brand.querySelector('.brand-note.is-open') ? brand.offsetHeight : null;
+    if (h !== null) root.style.setProperty('--pg-brand-h', h + 'px');
+    else if (!pageMode() || !brand.firstElementChild) root.style.setProperty('--pg-brand-h', '0px');
   }
 
   function open() {
@@ -266,6 +276,8 @@
       markCurrent();
     }, 30);
     if (index >= items.length - 6) more();
+    syncBrandH();
+    setTimeout(syncBrandH, 400);
     if (resumeUrl) {
       const url = resumeUrl;
       resumeUrl = null;
@@ -376,6 +388,7 @@
     if (mode() !== 'gallery' || !feed) return;
     if (pageMode() && window.innerWidth === lastW) return;
     lastW = window.innerWidth;
+    syncBrandH();
     noSnap(() => { setTop(pos(index) * slideHeight()); });
   });
   // filters, sold-out switch and sorting swap the results: rebuild the gallery from them
