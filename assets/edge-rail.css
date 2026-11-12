@@ -110,7 +110,9 @@ html.edge-locked { overflow: hidden; }
 #results .edge-soldtag { display: none; }
 #results .product-card--sold-out .product-tile-price > :not(.edge-soldout) { display: none; }
 #results .product-card--sold-out .product-tile-price .edge-soldout::before { content: none; }
-html.edge-busy #results { opacity: 0.4; transition: opacity 0.15s; }
+/* the transition stays on after loading, so the new results fade up from the dimmed state instead of snapping (no flash when a filter is chosen) */
+#results { transition: opacity 0.22s ease; }
+html.edge-busy #results { opacity: 0.4; }
 html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { display: none; }
 
 /* Sticky logo strip (Header > Sticky logo strip): transparent, sits over the page and stays while scrolling; only the logo and summary take clicks */
