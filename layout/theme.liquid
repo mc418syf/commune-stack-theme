@@ -77,8 +77,6 @@
     {%- endunless -%}
 
     {%- liquid
-      assign title_lower = page_title | downcase
-      assign shop_name_lower = shop.name | downcase
       assign seo_description = page_description | default: shop.description
     -%}
     <title>
@@ -87,9 +85,6 @@
         &ndash; tagged "{{ current_tags | join: ', ' }}"
       {%- endif -%}
       {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- unless title_lower contains shop_name_lower %}
-        &ndash; {{ shop.name -}}
-      {%- endunless -%}
     </title>
 
     {% if seo_description != blank %}
