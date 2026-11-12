@@ -62,8 +62,10 @@
         "menu_footer_links": true,
         "menu_newsletter": true,
         "menu_social": true,
+        "book_button_label": "Book a visit",
         "menu_legal_line": "© 2026 Commune.",
-        "menu_legal_address": "237 Keefer Street, Vancouver, BC"
+        "menu_legal_address": "",
+        "menu_legal_address_link": ""
       }
     }
   },
