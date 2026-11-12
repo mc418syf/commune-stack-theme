@@ -37,7 +37,9 @@
   function size() {
     if (desktop.matches) {
       fp.style.maxHeight = '';
-      const w = parseFloat(getComputedStyle(fp).getPropertyValue('--pf-w')) || 342;
+      // --pf-w is a formula (a quarter of the screen, at least 280px), so it cannot be read as a number: measure the panel itself.
+      // (Before, the fallback 342px was used on every screen, so on a wide screen the gallery slid under the panel and lost its left padding.)
+      const w = (inner && inner.offsetWidth) || parseFloat(getComputedStyle(fp).getPropertyValue('--pf-w')) || 342;
       html.style.setProperty('--plp-panel-w', isOpen ? w + 'px' : '0px');
       html.style.setProperty('--plp-panel-h', '0px');
       return;
