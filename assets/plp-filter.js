@@ -83,6 +83,9 @@
     timer = setTimeout(commit, ms);
   }
 
+  // false: choosing a designer filters the page in place (no jump to the brand's own page, no redirect of old filter links)
+  const BRAND_REDIRECT = false;
+
   /* On a brand collection page the Designer list shows every designer (taken from the All page) and works as navigation */
   const ALL_KEY = 'plp-all-designers:v2';
   // The collection comes from the page address as well (not only from the panel's attribute), including market prefixes like /en-ca
@@ -154,14 +157,15 @@
     u.searchParams.delete(param);
     if (btn.hasAttribute('data-single') && onBrandPage()) {
       // the designer list is a menu here: another brand opens its own page, the current one goes back to All
-      const to = new URL(on ? allUrl() : (btn.dataset.brandUrl || allUrl()), location.origin);
+      const brandUrl = BRAND_REDIRECT ? btn.dataset.brandUrl : '';
+      const to = new URL(on ? allUrl() : (brandUrl || allUrl()), location.origin);
       u.searchParams.delete(param);
       u.searchParams.forEach((val, key) => { if (key !== 'q' && key !== 'page') to.searchParams.append(key, val); });
-      if (!on && !btn.dataset.brandUrl) to.searchParams.set(param, value);
+      if (!on && !brandUrl) to.searchParams.set(param, value);
       window.location.href = to.pathname + to.search;
       return;
     }
-    if (btn.hasAttribute('data-single') && btn.dataset.brandUrl) {
+    if (BRAND_REDIRECT && btn.hasAttribute('data-single') && btn.dataset.brandUrl) {
       // choosing a designer opens that brand's own page (own URL for SEO); other filters and sort carry over
       const keep = new URL(btn.dataset.brandUrl, location.origin);
       if (!on) {
@@ -425,6 +429,7 @@
 
   /* An old or shared filter link (?filter.p.vendor=X) moves to the brand's own page when that page exists. */
   (function toBrandPage() {
+    if (!BRAND_REDIRECT) return;
     const sel = $$('[data-plp-opt][data-single][aria-pressed="true"][data-brand-url]');
     const u = new URL(location.href);
     if (sel.length !== 1 || u.searchParams.getAll(sel[0].dataset.param).length !== 1) return;
