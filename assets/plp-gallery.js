@@ -24,6 +24,13 @@
   let lead = false; // true while the feed has a copy of the last slide in front and of the first slide behind (so it can loop)
   let settleTimer = 0;
   let pendingUrl = null; // the product to start on when the gallery opens
+  let resumeUrl = null; // the product that was opened from the gallery: Back (or a reload) returns to it
+  const LAST_KEY = 'plp-gallery-last';
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    const last = JSON.parse(sessionStorage.getItem(LAST_KEY));
+    if (nav && nav.type === 'back_forward' && last && last.page === location.pathname + location.search) resumeUrl = last.url;
+  } catch (_) { /* storage blocked */ }
 
   const read = (el) => {
     const d = el.dataset;
@@ -259,6 +266,38 @@
       markCurrent();
     }, 30);
     if (index >= items.length - 6) more();
+    if (resumeUrl) {
+      const url = resumeUrl;
+      resumeUrl = null;
+      resume(url);
+    }
+  }
+
+  // Coming back from a product page: load pages of the listing until that product is in the feed, then stand on it.
+  // The feed stays invisible meanwhile so nobody sees it jump.
+  async function resume(url) {
+    if (root) root.style.visibility = 'hidden';
+    let moved = false;
+    const mark = () => { moved = true; };
+    ['wheel', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, mark, { once: true, passive: true }));
+    const started = Date.now();
+    try {
+      while (items.findIndex((it) => it.url === url) < 0 && next && Date.now() - started < 8000) {
+        if (loading) await new Promise((r) => setTimeout(r, 50));
+        else await more();
+      }
+    } catch (_) { /* show it where it is */ }
+    const place = () => {
+      const k = items.findIndex((it) => it.url === url);
+      if (k < 0 || !feed || mode() !== 'gallery') return;
+      index = k;
+      noSnap(() => { setTop(pos(k) * slideHeight()); });
+      markCurrent();
+    };
+    place();
+    if (root) root.style.visibility = '';
+    // the listing's own scroll restore may run a moment later: stand on the product again unless the visitor has moved
+    [250, 700, 1500].forEach((ms) => setTimeout(() => { if (!moved) place(); }, ms));
   }
 
   // The rail button shows the view you would switch to: the gallery icon in grid view, the grid icon in gallery view
@@ -302,6 +341,19 @@
     syncToggle();
   }
 
+  // Remember which product was opened from the gallery (and name the listing for the product page's <Back> button)
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('.plp-slide__img, .plp-gallery__name');
+    if (!a || !a.getAttribute('href')) return;
+    const url = a.getAttribute('href');
+    try {
+      sessionStorage.setItem(LAST_KEY, JSON.stringify({ page: location.pathname + location.search, url }));
+      const lab = document.querySelector('[data-plp-trigger-label] .plp-t__d');
+      let name = ((lab && lab.textContent) || '').trim().replace(/^</, '').replace(/>$/, '');
+      if (!name || /^filter$/i.test(name)) name = 'All';
+      sessionStorage.setItem('plp-last', JSON.stringify({ url: location.pathname + location.search, label: name }));
+    } catch (_) { /* storage blocked */ }
+  });
   document.addEventListener('click', (e) => {
     const note = e.target.closest('.brand-note');
     if (note && !e.target.closest('a')) {

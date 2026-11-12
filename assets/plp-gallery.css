@@ -118,11 +118,12 @@ html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
   html.plp-gallery-on .plp-gallery { position: static; display: block; padding: 0; }
   html.plp-gallery-on .plp-gallery__main { display: block; }
   html.plp-gallery-on .plp-gallery__feed { overflow: visible; scroll-snap-type: none; }
-  /* One slide is as tall as the screen with the browser bars hidden. While the bars are still showing, the extra room
-     under the photo (100lvh - 100dvh) keeps the photo clear of the name card; it shrinks to nothing as the bars slide away. */
+  /* One slide is as tall as the screen with the browser bars hidden (lvh). The photo keeps the size it has with the bars showing
+     (svh minus the header strip and the name card) and never changes while the bars slide away: the extra height
+     (100lvh - 100svh) is padding under the photo, so the screen is full without resizing the picture. */
   html.plp-gallery-on .plp-slide { height: 100vh; padding: var(--strip-h, 56px) 0 var(--pg-info-h, 110px); }
   @supports (height: 100lvh) {
-    html.plp-gallery-on .plp-slide { height: 100lvh; padding-bottom: calc(var(--pg-info-h, 110px) + 100lvh - 100dvh); }
+    html.plp-gallery-on .plp-slide { height: 100lvh; padding-bottom: calc(var(--pg-info-h, 110px) + 100lvh - 100svh); }
   }
   html.plp-gallery-on .plp-gallery__info { position: fixed; z-index: 11; left: var(--rail-w, 0px); right: 0; bottom: 0; }
   html.plp-gallery-on .plp-gallery__brand { position: fixed; z-index: 12; top: var(--strip-h, 56px); left: var(--rail-w, 0px); right: 0; }
