@@ -301,3 +301,9 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
   .splide--product .splide__list,
   .splide--product .splide__slide { touch-action: pan-y pinch-zoom; }
 }
+
+/* PDP back button on phones: fades out while scrolling down so it does not lie over the title */
+.edge-back { transition: opacity 0.2s ease; }
+@media (max-width: 767px) {
+  .edge-back.is-hidden { opacity: 0; pointer-events: none; }
+}

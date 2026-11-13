@@ -505,6 +505,17 @@
       }
       window.location.href = b.dataset.fallback || '/collections/all';
     });
+
+    // Phones: the bar is see-through, so the button would lie over the title while reading.
+    // It hides while scrolling down and comes back on the way up (and at the top).
+    let lastY = window.scrollY;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      const dy = y - lastY;
+      if (y < 60 || dy < -4) b.classList.remove('is-hidden');
+      else if (dy > 4) b.classList.add('is-hidden');
+      if (Math.abs(dy) > 4) lastY = y;
+    }, { passive: true });
   })();
 
   /* ---------- init ---------- */

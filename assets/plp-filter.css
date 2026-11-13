@@ -158,8 +158,8 @@
 .plp-o[aria-disabled='true'] { cursor: default; }
 .plp-o:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -2px; }
 
-/* Footer: one thin row, about 24px high */
-.plp-f__foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; min-height: 24px; padding: 0 12px; border-top: 1px dashed var(--pf-dash); }
+/* Footer: one row, 28px high like the rows of the filter lists */
+.plp-f__foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; min-height: 28px; padding: 0 12px; border-top: 1px dashed var(--pf-dash); }
 .plp-f__clear {
   display: inline-flex; align-items: center; font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--pf-ink); text-decoration: underline; text-underline-offset: 3px;
