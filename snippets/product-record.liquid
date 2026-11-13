@@ -2,11 +2,12 @@
   Turns the text of a measurement metafield (passed in as `source`) into dashed list rows.
 
   Format (one per line):
-    - Chest: 49cm/19.5in          -> a row shown as <49 CM (19.5 IN)>
+    - Chest: 49cm/19.5in          -> a row shown as <49 CM / 19.5 IN>
     - Material: 100% cotton       -> a row shown as <100% COTTON>
   A "Size 36." line becomes a Size row (<36>).
   Rows keep the order they are written in.
   Every value is escaped; nothing from the metafield is output raw.
+  escape_once, not escape: metafield_text already turns an apostrophe into &#39;, and escaping that again printed "MEN&#39;S" on the page.
 
   Output: <li> rows only, nothing when there are none. The caller wraps them in <ul class="record">.
 {%- endcomment -%}
@@ -46,7 +47,7 @@
     {%- if size_text.size > 0 -%}
       {%- assign size_value = size_text -%}
       {%- capture size_row -%}
-        <li class="record__row"><span class="record__label">Size</span><span class="record__value">&lt;{{ size_text | escape }}&gt;</span></li>
+        <li class="record__row"><span class="record__label">Size</span><span class="record__value">&lt;{{ size_text | escape_once }}&gt;</span></li>
       {%- endcapture -%}
       {%- assign ordered_rows = ordered_rows | append: size_row -%}
     {%- endif -%}
@@ -80,11 +81,11 @@
           {%- assign right_number = right | remove: right_unit | strip -%}
           {%- assign right_text = right_number | append: ' ' | append: right_unit -%}
         {%- endif -%}
-        {%- assign display_value = left_text | append: ' (' | append: right_text | append: ')' -%}
+        {%- assign display_value = left_text | append: ' / ' | append: right_text -%}
       {%- endif -%}
 
       {%- capture row -%}
-        <li class="record__row"><span class="record__label">{{ label | escape }}</span><span class="record__value">&lt;{{ display_value | escape }}&gt;</span></li>
+        <li class="record__row"><span class="record__label">{{ label | escape_once }}</span><span class="record__value">&lt;{{ display_value | escape_once }}&gt;</span></li>
       {%- endcapture -%}
 
       {%- assign ordered_rows = ordered_rows | append: row -%}

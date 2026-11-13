@@ -438,9 +438,16 @@
     if (mode() === 'gallery') { index = 0; open(); }
   });
 
+  // Opening a listing (Shop All from the menu, a brand, a link) starts in grid view. The view chosen last is only
+  // brought back when the same page is shown again: Back from a product, or a reload.
   let saved = null;
-  try { saved = localStorage.getItem(KEY); } catch (_) {}
-  if (saved === 'gallery') setMode('gallery', true);
+  let again = false;
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    again = !!nav && (nav.type === 'back_forward' || nav.type === 'reload');
+    saved = localStorage.getItem(KEY);
+  } catch (_) {}
+  if (saved === 'gallery' && again) setMode('gallery', true);
   else syncToggle();
 })();
 /* brand note v5 */
