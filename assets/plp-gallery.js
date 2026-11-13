@@ -219,6 +219,24 @@
     watchEnd();
   }
 
+  // A small listing (a brand with a few pages) is loaded whole right away, so the feed can loop from the very first slide:
+  // swiping down on the first product lands on the last one. A big listing (All) still loops only once its end is reached.
+  const lastPageOf = (doc) => {
+    let last = 1;
+    doc.querySelectorAll('#results [data-plp-pagination] a[href*="page="]').forEach((a) => {
+      const n = parseInt(new URL(a.getAttribute('href'), location.origin).searchParams.get('page'), 10);
+      if (n > last) last = n;
+    });
+    return last;
+  };
+  async function loadSmall() {
+    if (!next || lastPageOf(document) > 4) return;
+    for (let guard = 0; next && guard < 60; guard++) {
+      if (loading) await new Promise((r) => setTimeout(r, 120));
+      else await more();
+    }
+  }
+
   // A second way to notice the end is near, next to the scroll position: the last few slides coming into view.
   // It does not depend on scroll events, so a phone browser that reports them late (or not at all) still loads the next page.
   let endWatch = null;
@@ -291,6 +309,7 @@
       markCurrent();
     }, 30);
     if (index >= items.length - 6) more();
+    loadSmall();
     syncBrandH();
     setTimeout(syncBrandH, 400);
     if (resumeUrl) {
