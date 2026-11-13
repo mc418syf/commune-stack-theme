@@ -1,0 +1,476 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+
+  assign mobile_ratio = section.settings.mobile_ratio
+  assign ratio_mode = 'fixed'
+  if mobile_ratio == 'fill'
+    assign ratio_mode = 'fill'
+  elsif mobile_ratio == 'original'
+    assign ratio_mode = 'original'
+  endif
+-%}
+
+<section
+  class="split bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+  data-split-screens
+  data-snap="{{ section.settings.snap }}"
+  data-mobile-ratio="{{ ratio_mode }}"
+  data-mobile-layout="{{ section.settings.mobile_layout }}"
+  data-haptics="{{ section.settings.mobile_haptics }}"
+  style="--split-h-desktop: {{ section.settings.height_desktop }}vh; --split-h-mobile: {{ section.settings.height_mobile }}svh; --split-gap: {{ section.settings.gap }}px;{% if ratio_mode == 'fixed' %} --split-ratio: {{ mobile_ratio }};{% endif %}"
+>
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign pair_position = forloop.index0 | modulo: 2
+      assign media_type = block.settings.media_type
+      assign image = block.settings.image
+      assign video = block.settings.video
+      assign heading = block.settings.heading
+      assign subheading = block.settings.subheading
+      assign button_label = block.settings.button_label
+      assign link = block.settings.link
+      assign alt_text = image.alt | default: heading
+      assign panel_ratio = image.aspect_ratio | default: video.aspect_ratio | default: 0.8
+      assign eager = false
+      assign loading_attr = 'lazy'
+      if forloop.index <= 2 and section.index <= 2
+        assign eager = true
+        assign loading_attr = 'eager'
+      endif
+      assign tag = 'div'
+      if link != blank
+        assign tag = 'a'
+      endif
+    -%}
+
+    {%- if pair_position == 0 -%}
+      <div class="split__screen">
+    {%- endif -%}
+
+    <{{ tag }}
+      class="split__panel group"
+      {% if link != blank %}href="{{ link }}"{% endif %}
+      style="--split-ar: {{ panel_ratio }}; --split-text-color: {{ block.settings.text_color }}; --split-overlay: {{ block.settings.overlay | divided_by: 100.0 }};"
+      {{ block.shopify_attributes }}
+    >
+      {%- if media_type == 'video' and video != blank -%}
+        <video
+          class="split__media"
+          muted
+          loop
+          playsinline
+          preload="{% if eager %}auto{% else %}none{% endif %}"
+          {% if eager %}autoplay{% endif %}
+          {% if video.preview_image %}poster="{{ video.preview_image | image_url: width: 1600 }}"{% endif %}
+          aria-label="{{ heading | default: video.alt | escape }}"
+        >
+          {%- for source in video.sources -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {%- endfor -%}
+        </video>
+      {%- elsif image != blank -%}
+        {{
+          image
+          | image_url: width: 1600
+          | image_tag:
+            loading: loading_attr,
+            widths: '600, 900, 1200, 1600',
+            sizes: '(min-width: 750px) 50vw, 100vw',
+            class: 'split__media',
+            alt: alt_text
+        }}
+      {%- else -%}
+        <div class="split__media split__placeholder" aria-hidden="true"></div>
+      {%- endif -%}
+
+      {%- if heading != blank or subheading != blank or button_label != blank -%}
+        <div class="split__text split__text--v-{{ block.settings.text_vertical }} split__text--h-{{ block.settings.text_horizontal }} split__text--{{ block.settings.text_style }}">
+          {%- if heading != blank -%}
+            <h2 class="split__heading font-heading {{ block.settings.heading_size }}"><span>{{ heading | escape }}</span></h2>
+          {%- endif -%}
+          {%- if subheading != blank -%}
+            <p class="split__sub font-body {{ block.settings.subheading_size }}"><span>{{ subheading | escape }}</span></p>
+          {%- endif -%}
+          {%- if button_label != blank -%}
+            {%- if block.settings.button_style == 'link' -%}
+              <span class="split__cta theme-link inline-block"{% if block.settings.button_color != blank %} style="color: {{ block.settings.button_color }};"{% endif %}>{{ button_label | escape }}</span>
+            {%- else -%}
+              <span class="split__cta theme-button theme-button--in-group inline-block"{% if block.settings.button_color != blank %} style="color: {{ block.settings.button_color }};"{% endif %}>{{ button_label | escape }}</span>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </{{ tag }}>
+
+    {%- if pair_position == 1 or forloop.last -%}
+      {%- if pair_position == 0 -%}
+        <div class="split__panel split__panel--empty" aria-hidden="true"><div class="split__media split__placeholder"></div></div>
+      {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+</section>
+
+{{ 'split-screens.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'split-screens.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Split screens",
+  "tag": "section",
+  "class": "split-screens-section",
+  "disabled_on": {
+    "groups": [
+      "aside"
+    ]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add assets (images or videos). Every two assets make one screen: side by side on desktop, stacked on mobile with one screen per page and snap scrolling."
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Screen height (desktop)",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full screen (one asset per page)"
+        },
+        {
+          "value": "stacked",
+          "label": "Two assets stacked per page"
+        }
+      ],
+      "default": "full",
+      "info": "Full screen shows each asset on its own page and snaps from one to the next."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_haptics",
+      "label": "Vibrate when snapping to the next asset (mobile)",
+      "info": "A short haptic tick as each asset lands. Supported on Android browsers; iPhones don't allow web pages to vibrate. Off in the theme editor.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile image aspect ratio (stacked layout)",
+      "options": [
+        {
+          "value": "fill",
+          "label": "Fill the screen (two halves)"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "3 / 4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "2 / 3",
+          "label": "Tall portrait (2:3)"
+        },
+        {
+          "value": "4 / 3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "16 / 9",
+          "label": "Wide (16:9)"
+        },
+        {
+          "value": "original",
+          "label": "Original image ratio"
+        }
+      ],
+      "default": "fill",
+      "info": "Used when the mobile layout is Two assets stacked per page. Fill splits the screen height in half; other ratios size each asset from the screen width, so a screen can be shorter or taller than the phone."
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Screen height (mobile)",
+      "info": "Height of each asset on mobile in full screen layout, or of the pair when stacked and filling the screen.",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between the two assets",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "snap",
+      "label": "Snap scrolling",
+      "options": [
+        {
+          "value": "mobile",
+          "label": "Mobile only"
+        },
+        {
+          "value": "all",
+          "label": "Mobile and desktop"
+        },
+        {
+          "value": "off",
+          "label": "Off"
+        }
+      ],
+      "default": "mobile",
+      "info": "Each swipe or scroll lands on the next screen. Turned off inside the theme editor."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme",
+      "info": "Colors the highlighted text boxes."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "asset",
+      "name": "Asset",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "select",
+          "id": "media_type",
+          "label": "Media",
+          "options": [
+            {
+              "value": "image",
+              "label": "Image"
+            },
+            {
+              "value": "video",
+              "label": "Video"
+            }
+          ],
+          "default": "image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Also used as the poster while a video loads."
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Uploaded to Shopify (Content > Files). Plays muted on a loop."
+        },
+        {
+          "type": "header",
+          "content": "Text"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading size",
+          "options": [
+            {
+              "value": "text-heading-standard",
+              "label": "Standard"
+            },
+            {
+              "value": "text-heading-feature",
+              "label": "Feature"
+            },
+            {
+              "value": "text-heading-secondary",
+              "label": "Secondary"
+            }
+          ],
+          "default": "text-heading-standard",
+          "info": "Uses the theme's heading font and sizes."
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "select",
+          "id": "subheading_size",
+          "label": "Subheading size",
+          "options": [
+            {
+              "value": "text-base",
+              "label": "Base"
+            },
+            {
+              "value": "text-lg",
+              "label": "Large"
+            }
+          ],
+          "default": "text-base",
+          "info": "Uses the theme's body font."
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "label": "Text style",
+          "options": [
+            {
+              "value": "highlight",
+              "label": "Highlighted (boxed)"
+            },
+            {
+              "value": "plain",
+              "label": "Plain"
+            }
+          ],
+          "default": "highlight"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Plain text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "overlay",
+          "min": 0,
+          "max": 60,
+          "step": 5,
+          "unit": "%",
+          "label": "Darken media",
+          "info": "Helps plain text stay readable.",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Placement"
+        },
+        {
+          "type": "select",
+          "id": "text_vertical",
+          "label": "Vertical position",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ],
+          "default": "bottom"
+        },
+        {
+          "type": "select",
+          "id": "text_horizontal",
+          "label": "Horizontal position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Button and link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button text",
+          "info": "Leave empty to hide the button."
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "button",
+              "label": "Button"
+            },
+            {
+              "value": "link",
+              "label": "Link"
+            }
+          ],
+          "default": "button"
+        },
+        {
+          "type": "color",
+          "id": "button_color",
+          "label": "Button text color",
+          "info": "Leave unset to use the theme's button colors."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "The whole asset links here."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Split screens",
+      "blocks": [
+        {
+          "type": "asset"
+        },
+        {
+          "type": "asset"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

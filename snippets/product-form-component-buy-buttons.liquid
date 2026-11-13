@@ -110,7 +110,7 @@
     {%- endif -%}
 
     <div
-      class="add-to-cart-container {% unless quick_buy %} max-w-2xl mt-8{% endunless %}"
+      class="add-to-cart-container {% unless quick_buy %} max-w-2xl{% endunless %}"
     >
       {%- liquid
         unless quick_buy
@@ -131,7 +131,8 @@
         {% unless quick_buy %}
           :class="
             {
-              'opacity-50 cursor-not-allowed after:content-none': !currentVariantAvailable
+              'opacity-50 cursor-not-allowed after:content-none': !currentVariantAvailable,
+              'is-added': addedToCart
             }
           "
           :disabled="!currentVariantAvailable || loading"
@@ -151,7 +152,7 @@
           <template x-if="currentVariant">
             <span>
               <template x-if="currentVariantAvailable">
-                <span>
+                <span x-text="addedToCart ? {{ 'Added to cart' | json | escape }} : {{ 'products.product.add_to_cart' | t | json | escape }}">
                   {{- 'products.product.add_to_cart' | t -}}
                 </span>
               </template>
@@ -198,20 +199,6 @@
     </div>
   {% endform %}
 
-  {% if block and block.settings.show_pickup_availability %}
-    <template x-if="currentVariant && currentVariantAvailable">
-      <div
-        x-html="
-          $fetchedFragment(
-            `{{ routes.root_url }}variants/${currentVariantId}/?section_id=pickup-availability`,
-            '.pickup-availability',
-            'opacity-50'
-          )
-        "
-      ></div>
-    </template>
-  {% endif %}
-
   {% unless quick_buy %}
     {%- liquid
       assign show_try_on = false
@@ -227,6 +214,20 @@
       {% render 'try-on-button', product: product, label: try_on_label, block: block %}
     {% endif %}
   {% endunless %}
+
+  {% if block and block.settings.show_pickup_availability %}
+    <template x-if="currentVariant && currentVariantAvailable">
+      <div
+        x-html="
+          $fetchedFragment(
+            `{{ routes.root_url }}variants/${currentVariantId}/?section_id=pickup-availability`,
+            '.pickup-availability',
+            'opacity-50'
+          )
+        "
+      ></div>
+    </template>
+  {% endif %}
 </div>
 
 {% if settings.buttons_show_arrow %}

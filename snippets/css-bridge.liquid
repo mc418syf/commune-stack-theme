@@ -8,6 +8,29 @@
   assign heading_font = settings.font_heading
   assign heading_font_weight = heading_font.weight
   assign heading_font_style = heading_font.style
+
+  comment
+    Vendor and title weight. The two in-between choices keep the Regular weight and add a fine outline,
+    because the theme font has no Medium.
+  endcomment
+  assign name_weight_pdp = settings.product_name_weight_pdp | default: '600'
+  assign name_weight_card = settings.product_name_weight_card | default: '400'
+  assign name_font_pdp = heading_font | font_modify: 'weight', name_weight_pdp
+  assign name_font_card = heading_font | font_modify: 'weight', name_weight_card
+
+  assign record_tab_font = heading_font | font_modify: 'weight', '600'
+  assign record_button_font = body_font | font_modify: 'weight', '500'
+
+  assign product_info_choice = settings.product_info_weight | default: '500'
+  assign product_info_weight = product_info_choice
+  assign product_info_stroke = '0px'
+  if product_info_choice == '450'
+    assign product_info_weight = '400'
+    assign product_info_stroke = '0.25px'
+  elsif product_info_choice == '500'
+    assign product_info_weight = '400'
+    assign product_info_stroke = '0.45px'
+  endif
 -%}
 {% comment %} theme-check-disable AssetPreload {% endcomment %}
 {% comment %}
@@ -39,6 +62,10 @@
 {% style %}
   {{ body_font | font_face: font_display: 'swap' }}
   {{ heading_font | font_face: font_display: 'swap' }}
+  {% if name_font_pdp %}{{ name_font_pdp | font_face: font_display: 'swap' }}{% endif %}
+  {% if name_font_card %}{{ name_font_card | font_face: font_display: 'swap' }}{% endif %}
+  {% if record_tab_font %}{{ record_tab_font | font_face: font_display: 'swap' }}{% endif %}
+  {% if record_button_font %}{{ record_button_font | font_face: font_display: 'swap' }}{% endif %}
 
   {%- liquid
     if body_font_bold
@@ -202,6 +229,18 @@
     -%}
 
     :root {
+      --product-info-size: {{ settings.product_info_size | default: 12 }}px;
+      --product-info-weight: {{ product_info_weight }};
+      --product-info-stroke: {{ product_info_stroke }};
+      --product-name-weight-pdp: {{ name_weight_pdp }};
+      --product-name-weight-card: {{ name_weight_card }};
+      --product-card-offset: {{ settings.product_card_size_offset | default: 2 }}px;
+      --gallery-bg: {{ settings.gallery_bg | default: '#dddddd' }};
+      --recs-card-offset: {{ settings.recommendation_card_size_offset | default: 2 }}px;
+      --product-vendor-title-gap: {{ settings.product_vendor_title_gap | default: 6 }}px;
+      --product-title-price-gap: {{ settings.product_title_price_gap | default: 6 }}px;
+      --product-info-letterspacing: {{ settings.product_info_letterspacing | default: '-0.025em' }};
+      --product-price-size: {{ settings.product_price_size | default: 10 }}px;
 
       --font-size-xs: 0.64rem;
       --font-size-sm: 0.8rem;
@@ -396,4 +435,92 @@
       display: block;
     }
   }
+</style>
+
+{%- if settings.type_system == 'commune' -%}
+  {%- liquid
+    comment
+      Commune compact: every step is a whole pixel size, converted to rem for the chosen base font size.
+      xs 11, sm 12, base 13, lg 14, xl 18, 2xl 20, 3xl 28, 4xl 40, 5xl and up 64 (the type scale of the Commune type system)
+    endcomment
+    assign type_base = settings.base_font_size | times: 1.0
+  -%}
+  <style>
+    :root {
+      --font-size-xs: {{ 11 | divided_by: type_base }}rem;
+      --font-size-sm: {{ 12 | divided_by: type_base }}rem;
+      --font-size-base: {{ 13 | divided_by: type_base }}rem;
+      --font-size-lg: {{ 14 | divided_by: type_base }}rem;
+      --font-size-xl: {{ 18 | divided_by: type_base }}rem;
+      --font-size-2xl: {{ 20 | divided_by: type_base }}rem;
+      --font-size-3xl: {{ 28 | divided_by: type_base }}rem;
+      --font-size-4xl: {{ 40 | divided_by: type_base }}rem;
+      --font-size-5xl: {{ 64 | divided_by: type_base }}rem;
+      --font-size-6xl: {{ 64 | divided_by: type_base }}rem;
+      --font-size-7xl: {{ 64 | divided_by: type_base }}rem;
+      --font-size-8xl: {{ 64 | divided_by: type_base }}rem;
+      --font-size-9xl: {{ 64 | divided_by: type_base }}rem;
+
+      /* Small text needs a little more air than headings */
+      --base-line-height: 1.615;
+      --heading-line-height: 1.15;
+    }
+  </style>
+{%- endif -%}
+
+{%- comment -%} Font sizes from Theme settings > Font sizes; assets/commune-type.css turns them into the type roles {%- endcomment -%}
+{%- liquid
+  comment
+    Product name and price: the mobile size falls back to the old single setting; desktop is 2px bigger unless set
+  endcomment
+  assign name_m = settings.size_name_mobile | default: settings.size_name | default: 14
+  assign name_d = settings.size_name_desktop | default: name_m | plus: 2
+  assign price_m = settings.size_price_mobile | default: settings.size_price | default: 12
+  assign price_d = settings.size_price_desktop | default: price_m | plus: 2
+-%}
+<style>
+    :root {
+      --cfg-hero-size-d: {{ settings.size_hero_desktop | default: 64 }}px;
+      --cfg-hero-size-m: {{ settings.size_hero_mobile | default: 40 }}px;
+      --cfg-head-size-d: {{ settings.size_head_desktop | default: 28 }}px;
+      --cfg-head-size-m: {{ settings.size_head_mobile | default: 22 }}px;
+      --cfg-mark-size-d: {{ settings.size_mark_desktop | default: 20 }}px;
+      --cfg-mark-size-m: {{ settings.size_mark_mobile | default: 18 }}px;
+      --cfg-tab-size-d: {{ settings.size_tab_desktop | default: 20 }}px;
+      --cfg-tab-size-m: {{ settings.size_tab_mobile | default: 18 }}px;
+      --cfg-name-size-m: {{ name_m }}px;
+      --cfg-name-size-d: {{ name_d }}px;
+      --cfg-price-size-m: {{ price_m }}px;
+      --cfg-price-size-d: {{ price_d }}px;
+      --cfg-button-size: {{ settings.size_button | default: 14 }}px;
+      --cfg-label-size: {{ settings.size_label | default: 11 }}px;
+      --cfg-body-size: {{ settings.size_body | default: 13 }}px;
+      --cfg-hero-weight: {{ settings.weight_hero | default: 600 }};
+      --cfg-hero-ls: {{ settings.tracking_hero | default: 2 | divided_by: 100.0 }}em;
+      --cfg-hero-lh: {{ settings.lineheight_hero | default: 95 | divided_by: 100.0 }};
+      --cfg-head-weight: {{ settings.weight_head | default: 600 }};
+      --cfg-head-ls: {{ settings.tracking_head | default: 10 | divided_by: 100.0 }}em;
+      --cfg-head-lh: {{ settings.lineheight_head | default: 109 | divided_by: 100.0 }};
+      --cfg-mark-weight: {{ settings.weight_mark | default: 600 }};
+      --cfg-mark-ls: {{ settings.tracking_mark | default: 32 | divided_by: 100.0 }}em;
+      --cfg-mark-lh: {{ settings.lineheight_mark | default: 122 | divided_by: 100.0 }};
+      --cfg-tab-weight: {{ settings.weight_tab | default: 600 }};
+      --cfg-tab-ls: {{ settings.tracking_tab | default: 4 | divided_by: 100.0 }}em;
+      --cfg-tab-lh: {{ settings.lineheight_tab | default: 122 | divided_by: 100.0 }};
+      --cfg-name-weight: {{ settings.weight_name | default: 600 }};
+      --cfg-name-ls: {{ settings.tracking_name | default: 10 | divided_by: 100.0 }}em;
+      --cfg-name-lh: {{ settings.lineheight_name | default: 129 | divided_by: 100.0 }};
+      --cfg-price-weight: {{ settings.weight_price | default: 400 }};
+      --cfg-price-ls: {{ settings.tracking_price | default: 0 | divided_by: 100.0 }}em;
+      --cfg-price-lh: {{ settings.lineheight_price | default: 134 | divided_by: 100.0 }};
+      --cfg-label-weight: {{ settings.weight_label | default: 400 }};
+      --cfg-label-ls: {{ settings.tracking_label | default: 8 | divided_by: 100.0 }}em;
+      --cfg-label-lh: {{ settings.lineheight_label | default: 127 | divided_by: 100.0 }};
+      --cfg-body-weight: {{ settings.weight_body | default: 400 }};
+      --cfg-body-ls: {{ settings.tracking_body | default: 0 | divided_by: 100.0 }}em;
+      --cfg-body-lh: {{ settings.lineheight_body | default: 162 | divided_by: 100.0 }};
+      --cfg-button-weight: {{ settings.weight_button | default: 500 }};
+      --cfg-button-ls: {{ settings.tracking_button | default: 8 | divided_by: 100.0 }}em;
+      --cfg-button-lh: {{ settings.lineheight_button | default: 123 | divided_by: 100.0 }};
+    }
 </style>

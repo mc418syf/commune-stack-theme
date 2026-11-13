@@ -1,0 +1,144 @@
+/* gallery v31 */
+/* PLP gallery view: a feed of products you scroll through one by one (scroll, swipe or arrow keys),
+   each with a small info card and Add to cart, and every product as a thumbnail row below */
+
+.plp-gallery { display: none; }
+html.plp-gallery-on #results { display: none !important; }
+/* Fixed to the screen (right of the rail), so margins on the collection section cannot push it off the bottom */
+html.plp-gallery-on .plp-gallery { display: flex; flex-direction: column; box-sizing: border-box; position: fixed; z-index: 10; top: 0; right: 0; bottom: 0; left: calc(var(--rail-w, 0px) + var(--plp-panel-w, 0px)); padding-top: calc(var(--strip-h, 56px) + var(--plp-panel-h, 0px)); padding-bottom: env(safe-area-inset-bottom); background: var(--gallery-bg, #DDDDDD); }
+
+.plp-gallery__feed { flex: 1 1 auto; min-height: 0; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; scrollbar-width: none; outline: none; }
+.plp-gallery__feed::-webkit-scrollbar { display: none; }
+
+.plp-gallery__main { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.plp-gallery__main .plp-gallery__feed { flex: 1 1 auto; }
+
+.plp-slide { position: relative; box-sizing: border-box; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; align-items: center; justify-content: center; padding: 8px var(--gut, 24px); }
+.plp-slide__img { display: flex; align-items: center; justify-content: center; max-width: 100%; height: 100%; }
+.plp-slide__img img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; background: #E6E5DF; }
+
+/* The info card is fixed in place; only the images scroll. It uses the product page sizes (name and price tokens). */
+.plp-gallery__info { position: absolute; right: var(--gut, 24px); bottom: 28px; width: 260px; box-sizing: border-box; padding: 14px 14px 18px; display: flex; flex-direction: column; gap: 6px; background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
+.plp-gallery__name { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; text-align: left; }
+.plp-gallery__vendor, .plp-gallery__title { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: calc(var(--name-size, 16px) - var(--product-card-offset, 2px)); line-height: calc(var(--name-lh, 20px) - var(--product-card-offset, 2px)); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
+.plp-gallery__price { font-family: var(--font-mono); font-weight: var(--price-weight, 400); font-size: var(--price-size, 12px); line-height: var(--price-lh, 16px); letter-spacing: var(--price-ls, 0); color: var(--ink); }
+/* the theme's standard button (same classes as Add to cart on the product page); only the width is set here */
+.plp-gallery__add { margin-top: 6px; width: 100%; box-sizing: border-box; display: flex; justify-content: center; padding: 8px 4px; min-height: 0; cursor: pointer; }
+.plp-gallery__add:disabled { opacity: 0.6; cursor: default; }
+
+.plp-gallery__thumbs { flex: none; display: flex; gap: 6px; overflow-x: auto; padding: 8px var(--gut, 24px) 14px; scrollbar-width: none; }
+.plp-gallery__thumbs::-webkit-scrollbar { display: none; }
+.plp-thumb { flex: none; width: 64px; height: 80px; padding: 0; background: #E6E5DF; border: 1px solid transparent; opacity: 0.55; cursor: pointer; }
+.plp-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.plp-thumb:hover { opacity: 0.85; }
+.plp-thumb[aria-current='true'] { opacity: 1; border-color: var(--ink); }
+.plp-thumb:focus-visible, .plp-gallery__add:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: 2px; }
+
+/* Phones: no thumbnails; the info card sits under the images and stays put */
+@media (max-width: 767px) {
+  .plp-gallery__thumbs { display: none; }
+  /* The photo is the same size as a product tile in the one-per-row phone listing: the full width, in a 3:4 box (the listing's
+     "natural" size setting uses 0.75). The rest of the screen is padding around it (see the page-scroll block below). */
+  .plp-slide { padding: 0; }
+  .plp-slide__img { width: 100%; height: 100%; }
+  /* full width in a 3:4 box; when the brand note takes room above, the photo shrinks in proportion (never cropped, never covered) */
+  .plp-slide__img img { width: auto; height: auto; max-width: 100%; max-height: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+  .plp-gallery__info { position: static; flex: none; width: auto; padding: 12px var(--gut, 16px) calc(28px + env(safe-area-inset-bottom)); background: var(--vellum-layer, var(--vellum, rgba(244,243,239,.6))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); }
+}
+@media (prefers-reduced-motion: reduce) { .plp-gallery__feed { scroll-behavior: auto; } }
+
+/* Rail button that switches between Grid and Gallery: the word View with the icon of the view you would get above it */
+.edge-rail__view { background: none; border: 0; cursor: pointer; color: var(--gray); }
+.edge-rail__view:hover { color: var(--ink); }
+.edge-rail__view svg { flex: none; }
+.edge-rail__view svg[hidden] { display: none; }
+.edge-rail__view:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+
+/* Dashed divider (secondary colour) between Menu, Search and Filter and the View button */
+.edge-rail__sep { flex: none; width: 12px; height: 0; border-top: 1px dashed #6B6B66; }
+
+/* Gallery view paints one solid background everywhere (page, header strip area, image area, thumbnail row), so no light line shows between the parts */
+html.plp-gallery-on, html.plp-gallery-on body { background: var(--gallery-bg, #DDDDDD) !important; }
+html.plp-gallery-on .plp-gallery__main, html.plp-gallery-on .plp-gallery__feed, html.plp-gallery-on .plp-gallery__thumbs, html.plp-gallery-on .plp-slide { background: var(--gallery-bg, #DDDDDD); }
+html.plp-gallery-on .plp-gallery { gap: 0; border: 0; }
+html.plp-gallery-on .plp-gallery__thumbs { margin: 0; border: 0; }
+
+/* Brand description: shown above the grid when one brand is selected; in gallery view it sits top left over the image area */
+.brand-note { box-sizing: border-box; margin: 0 var(--gut, 24px) 12px; padding: 10px 12px; max-width: 640px; background: var(--vellum-layer, var(--vellum, rgba(244, 243, 239, 0.66))); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); color: var(--ink); }
+.brand-note__n { margin: 0; font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: calc(var(--name-size, 16px) - var(--product-card-offset, 2px)); line-height: calc(var(--name-lh, 20px) - var(--product-card-offset, 2px)); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; }
+.brand-note__d { margin-top: 4px; font-family: var(--font-mono); font-size: var(--body-size, 12px); line-height: var(--body-lh, 18px); letter-spacing: 0; text-transform: none; }
+.brand-note__d p { margin: 0 0 6px; }
+.brand-note__d > :last-child { margin-bottom: 0; }
+.plp-gallery__brand { position: absolute; z-index: 2; left: var(--gut, 24px); top: 12px; width: 300px; }
+.plp-gallery__brand .brand-note { margin: 0; max-width: none; }
+/* grid view on desktop: the note spans three quarters of the page (gallery view keeps its own small box above) */
+@media (min-width: 768px) { html:not(.plp-gallery-on) .brand-note { max-width: 75%; } }
+.plp-gallery__brand:empty { display: none; }
+@media (max-width: 767px) {
+  .brand-note { margin: 0 var(--gut, 16px) 10px; }
+  .plp-gallery__brand { position: relative; z-index: 3; order: -1; flex: none; width: auto; padding: 0 var(--gut, 16px) 8px; }
+}
+/* the collection description often starts with the brand name as a heading: the note already shows it */
+.brand-note__d > h1:first-child, .brand-note__d > h2:first-child, .brand-note__d > h3:first-child { display: none; }
+.brand-note__d h1, .brand-note__d h2, .brand-note__d h3, .brand-note__d h4 { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--body-size, 12px); line-height: var(--body-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; margin: 6px 0 2px; }
+
+/* Long descriptions show a few lines; click to read all */
+.brand-note { cursor: pointer; }
+.brand-note:not(.is-open) .brand-note__d { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.brand-note::after { content: 'More +'; display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B66; }
+.brand-note.is-open::after { content: 'Less \2212'; }
+.plp-gallery__brand .brand-note.is-open { max-height: calc(100vh - var(--strip-h, 56px) - 120px); overflow-y: auto; }
+
+/* For now the brand description is shown in gallery view only (the grid keeps its copy hidden) */
+#results .brand-note { display: none; }
+
+/* Phones: an opened note lies over the image (scrolls if long) instead of squeezing it */
+@media (max-width: 767px) {
+  .plp-gallery__brand .brand-note.is-open { position: absolute; left: var(--gut, 16px); right: var(--gut, 16px); top: 0; max-height: calc(100vh - var(--strip-h, 56px) - 120px); max-height: calc(100dvh - var(--strip-h, 56px) - 120px); overflow-y: auto; background: rgba(244, 243, 239, 0.94); -webkit-overflow-scrolling: touch; }
+}
+
+/* Gallery view, desktop: the part of the top bar above the filter panel is the panel's paper (the rest of the header keeps the gallery grey).
+   It opens and closes with the same width, opacity and timing as the panel itself (plp-filter.css), so the two stay in step. */
+@media (min-width: 768px) {
+  html.plp-gallery-on .edge-strip::before {
+    content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--rail-w, 0px); width: var(--pf-w, 342px); max-width: 0; opacity: 0; box-sizing: border-box;
+    background: var(--paper, #F4F3EF); pointer-events: none;
+    transition: max-width 0.24s ease-out, opacity 0.24s ease-out;
+  }
+  html.plp-gallery-on.plp-fp-open .edge-strip::before { max-width: var(--pf-w, 342px); opacity: 1; }
+  html.plp-gallery-on .edge-strip[data-sticky='true']::before { left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { html.plp-gallery-on .edge-strip::before { transition: none; } }
+
+/* ---- Phones: the gallery scrolls with the page ----
+   A mobile browser hides its address bar and toolbar only when the page itself scrolls. So on phones the feed is not a
+   scrolling box of its own: each product is one screen of the page, the page snaps from one to the next, and the name
+   card, the header strip and the brand note are fixed to the screen. (plp-gallery.js reads the page scroll here.) */
+@media (max-width: 767px) {
+  html.plp-gallery-on { scroll-snap-type: y mandatory; }
+  html.plp-gallery-on .plp-gallery { position: static; display: block; padding: 0; }
+  html.plp-gallery-on .plp-gallery__main { display: block; }
+  html.plp-gallery-on .plp-gallery__feed { overflow: visible; scroll-snap-type: none; }
+  /* One slide is as tall as the screen with the browser bars hidden (lvh). The photo keeps the size it has with the bars showing
+     (svh minus the header strip and the name card) and never changes while the bars slide away: the extra height
+     (100lvh - 100svh) is padding under the photo, so the screen is full without resizing the picture. */
+  html.plp-gallery-on .plp-slide { height: 100vh; padding: calc(var(--strip-h, 56px) + var(--pg-brand-h, 0px)) 0 var(--pg-info-h, 110px); }
+  @supports (height: 100lvh) {
+    html.plp-gallery-on .plp-slide { height: 100lvh; padding-bottom: calc(var(--pg-info-h, 110px) + 100lvh - 100svh); }
+  }
+  /* With a brand note above, the photo sits at the bottom of its space (against the name card), leaving the gap under the note:
+     centred, it would touch the note and the hanger would look cut off by it. */
+  html.plp-gallery-on .plp-gallery.has-brand .plp-slide__img { align-items: flex-end; }
+  html.plp-gallery-on .plp-gallery__info { position: fixed; z-index: 11; left: var(--rail-w, 0px); right: 0; bottom: 0; }
+  html.plp-gallery-on .plp-gallery__brand { position: fixed; z-index: 12; top: var(--strip-h, 56px); left: var(--rail-w, 0px); right: 0; }
+  html.plp-gallery-on .edge-strip { position: fixed; left: var(--rail-w, 0px); right: 0; }
+  /* nothing else of the page takes part in the scroll */
+  html.plp-gallery-on #filterable.collection { margin: 0 !important; padding: 0 !important; border: 0; }
+  html.plp-gallery-on [data-plp-head], html.plp-gallery-on .shopify-section-group-footer-group, html.plp-gallery-on .plp-top { display: none !important; }
+}
+
+/* Phones, gallery view: the filter sheet (and the top bar row above it) uses the gallery grey instead of the paper colour */
+@media (max-width: 767px) {
+  html.plp-gallery-on .plp-fp { --pf-paper: var(--gallery-bg, #DDDDDD); }
+  html.plp-gallery-on .plp-strip-s.is-open { background: var(--gallery-bg, #DDDDDD); }
+}

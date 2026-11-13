@@ -1,0 +1,42 @@
+{%- comment -%}
+  Record list block: dashed rows of values taken from product metafields.
+  - The measurement metafield (key set in the block) is split into one row per "- Label: value" line.
+  - Up to six more rows, each a label plus a metafield key written as namespace.key, with an optional fallback text.
+  A row with no value is left out; when nothing is left the block prints nothing.
+{%- endcomment -%}
+
+{{ 'product-record.css' | asset_url | stylesheet_tag }}
+
+{%- capture rows -%}
+  {%- if block.settings.show_measurements -%}
+    {%- assign source_key = block.settings.measurement_key | default: 'custom.measurement' | split: '.' -%}
+    {%- assign source_ns = source_key[0] -%}
+    {%- assign source_name = source_key[1] -%}
+    {%- assign source = product.metafields[source_ns][source_name] | metafield_text | default: '' -%}
+    {%- render 'product-record', source: source -%}
+  {%- endif -%}
+
+  {%- for i in (1..6) -%}
+    {%- assign label_id = 'label_' | append: i -%}
+    {%- assign key_id = 'key_' | append: i -%}
+    {%- assign fallback_id = 'fallback_' | append: i -%}
+    {%- assign row_label = block.settings[label_id] | default: '' -%}
+    {%- assign row_key = block.settings[key_id] | default: '' | split: '.' -%}
+    {%- assign row_value = '' -%}
+    {%- if row_key.size == 2 -%}
+      {%- assign row_ns = row_key[0] | strip -%}
+      {%- assign row_name = row_key[1] | strip -%}
+      {%- assign row_value = product.metafields[row_ns][row_name] | metafield_text | default: '' | strip -%}
+    {%- endif -%}
+    {%- if row_value.size == 0 -%}
+      {%- assign row_value = block.settings[fallback_id] | default: '' -%}
+    {%- endif -%}
+    {%- if row_label.size > 0 and row_value.size > 0 -%}
+      <li class="record__row"><span class="record__label">{{ row_label | escape }}</span><span class="record__value">&lt;{{ row_value | escape }}&gt;</span></li>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if rows contains 'record__row' -%}
+  <div class="record-block" style="--record-gap: {{ block.settings.gap_below | default: 24 }}px;" {{ block.shopify_attributes }}><ul class="record">{{ rows }}</ul></div>
+{%- endif -%}

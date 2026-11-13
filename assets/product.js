@@ -694,6 +694,8 @@ document.addEventListener('alpine:init', () => {
         const value = el.value.trim();
 
         this[`option${position}`] = value;
+        // another size or colour: the button offers Add to cart again
+        this.addedToCart = false;
       },
       lockOptionChangeHandler() {
         this.optionChangesThisKeypress++;
@@ -721,7 +723,8 @@ document.addEventListener('alpine:init', () => {
 
           this.loading = true;
           this.errorMessage = null;
-          this.addedToCart = false;
+          // Show the result at once; the request to the cart runs in the background and an error puts the button back
+          this.addedToCart = true;
         });
 
         this.$root.addEventListener('baseline:productform:success', (event) => {
@@ -744,6 +747,7 @@ document.addEventListener('alpine:init', () => {
 
             this.errorMessage =
               event.detail.message || window.theme.strings.cartError;
+            this.addedToCart = false;
 
             this.quantity = Number(
               this.$root.querySelector('[name="quantity"]').getAttribute('min')
@@ -822,7 +826,8 @@ document.addEventListener('alpine:init', () => {
             pagination: Boolean(
               this.splideEl.querySelector('.splide__pagination')
             ),
-            rewind: true,
+            // Infinite: after the last image the first one follows (and the other way round)
+            type: 'loop',
             speed: 600,
             drag: !(this.splideEl.dataset.dragDisabled === 'true'),
             mediaQuery: 'min',
@@ -833,6 +838,13 @@ document.addEventListener('alpine:init', () => {
             this.mainSplideOptions.breakpoints['1024'] = {
               destroy: true,
             };
+          }
+
+          // Mobile: show a fraction of the next image (Images per screen on mobile)
+          const perScreen = parseFloat(this.splideEl.dataset.mobilePerScreen) || 1;
+          if (perScreen > 1) {
+            this.mainSplideOptions.fixedWidth = `${100 / perScreen}%`;
+            this.mainSplideOptions.gap = '4px';
           }
         } else {
           this.mainSplideOptions = {

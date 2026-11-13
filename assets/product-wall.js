@@ -1,0 +1,435 @@
+(() => {
+  'use strict';
+
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)');
+  const FINE_POINTER = matchMedia('(hover: hover) and (pointer: fine)');
+  const MAX_SPEED = 1600;
+
+  const mod = (n, m) => ((n % m) + m) % m;
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const sized = (src, w) => src + (src.includes('?') ? '&' : '?') + 'width=' + w;
+
+  function shuffle(list) {
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  }
+
+  async function loadProducts(collection) {
+    const out = [];
+    const seen = new Set();
+    for (let page = 1; page <= 8; page++) {
+      const res = await fetch(`/collections/${collection}/products.json?limit=250&page=${page}`);
+      if (!res.ok) break;
+      const batch = (await res.json()).products;
+      for (const p of batch) {
+        if (!p.images.length || seen.has(p.handle)) continue;
+        seen.add(p.handle);
+        out.push({
+          handle: p.handle,
+          title: p.title,
+          vendor: p.vendor,
+          price: p.variants[0].price,
+          available: p.variants.some((v) => v.available),
+          image: p.images[0].src,
+          w: p.images[0].width,
+          h: p.images[0].height,
+        });
+      }
+      if (batch.length < 250) break;
+    }
+    return out;
+  }
+
+  function mount(root) {
+    const cfg = root.dataset;
+    const host = root.querySelector('[data-product-wall-rows]');
+    const abort = new AbortController();
+    const on = { signal: abort.signal };
+    let frameId = 0;
+    let observer;
+    let resizer;
+
+    // The header floats over the page (it takes no space), so reserve room for it above the first row.
+    const header = document.querySelector('[data-theme-header] header');
+    // On mobile the header can be docked to the bottom, which reserves room there instead.
+    const narrow = matchMedia('(max-width: 1023px)');
+    const reserve = () => {
+      const h = cfg.reserveHeader === 'true' && header ? header.getBoundingClientRect().height : 0;
+      const atBottom = narrow.matches && header && header.closest('[data-theme-header]').hasAttribute('data-mobile-bottom');
+      root.style.setProperty('--wall-header-h', (atBottom ? 0 : h) + 'px');
+      root.style.setProperty('--wall-bottom-h', (atBottom && cfg.reserveHeader === 'true' ? h : 0) + 'px');
+    };
+    reserve();
+    narrow.addEventListener('change', reserve, on);
+    const headerWatch = new ResizeObserver(reserve);
+    if (header) headerWatch.observe(header);
+
+    const oneScreen = cfg.oneScreen === 'true';
+    const rowCount = matchMedia('(max-width: 640px)').matches
+      ? parseInt(cfg.rowsMobile, 10)
+      : parseInt(cfg.rowsDesktop, 10);
+
+    const perRow = Math.max(4, parseInt(cfg.perRow, 10) || 28);
+    const speedScale = parseFloat(cfg.speed);
+    const staticMode = cfg.motion === 'on_scroll';
+    const html = document.documentElement;
+    const designMode = !!(window.Shopify && window.Shopify.designMode);
+    const lock = (on) => html.classList.toggle('product-wall-locked', on);
+
+    // Opening screen: the wall covers the page until the visitor enters. Not in the theme editor.
+    const opening = cfg.opening === 'true' && !designMode;
+    const enterMode = cfg.enterMode || 'both';
+    const viaScroll = enterMode === 'scroll' || enterMode === 'both';
+    const SESSION_KEY = 'product-wall-entered';
+    let entered = false;
+    let busy = false;
+
+    function setEntered(next, instant) {
+      if (next === entered && !instant) return;
+      entered = next;
+      root.dataset.entered = String(next);
+      root.classList.toggle('is-open', next);
+      lock(!next);
+      if (next) {
+        root.setAttribute('inert', '');
+        busy = !instant;
+        if (cfg.oncePerSession === 'true') { try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) { /* private mode */ } }
+        const done = () => { if (!entered) return; root.classList.add('is-gone'); busy = false; };
+        if (instant) done();
+        else {
+          // transitionend also bubbles up from the rows' own fades, so only react to the wall itself
+          root.addEventListener('transitionend', (e) => { if (e.target === root) done(); }, { signal: abort.signal });
+          setTimeout(done, 1200);
+        }
+      } else {
+        root.classList.remove('is-gone');
+        root.removeAttribute('inert');
+        busy = true;
+        scrollTo(0, 0);
+        setTimeout(() => (busy = false), 1000);
+      }
+    }
+
+    // Lock the page so scroll and swipe only shuffle the wall. Not in the theme editor, where the preview must scroll.
+    const lockPage = !opening && cfg.lockPage === 'true' && cfg.oneScreen === 'true' && !designMode;
+    if (lockPage) lock(true);
+
+    if (opening) {
+      html.classList.add('product-wall-opening');
+      let seen = root.dataset.entered === 'true';
+      try { seen = seen || (cfg.oncePerSession === 'true' && !!sessionStorage.getItem(SESSION_KEY)); } catch (e) { /* private mode */ }
+      if (seen) setEntered(true, true);
+      else { scrollTo(0, 0); lock(true); }
+
+      // Scroll or swipe up to enter; scroll or swipe down at the very top to come back.
+      let acc = 0, accAt = 0, startY = null, startX = null, startAtTop = false;
+      const gather = (d) => {
+        const now = performance.now();
+        if (now - accAt > 400) acc = 0;
+        accAt = now;
+        return (acc += d);
+      };
+      if (viaScroll) {
+        addEventListener('wheel', (e) => {
+          if (busy || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+          if (!entered && e.deltaY > 0 && gather(e.deltaY) > 90) setEntered(true);
+          else if (entered && scrollY <= 0 && e.deltaY < 0 && gather(-e.deltaY) > 140) setEntered(false);
+        }, { passive: true, signal: abort.signal });
+
+        addEventListener('touchstart', (e) => {
+          startY = e.touches[0].clientY; startX = e.touches[0].clientX; startAtTop = scrollY <= 0;
+        }, { passive: true, signal: abort.signal });
+        addEventListener('touchmove', (e) => {
+          if (startY === null || busy) return;
+          const dy = startY - e.touches[0].clientY, dx = startX - e.touches[0].clientX;
+          if (Math.abs(dy) < Math.abs(dx)) return;
+          if (!entered && dy > 70) { setEntered(true); startY = null; }
+          else if (entered && startAtTop && scrollY <= 0 && dy < -110) { setEntered(false); startY = null; }
+        }, { passive: true, signal: abort.signal });
+        addEventListener('touchend', () => (startY = null), { passive: true, signal: abort.signal });
+
+        addEventListener('keydown', (e) => {
+          if (entered || busy || e.defaultPrevented) return;
+          if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && e.target === document.body)) {
+            e.preventDefault();
+            setEntered(true);
+          }
+        }, { signal: abort.signal });
+      }
+    }
+
+    const cta = root.querySelector('[data-product-wall-cta]');
+    if (cta) {
+      cta.addEventListener('click', () => {
+        if (opening) { setEntered(true); return; }
+        // In the theme editor the wall is a normal section, so the button scrolls to whatever follows it.
+        const next = root.closest('.shopify-section') && root.closest('.shopify-section').nextElementSibling;
+        if (next) next.scrollIntoView({ behavior: 'smooth' });
+      }, { signal: abort.signal });
+    }
+
+    const hoverShuffle = cfg.hoverShuffle !== 'false';
+    const shuffleStrength = parseFloat(cfg.shuffle) || 1;
+    const hideSold = cfg.hideSoldOut === 'true';
+    const money = new Intl.NumberFormat(document.documentElement.lang || undefined, {
+      style: 'currency', currency: cfg.currency || 'USD', maximumFractionDigits: 0,
+    });
+
+    function cardHTML(p, eager) {
+      const ar = p.w && p.h ? (p.w / p.h).toFixed(4) : 0.75;
+      return `<a class="product-wall__card${p.available ? '' : ' is-sold'}" href="/products/${p.handle}" style="--ar:${ar}" draggable="false">
+        <img class="product-wall__img" draggable="false" alt="${esc(p.title)}" width="${p.w || 300}" height="${p.h || 400}"
+          ${eager ? '' : 'loading="lazy" decoding="async"'}
+          src="${sized(p.image, 360)}" srcset="${sized(p.image, 360)} 1x, ${sized(p.image, 720)} 2x">
+        <span class="product-wall__meta">
+          <span class="product-wall__vendor">${esc(p.vendor)}</span>
+          <span class="product-wall__price">${p.available ? money.format(parseFloat(p.price)) : esc(cfg.soldOutText)}</span>
+          <span class="product-wall__title">${esc(p.title)}</span>
+        </span>
+      </a>`;
+    }
+
+    function buildRows(products) {
+      const count = oneScreen ? Math.max(1, rowCount || 3) : Math.max(4, Math.ceil(products.length / perRow));
+      const buckets = Array.from({ length: count }, () => []);
+      shuffle(products.slice()).forEach((p, i) => buckets[i % count].push(p));
+
+      return buckets.filter((items) => items.length).map((items, i) => {
+        const el = document.createElement('div');
+        el.className = 'product-wall__row';
+        el.style.setProperty('--i', i);
+        el.innerHTML = `<div class="product-wall__track"><div class="product-wall__set">${items.map((p, n) => cardHTML(p, i < 4 && n < 8)).join('')}</div></div>`;
+        host.appendChild(el);
+
+        const dir = i % 2 ? 1 : -1;
+        const speed = REDUCED.matches || staticMode ? 0 : 16 + ((i * 37) % 6) * 7;
+        return {
+          el, dir,
+          track: el.firstChild,
+          set: el.querySelector('.product-wall__set'),
+          base: dir * speed,
+          gain: dir * (0.55 + ((i * 53) % 5) * 0.2),
+          depth: 0.4 + ((i * 29) % 7) / 7,
+          o: Math.random() * 4000,
+          v: dir * speed,
+          px: 0, ptx: 0, snap: 0, w: 0,
+          hover: false, dragging: false, moved: false, focused: false, visible: true,
+        };
+      });
+    }
+
+    function run(products) {
+      const rows = buildRows(products);
+      const state = { nx: 0.5, lastX: null, lastY: null, scrollY: scrollY };
+
+      function measure() {
+        for (const r of rows) {
+          r.w = r.set.getBoundingClientRect().width;
+          if (!r.w) continue;
+          const want = Math.max(2, Math.ceil(innerWidth / r.w) + 1);
+          while (r.track.children.length < want) {
+            const copy = r.set.cloneNode(true);
+            copy.setAttribute('aria-hidden', 'true');
+            copy.querySelectorAll('a').forEach((a) => (a.tabIndex = -1));
+            r.track.appendChild(copy);
+          }
+        }
+      }
+      measure();
+      resizer = new ResizeObserver(measure);
+      resizer.observe(root);
+
+      observer = new IntersectionObserver((entries) => {
+        for (const e of entries) rows.find((r) => r.el === e.target).visible = e.isIntersecting;
+      }, { rootMargin: '120px 0px' });
+      rows.forEach((r) => observer.observe(r.el));
+
+      // Pointer: every row reacts a little differently, so the wall shuffles.
+      addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse' || !hoverShuffle || entered) return;
+        state.nx = e.clientX / innerWidth;
+        if (state.lastX !== null && !REDUCED.matches) {
+          const dx = e.clientX - state.lastX;
+          const dy = e.clientY - state.lastY;
+          for (const r of rows) {
+            if (r.dragging) continue;
+            r.v = clamp(r.v + (dx * 3.2 * r.gain + Math.abs(dy) * 0.8 * r.dir) * (staticMode ? shuffleStrength : 1), -MAX_SPEED, MAX_SPEED);
+          }
+        }
+        state.lastX = e.clientX;
+        state.lastY = e.clientY;
+      }, { passive: true, signal: abort.signal });
+
+      // Scrolling gives each row a push in its own direction.
+      const push = (dy) => {
+        if (REDUCED.matches || entered) return;
+        for (const r of rows) r.v = clamp(r.v + dy * (staticMode ? 5 * shuffleStrength : 3) * r.dir, -MAX_SPEED, MAX_SPEED);
+      };
+
+      // Wheel and swipe over the wall drive the shuffle directly, so it works whether or not the page
+      // can scroll. Scroll events are skipped while those are active, so one gesture isn't counted twice.
+      let ty = null, tx = null, lastWheel = 0;
+      addEventListener('scroll', () => {
+        const dy = scrollY - state.scrollY;
+        state.scrollY = scrollY;
+        if (ty !== null || performance.now() - lastWheel < 150) return;
+        push(dy);
+      }, { passive: true, signal: abort.signal });
+
+      root.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        lastWheel = performance.now();
+        push(e.deltaY);
+      }, { passive: true, signal: abort.signal });
+
+      root.addEventListener('touchstart', (e) => { ty = e.touches[0].clientY; tx = e.touches[0].clientX; }, { passive: true, signal: abort.signal });
+      root.addEventListener('touchmove', (e) => {
+        if (ty === null) return;
+        const dy = ty - e.touches[0].clientY, dx = tx - e.touches[0].clientX;
+        ty = e.touches[0].clientY; tx = e.touches[0].clientX;
+        if (Math.abs(dy) > Math.abs(dx)) push(dy);
+      }, { passive: true, signal: abort.signal });
+      root.addEventListener('touchend', () => (ty = null), { passive: true, signal: abort.signal });
+      root.addEventListener('touchcancel', () => (ty = null), { passive: true, signal: abort.signal });
+
+      for (const r of rows) {
+        r.el.addEventListener('mouseenter', () => (r.hover = true), on);
+        r.el.addEventListener('mouseleave', () => (r.hover = false), on);
+
+        r.el.addEventListener('focusin', (e) => {
+          r.focused = true;
+          const card = e.target.closest('.product-wall__card');
+          if (!card) return;
+          const b = card.getBoundingClientRect();
+          if (b.left < 0 || b.right > innerWidth) r.snap = innerWidth / 2 - (b.left + b.width / 2);
+        }, on);
+        r.el.addEventListener('focusout', () => (r.focused = false), on);
+
+        r.el.addEventListener('wheel', (e) => {
+          const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX;
+          if (Math.abs(dx) <= Math.abs(e.deltaY) && !(e.shiftKey && e.deltaY)) return;
+          e.preventDefault();
+          r.o -= dx;
+        }, { passive: false, signal: abort.signal });
+
+        // Drag / swipe along a row; vertical gestures stay native (touch-action: pan-y).
+        let sx = 0, sy = 0, lx = 0, lt = 0, id = null, armed = false, vel = 0;
+
+        r.el.addEventListener('pointerdown', (e) => {
+          if (e.button !== 0) return;
+          id = e.pointerId;
+          sx = lx = e.clientX; sy = e.clientY; lt = e.timeStamp;
+          armed = true; vel = 0; r.moved = false;
+        }, on);
+
+        addEventListener('pointermove', (e) => {
+          if (e.pointerId !== id || !armed) return;
+          const dx = e.clientX - sx, dy = e.clientY - sy;
+          if (!r.dragging) {
+            if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy)) return;
+            r.dragging = true; r.moved = true;
+            r.el.classList.add('is-dragging');
+          }
+          const step = e.clientX - lx;
+          const dt = Math.max(1, e.timeStamp - lt);
+          r.o += step;
+          vel = vel * 0.6 + (step / dt * 1000) * 0.4;
+          lx = e.clientX; lt = e.timeStamp;
+        }, { passive: true, signal: abort.signal });
+
+        const release = (e) => {
+          if (e.pointerId !== id) return;
+          id = null; armed = false;
+          if (r.dragging) {
+            r.dragging = false;
+            r.el.classList.remove('is-dragging');
+            r.v = clamp(vel, -MAX_SPEED, MAX_SPEED);
+          }
+        };
+        addEventListener('pointerup', release, on);
+        addEventListener('pointercancel', release, on);
+
+        // A drag must not become a click on the card underneath.
+        r.el.addEventListener('click', (e) => {
+          if (r.moved) { e.preventDefault(); e.stopPropagation(); r.moved = false; }
+        }, { capture: true, signal: abort.signal });
+      }
+
+      let last = performance.now();
+      function frame(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        if (entered) { frameId = requestAnimationFrame(frame); return; }
+        const ease = 1 - Math.exp(-dt * 1.6);
+        const pEase = 1 - Math.exp(-dt * 5);
+        const sEase = 1 - Math.exp(-dt * 8);
+
+        for (const r of rows) {
+          if (!r.dragging) {
+            const target = r.base * speedScale * (r.hover || r.focused ? 0.12 : 1);
+            r.v += (target - r.v) * ease;
+            r.o += r.v * dt;
+          }
+          if (r.snap) {
+            const s = r.snap * sEase;
+            r.o += s; r.snap -= s;
+            if (Math.abs(r.snap) < 0.5) r.snap = 0;
+          }
+          if (FINE_POINTER.matches && !REDUCED.matches && hoverShuffle) r.ptx = (state.nx - 0.5) * -180 * r.depth * r.dir;
+          r.px += (r.ptx - r.px) * pEase;
+
+          if (!r.visible || !r.w) continue;
+          const x = mod(r.o + r.px, r.w) - r.w;
+          r.track.style.transform = `translate3d(${x.toFixed(2)}px,0,0)`;
+        }
+        frameId = requestAnimationFrame(frame);
+      }
+      frameId = requestAnimationFrame(frame);
+
+      requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-ready')));
+    }
+
+    loadProducts(cfg.collection)
+      .then((list) => run(hideSold ? list.filter((p) => p.available) : list))
+      .catch((err) => console.error('[product-wall]', err));
+
+    return () => {
+      abort.abort();
+      html.classList.remove('product-wall-locked', 'product-wall-opening');
+      cancelAnimationFrame(frameId);
+      if (observer) observer.disconnect();
+      if (resizer) resizer.disconnect();
+      headerWatch.disconnect();
+    };
+  }
+
+  // One teardown per section instance, so the theme editor can reload a section cleanly.
+  const mounted = new WeakMap();
+  function mountAll(scope) {
+    scope.querySelectorAll('[data-product-wall]').forEach((el) => {
+      if (!mounted.has(el)) mounted.set(el, mount(el));
+    });
+  }
+  function unmountAll(scope) {
+    scope.querySelectorAll('[data-product-wall]').forEach((el) => {
+      const stop = mounted.get(el);
+      if (stop) { stop(); mounted.delete(el); }
+    });
+  }
+
+  // The row count differs between desktop and mobile, so rebuild when the breakpoint is crossed.
+  matchMedia('(max-width: 640px)').addEventListener('change', () => {
+    unmountAll(document);
+    document.querySelectorAll('[data-product-wall-rows]').forEach((el) => (el.innerHTML = ''));
+    document.querySelectorAll('[data-product-wall]').forEach((el) => el.classList.remove('is-ready'));
+    mountAll(document);
+  });
+
+  mountAll(document);
+  document.addEventListener('shopify:section:load', (e) => mountAll(e.target));
+  document.addEventListener('shopify:section:unload', (e) => unmountAll(e.target));
+})();

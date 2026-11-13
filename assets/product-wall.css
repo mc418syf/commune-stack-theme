@@ -1,0 +1,220 @@
+.product-wall {
+  --wall-gap: var(--wall-gap-desktop, 10px);
+  --wall-rows: var(--wall-rows-desktop, 3);
+  /* Fill the first screen: viewport minus header, gaps and text, split across the rows */
+  --wall-card-h: max(
+    120px,
+    calc((100svh - var(--wall-header-h, 0px) - var(--wall-bottom-h, 0px) - (var(--wall-rows) + 1) * var(--wall-gap) - var(--wall-rows) * var(--wall-meta-h, 0px)) / var(--wall-rows))
+  );
+  --wall-meta-size: 10px;
+  padding: calc(var(--wall-gap) + var(--wall-header-h, 0px)) 0 var(--wall-gap);
+  overflow: hidden;
+}
+
+.product-wall[data-one-screen='true'] {
+  box-sizing: border-box;
+  height: calc(100svh - var(--wall-bottom-h, 0px));
+}
+
+.product-wall__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wall-gap);
+}
+
+.product-wall__row {
+  position: relative;
+  overflow: hidden;
+  overflow: clip;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  opacity: 0;
+  transform: translateY(36px);
+}
+
+.product-wall.is-ready .product-wall__row {
+  opacity: 1;
+  transform: none;
+  transition: opacity .8s ease, transform .9s cubic-bezier(.2, .7, .2, 1);
+  transition-delay: calc(min(var(--i), 8) * 70ms);
+}
+
+.product-wall__row.is-dragging { cursor: grabbing; }
+
+.product-wall__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.product-wall__set {
+  display: flex;
+  gap: var(--wall-gap);
+  padding-right: var(--wall-gap);
+}
+
+.product-wall__card {
+  flex: none;
+  width: calc(var(--wall-card-h) * var(--ar, 0.75));
+  color: inherit;
+  text-decoration: none;
+  -webkit-user-drag: none;
+  transition: opacity .3s ease;
+}
+
+.product-wall__img {
+  display: block;
+  width: 100%;
+  height: var(--wall-card-h);
+  object-fit: contain;
+  background: rgb(128 128 128 / .12);
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.product-wall__card.is-sold .product-wall__img { opacity: .7; }
+
+.product-wall__meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  padding-top: 6px;
+  font-size: var(--wall-meta-size);
+  line-height: 1.3;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.product-wall__vendor,
+.product-wall__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-wall__title { grid-column: 1 / -1; opacity: .6; }
+
+.product-wall[data-show-vendor='false'] .product-wall__vendor,
+.product-wall[data-show-title='false'] .product-wall__title,
+.product-wall[data-show-price='false'] .product-wall__price { display: none; }
+.product-wall[data-show-vendor='false'] .product-wall__price { grid-column: 1 / -1; }
+.product-wall[data-show-vendor='false'][data-show-title='false'][data-show-price='false'] .product-wall__meta { display: none; }
+
+@media (hover: hover) {
+  .product-wall__row:hover .product-wall__card:not(:hover) { opacity: .5; }
+  .product-wall__card:hover .product-wall__title { opacity: 1; }
+}
+
+.product-wall__card:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+/* Page lock: the wall is the whole page, so gestures shuffle it instead of scrolling */
+html.product-wall-locked,
+html.product-wall-locked body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.product-wall-locked .product-wall,
+html.product-wall-locked .product-wall__row {
+  touch-action: none;
+}
+
+/* Opening screen: the wall covers the page until the visitor enters */
+html.product-wall-opening .product-wall {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background-color: rgb(var(--color-scheme-background));
+  transition: transform .95s cubic-bezier(.7, 0, .2, 1);
+}
+
+html.product-wall-opening .product-wall.is-open {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+html.product-wall-opening .product-wall.is-gone { visibility: hidden; }
+
+.product-wall__cta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  padding: 14px 38px;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: inherit;
+  cursor: pointer;
+  background: rgb(var(--color-scheme-background) / .45);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgb(var(--color-scheme-text) / .25);
+  border-radius: 999px;
+  transition: background-color .25s ease, transform .25s ease;
+}
+
+.product-wall__cta:hover { background: rgb(var(--color-scheme-background) / .75); transform: translate(-50%, -50%) scale(1.04); }
+.product-wall__cta:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+.product-wall__scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--wall-bottom-h, 0px) + 18px);
+  z-index: 5;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.product-wall__arrow {
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+  animation: product-wall-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes product-wall-bob {
+  0%, 100% { transform: translateY(0) rotate(45deg); }
+  50% { transform: translateY(5px) rotate(45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-wall__arrow { animation: none; }
+  html.product-wall-opening .product-wall { transition: none; }
+}
+
+.product-wall__empty { padding: 80px 18px; text-align: center; }
+
+.product-wall[data-sizing='fixed'] { --wall-card-h: var(--wall-h-desktop, 36vh); }
+
+@media (max-width: 640px) {
+  .product-wall {
+    --wall-gap: var(--wall-gap-mobile, 8px);
+    --wall-rows: var(--wall-rows-mobile, 3);
+    --wall-meta-size: 9px;
+  }
+  .product-wall[data-sizing='fixed'] { --wall-card-h: var(--wall-h-mobile, 24svh); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-wall__row,
+  .product-wall.is-ready .product-wall__row { transition: none; transform: none; opacity: 1; }
+}

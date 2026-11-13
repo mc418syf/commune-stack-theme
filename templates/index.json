@@ -9,6 +9,98 @@
  */
 {
   "sections": {
+    "product_wall": {
+      "type": "product-wall",
+      "disabled": true,
+      "settings": {
+        "opening_screen": true,
+        "enter_mode": "both",
+        "cta_text": "",
+        "scroll_hint_text": "",
+        "once_per_session": false,
+        "collection": "",
+        "hide_sold_out": true,
+        "hide_footer_mobile": true,
+        "show_vendor": false,
+        "show_title": false,
+        "show_price": false,
+        "motion": "autoplay",
+        "hover_shuffle": true,
+        "shuffle_strength": 100,
+        "speed": 25,
+        "products_per_row": 28,
+        "one_screen": true,
+        "lock_page": true,
+        "sizing": "fit_rows",
+        "rows_desktop": 3,
+        "rows_mobile": 4,
+        "image_height_desktop": 36,
+        "image_height_mobile": 24,
+        "gap_desktop": 10,
+        "gap_mobile": 8,
+        "reserve_header_space": false,
+        "color_scheme": "scheme1"
+      }
+    },
+    "split_screens": {
+      "type": "split-screens",
+      "blocks": {
+        "asset_1": {
+          "type": "asset",
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/DSC06008.jpg",
+            "heading": "",
+            "heading_size": "text-heading-standard",
+            "subheading": "",
+            "subheading_size": "text-base",
+            "text_style": "plain",
+            "text_color": "#ffffff",
+            "overlay": 0,
+            "text_vertical": "center",
+            "text_horizontal": "center",
+            "button_label": "Shop All",
+            "button_style": "link",
+            "button_color": "#f2f3f4",
+            "link": "shopify://collections/all"
+          }
+        },
+        "asset_2": {
+          "type": "asset",
+          "settings": {
+            "media_type": "image",
+            "image": "shopify://shop_images/commune_landing_page.jpg",
+            "heading": "",
+            "heading_size": "text-heading-standard",
+            "subheading": "",
+            "subheading_size": "text-base",
+            "text_style": "plain",
+            "text_color": "#ffffff",
+            "overlay": 0,
+            "text_vertical": "center",
+            "text_horizontal": "center",
+            "button_label": "Book a Visit",
+            "button_style": "link",
+            "button_color": "#0d0d0d",
+            "link": "https://calendly.com/commune237/showroomappointment"
+          }
+        }
+      },
+      "block_order": [
+        "asset_1",
+        "asset_2"
+      ],
+      "settings": {
+        "height_desktop": 100,
+        "mobile_layout": "full",
+        "mobile_haptics": true,
+        "mobile_ratio": "2 / 3",
+        "height_mobile": 85,
+        "gap": 0,
+        "snap": "off",
+        "color_scheme": "scheme1"
+      }
+    },
     "featured-navigation": {
       "type": "featured-navigation",
       "disabled": true,
@@ -26,6 +118,7 @@
     },
     "image_with_text_overlay_yYaW8G": {
       "type": "image-with-text-overlay",
+      "disabled": true,
       "custom_css": [],
       "name": "Image with text overlay",
       "settings": {
@@ -69,6 +162,7 @@
         "link_FgQa6y",
         "link_NPL7Nd"
       ],
+      "disabled": true,
       "custom_css": [
         ".w-full {margin-top: 20px;}"
       ],
@@ -139,6 +233,8 @@
     }
   },
   "order": [
+    "product_wall",
+    "split_screens",
     "featured-navigation",
     "image_with_text_overlay_yYaW8G",
     "featured_custom_links_FQDUX4",

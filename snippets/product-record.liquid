@@ -1,0 +1,95 @@
+{%- comment -%}
+  Turns the text of a measurement metafield (passed in as `source`) into dashed list rows.
+
+  Format (one per line):
+    - Chest: 49cm/19.5in          -> a row shown as <49 CM (19.5 IN)>
+    - Material: 100% cotton       -> a row shown as <100% COTTON>
+  A "Size 36." line becomes a Size row (<36>).
+  Rows keep the order they are written in.
+  Every value is escaped; nothing from the metafield is output raw.
+
+  Output: <li> rows only, nothing when there are none. The caller wraps them in <ul class="record">.
+{%- endcomment -%}
+
+{%- assign raw = source | default: '' -%}
+{%- assign size_value = '' -%}
+{%- assign made_in_value = '' -%}
+{%- assign material_value = '' -%}
+{%- assign length_rows = '' -%}
+{%- assign shoulder_rows = '' -%}
+{%- assign chest_rows = '' -%}
+{%- assign sleeve_rows = '' -%}
+{%- assign other_rows = '' -%}
+{%- assign ordered_rows = '' -%}
+
+{%- assign lines = raw | newline_to_br | split: '<br />' -%}
+{%- for line_raw in lines -%}
+  {%- assign line = line_raw | strip -%}
+  {%- if line.size == 0 -%}
+    {%- continue -%}
+  {%- endif -%}
+
+  {%- assign head = line | slice: 0, 4 | downcase -%}
+  {%- assign first_char = line | slice: 0, 1 -%}
+
+  {%- if head == 'size' -%}
+    {%- assign size_text = line | slice: 4, 500 | strip -%}
+    {%- assign lead = size_text | slice: 0, 1 -%}
+    {%- if lead == ':' or lead == '-' -%}
+      {%- assign size_text = size_text | slice: 1, 500 | strip -%}
+    {%- endif -%}
+    {%- assign tail = size_text | slice: -1, 1 -%}
+    {%- if tail == '.' -%}
+      {%- assign size_length = size_text.size | minus: 1 -%}
+      {%- assign size_text = size_text | slice: 0, size_length | strip -%}
+    {%- endif -%}
+    {%- if size_text.size > 0 -%}
+      {%- assign size_value = size_text -%}
+      {%- capture size_row -%}
+        <li class="record__row"><span class="record__label">Size</span><span class="record__value">&lt;{{ size_text | escape }}&gt;</span></li>
+      {%- endcapture -%}
+      {%- assign ordered_rows = ordered_rows | append: size_row -%}
+    {%- endif -%}
+
+  {%- elsif first_char == '-' and line contains ':' -%}
+    {%- assign rest = line | slice: 1, 500 | strip -%}
+    {%- assign parts = rest | split: ':' -%}
+    {%- assign label = parts[0] | strip -%}
+    {%- assign value = rest | remove_first: parts[0] | remove_first: ':' | strip -%}
+    {%- if label.size == 0 or value.size == 0 -%}
+      {%- continue -%}
+    {%- endif -%}
+    {%- assign label_l = label | downcase -%}
+
+    {%- if label_l.size > 0 -%}
+      {%- comment -%} 49cm/19.5in becomes 49 cm (19.5 in); a value without a slash stays as typed {%- endcomment -%}
+      {%- assign display_value = value -%}
+      {%- if value contains '/' -%}
+        {%- assign pair = value | split: '/' -%}
+        {%- assign left = pair[0] | strip -%}
+        {%- assign right = pair[1] | strip -%}
+        {%- assign left_unit = left | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9' | remove: '.' | strip -%}
+        {%- assign right_unit = right | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9' | remove: '.' | strip -%}
+        {%- assign left_text = left -%}
+        {%- if left_unit.size > 0 -%}
+          {%- assign left_number = left | remove: left_unit | strip -%}
+          {%- assign left_text = left_number | append: ' ' | append: left_unit -%}
+        {%- endif -%}
+        {%- assign right_text = right -%}
+        {%- if right_unit.size > 0 -%}
+          {%- assign right_number = right | remove: right_unit | strip -%}
+          {%- assign right_text = right_number | append: ' ' | append: right_unit -%}
+        {%- endif -%}
+        {%- assign display_value = left_text | append: ' (' | append: right_text | append: ')' -%}
+      {%- endif -%}
+
+      {%- capture row -%}
+        <li class="record__row"><span class="record__label">{{ label | escape }}</span><span class="record__value">&lt;{{ display_value | escape }}&gt;</span></li>
+      {%- endcapture -%}
+
+      {%- assign ordered_rows = ordered_rows | append: row -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{{- ordered_rows -}}

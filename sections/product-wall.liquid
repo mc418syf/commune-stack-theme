@@ -1,0 +1,338 @@
+{%- liquid
+  assign section_color = section.settings.color_scheme
+  assign collection_handle = section.settings.collection.handle | default: 'all'
+
+  comment
+    Rows on screen drive the image height, so reserve room for the text under each image.
+  endcomment
+  assign meta_lines = 0
+  if section.settings.show_vendor or section.settings.show_price
+    assign meta_lines = meta_lines | plus: 1
+  endif
+  if section.settings.show_title
+    assign meta_lines = meta_lines | plus: 1
+  endif
+  assign opening = section.settings.opening_screen
+  assign one_screen = section.settings.one_screen
+  if opening
+    assign one_screen = true
+  endif
+  assign enter_mode = section.settings.enter_mode
+
+  assign meta_height = 0
+  if meta_lines > 0
+    assign meta_height = meta_lines | times: 13 | plus: 6
+  endif
+-%}
+
+<section
+  class="product-wall bg-scheme-background text-scheme-text"
+  data-color-scheme="{{ section_color }}"
+  data-product-wall
+  data-collection="{{ collection_handle }}"
+  data-hover-shuffle="{{ section.settings.hover_shuffle }}"
+  data-motion="{{ section.settings.motion }}"
+  data-shuffle="{{ section.settings.shuffle_strength | divided_by: 100.0 }}"
+  data-speed="{{ section.settings.speed | divided_by: 100.0 }}"
+  data-sizing="{{ section.settings.sizing }}"
+  data-reserve-header="{{ section.settings.reserve_header_space }}"
+  data-lock-page="{{ section.settings.lock_page }}"
+  data-one-screen="{{ one_screen }}"
+  data-opening="{{ opening }}"
+  data-enter-mode="{{ enter_mode }}"
+  data-once-per-session="{{ section.settings.once_per_session }}"
+  data-rows-desktop="{{ section.settings.rows_desktop }}"
+  data-rows-mobile="{{ section.settings.rows_mobile }}"
+  data-per-row="{{ section.settings.products_per_row }}"
+  data-hide-sold-out="{{ section.settings.hide_sold_out }}"
+  data-show-vendor="{{ section.settings.show_vendor }}"
+  data-show-title="{{ section.settings.show_title }}"
+  data-show-price="{{ section.settings.show_price }}"
+  data-currency="{{ shop.currency }}"
+  data-sold-out-text="{{ 'products.product.sold_out' | t | escape }}"
+  style="--wall-rows-desktop: {{ section.settings.rows_desktop }}; --wall-rows-mobile: {{ section.settings.rows_mobile }}; --wall-h-desktop: {{ section.settings.image_height_desktop }}vh; --wall-h-mobile: {{ section.settings.image_height_mobile }}svh; --wall-gap-desktop: {{ section.settings.gap_desktop }}px; --wall-gap-mobile: {{ section.settings.gap_mobile }}px; --wall-meta-h: {{ meta_height }}px;"
+>
+  <div class="product-wall__rows" data-product-wall-rows aria-label="{{ section.settings.collection.title | default: 'All products' | escape }}"></div>
+  {%- if opening -%}
+    {%- if enter_mode != 'scroll' and section.settings.cta_text != blank -%}
+      <button type="button" class="product-wall__cta" data-product-wall-cta>{{ section.settings.cta_text | escape }}</button>
+    {%- endif -%}
+    {%- if enter_mode != 'cta' and section.settings.scroll_hint_text != blank -%}
+      <p class="product-wall__scroll-hint" aria-hidden="true">{{ section.settings.scroll_hint_text | escape }}<span class="product-wall__arrow"></span></p>
+    {%- endif -%}
+  {%- endif -%}
+  <noscript>
+    <p class="product-wall__empty"><a href="{{ section.settings.collection.url | default: routes.all_products_collection_url }}">{{ 'collections.general.view_all' | t }}</a></p>
+  </noscript>
+</section>
+
+{%- if section.settings.hide_footer_mobile -%}
+  {% style %}
+    @media (max-width: 1023px) {
+      .shopify-section-group-footer-group { display: none; }
+    }
+  {% endstyle %}
+{%- endif -%}
+
+{{ 'product-wall.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-wall.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product wall",
+  "disabled_on": {
+    "groups": ["aside"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Every product in rotating rows. Rows autoplay in alternating directions; visitors can move the mouse, scroll or swipe to shuffle them, and tap a product to open it. Reduced-motion visitors get static rows."
+    },
+    {
+      "type": "header",
+      "content": "Opening screen"
+    },
+    {
+      "type": "checkbox",
+      "id": "opening_screen",
+      "label": "Use as the website's opening screen",
+      "info": "The wall covers the whole screen and the page below is the actual homepage. Visitors enter with the button, by scrolling or swiping up, or both. Not applied inside the theme editor, so you can still edit the page.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "enter_mode",
+      "label": "How visitors enter",
+      "options": [
+        { "value": "both", "label": "Button, or scroll / swipe" },
+        { "value": "cta", "label": "Button only" },
+        { "value": "scroll", "label": "Scroll / swipe only" }
+      ],
+      "default": "both",
+      "info": "Scrolling or swiping up slides the wall away to reveal the homepage. Scrolling back up at the top brings it back."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Enter",
+      "info": "Shown in the middle of the screen. Leave empty to hide the button."
+    },
+    {
+      "type": "text",
+      "id": "scroll_hint_text",
+      "label": "Scroll hint text",
+      "default": "Scroll to enter",
+      "info": "Leave empty to hide the hint."
+    },
+    {
+      "type": "checkbox",
+      "id": "once_per_session",
+      "label": "Show the opening screen once per visit",
+      "info": "After entering, going back to the homepage in the same browser session skips the wall.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave empty to show all products."
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_sold_out",
+      "label": "Hide sold out products",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_footer_mobile",
+      "label": "Hide the footer on mobile",
+      "info": "Removes the footer group on phones and tablets on pages that use this section, so the wall is the whole screen.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Product details"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show brand",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout and motion"
+    },
+    {
+      "type": "select",
+      "id": "motion",
+      "label": "Motion",
+      "options": [
+        { "value": "autoplay", "label": "Autoplay (rows always moving)" },
+        { "value": "on_scroll", "label": "Static, shuffles when scrolling" }
+      ],
+      "default": "autoplay",
+      "info": "Static keeps the rows still until the visitor scrolls or swipes, then shuffles them in alternating directions."
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_shuffle",
+      "label": "Shuffle when the pointer moves (desktop)",
+      "info": "Moving the mouse over the wall pushes the rows and shifts them slightly with the cursor. Works in both motion modes.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "shuffle_strength",
+      "min": 25,
+      "max": 300,
+      "step": 25,
+      "unit": "%",
+      "label": "Shuffle strength",
+      "info": "Strength of the scroll and pointer shuffle in static mode.",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 0,
+      "max": 400,
+      "step": 25,
+      "unit": "%",
+      "label": "Autoplay speed",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "label": "Products per row",
+      "info": "Only used when \"Keep the wall to one screen\" is off.",
+      "default": 28
+    },
+    {
+      "type": "checkbox",
+      "id": "one_screen",
+      "label": "Keep the wall to one screen",
+      "info": "The wall is exactly as tall as the screen (minus the header) and shows the rows set below. All products are spread across those rows. Turn off to stack as many rows as needed and scroll the page.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "lock_page",
+      "label": "Lock page scrolling",
+      "info": "Not needed for the opening screen, which locks itself. The page stays fixed on the screen. Scrolling, swiping or moving the pointer only shuffles the wall. Needs \"Keep the wall to one screen\", and is off inside the theme editor so you can still scroll the preview.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sizing",
+      "label": "Image sizing",
+      "options": [
+        { "value": "fit_rows", "label": "Fit rows to the screen" },
+        { "value": "fixed", "label": "Fixed image height" }
+      ],
+      "default": "fit_rows"
+    },
+    {
+      "type": "range",
+      "id": "rows_desktop",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "label": "Rows on screen (desktop)",
+      "info": "Used when sizing is \"Fit rows to the screen\". Image height adjusts to match.",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "rows_mobile",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "label": "Rows on screen (mobile)",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "image_height_desktop",
+      "min": 15,
+      "max": 70,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image height (desktop)",
+      "info": "Used when sizing is \"Fixed image height\".",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image height (mobile)",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between images (desktop)",
+      "info": "Applies between images and between rows.",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between images (mobile)",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "reserve_header_space",
+      "label": "Leave space for the header",
+      "info": "The header floats over the page, so this keeps it clear of the first row.",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme1",
+      "label": "Color scheme"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product wall"
+    }
+  ]
+}
+{% endschema %}

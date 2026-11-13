@@ -2,11 +2,20 @@
   assign product_form_id = 'product-form-' | append: section.id
   assign tab_counter = 0
 
+  assign strip_layout = false
+  if section.settings.desktop_layout == 'strip'
+    assign strip_layout = true
+    assign right_types = 'variant_picker,quantity_selector,record,buy_buttons,information_list,inventory,location_inventory,icon_list,popup,share' | split: ','
+    assign left_html = ''
+    assign right_html = ''
+  endif
+
   comment
     The product is being passed in explicitly only so this snippet can work when called from the featured product section, it is not necessary for product templates
   endcomment
 
   for block in section.blocks
+    capture block_html
     case block.type
       when '@app'
         render 'product-block-app', block: block, product: product
@@ -22,6 +31,8 @@
         render 'product-form-component-quantity-selector', block: block, product: product, product_form_id: product_form_id
       when 'buy_buttons'
         render 'product-form-component-buy-buttons', block: block, product: product, product_form_id: product_form_id
+      when 'record'
+        render 'product-block-record', block: block, product: product
       when 'description'
         render 'product-block-description', block: block, product: product
       when 'text'
@@ -51,5 +62,25 @@
       when 'custom_liquid'
         render 'product-block-custom-liquid', block: block, product: product
     endcase
+    endcapture
+
+    if strip_layout
+      comment
+        Each block keeps its original position (order) so mobile can stack them as before;
+        on desktop they split into a left and a right column.
+      endcomment
+      assign wrapped = '<div class="pb" data-pb="' | append: block.type | append: '" style="order: ' | append: forloop.index | append: '">' | append: block_html | append: '</div>'
+      if right_types contains block.type
+        assign right_html = right_html | append: wrapped
+      else
+        assign left_html = left_html | append: wrapped
+      endif
+    else
+      echo block_html
+    endif
   endfor
+
+  if strip_layout
+    echo '<div class="pb-col pb-col--left">' | append: left_html | append: '</div><div class="pb-col pb-col--right">' | append: right_html | append: '</div>'
+  endif
 -%}

@@ -1,38 +1,6 @@
 {%- liquid
-  assign layout = section.settings.layout
   assign section_color = section.settings.color_scheme
-  assign overlay_text_color_scheme = section.settings.overlay_text_color_scheme
-  assign show_icons = section.settings.show_icons
-
-  {% comment %}DISABLED: overlay header / scroll logo swap — forced off{% endcomment %}
-  assign overlay_header = false
-  assign overlay_header_with_sticky = false
-  assign overlay_header_without_sticky = false
-
-  assign drop_down_flex_alignment = 'justify-center'
-
-  if section.settings.layout contains 'menu_left'
-    assign drop_down_flex_alignment = 'justify-start'
-  endif
-
-  assign locale_selector = false
-  assign country_selector = false
-
-  if section.settings.show_country_selector and localization.available_countries.size > 1
-    assign country_selector = true
-  endif
-
-  if section.settings.show_locale_selector and shop.published_locales.size > 1
-    assign locale_selector = true
-  endif
-
-  if locale_selector or country_selector
-    assign show_localization = true
-  endif
-
-  assign item_spacing = section.settings.header_vertical_spacing
-  assign show_try_on_button = section.settings.show_try_on_button
-  assign mobile_layout = section.settings.mobile_layout
+  assign item_spacing = 'py-2'
 -%}
 
 {%- capture header_logo -%}
@@ -91,484 +59,73 @@
 {%- endcapture -%}
 
 {%- liquid
-  capture header_menu
-    render 'header-menu', layout: layout, drop_down_flex_alignment: drop_down_flex_alignment, item_spacing: item_spacing
-  endcapture
+  assign vellum_alpha = section.settings.vellum_opacity | default: 72 | divided_by: 100.0
+  assign text_alpha = section.settings.vellum_text_layer | default: 40 | divided_by: 100.0
+  assign vellum_rgb = section.settings.vellum_color | default: '#F4F3EF' | color_to_rgb | remove: 'rgb(' | remove: ')'
 -%}
-
-{%- capture header_menu_toggle -%}
-  <button
-    class="inline-block no-js:hidden lg:hidden {{ item_spacing }}{% if settings.header_uppercase %} uppercase{% endif %}"
-    :aria-expanded="$store.modals.leftDrawer.contents === 'sidebar'"
-    @click="$store.modals.leftDrawer.open ? $store.modals.close('sidebar') : $store.modals.open('sidebar')"
-  >
-    {%- if show_icons -%}
-      <span class="sr-only">{{ 'layout.navigation.menu' | t }}</span>
-      <span
-        class="header-menu-toggle-icon inline-block h-6 w-6 align-middle"
-        style="transition: transform 0.3s ease;"
-        :style="{ transform: ($store.modals.leftDrawer.open && $store.modals.leftDrawer.contents === 'sidebar') ? 'rotate(45deg)' : 'rotate(0deg)' }"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <line x1="3" y1="9" x2="21" y2="9"/>
-          <line x1="3" y1="15" x2="21" y2="15"/>
-        </svg>
-      </span>
-    {%- else -%}
-      {{ 'layout.navigation.menu' | t }}
-    {%- endif -%}
-  </button>
-{%- endcapture -%}
-
-{%- capture header_cart %}
-  <a
-    href="{{ routes.cart_url }}"
-    class="inline-flex items-center {{ item_spacing }}"
-    aria-label="{{ 'layout.cart.title' | t }}"
-    {% if settings.cart_type == 'drawer' and template != 'cart' %}
-      data-cart-drawer-toggle
-      :aria-expanded="$store.modals.rightDrawer.contents === 'cart'"
-      @click.prevent="$store.modals.open('cart')"
-      @keydown.space="$store.modals.open('cart')"
-    {% endif %}
-  >
-    <span
-      class="inline-flex items-center justify-center text-sm leading-none"
-      style="background: #DBDBDB; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
-      x-text="$store.cartCount.count"
-    >{{ cart.item_count }}</span>
-    <span class="sr-only">{{ 'layout.cart.title' | t }}</span>
-  </a>
-{%- endcapture -%}
-
-{%- liquid
-  if show_localization
-    capture localization_form
-      assign button_class = 'text-base ' | append: item_spacing
-      render 'localization-form', context: 'header', wrapper_classes: 'justify-end max-lg:hidden', open: 'top-full left-0 right-auto', locale_selector: locale_selector, country_selector: country_selector, button_classes: button_class, options_max_width: 'max-w-[theme(spacing.64)]', option_text_size: 'text-base', option_padding: 'px-4 py-2'
-    endcapture
-  endif
--%}
-
-{% if overlay_header %}
-  {% style %}
-    #{{ section.id }} {
-      --color-gridline: {{ section.settings.overlay_text_color_scheme.settings.text.rgb }};
+{% style %}
+  .edge-rail, .edge-panel, .edge-strip, .plp-fp {
+    --paper: {{ section.settings.vellum_color | default: '#F4F3EF' }};
+    --ink: {{ section.settings.ink_color | default: '#111111' }};
+    --gray: {{ section.settings.muted_color | default: '#6B6B66' }};
+    --orange: {{ section.settings.accent_color | default: '#FF5A1F' }};
+    --orange-ink: {{ section.settings.accent_text_color | default: '#C23B05' }};
+  }
+  {% if section.settings.vellum_stack != false %}
+  .edge-strip {
+    --vellum-layer: linear-gradient(rgba({{ vellum_rgb }}, {{ vellum_alpha }}), rgba({{ vellum_rgb }}, {{ vellum_alpha }})), rgb(var(--color-scheme-background));
+  }
+  {% endif %}
+  {% if section.settings.vellum_match_page != false %}
+  .edge-strip {
+    --paper: rgb(var(--color-scheme-background));
+    --vellum: rgb(var(--color-scheme-background) / {{ vellum_alpha }});
+  }
+  {% endif %}
+  :root {
+    --vellum: rgba({{ vellum_rgb }}, {{ vellum_alpha }});
+    --vellum-blur: {{ section.settings.vellum_blur | default: 18 }}px;
+    --vellum-text: rgba({{ vellum_rgb }}, {{ text_alpha }});
+    --rail-w: {{ section.settings.rail_width_mobile | default: 36 }}px;
+    --strip-h: {{ section.settings.strip_height_mobile | default: 41 }}px;
+  }
+  @media (min-width: 768px) {
+    :root {
+      --rail-w: {{ section.settings.rail_width_desktop | default: 40 }}px;
+      --strip-h: {{ section.settings.strip_height | default: 56 }}px;
     }
-
-    {% if overlay_header_with_sticky %}
-      #{{ section.id }}.is-stuck {
-        --color-gridline: {{ section.settings.color_scheme.settings.text.rgb }};
-      }
-    {% endif %}
-    {% style %}
+  }
+  /* Menu, Cart and Filter are as wide as one product card (grid gap 6px): a quarter of the page at 1024px and up, half of it between 768 and 1023px */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    :root {
+      --pf-w: max(280px, calc((100vw - var(--rail-w) - 6px) / 2));
+      --panel-w: var(--pf-w);
+    }
+  }
+  @media (min-width: 1024px) {
+    :root {
+      --pf-w: max(280px, calc((100vw - var(--rail-w) - 18px) / 4));
+      --panel-w: var(--pf-w);
+    }
+  }
 {% endstyle %}
-  {% endstyle %}
-{% endif %}
 
 <header-section
-  x-data="Theme_Header"
-  class="block{% if overlay_header %} absolute top-0 left-0 right-0 z-50{% endif %}"
-  :class="{ 'is-stuck' : isStuck, 'invisible pointer-events-none' : $store.modals && $store.modals.modal && $store.modals.modal.open }"
-  {% if section.settings.sticky_header %}
-    data-sticky="true"
-  {% endif %}
-  {% if overlay_header %}
-    data-overlay-header="true"
-  {% endif %}
+  class="block"
   data-color-scheme="{{ section_color }}"
-  data-overlay-header-with-sticky="false"
-  data-overlay-text-color-scheme="{{ overlay_text_color_scheme }}"
   id="{{ section.id }}"
   data-theme-header
 >
-  <header
-    x-ref="header"
-    :class="$store.modals.leftDrawer.open ? 'drawer-open-header' : ''"
-    class="relative z-10 border-b-gridline border-gridline-color text-scheme-text {% unless overlay_header %} border-gridline-color bg-scheme-background{% endunless %}"
-    data-color-scheme="{%- if overlay_header_without_sticky -%}{{ overlay_text_color_scheme }}{%- else -%}{{ section_color }}{%- endif -%}"
-  >
-    <nav
-      class="relative hidden{% if settings.header_uppercase %} uppercase{% endif %}{% unless layout contains 'menu_drawer' %} lg:block{% endunless %}"
-      aria-label="{{ 'general.accessibility.primary' | t }}"
-    >
-      {%- comment -%} Single flat flex row: logo | menu (flex-1) | actions — all items-center {%- endcomment -%}
-      <div class="px-section-horizontal-spacing" style="display:flex; align-items:stretch; justify-content:space-between;">
-
-        {%- comment -%} LEFT — logo (+ menu if left layout) {%- endcomment -%}
-        <div style="display:flex; flex-shrink:0; align-items:center;">
-          {% if layout contains 'logo_left' %}
-            {{ header_logo }}
-          {% endif %}
-          {% if layout contains 'menu_left' %}
-            <div style="margin-left:1.5rem;">{{ header_menu }}</div>
-          {% endif %}
-        </div>
-
-        {%- comment -%} CENTER — menu / logo-center {%- endcomment -%}
-        {% if layout contains 'menu_spread' or layout contains 'menu_center' %}
-          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:center;">
-            {% if layout contains 'logo_center' %}{{ header_logo }}{% endif %}
-            {{ header_menu }}
-          </div>
-        {% elsif layout contains 'menu_right' %}
-          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:flex-end;">
-            {{ header_menu }}
-          </div>
-        {% elsif layout contains 'logo_center' %}
-          <div style="display:flex; flex:1 1 0%; align-items:center; justify-content:center;">
-            {{ header_logo }}
-          </div>
-        {% else %}
-          <div style="flex:1 1 0%;"></div>
-        {% endif %}
-
-        {%- comment -%} RIGHT — localization · accounts · search · try-on · cart {%- endcomment -%}
-        <div style="display:flex; flex-shrink:0; align-items:center; column-gap:1rem;">
-          {%- if show_localization -%}
-            {{ localization_form }}
-          {%- endif -%}
-
-          {%- if shop.customer_accounts_enabled -%}
-            {{ customer_accounts }}
-          {%- endif -%}
-
-          {% if section.settings.show_search %}
-            {% render 'header-search',
-              layout: layout,
-              header_item_spacing: item_spacing,
-              section_color: section_color,
-              show_icons: show_icons
-            %}
-          {% endif %}
-
-          {% if show_try_on_button %}
-            <div x-data>
-              <a
-                href="/pages/try-in-store"
-                class="inline-flex items-center {{ item_spacing }}"
-                aria-label="Try In-Store"
-              >
-                <span
-                  class="inline-flex items-center justify-center text-sm leading-none"
-                  style="background: #B0B0B0; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
-                  x-text="$store.tryOnList.count"
-                >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;document.currentScript.previousElementSibling.textContent=n;}catch(e){}})();</script>
-                <span class="sr-only">Try In-Store</span>
-              </a>
-            </div>
-          {% endif %}
-
-          {{ header_cart }}
-        </div>
-
-      </div>
-
-      {% if layout contains 'menu_below' %}
-        <div class="border-t-gridline border-gridline-color px-section-horizontal-spacing" style="display:flex; align-items:center; justify-content:center;">
-          {{ header_menu }}
-        </div>
-      {% endif %}
-    </nav>
-
-    {% comment %}
-      Mobile Nav
-    {% endcomment %}
-    <nav
-      aria-label="{{ 'general.accessibility.header' | t }}"
-      class="{% unless layout contains 'menu_drawer' %}lg:hidden{% endunless %}{% if settings.header_uppercase %} uppercase{% endif %}"
-    >
-      <div class="flex items-center justify-between px-section-horizontal-spacing lg:relative">
-        <div class="flex gap-2 items-center{% if mobile_layout == 'logo_center' %} flex-grow w-1/3{% endif %}">
-          {% if mobile_layout == 'logo_left' %}
-            <div>
-              {{ header_logo }}
-            </div>
-          {% elsif mobile_layout == 'logo_center' %}
-            {{ header_menu_toggle }}
-          {% endif %}
-        </div>
-
-        {% if mobile_layout == 'logo_center' %}
-          <div class="shrink-0 justify-center text-center">
-            {{ header_logo }}
-          </div>
-        {% endif %}
-
-        <div class="flex justify-end gap-2 items-center text-right{% if mobile_layout == 'logo_center' %} flex-grow flex-wrap w-1/3{% endif %}">
-          {% if mobile_layout == 'logo_left' %}
-            {{ header_menu_toggle }}
-          {% endif %}
-
-          {% if layout contains 'menu_drawer' %}
-            {%- if show_localization -%}
-              <div class="my-auto hidden shrink-0 lg:block">
-                {{ localization_form }}
-              </div>
-            {%- endif -%}
-
-            {%- if shop.customer_accounts_enabled -%}
-              <div class="hidden whitespace-nowrap lg:block">
-                {{ customer_accounts }}
-              </div>
-            {%- endif -%}
-          {% endif %}
-
-          {% if section.settings.show_search %}
-            <div class="whitespace-nowrap lg:ml-4">
-              {% render 'header-search',
-                layout: layout,
-                header_item_spacing: item_spacing,
-                section_color: section_color,
-                show_icons: show_icons,
-                location: 'mobile'
-              %}
-            </div>
-          {% endif %}
-          {% comment %} Try In-Store button — mobile {% endcomment %}
-          {% if show_try_on_button %}
-          <div class="whitespace-nowrap lg:ml-4" x-data>
-            <a
-              href="/pages/try-in-store"
-              class="inline-flex items-center {{ item_spacing }}"
-              aria-label="Try In-Store"
-            >
-              <span
-                class="inline-flex items-center justify-center text-sm leading-none"
-                style="background: #B0B0B0; color: rgb(var(--color-scheme-text)); min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem;"
-                x-text="$store.tryOnList.count"
-              >0</span><script>(function(){try{var n=(JSON.parse(localStorage.getItem('commune_try_on_list')||'[]')||[]).length;document.currentScript.previousElementSibling.textContent=n;}catch(e){}})();</script>
-              <span class="sr-only">Try In-Store</span>
-            </a>
-          </div>
-          {% endif %}
-
-          <div class="whitespace-nowrap lg:ml-4">
-            {{ header_cart }}
-          </div>
-        </div>
-      </div>
-    </nav>
+  <header class="edge-strip text-scheme-text" data-logo="{{ section.settings.logo_align | default: 'left' }}" data-color-scheme="{{ section_color }}" data-sticky="{{ section.settings.strip_sticky | default: true }}">
+    {% render 'edge-rail', header_logo: header_logo, section: section %}
   </header>
 </header-section>
-
-{%- liquid
-  if settings.enable_breadcrumbs
-    render 'breadcrumbs', section_color: 'header'
-  endif
--%}
-
-<noscript>
-  {% style %}
-    .no-js-focus-wrapper:focus-within .no-js-focus-container {
-      display: block !important;
-    }
-
-    {% if layout == 'logo_center_menu_drawer' %}
-      .section-sidebar {
-        display: block !important;
-      }
-    {%- endif -%}
-  {% endstyle %}
-</noscript>
-
-{% style %}
-  /* === Sticky header === */
-  {% if section.settings.sticky_header %}
-    #shopify-section-{{ section.id }} {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-    }
-    :root {
-      --sticky-header-height: 66px;
-    }
-  {% else %}
-    :root {
-      --sticky-header-height: 0;
-    }
-  {% endif %}
-
-  /* === Force sticky on mobile === */
-  @media (max-width: 1023px) {
-    #shopify-section-{{ section.id }} {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    #shopify-section-{{ section.id }} nav {
-      position: relative;
-    }
-  }
-
-  /* === Logo width === */
-  #shopify-section-{{ section.id }} {
-    --logo-max-width: {{ section.settings.logo_max_width_mobile }}px;
-  }
-  @media (min-width: 1024px) {
-    #shopify-section-{{ section.id }} {
-      --logo-max-width: {{ section.settings.logo_max_width }}px;
-    }
-  }
-
-  /* === Mobile centered logo (only for the logo-center mobile layout) === */
-  {% if section.settings.mobile_layout == 'logo_center' %}
-  @media (max-width: 1023px) {
-    #shopify-section-{{ section.id }} a.header-logo-mobile-centered {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 40;
-      pointer-events: auto;
-    }
-    #shopify-section-{{ section.id }} a.header-logo-mobile-centered .max-w-\[var\(--logo-max-width\)\] {
-      max-width: calc(var(--logo-max-width) * 0.9);
-    }
-  }
-  {% endif %}
-
-  /* === Frosted glass header === */
-  #shopify-section-{{ section.id }} header {
-    position: relative;
-    background: rgb(var(--color-scheme-background) / 0.2) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border-bottom: none !important;
-  }
-
-  /* === Remove gridlines === */
-  #shopify-section-{{ section.id }} .border-b-gridline {
-    border-bottom: none !important;
-    border-bottom-width: 0 !important;
-  }
-
-  /* === Frosted glass dropdown === */
-  #shopify-section-{{ section.id }} .submenu {
-    background: rgb(var(--color-scheme-background) / 0.4) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: none !important;
-  }
-  #shopify-section-{{ section.id }} .submenu li,
-  #shopify-section-{{ section.id }} .submenu a {
-    border: none !important;
-  }
-
-/* === Frosted glass search bar — opens below the header === */
-  #shopify-section-{{ section.id }} [x-ref="searchComponent"] {
-    background: rgb(var(--color-scheme-background) / 0.4) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: none !important;
-    top: var(--sticky-header-height, 56px) !important;
-    padding-top: 0.5rem !important;
-  }
-  /* === Frosted glass search results === */
-#shopify-section-{{ section.id }} [x-ref="searchComponent"] {
-  background: rgb(var(--color-scheme-background) / 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: none !important;
-}
-
-/* === Frosted glass predictive results === */
-#shopify-section-{{ section.id }} .predictive-search-results > div {
-  background: rgb(var(--color-scheme-background) / 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: none !important;
-}
-
-/* === Remove result divider lines === */
-#shopify-section-{{ section.id }} .predictive-search-results li,
-#shopify-section-{{ section.id }} .predictive-search-results a {
-  border-bottom: none !important;
-  border-top: none !important;
-}
-
-/* === 2 products per row in search results === */
-#shopify-section-{{ section.id }} .predictive-search-results ul.grid {
-  grid-template-columns: repeat(2, 1fr) !important;
-}
-/* === Remove search input border === */
-#shopify-section-{{ section.id }} input[type="search"] {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-/* === Menu icon rotation === */
-.header-menu-toggle-icon {
-  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
-}
-.drawer-open .header-menu-toggle-icon {
-  transform: rotate(90deg);
-}
-{% endstyle %}
-<script
-  type="module"
->
-  if (!customElements.get('header-section')) {
-    class HeaderSection extends HTMLElement {
-      constructor() {
-        super();
-      }
-
-      connectedCallback() {
-        if (this.getAttribute('data-sticky')) {
-          document.documentElement.style.setProperty(
-            '--sticky-header-height',
-            `${this.getBoundingClientRect().height}px`
-          );
-        } else {
-          document.documentElement.style.setProperty(
-            '--sticky-header-height',
-            '0'
-          );
-        }
-      }
-    }
-
-    customElements.define('header-section', HeaderSection);
-  }
-</script>
-
-{% unless request.design_mode %}
-  <script src="{{ 'cart-count.js' | asset_url }}" type="module"></script>
-  <script src="{{ 'header.js' | asset_url }}" type="module"></script>
-
-  {% if settings.predictive_search_enabled %}
-    <script
-      src="{{ 'predictive-search.js' | asset_url }}"
-      type="module"
-    ></script>
-  {% endif %}
-  <script>
-  document.addEventListener('alpine:init', () => {
-    Alpine.effect(() => {
-      if (Alpine.store('modals').leftDrawer.open) {
-        document.body.classList.add('drawer-open');
-      } else {
-        document.body.classList.remove('drawer-open');
-      }
-    });
-  });
-</script>
-{% endunless %}
 
 {% schema %}
 {
   "name": "Header",
   "class": "section-header relative z-20",
   "settings": [
-    {
-      "type": "header",
-      "content": "Logo"
-    },
-    {
-      "type": "paragraph",
-      "content": "Edit your logo in [theme settings](/editor?context=theme&category=logo)."
-    },
     {
       "type": "range",
       "id": "logo_max_width",
@@ -591,186 +148,16 @@
     },
     {
       "type": "link_list",
+      "id": "edge_menu",
+      "label": "Rail menu",
+      "info": "Menu tab links. Uses the four default rows when no menu is chosen."
+    },
+    {
+      "type": "link_list",
       "id": "menu",
-      "label": "Menu",
+      "label": "Fallback menu",
       "default": "main-menu",
       "info": "This menu is only displayed on desktop. To change navigation for mobile/drawer menu, go to sidebar settings."
-    },
-    {
-      "type": "select",
-      "id": "layout",
-      "options": [
-        {
-          "value": "logo_left_menu_left",
-          "label": "Logo left / menu left"
-        },
-        {
-          "value": "logo_left_menu_right",
-          "label": "Logo left / menu right"
-        },
-        {
-          "value": "logo_left_menu_center",
-          "label": "Logo left / menu center"
-        },
-        {
-          "value": "logo_left_menu_spread",
-          "label": "Logo left / menu spread"
-        },
-        {
-          "value": "logo_left_menu_below",
-          "label": "Logo left / menu below"
-        },
-        {
-          "value": "logo_center_menu_left",
-          "label": "Logo center / menu left"
-        },
-        {
-          "value": "logo_center_menu_drawer",
-          "label": "Logo center / menu drawer"
-        }
-      ],
-      "label": "Desktop layout"
-    },
-    {
-      "type": "select",
-      "id": "mobile_layout",
-      "label": "Mobile layout",
-      "options": [
-        {
-          "value": "logo_left",
-          "label": "Logo left"
-        },
-        {
-          "value": "logo_center",
-          "label": "Logo centered"
-        }
-      ],
-      "default": "logo_left"
-    },
-    {
-      "type": "select",
-      "id": "header_vertical_spacing",
-      "label": "Vertical spacing",
-      "options": [
-        {
-          "value": "py-4",
-          "label": "Medium"
-        },
-        {
-          "value": "py-2",
-          "label": "Small"
-        }
-      ],
-      "default": "py-4"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_search",
-      "label": "Show search",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "sticky_header",
-      "label": "Sticky header"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_icons",
-      "label": "Show icons",
-      "info": "Show icons for menu, search,account and cart"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_try_on_button",
-      "label": "Show Try In-Store button",
-      "default": true,
-      "info": "Displays the hanger icon in the header. Turn off to hide the Try In-Store showroom feature."
-    },
-    {
-      "type": "header",
-      "content": "Dropdown menus"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_all_navigation_links",
-      "label": "Enable links to drop-down link headings"
-    },
-    {
-      "type": "select",
-      "id": "dropdown_heading_font",
-      "label": "Heading font",
-      "options": [
-        {
-          "value": "font-body",
-          "label": "Body"
-        },
-        {
-          "value": "font-heading",
-          "label": "Heading"
-        }
-      ],
-      "default": "font-body"
-    },
-    {
-      "type": "select",
-      "id": "dropdown_text_align",
-      "options": [
-        {
-          "value": "text-left",
-          "label": "Left"
-        },
-        {
-          "value": "text-center",
-          "label": "Center"
-        },
-        {
-          "value": "text-right",
-          "label": "Right"
-        }
-      ],
-      "label": "Text align"
-    },
-    {
-      "type": "select",
-      "id": "dropdown_style",
-      "options": [
-        {
-          "value": "grid_with_border",
-          "label": "Grid with border"
-        },
-        {
-          "value": "columns",
-          "label": "Columns"
-        }
-      ],
-      "label": "Style"
-    },
-    {
-      "type": "header",
-      "content": "Language Selector",
-      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_locale_selector",
-      "label": "Show language selector",
-      "default": false
-    },
-    {
-      "type": "header",
-      "content": "Country/region selector",
-      "info": "To add a country/region, go to your [payment settings.](/admin/settings/payments)"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_country_selector",
-      "label": "Show country/region selector",
-      "default": false
-    },
-    {
-      "type": "header",
-      "content": "Color"
     },
     {
       "type": "color_scheme",
@@ -780,31 +167,230 @@
     },
     {
       "type": "header",
-      "content": "Overlay Settings"
+      "content": "Colours"
     },
     {
       "type": "checkbox",
-      "id": "overlay_homepage",
-      "label": "Overlay header over home page"
-    },
-    {
-      "type": "color_scheme",
-      "id": "overlay_text_color_scheme",
-      "label": "Overlay text color scheme",
-      "info": "Only the text color from the scheme will be used",
-      "default": "scheme4"
-    },
-    {
-      "type": "image_picker",
-      "id": "overlay_logo",
-      "label": "Overlay logo image"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_logo_scroll_swap",
-      "label": "Swap/hide logo on scroll",
+      "id": "vellum_stack",
+      "label": "Stack vellum on the page background",
       "default": false,
-      "info": "On overlay homepages, hides the main logo at the top and shows it once you scroll, swapping with the Overlay logo. Off by default — the logo stays on screen the whole time (recommended when the logo sits on the left)."
+      "info": "Off: the rail and windows are see-through and blurred, like vellum laid over the page. On: the page background colour is painted first, then the vellum on top, so nothing shows through."
+    },
+    {
+      "type": "checkbox",
+      "id": "vellum_match_page",
+      "label": "Match the page background",
+      "default": true,
+      "info": "Colours the rail and panel from the page's colour scheme (Theme settings > Colors). Turn off to pick a vellum colour below."
+    },
+    {
+      "type": "color",
+      "id": "vellum_color",
+      "label": "Vellum colour",
+      "default": "#F4F3EF",
+      "info": "Colour of the rail, panel and search window."
+    },
+    {
+      "type": "range",
+      "id": "vellum_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Vellum opacity",
+      "default": 72,
+      "info": "Lower is more see-through."
+    },
+    {
+      "type": "range",
+      "id": "vellum_blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Vellum blur",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "vellum_text_layer",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Colour layer under the text",
+      "default": 40,
+      "info": "An extra layer of the vellum colour behind the menu, filter and cart text, so it reads clearly over photos."
+    },
+    {
+      "type": "color",
+      "id": "ink_color",
+      "label": "Text colour",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Secondary text colour",
+      "default": "#6B6B66"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent fill (buttons, cart dot)",
+      "default": "#FF5A1F"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text and hover",
+      "default": "#C23B05"
+    },
+    {
+      "type": "header",
+      "content": "Width"
+    },
+    {
+      "type": "range",
+      "id": "rail_width_desktop",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Rail width, desktop",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "rail_width_mobile",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Rail width, mobile",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "min": 40,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "label": "Logo strip height",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "strip_height_mobile",
+      "min": 32,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "label": "Logo strip height, mobile",
+      "default": 41
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_sticky",
+      "label": "Sticky logo strip",
+      "default": true,
+      "info": "Transparent strip that stays at the top while scrolling."
+    },
+    {
+      "type": "select",
+      "id": "logo_align",
+      "label": "Logo position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Components"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Cart button (bottom of the rail, hidden while empty)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_menu",
+      "label": "Menu button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_expand",
+      "label": "Open the panel when hovering the rail (desktop)",
+      "default": true,
+      "info": "Hover opens and closes the panel; clicking pins it open."
+    },
+    {
+      "type": "header",
+      "content": "Menu tab"
+    },
+    {
+      "type": "link_list",
+      "id": "footer_menu",
+      "label": "Footer links",
+      "default": "footer"
+    },
+    {
+      "type": "checkbox",
+      "id": "menu_footer_links",
+      "label": "Footer links",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "menu_newsletter",
+      "label": "Newsletter sign-up",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "menu_social",
+      "label": "Social links (from Theme settings > Social)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "book_button_label",
+      "label": "Try-on: booking button text",
+      "default": "Book a visit"
+    },
+    {
+      "type": "text",
+      "id": "menu_legal_line",
+      "label": "Menu footer: copyright line",
+      "default": "© 2026 Commune. All rights reserved."
+    },
+    {
+      "type": "text",
+      "id": "menu_legal_address",
+      "label": "Menu footer: address",
+      "default": "237 Keefer Street, Vancouver, BC"
+    },
+    {
+      "type": "text",
+      "id": "menu_legal_address_link",
+      "label": "Menu footer: address link",
+      "info": "Leave empty to open the address in Google Maps"
     }
   ]
 }

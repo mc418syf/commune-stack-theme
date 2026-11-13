@@ -1,0 +1,142 @@
+.split {
+  --split-gap: 0px;
+}
+
+.split__screen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--split-gap);
+  height: var(--split-h-desktop, 100vh);
+}
+
+.split__panel {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  background: rgb(128 128 128 / .15);
+}
+
+.split__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1s cubic-bezier(.2, .7, .2, 1);
+}
+
+.split__placeholder { background: rgb(128 128 128 / .2); }
+
+/* Darkening for legibility of plain text */
+.split__panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / var(--split-overlay, 0));
+  pointer-events: none;
+}
+
+.split__text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+}
+
+/* Placement: 3 x 3 */
+.split__text--v-bottom { bottom: 0; padding-bottom: 40px; }
+.split__text--v-top { top: 0; padding-top: 72px; }
+.split__text--v-center { top: 50%; transform: translateY(-50%); }
+
+.split__text--h-center { align-items: center; text-align: center; }
+.split__text--h-left { align-items: flex-start; text-align: left; }
+.split__text--h-right { align-items: flex-end; text-align: right; }
+
+/* Fonts and sizes come from the theme's type classes (font-heading, text-heading-*, font-body, text-base) */
+.split__heading,
+.split__sub { margin: 0; }
+
+.split__heading span,
+.split__sub span { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+/* Highlighted: boxed text in the section's color scheme */
+.split__text--highlight .split__heading span,
+.split__text--highlight .split__sub span {
+  background: rgb(var(--color-scheme-background));
+  color: rgb(var(--color-scheme-text));
+}
+
+.split__text--highlight .split__heading span { padding: .04em .22em; }
+.split__text--highlight .split__sub span { padding: .08em .35em; }
+
+/* Plain: text straight on the media */
+.split__text--plain { color: var(--split-text-color, #fff); text-shadow: 0 1px 14px rgb(0 0 0 / .25); }
+.split__text--plain .split__cta { color: inherit; }
+
+.split__cta { margin-top: 4px; }
+.split__cta[style*='color'] { border-color: currentColor; }
+
+@media (hover: hover) {
+  a.split__panel:hover .split__media { transform: scale(1.03); }
+}
+
+a.split__panel:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+
+/* Snap scrolling: only while the section is on screen (see split-screens.js) */
+html.split-snap { scroll-snap-type: y mandatory; }
+.split__screen { scroll-snap-align: start; }
+.split-snap-point { scroll-snap-align: start; }
+
+@media (max-width: 749px) {
+  .split__screen {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: var(--split-h-mobile, 100svh);
+    scroll-snap-stop: always;
+  }
+
+  /* Stacked with a fixed or original ratio: each asset is sized from the screen width instead of splitting the height */
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='fixed'] .split__screen,
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='original'] .split__screen {
+    height: auto;
+    grid-template-rows: none;
+  }
+
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='fixed'] .split__panel { aspect-ratio: var(--split-ratio, 4 / 5); }
+  .split[data-mobile-layout='stacked'][data-mobile-ratio='original'] .split__panel { aspect-ratio: var(--split-ar, 0.8); }
+
+  /* Full screen: every asset is its own page and snaps into place */
+  .split[data-mobile-layout='full'] .split__screen {
+    grid-template-rows: none;
+    grid-auto-rows: var(--split-h-mobile, 100svh);
+    height: auto;
+    scroll-snap-align: none;
+  }
+
+  .split[data-mobile-layout='full'] .split__panel {
+    height: var(--split-h-mobile, 100svh);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .split[data-mobile-layout='full'] .split__panel--empty { display: none; }
+
+  .split__text { padding: 16px; gap: 8px; }
+  .split__text--v-bottom { padding-bottom: 24px; }
+  .split__text--v-top { padding-top: 56px; }
+
+  /* Keep text clear of a header docked to the bottom: the lower asset when stacked, every asset when full screen */
+  .split[data-mobile-layout='stacked'] .split__panel:last-child .split__text--v-bottom,
+  .split[data-mobile-layout='full'] .split__text--v-bottom { padding-bottom: calc(24px + var(--header-bar-height, 0px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split__media { transition: none; }
+}

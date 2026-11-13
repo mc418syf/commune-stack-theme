@@ -1,0 +1,303 @@
+/* v3 vellum */
+/* Edge rail + products-first grid. Values follow the "Edge rail" design (desktop 1440, mobile 390).
+   Rail 40px desktop / 36px mobile; panel 380px / calc(100vw - 36px); gutters 24px / 16px; breakpoint = theme md (768px). */
+
+:root { --vellum: rgba(244, 243, 239, 0.72); --vellum-edge: rgba(17, 17, 17, 0.10); --rail-w: 36px; --panel-w: calc(100vw - var(--rail-w)); --strip-h: 56px; --gut: 16px; }
+@media (min-width: 768px) { :root { --rail-w: 40px; --panel-w: var(--pf-w, 342px); --gut: 24px; } }
+
+body { padding-left: var(--rail-w); }
+html.edge-locked { overflow: hidden; }
+
+/* ---- Top strip: filter button left (see plp-filter.css), logo centred or at a side. No rule under it. ---- */
+.edge-strip { position: absolute; top: 0; left: 0; right: 0; z-index: 30; height: var(--strip-h); background: transparent; }
+.edge-strip__inner { position: relative; height: var(--strip-h); display: flex; align-items: center; justify-content: center; padding: 0 var(--gut); }
+.edge-strip__left, .edge-strip__right { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; min-width: 0; }
+.edge-strip__left { left: var(--gut); }
+.edge-strip__right { right: var(--gut); justify-content: flex-end; }
+.edge-strip__logo { display: flex; justify-content: center; align-items: center; }
+.edge-strip__logo a { padding: 0; }
+.edge-strip__logo img { max-height: calc(var(--strip-h) - 14px); width: auto; max-width: var(--logo-max-width, 120px); object-fit: contain; }
+
+.edge-rail button, .edge-panel button {
+  font: inherit; color: inherit; background: none; border: 0; border-radius: 0; padding: 0; cursor: pointer; text-align: inherit;
+}
+.edge-rail__v, .edge-pill {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; line-height: 14px;
+}
+/* ---- Rail ---- */
+.edge-rail { position: fixed; z-index: 60; left: 0; top: 0; bottom: 0; width: var(--rail-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); border-right: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 0; }
+.edge-rail__group { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.edge-rail__v { writing-mode: vertical-rl; transform: rotate(180deg); min-width: 44px; padding: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.edge-rail__v:hover { color: var(--ink); }
+.edge-noscript { display: none; }
+.edge-rail button:focus-visible, .edge-panel button:focus-visible, .edge-panel a:focus-visible {
+  outline: 1px solid var(--ink, #111111); outline-offset: 2px;
+}
+
+/* ---- Scrim + panel ---- */
+.edge-scrim { position: fixed; z-index: 40; inset: 0 0 0 var(--rail-w); background: rgba(17, 17, 17, 0.28); }
+.edge-scrim[hidden], .edge-panel[hidden] { display: none; }
+.edge-panel { position: fixed; z-index: 50; left: var(--rail-w); width: var(--panel-w); box-sizing: border-box; background: var(--vellum-layer, var(--vellum)); -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+  border-right: 0;
+  display: flex; flex-direction: column; top: var(--edge-win-top, 0px); bottom: auto; max-height: calc(100vh - var(--edge-win-top, 0px)); max-height: calc(100dvh - var(--edge-win-top, 0px)); transition: clip-path 0.2s ease-out;
+  clip-path: inset(-24px -24px -24px calc(-1 * var(--rail-w))); }
+.edge-panel[data-tab='cart'] { top: auto; bottom: 0; max-height: 100vh; max-height: 100dvh; }
+/* The window opens out from the rail's right edge (it is revealed left to right), not from the screen edge behind the rail */
+.edge-panel.is-entering { clip-path: inset(-24px 100% -24px 0); transition-delay: 0s; }
+.edge-scrim { transition: opacity 0.2s ease-out; }
+.edge-scrim.is-entering { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .edge-panel, .edge-scrim { transition: none; } }
+
+
+.edge-panes { padding-top: 8px; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.edge-panes > [data-edge-pane] { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+.edge-panes > [hidden] { display: none; }
+
+/* Menu */
+.edge-menu { list-style: none; margin: 0; padding: 0 var(--gut); }
+.edge-row { display: flex; align-items: center; gap: 12px; min-height: 40px; border-bottom: 1px dashed var(--rule-dashed); color: var(--ink); text-decoration: none; }
+.edge-row__n { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); color: var(--gray); width: 20px; flex: none; }
+.edge-row__l { font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 20px; letter-spacing: 0.10em; text-transform: uppercase; }
+.edge-row__c { font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--body-ls, 0em); color: var(--gray); margin-left: auto; }
+.edge-panel a:hover { text-decoration: none; }
+
+/* Footer, buttons */
+.edge-foot { flex: none; display: flex; flex-direction: column; gap: 4px; padding: 12px var(--gut) 16px; border-top: 1px solid var(--rule); }
+.edge-body .edge-foot { padding: 20px 0 0; border-top: 0; }
+.edge-pill { display: flex; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; height: 44px; border-radius: 9999px !important; font-weight: 500; text-decoration: none; color: var(--ink); }
+.edge-pill--primary { background: var(--orange) !important; border: 1px solid var(--orange) !important; }
+.edge-pill--secondary { border: 1px solid var(--ink) !important; background: transparent; }
+
+/* Cart + try-on lines */
+.edge-body { padding: 20px var(--gut) 16px; display: flex; flex-direction: column; }
+.edge-line { display: flex; gap: 16px; padding-bottom: 8px; }
+.edge-line__img { width: 64px; height: 80px; flex: none; background: #E6E5DF; overflow: hidden; display: block; }
+.edge-line__img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; display: block; }
+.edge-line__txt { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.edge-line__name { font-family: var(--font-display); font-weight: var(--name-weight, 600); font-size: var(--name-size, 13px); line-height: var(--name-lh, 18px); letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.edge-line__ref { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
+.edge-line__price { font-family: var(--font-mono); font-size: var(--price-size, 11px); line-height: var(--price-lh, 16px); color: var(--gray); font-variant-numeric: tabular-nums; }
+.edge-line__act { display: flex; gap: 20px; }
+.edge-line__act button { font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; color: var(--ink); }
+.edge-line__act button:hover { color: var(--ink); }
+.edge-ledger { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; margin-top: 8px; border-top: 1px dashed var(--rule-dashed); border-bottom: 1px dashed var(--rule-dashed);
+  font-family: var(--font-mono); font-size: 11px; line-height: 20px; letter-spacing: 0.02em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.edge-empty { margin: 0; padding: 20px var(--gut); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
+.edge-body .edge-empty { padding: 0; }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root { --vellum: rgba(244, 243, 239, 0.94); }
+}
+
+/* ---- PLP: products first. Flush grid, no gutters; name and price on hover (desktop) or under the photo (mobile). ---- */
+#results .collection-list { gap: 0 !important; padding: 0 !important; margin: 0 !important; }
+#results .collection-list > li { padding: 0 !important; }
+#results .collection-list .group > .relative > .w-full { padding: 0 !important; border: 0 !important; }
+#results .collection-list .product-tile-meta {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 2px; text-align: left;
+  padding: 8px 10px 14px !important; margin: 0;
+}
+#results .collection-list .product-tile-meta > div { width: auto !important; padding: 0 !important; margin: 0 !important; text-align: left !important; }
+#results .collection-list .product-tile-vendor { margin: 0 !important; }
+/* Name and price sit under the image on every screen size */
+
+.product-card--sold-out { opacity: 0.55; }
+.product-card--sold-out .line-through { text-decoration: none; }
+.edge-soldtag { position: absolute; top: 12px; left: 12px; z-index: 11; background: var(--paper); padding: 4px 8px; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); pointer-events: none; }
+.product-tile-price .edge-soldout::before { content: ' · '; }
+/* Collection and search grids: a sold-out piece shows "Sold out" in place of its price, and no badge on the image */
+#results .edge-soldtag { display: none; }
+#results .product-card--sold-out .product-tile-price > :not(.edge-soldout) { display: none; }
+#results .product-card--sold-out .product-tile-price .edge-soldout::before { content: none; }
+/* the transition stays on after loading, so the new results fade up from the dimmed state instead of snapping (no flash when a filter is chosen) */
+#results { transition: opacity 0.22s ease; }
+html.edge-busy #results { opacity: 0.4; }
+html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { display: none; }
+
+/* Sticky logo strip (Header > Sticky logo strip): transparent, sits over the page and stays while scrolling; only the logo and summary take clicks */
+.edge-strip[data-sticky='true'] { position: fixed; left: var(--rail-w); right: 0; background: transparent; pointer-events: none; }
+.edge-strip[data-sticky='true'] a, .edge-strip[data-sticky='true'] button { pointer-events: auto; }
+/* the rail, panel and scrim live inside the strip element; they must keep taking clicks */
+.edge-strip[data-sticky='true'] .edge-rail, .edge-strip[data-sticky='true'] .edge-panel, .edge-strip[data-sticky='true'] .edge-scrim { pointer-events: auto; }
+
+/* Logo sits at the left of the page (Header > Logo position) */
+.edge-strip[data-logo='left'] .edge-strip__logo { position: absolute; left: var(--gut); top: 0; bottom: 0; }
+.edge-strip[data-logo='right'] .edge-strip__logo { position: absolute; right: var(--gut); top: 0; bottom: 0; }
+.edge-strip[data-logo='right'] .edge-strip__right { right: auto; left: var(--gut); justify-content: flex-start; }
+
+/* ---- Menu tab: items, footer links, newsletter, social ---- */
+.edge-menu .edge-row { border-bottom: 0; }
+[data-edge-pane='menu'] { padding-bottom: 4px; }
+.edge-rule { border: 0; border-top: 1px solid var(--rule); margin: 10px var(--gut); flex: none; }
+.edge-footlinks { list-style: none; margin: 0; padding: 0 var(--gut); }
+.edge-footlinks a { display: flex; align-items: center; min-height: 28px; color: var(--gray); text-decoration: none;
+  font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; }
+.edge-footlinks a:hover { color: var(--ink); }
+.edge-news { padding: 2px var(--gut) 4px; }
+.edge-news__l { display: block; margin-bottom: 4px; color: var(--gray); font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; }
+.edge-news__row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--ink); }
+.edge-news__row input { flex: 1; min-width: 0; height: 36px; border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; outline: none;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--body-ls, 0em); color: var(--ink); }
+.edge-news__row input:focus-visible { outline: none; }
+.edge-news__row button { min-height: 36px; font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
+.edge-news__ok, .edge-news__err { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
+.edge-social { list-style: none; margin: auto 0 0; padding: 0 calc(var(--gut) - 8px) 4px; display: flex; flex-wrap: wrap; gap: 0; }
+.edge-social a { display: inline-flex; align-items: center; justify-content: center; width: 36px; min-height: 36px; color: var(--ink); text-decoration: none; }
+.edge-social a:hover { color: var(--gray); }
+.edge-social__icon { display: inline-flex; width: 20px; height: 20px; }
+.edge-social__icon svg { width: 100%; height: 100%; fill: currentColor; }
+.edge-social__icon svg path { fill: currentColor; }
+
+/* Opening pushes the rail out to the panel's right edge first, then the panel expands in the space it left */
+@media (prefers-reduced-motion: reduce) { .edge-panel { transition: none !important; } }
+
+/* The Cart button and tab disappear while the cart and the try-on list are both empty */
+.edge-rail [hidden] { display: none !important; }
+/* Cart window: the try-on lines sit under the cart lines */
+.edge-sec { border-top: 1px solid var(--rule); margin-top: 8px; }
+.edge-sec__h { margin: 0; padding: 20px var(--gut) 0; font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
+.edge-sec .edge-body { padding-top: 12px; }
+
+/* While a window is open, the other rail labels go quiet so the open one reads as selected */
+.edge-rail.is-open .edge-rail__v:not(.is-active) { color: var(--gray); }
+.edge-rail__v.is-active { color: var(--ink); }
+
+/* Extra colour layer under the text of every window (Header > Colour layer under the text) */
+
+/* The rail labels sit on the same extra colour layer as the window text */
+
+/* One sheet: the rail strip, the window behind its label and the window itself share the same layers */
+.edge-rail { background: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.edge-rail__bg, .edge-panel {
+  background: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)), var(--vellum-layer, var(--vellum));
+  -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+}
+.edge-rail__bg { position: fixed; z-index: 45; left: 0; top: 0; bottom: 0; width: var(--rail-w); pointer-events: none; }
+.edge-panes { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* Light divider lines show between the Menu sections and above Try-on in the Cart window */
+.edge-foot { border-top: 0 !important; }
+
+/* Product text in the Cart window (brand, title, price) uses exactly the product card's sizes and style (commune-type.css): the type scale for the device minus the card offset from Theme settings > Product text */
+.edge-panel .edge-line__name {
+  font-family: var(--font-display) !important; font-weight: var(--name-weight, 600) !important; letter-spacing: var(--name-ls, 0.10em) !important; text-transform: uppercase !important;
+  font-size: calc(var(--name-size, 14px) - var(--product-card-offset, 2px)) !important; line-height: calc(var(--name-lh, 18px) - var(--product-card-offset, 2px)) !important;
+}
+.edge-line__vendor, .edge-line__title { display: block; }
+.edge-panel .edge-line__price {
+  font-family: var(--font-mono); font-weight: var(--price-weight, 400); letter-spacing: var(--price-ls, 0em); color: var(--ink);
+  font-size: calc(var(--price-size, 12px) - var(--product-card-offset, 2px)); line-height: calc(var(--price-lh, 16px) - var(--product-card-offset, 2px));
+}
+
+
+/* The sheet joins the rail only along the open button: that label and its window share a colour,
+   the rest of the rail keeps its own. The join is sized by JS (--edge-join-top / --edge-join-h). */
+.edge-panel::before {
+  content: ''; position: absolute; left: calc(-1 * var(--rail-w)); top: var(--edge-join-top, 0px); width: var(--rail-w); height: var(--edge-join-h, 0px);
+  background: linear-gradient(var(--vellum-text, transparent), var(--vellum-text, transparent)), var(--vellum-layer, var(--vellum));
+  -webkit-backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05); backdrop-filter: blur(var(--vellum-blur, 18px)) saturate(1.05);
+  pointer-events: none;
+}
+
+/* The window takes focus when it opens, without a ring */
+.edge-panel:focus { outline: none; }
+/* 16px inputs on phones, so iOS does not zoom in when the newsletter field is focused */
+/* Phone: iOS zooms the page when a field's text is under 16px. The field is set at 16px and scaled to 11px (16 x 0.6875), so it looks like the label and does not zoom */
+@media (max-width: 767px) {
+  .edge-news__row { display: grid; grid-template-columns: 1fr auto; }
+  .edge-news__row input { flex: none; width: 145.4545%; height: 52px; font-size: 16px !important; transform: scale(0.6875); transform-origin: 0 50%; }
+}
+
+/* Checkout and Book a fitting are the theme's standard button size (the Add to cart size from Theme settings) */
+.edge-panel .edge-pill {
+  height: var(--add-to-cart-button-height, 44px) !important; min-height: var(--add-to-cart-button-height, 44px) !important;
+  font-size: var(--button-size, 14px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important; line-height: 1 !important;
+  border-radius: var(--button-border-radius, 9999px) !important; /* Theme settings > Buttons > Style */
+}
+
+/* All panel buttons use the slim product-page button: Add to cart black, Try in-store outlined, shape from Theme settings > Buttons > Style */
+.edge-panel .edge-pill, .edge-panel .edge-pill--primary, .edge-panel .edge-pill--secondary {
+  height: auto !important; min-height: 0 !important; padding: 8px 4px !important; box-sizing: border-box;
+  font-family: var(--font-mono) !important; text-transform: uppercase;
+  font-size: var(--button-size, 13px) !important; font-weight: var(--button-weight, 500) !important; letter-spacing: var(--button-ls, 0.08em) !important;
+  line-height: calc(var(--button-size, 13px) * var(--cfg-button-lh, 1.23)) !important;
+  border-radius: var(--button-border-radius, 0) !important;
+}
+.edge-panel .edge-pill--primary { background: var(--ink) !important; border: 1px solid var(--ink) !important; color: var(--paper) !important; }
+@media (hover: hover) and (pointer: fine) { .edge-panel .edge-pill--primary:hover { background: var(--orange) !important; border-color: var(--orange) !important; color: var(--ink) !important; } }
+.edge-panel .edge-pill--secondary { background: transparent !important; border: 1px solid var(--ink) !important; color: var(--ink) !important; }
+/* Phones: lift the bottom labels (Cart, Try-on) clear of the screen edge, rounded corners and browser bars */
+@media (max-width: 767px) {
+  .edge-rail { padding-bottom: calc(44px + env(safe-area-inset-bottom)); }
+}
+
+/* Menu window: visible dividers between the menu, footer links and newsletter; tighter newsletter and social spacing */
+.edge-panel .edge-rule { border-top: 1px solid rgba(17, 17, 17, 0.22); margin: 8px var(--gut); }
+.edge-panel .edge-news { padding: 0 var(--gut); }
+.edge-panel .edge-news__l { margin-bottom: 0; }
+.edge-panel .edge-social { margin: 0; padding: 0 calc(var(--gut) - 8px) 2px; }
+.edge-panel .edge-footlinks a { min-height: 26px; }
+
+/* Newsletter block: 10px above, 4px below, same side padding */
+.edge-panel .edge-news { padding: 10px var(--gut) 4px; }
+
+/* Rail labels have padding above and below the text (not at the sides); the space between labels comes from it.
+   When a label is open, the window's joined box starts where that padding starts. */
+.edge-rail__group { gap: 0; }
+.edge-rail .edge-rail__v { padding: 14px 0 !important; }
+.edge-rail__sep { margin: 14px 0; }
+
+/* Phones: the filter button sits 12px from the left edge and the logo at the right edge, 12px in */
+@media (max-width: 767px) {
+  .edge-strip__left { left: 12px; }
+  .edge-strip[data-logo] .edge-strip__logo { position: absolute; left: auto; right: 12px; top: 0; bottom: 0; }
+}
+
+/* Cart window spacing: tighter, like the product page. Brand-to-title and title-to-price use the same theme-wide gaps as the product page and the cards
+   (Theme settings > Product text); the rest of the spacing is reduced to a compact 12 / 8 / 4 scale. */
+.edge-panel .edge-body { padding: 12px var(--gut) 12px; }
+.edge-panel .edge-line { gap: 12px; padding-bottom: 0; }
+.edge-panel .edge-line + .edge-line { margin-top: 12px; }
+.edge-panel .edge-line__txt { gap: 0; }
+.edge-panel .edge-line__vendor { margin-bottom: var(--product-vendor-title-gap, 6px); }
+.edge-panel .edge-line__ref { margin-top: 2px; }
+.edge-panel .edge-line__price { margin-top: var(--product-title-price-gap, 6px); }
+.edge-panel .edge-line__act { gap: 16px; margin-top: 2px; }
+.edge-panel .edge-line__act button { min-height: 32px; }
+.edge-panel .edge-sec { margin-top: 0; }
+.edge-panel .edge-sec__h { padding: 12px var(--gut) 0; }
+.edge-panel .edge-sec .edge-body { padding-top: 8px; }
+.edge-panel .edge-ledger { padding: 6px 0; margin-top: 4px; }
+.edge-panel .edge-body .edge-foot { padding-top: 12px; }
+
+
+/* Menu footer: copyright on the left with the social icons on the right, the address (a link) at the very bottom */
+.edge-panel .edge-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.edge-panel .edge-bottom .edge-social { flex: none; }
+.edge-panel .edge-bottom__l { margin: 0; padding: 0 0 0 var(--gut); font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); }
+.edge-panel .edge-legal { padding: 4px var(--gut) 14px; }
+.edge-panel .edge-legal a { font-family: var(--font-mono); font-size: 9px; line-height: 14px; letter-spacing: var(--body-ls, 0em); text-transform: uppercase; color: var(--gray); text-decoration: none; }
+.edge-panel .edge-legal a:hover { color: var(--ink); }
+/* Menu footer row: 26px tall, address right under it */
+.edge-panel .edge-bottom { height: 26px; }
+.edge-panel .edge-bottom .edge-social { padding: 0 calc(var(--gut) - 4px) 0 0; }
+.edge-panel .edge-bottom .edge-social a { width: 28px; min-height: 26px; }
+.edge-panel .edge-bottom + .edge-legal { padding-top: 0; }
+
+/* Menu footer links in Barlow Condensed, like the brand names; the newsletter and the copyright/address stay in mono.
+   No rule under the newsletter, its own underline is the divider */
+.edge-panel .edge-footlinks a { font-family: var(--font-display); font-weight: 500; letter-spacing: var(--name-ls, 0.10em); text-transform: uppercase; font-size: 13px; line-height: 16px; }
+.edge-panel .edge-news { margin-bottom: 10px; }
+.edge-panel .edge-bottom { margin-top: auto; }
+
+/* PDP: after the piece is in the cart the button turns grey ("Added to cart") */
+#addToCartButton.is-added { background-color: var(--gray, #6B6B66) !important; border-color: var(--gray, #6B6B66) !important; color: #fff !important; }
+
+/* PDP on phones: the browser keeps vertical scrolling, every sideways gesture goes straight to the image slider,
+   so the first swipe is not taken over by the browser (it used to need a tap on the image first) */
+@media (max-width: 1023px) {
+  .splide--product .splide__track,
+  .splide--product .splide__list,
+  .splide--product .splide__slide { touch-action: pan-y pinch-zoom; }
+}

@@ -15,6 +15,14 @@
     assign preload = false
   endunless
 
+  comment
+    The first image of a listing is the largest paint: ask the browser to fetch it first
+  endcomment
+  assign fetchpriority = null
+  if preload
+    assign fetchpriority = 'high'
+  endif
+
   if contain
     assign object_class = 'object-contain'
   else
@@ -29,15 +37,52 @@
 -%}
 
 <image-with-placeholder>
-  {{
-    image
-    | image_url: width: 3000
-    | image_tag:
-      loading: loading,
-      class: image_class,
-      sizes: sizes,
-      widths: widths
-  }}
+  {%- if defer -%}
+    {%- comment -%}
+      Deferred image: nothing is downloaded until images.js copies data-srcset to srcset
+      (used for the swipe slides of a product card that are off screen until the visitor swipes)
+    {%- endcomment -%}
+    {%- liquid
+      assign defer_preview = image.preview_image | default: image
+      assign defer_widths = widths | remove: ' ' | split: ','
+      assign defer_srcset = ''
+      for w in defer_widths
+        assign w_num = w | plus: 0
+        if w_num > defer_preview.width
+          continue
+        endif
+        assign defer_url = defer_preview | image_url: width: w_num
+        assign defer_srcset = defer_srcset | append: defer_url | append: ' ' | append: w_num | append: 'w, '
+      endfor
+      assign defer_srcset = defer_srcset | strip | remove_last: ','
+    -%}
+    <img
+      data-src="{{ defer_preview | image_url: width: 750 }}"
+      data-srcset="{{ defer_srcset }}"
+      sizes="{{ sizes }}"
+      width="{{ defer_preview.width }}"
+      height="{{ defer_preview.height }}"
+      alt="{{ defer_preview.alt | escape }}"
+      class="{{ image_class }}"
+      decoding="async"
+      data-defer-image
+    >
+    <noscript>
+      {{ image | image_url: width: 750 | image_tag: class: image_class, sizes: sizes, widths: widths, loading: 'lazy' }}
+    </noscript>
+  {%- else -%}
+    {{
+      image
+      | image_url: width: 3000
+      | image_tag:
+        loading: loading,
+        class: image_class,
+        sizes: sizes,
+        widths: widths,
+        fetchpriority: fetchpriority,
+        decoding: 'async'
+    }}
+  {%- endif -%}
   {% unless no_placeholder %}
     <div
       class="absolute inset-0 h-full w-full bg-scheme-text opacity-[0.05] peer-[.is-complete]/image:opacity-0 no-js:hidden"

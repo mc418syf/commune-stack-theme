@@ -1,0 +1,73 @@
+/* Hide the listing while a returning visitor's scroll position is rebuilt, so it doesn't flash at the top */
+html.plp-restoring #results { opacity: 0; transition: none !important; }
+
+/* Only if rebuilding takes a while (it normally does not), say so after a couple of seconds */
+html.plp-restoring body::after {
+  content: 'Loading';
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  animation: plp-fade-in .3s ease 2.5s forwards;
+}
+
+@keyframes plp-fade-in { to { opacity: .6; } }
+
+/* Placeholder tiles shown for a moment while the real ones load */
+.plp-ghost { background: rgb(var(--color-scheme-text, 17 17 17) / .04) !important; }
+
+.plp-status {
+  padding: 28px 0 36px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .6;
+}
+
+.plp-top {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + var(--header-bar-height, 0px) + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  color: rgb(var(--color-scheme-text, 17 17 17));
+  cursor: pointer;
+  background: rgb(var(--color-scheme-background, 255 255 255) / .8);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+  border: 1px solid rgb(var(--color-scheme-text, 17 17 17) / .25);
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+.plp-top.is-visible { opacity: 1; pointer-events: auto; transform: none; }
+.plp-top:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+@media (hover: hover) {
+  .plp-top:hover { background: rgb(var(--color-scheme-background, 255 255 255) / .95); }
+}
+
+@media (min-width: 1024px) {
+  .plp-top { right: 24px; bottom: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plp-top { transition: none; }
+}

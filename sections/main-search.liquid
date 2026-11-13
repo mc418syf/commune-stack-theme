@@ -1,4 +1,26 @@
-{% paginate search.results by 12 %}
+<div
+  id="plp-config"
+  data-infinite="true"
+  data-top="true"
+  hidden
+></div>
+
+<script>
+  /* Returning from a product page: hide the listing until the saved scroll position is rebuilt */
+  (function () {
+    try {
+      var nav = performance.getEntriesByType('navigation')[0];
+      var u = new URL(location.href);
+      u.searchParams.delete('page');
+      if (nav && nav.type === 'back_forward' && sessionStorage.getItem('plp-state:' + u.pathname + u.search)) {
+        document.documentElement.classList.add('plp-restoring');
+        setTimeout(function () { document.documentElement.classList.remove('plp-restoring'); }, 5000);
+      }
+    } catch (e) {}
+  })();
+</script>
+
+{% paginate search.results by 48 %}
   {% liquid
     assign show_sort = section.settings.enable_sorting
     assign show_filters = false
@@ -37,7 +59,7 @@
 
   <div
     id="filterable"
-    class="border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
+    class="collection border-b-gridline border-gridline-color bg-scheme-background text-scheme-text"
     {% if show_filters or show_sort %}
       x-data="Filterable"
     {% else %}
@@ -45,10 +67,8 @@
     {% endif %}
     data-color-scheme="scheme1"
   >
-    <div class="grid gap-gutter bg-gridline-color lg:grid-cols-12">
-      <div class="bg-scheme-background px-section-horizontal-spacing pb-theme pt-theme-double text-scheme-text lg:col-span-12">
-        <h1
-          class="font-heading text-heading-standard {% if settings.section_title_align == 'center' %}text-center{% endif %}"
+    <h1
+          class="sr-only"
           data-main-search-title
         >
           {% if search.performed %}
@@ -63,10 +83,7 @@
           {% else %}
             {{ 'general.search.title' | t }}
           {% endif %}
-        </h1>
-      </div>
-
-    </div>
+    </h1>
 
     {% if search.performed %}
       <p
@@ -78,24 +95,6 @@
       >
         {{ 'general.search.results_count' | t: count: search.results_count }}
       </p>
-
-      {% if show_sort or show_filters %}
-        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
-          {%- liquid
-            if show_filters
-              if filters_layout_on_desktop == 'drop_down'
-                render 'filterable-filters-drop-down', filters: search.filters, total_active_values: total_active_values, section_color: 'scheme1', clear_url: results_url, container_classes: 'block', is_search: true, search_terms: search.terms
-              else
-                render 'filterable-drawer-toggle', container_classes: 'block md:hidden', total_active_values: total_active_values
-              endif
-            endif
-
-            if show_sort
-              render 'filterable-sort-drop-down', sort_options: search.sort_options, sort_by: sort_by, is_search: true, search_terms: search.terms
-            endif
-          -%}
-        </div>
-      {% endif %}
 
       <div
         id="results"
@@ -143,7 +142,11 @@
 
           <div class="{{ desktop_col_span }} bg-scheme-background text-scheme-text{% unless has_product_results %} max-lg:hidden{% endunless %}">
             {% if has_product_results %}
-              <ul class="grid h-full grid-cols-2 gap-gutter bg-scheme-background {{ products_grid_class }}" style="gap: 6px;">
+              <style>
+                #filterable.collection { margin-top: 40px; }
+                #filterable .collection-list { box-sizing: border-box; width: 100%; max-width: 100%; margin-left: 0; margin-right: 0; gap: 6px !important; }
+              </style>
+              <ul class="collection-list grid h-full grid-cols-2 gap-gutter bg-scheme-background {{ products_grid_class }}">
                 {% assign counter = 0 %}
                 {% for item in search.results %}
                   {% if item.object_type == 'product' %}
@@ -165,7 +168,8 @@
                           section_color: 'scheme1',
                           products_per_row_mobile: 2,
                           sizes: product_sizes,
-                          loading: loading
+                          loading: loading,
+                          enable_mobile_swipe: true
                         -%}
                       {% else %}
                         {%- render 'product-tile-standard',
@@ -175,7 +179,8 @@
                           sizes: product_sizes,
                           loading: loading,
                           enable_quick_buy: enable_quick_buy,
-                          quick_buy_button_classes: quick_buy_button_classes
+                          quick_buy_button_classes: quick_buy_button_classes,
+                          enable_mobile_swipe: true
                         -%}
                       {% endif %}
                     </li>
@@ -268,7 +273,7 @@
             </div>
           {% endif %}
           {% if paginate.pages > 1 %}
-            <div class="lg:col-span-full">
+            <div class="lg:col-span-full" data-plp-pagination>
               {% render 'pagination',
                 paginate: paginate,
                 no_border: true,
@@ -279,24 +284,11 @@
         {% endif %}
       </div>
     {% endif %}
-    {% if show_filters %}
-      {%- render 'mobile-filter-drawer',
-        context: 'drawer',
-        show_filters: show_filters,
-        show_sort: show_sort,
-        filters: search.filters,
-        total_active_values: total_active_values,
-        section_color: 'scheme1',
-        clear_url: results_url,
-        sort_options: search.sort_options,
-        sort_by: sort_by,
-        start_collapsed: collapse_filters,
-        is_search: true,
-        search_terms: search.terms
-      -%}
-    {% endif %}
   </div>
 {% endpaginate %}
+
+{{ 'plp-infinite.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'plp-infinite.js' | asset_url }}" defer></script>
 
 {% if has_price_range_filters %}
   {{ 'range-control.css' | asset_url | stylesheet_tag }}

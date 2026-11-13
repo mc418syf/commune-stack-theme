@@ -3,6 +3,11 @@
   assign enable_video_looping = section.settings.enable_video_looping
   assign two_media_per_row = section.settings.two_media_per_row
 
+  assign desktop_strip = false
+  if section.settings.desktop_layout == 'strip'
+    assign desktop_strip = true
+  endif
+
   assign models = product.media | where: 'media_type', 'model'
 
   assign desktop_media_width = section.settings.desktop_media_width
@@ -167,10 +172,36 @@
 
 {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
 {{ 'modules-slideshow.bundle.css' | asset_url | stylesheet_tag }}
+<style>
+  /* Space between vendor, title and price: theme-wide values (Theme settings > Product text), shared with the product cards */
+  #{{ section.id }} .product-price-block { margin-top: var(--product-title-price-gap, 6px); }
+  /* Space between the vendor and the title (the title keeps its own spacing when there is no vendor above it) */
+  #{{ section.id }} .product-vendor-block + .product-title-block,
+  #{{ section.id }} .pb[data-pb='vendor'] + .pb[data-pb='title'] .product-title-block { margin-top: var(--product-vendor-title-gap, 6px); }
+</style>
+<style>
+  /* Mobile gallery: no pager row under the image, a 01/05 counter on the image instead */
+  #{{ section.id }} .pdp-count {
+    position: absolute; right: 12px; bottom: 12px; z-index: 3;
+    padding: 4px 8px; background: none; color: var(--gray, #6B6B66);
+    font-family: var(--font-mono); font-size: 11px; line-height: 14px; letter-spacing: 0.08em; font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 1023px) {
+    #{{ section.id }} .pdp-pager { display: none !important; }
+    #{{ section.id }} .product-media-container { padding-bottom: 0 !important; }
+    #{{ section.id }} .product-content-container { box-shadow: none !important; }
+  }
+</style>
+<script src="{{ 'product-gallery.js' | asset_url }}" defer></script>
+{%- if desktop_strip -%}
+  {{ 'product-strip.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'product-strip.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 <section
-  class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background"
+  class="grid grid-flow-row-dense grid-cols-1 border-b-gridline border-gridline-color lg:grid-cols-12 lg:gap-gutter lg:bg-gridline-color [&:not(:has(.product-media-container):has(.product-content-container))]:lg:bg-scheme-background{% if desktop_strip %} product-strip{% endif %}"
   id="{{ section.id }}"
+  style="{% if desktop_strip %} --strip-h: {{ section.settings.strip_height }}vh; --strip-gap: {{ section.settings.strip_gap }}px;{% endif %} --info-desc-gap: {{ section.settings.info_desc_gap | default: 32 }}px; --info-left: {{ section.settings.info_left_width | default: 33 }}%; --info-right: {{ section.settings.info_right_width | default: 33 }}%; --info-px-d: {{ section.settings.info_padding_x_desktop | default: 32 }}px; --info-py-d: {{ section.settings.info_padding_y_desktop | default: 24 }}px; --info-px-m: {{ section.settings.info_padding_x_mobile | default: 12 }}px; --info-py-m: {{ section.settings.info_padding_y_mobile | default: 16 }}px;"
   x-data="
     Theme_Product({
       product: {{ product | json | escape }},
@@ -207,6 +238,7 @@
     <div
       class="splide splide--product lg:!sticky lg:top-sticky-header-less-gridline {% if negative_margin %}lg:-mb-gridline{% endif %}"
       data-drag-disabled="{{ has_interactive_media }}"
+      data-mobile-per-screen="{{ section.settings.mobile_images_per_screen | default: '1' }}"
       {% if product.media.size > 1 %}
         data-slideshow-enabled="true"
       {% endif %}
@@ -279,6 +311,7 @@
               class="splide__slide bg-scheme-background{% unless forloop.first %} max-lg:[.splide:not(.is-active)_&]:hidden{% endunless %}"
               data-index="{{ forloop.index0 }}"
               data-order="{{ forloop.index }}"
+              {% if desktop_strip %}data-media-type="{{ media.media_type }}" style="--strip-ar: {{ media.aspect_ratio }};"{% endif %}
               {% if enable_variant_media or single_variant_mode %}
                 {% if media_group_id %}
                   data-media-group-id="{{ media_group_id }}"
@@ -318,7 +351,7 @@
       {% assign first_3d_model = models | first %}
       {% if product.media.size > 1 %}
         <div
-          class="mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 opacity-0 no-js:hidden lg:hidden"
+          class="pdp-pager mx-1 mt-2 grid grid-cols-[minmax(0,_1fr)_auto] gap-2 opacity-0 no-js:hidden lg:hidden"
           x-data="
             {
               paginationIsWrapped: false,
@@ -350,6 +383,9 @@
               <span class="block">{% render 'icon-arrow-right' %}</span>
             </button>
           </div>
+        </div>
+        <div class="pdp-count lg:hidden" data-pdp-count aria-live="polite">
+          <span data-cur>01</span>/<span data-tot>{% if product.media.size < 10 %}0{% endif %}{{ product.media.size }}</span>
         </div>
       {% endif %}
       {%- if first_3d_model -%}
@@ -408,9 +444,15 @@
     @media (max-width: 1023px) {
       #{{ section.id }} .product-media-container {
         position: relative;
-        height: calc(133.333vw + {{ slide_distance }}vh);
+        height: auto;
         padding-bottom: 0 !important;
         border-bottom: 0 !important;
+      }
+      /* The runway is the image's own height plus the slide distance, so the details panel meets the image exactly */
+      #{{ section.id }} .product-media-container::after {
+        content: '';
+        display: block;
+        height: {{ slide_distance }}vh;
       }
       /* Gallery pins at its natural 3:4 height */
       #{{ section.id }} .product-media-container .splide--product {
@@ -434,7 +476,6 @@
         z-index: 2;
         margin-top: -{{ slide_distance }}vh;
         border-radius: 0;
-        box-shadow: 0 -16px 40px rgba(14, 14, 14, 0.1);
       }
     }
   </style>
@@ -458,14 +499,15 @@
 
 <script type="application/ld+json">
   {
-    "@context": "http://schema.org/",
+    "@context": "https://schema.org/",
     "@type": "Product",
     "name": {{ product.title | json }},
     "url": {{ shop.url | append: product.url | json }},
     {%- if product.featured_media -%}
-      {%- assign media_size = product.featured_media.preview_image.width -%}
       "image": [
-        {{ product.featured_media | image_url: media_size | prepend: "https:" | json }}
+        {%- for media in product.media limit: 6 -%}
+          {{ media.preview_image | image_url: width: 1600 | prepend: "https:" | json }}{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
       ],
     {%- endif -%}
     "description": {{ product.description | strip_html | json }},
@@ -473,7 +515,7 @@
       "sku": {{ current_variant.sku | json }},
     {%- endif -%}
     "brand": {
-      "@type": "Thing",
+      "@type": "Brand",
       "name": {{ product.vendor | json }}
     },
     "offers": [
@@ -483,7 +525,7 @@
           {%- if variant.sku != blank -%}
             "sku": {{ variant.sku | json }},
           {%- endif -%}
-          "availability" : "http://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+          "availability" : "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
           "price" : {{ variant.price | divided_by: 100.00 | json }},
           "priceCurrency" : {{ cart.currency.iso_code | json }},
           "url" : {{ shop.url | append: variant.url | json }}
@@ -518,6 +560,27 @@
     {
       "type": "header",
       "content": "Mobile image slide-over"
+    },
+    {
+      "type": "select",
+      "id": "mobile_images_per_screen",
+      "label": "Images per screen on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.2",
+          "label": "1.2 (next image peeks in)"
+        },
+        {
+          "value": "1.5",
+          "label": "1.5"
+        }
+      ],
+      "default": "1",
+      "info": "1.2 shows one full image with a fifth of the next one. Mobile images scroll in a loop."
     },
     {
       "type": "checkbox",
@@ -576,6 +639,125 @@
         }
       ],
       "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        {
+          "value": "split",
+          "label": "Media beside the details"
+        },
+        {
+          "value": "strip",
+          "label": "Image strip on top, details below"
+        }
+      ],
+      "default": "split",
+      "info": "Image strip: every image sits in one horizontal row you scroll or drag sideways, numbered underneath. Title, price and description sit below on the left, with the options and add to cart on the right. Mobile is unchanged."
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "min": 35,
+      "max": 75,
+      "step": 1,
+      "unit": "vh",
+      "label": "Image strip height",
+      "default": 58,
+      "info": "Used by the image strip layout."
+    },
+    {
+      "type": "range",
+      "id": "strip_gap",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between strip images",
+      "default": 48,
+      "info": "Used by the image strip layout."
+    },
+    {
+      "type": "header",
+      "content": "Product information columns"
+    },
+    {
+      "type": "range",
+      "id": "info_left_width",
+      "min": 30,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Left column (description) width",
+      "default": 33,
+      "info": "Image strip layout, desktop."
+    },
+    {
+      "type": "range",
+      "id": "info_right_width",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Right column (record list and buttons) width",
+      "default": 33
+    },
+    {
+      "type": "range",
+      "id": "info_desc_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between price and description",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Product information padding"
+    },
+    {
+      "type": "range",
+      "id": "info_padding_x_desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop: left and right",
+      "default": 32,
+      "info": "Space at the sides of the title, description and record column. Image strip layout."
+    },
+    {
+      "type": "range",
+      "id": "info_padding_y_desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Desktop: top and bottom",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "info_padding_x_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile: left and right",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "info_padding_y_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile: top and bottom",
+      "default": 16
     },
     {
       "type": "checkbox",
@@ -832,112 +1014,180 @@
       ]
     },
     {
+      "type": "record",
+      "name": "Record list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A list of dashed rows built from product metafields. Place it above the Add to cart block so it sits in the right column."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_measurements",
+          "label": "Show measurements",
+          "default": true,
+          "info": "Reads lines like - Chest: 49cm/19.5in from the metafield below, one row each."
+        },
+        {
+          "type": "text",
+          "id": "measurement_key",
+          "label": "Measurement metafield (namespace.key)",
+          "default": "custom.measurement"
+        },
+        {
+          "type": "range",
+          "id": "gap_below",
+          "min": 0,
+          "max": 120,
+          "step": 4,
+          "unit": "px",
+          "label": "Space between the list and the buttons",
+          "default": 24
+        },
+        {
+          "type": "header",
+          "content": "Row 1"
+        },
+        {
+          "type": "text",
+          "id": "label_1",
+          "label": "Label",
+          "default": "Condition"
+        },
+        {
+          "type": "text",
+          "id": "key_1",
+          "label": "Metafield (namespace.key)",
+          "default": "custom.condition",
+          "info": "For example custom.material"
+        },
+        {
+          "type": "text",
+          "id": "fallback_1",
+          "label": "Text when the metafield is empty",
+          "default": "Good"
+        },
+        {
+          "type": "header",
+          "content": "Row 2"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "Label",
+          "default": "Material"
+        },
+        {
+          "type": "text",
+          "id": "key_2",
+          "label": "Metafield (namespace.key)",
+          "default": "custom.material"
+        },
+        {
+          "type": "text",
+          "id": "fallback_2",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 3"
+        },
+        {
+          "type": "text",
+          "id": "label_3",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_3",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_3",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 4"
+        },
+        {
+          "type": "text",
+          "id": "label_4",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_4",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_4",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 5"
+        },
+        {
+          "type": "text",
+          "id": "label_5",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_5",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_5",
+          "label": "Text when the metafield is empty"
+        },
+        {
+          "type": "header",
+          "content": "Row 6"
+        },
+        {
+          "type": "text",
+          "id": "label_6",
+          "label": "Label"
+        },
+        {
+          "type": "text",
+          "id": "key_6",
+          "label": "Metafield (namespace.key)"
+        },
+        {
+          "type": "text",
+          "id": "fallback_6",
+          "label": "Text when the metafield is empty"
+        }
+      ]
+    },
+    {
       "type": "vendor",
       "name": "Vendor",
       "limit": 1
     },
     {
       "type": "description",
-      "name": "Description & tabs",
+      "name": "Description",
       "limit": 1,
       "settings": [
         {
-          "type": "paragraph",
-          "content": "Tab 1 is always the product description. Add up to 5 extra tabs below. Leave a tab title blank to hide that tab."
+          "type": "checkbox",
+          "id": "show_heading",
+          "label": "Show heading",
+          "default": true
         },
         {
           "type": "text",
           "id": "description_tab_label",
-          "label": "Tab 1 — Description label",
+          "label": "Heading text",
           "default": "Description"
-        },
-        {
-          "type": "range",
-          "id": "tab_gap",
-          "label": "Gap between tab titles (px)",
-          "min": 8,
-          "max": 64,
-          "step": 2,
-          "unit": "px",
-          "default": 20
-        },
-        {
-          "type": "checkbox",
-          "id": "tab_titles_bold",
-          "label": "Bold tab titles",
-          "default": false
-        },
-        {
-          "type": "header",
-          "content": "Tab 2"
-        },
-        {
-          "type": "text",
-          "id": "tab_2_title",
-          "label": "Title",
-          "default": "Details"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_2_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 3"
-        },
-        {
-          "type": "text",
-          "id": "tab_3_title",
-          "label": "Title",
-          "default": "Measurements"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_3_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 4"
-        },
-        {
-          "type": "text",
-          "id": "tab_4_title",
-          "label": "Title"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_4_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 5"
-        },
-        {
-          "type": "text",
-          "id": "tab_5_title",
-          "label": "Title"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_5_content",
-          "label": "Content"
-        },
-        {
-          "type": "header",
-          "content": "Tab 6"
-        },
-        {
-          "type": "text",
-          "id": "tab_6_title",
-          "label": "Title"
-        },
-        {
-          "type": "richtext",
-          "id": "tab_6_content",
-          "label": "Content"
         }
       ]
     },
@@ -2342,7 +2592,6 @@
         }
       ]
     }
-    
   ]
 }
 {% endschema %}

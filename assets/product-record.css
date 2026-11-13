@@ -1,0 +1,150 @@
+/* Product page, "archive record" detail section.
+   A typed printout in the style of a dot-matrix store directory: monospace, uppercase,
+   <ANGLE BRACKET> values and a dashed rule under every line.
+   Fonts come from the theme's own font settings (--heading-font-stack, --body-font-stack). */
+
+[data-product-root] {
+  --rec-ink: #111111;
+  --rec-divider: #CFCDC6;
+  --rec-accent: #FF5A1F;
+  --rec-muted: #6B6B66;
+}
+
+/* ---- The record list (also used by the stock block) ---- */
+.record {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px dashed var(--rec-divider);
+  font-family: var(--body-font-stack);
+  font-size: var(--body-size, 13px);
+  font-weight: 400;
+  line-height: var(--body-lh, 21px);
+  letter-spacing: var(--body-ls, 0);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--rec-ink);
+}
+
+.record__heading,
+.record__row {
+  margin: 0;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--rec-divider);
+}
+
+.record__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.record__label { flex: none; }
+
+/* Long values such as the material may wrap */
+.record__value {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.record-block { margin: 16px 0 var(--record-gap, 24px); }
+
+@media (min-width: 768px) {
+  .record__heading,
+  .record__row { padding: 6px 0; }
+}
+
+/* ---- Description heading (desktop) ---- */
+.product-desc { margin-top: var(--info-desc-gap, 32px); }
+
+.product-desc__title {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 0 0 6px;
+  font-family: var(--heading-font-stack);
+  font-size: var(--tab-size, 18px);
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rec-ink);
+  border-bottom: 2px solid var(--rec-ink);
+}
+
+@media (min-width: 768px) {
+}
+
+/* The description as a paragraph: only for the mobile order (see below) */
+.record-lede { display: none; }
+
+/* ---- Layout inside the image-strip product page ---- */
+
+/* Desktop and tablet: name, price and description on the left (half the width), the record and buttons on the right (a third) */
+@media (min-width: 768px) {
+  .product-strip .product-content-container {
+    padding: var(--info-py-d, 24px) var(--info-px-d, 32px) 4rem;
+  }
+
+  .product-strip .product-block-area {
+    display: grid;
+    grid-template-columns: var(--info-left, 50%) var(--info-right, 33%);
+    justify-content: space-between;
+    column-gap: 40px;
+    align-items: start;
+    padding-top: 0;
+  }
+
+  .product-strip .pb-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .product-strip .pb-col--left { max-width: none; }
+}
+
+/* Mobile: one column in this order: name, price, description paragraph, record, Add to cart, Try in-store.
+   The description block is taken apart so its paragraph sits above the record. */
+@media (max-width: 767px) {
+  .product-strip .product-content-container {
+    padding: var(--info-py-m, 16px) var(--info-px-m, 12px);
+  }
+
+  .product-strip .pb[data-pb='description'] { display: contents; }
+
+  .product-strip .record-lede {
+    display: block;
+    order: 4;
+    margin: 12px 0 0;
+  }
+
+  /* The paragraph above already shows the description */
+  .product-strip .product-desc { display: none; }
+}
+
+/* Product page body text: 10px (the record list above is 9px) */
+.product-strip .product-desc__body,
+.product-strip .record-lede {
+  font-size: var(--body-size, 13px);
+  line-height: var(--body-lh, 21px);
+}
+.product-strip .product-desc__body *,
+.product-strip .record-lede * { font-size: inherit; line-height: inherit; }
+
+/* Add to cart sits right under the record list; the space between them is "Space between the list and the buttons" in the product section */
+.product-strip .add-to-cart-container { margin-top: 0 !important; }
+
+/* The button itself says "Added to cart", so the extra confirmation message (which pushed everything down) is not shown on the product page */
+.product-strip [x-show="addedToCart"] { display: none !important; }
+
+/* Pickup availability under Add to cart: IBM Plex Mono at the button text size */
+.pickup-availability-preview, .pickup-availability-preview *, .pickup-availability-preview .theme-link,
+.pickup-availability-preview h2, .pickup-availability-preview small, .pickup-availability-preview button {
+  font-family: var(--font-mono) !important;
+  font-size: var(--button-size, 13px) !important;
+  line-height: calc(var(--button-size, 13px) * var(--cfg-button-lh, 1.23)) !important;
+  font-weight: var(--button-weight, 400) !important;
+  letter-spacing: var(--button-ls, 0.08em) !important;
+}
+.pickup-availability-preview h2, .pickup-availability-preview button { text-transform: uppercase; }

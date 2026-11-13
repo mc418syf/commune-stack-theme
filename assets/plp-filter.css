@@ -1,0 +1,257 @@
+/* plp filter v7 */
+/* Filter and search panel, the top-left trigger and the sidebar "In stock" switch.
+   Values follow the "Filter, left panel, desktop" and "Filter, archive list, mobile" designs. Everything in the panel and the trigger is 9px
+   on purpose, below the site's usual 11px; the sidebar labels stay 11px. Colours marked "brief" are the literal values from the design. */
+
+:root { --pf-w: 342px; }   /* brief: desktop panel width (also read by the page, which moves right by it) */
+
+.plp-fp, .plp-trigger {
+  --pf-paper: var(--paper, #F4F3EF);
+  --pf-ink: var(--ink, #111111);
+  --pf-text: #3A3A37;   /* brief: unselected values */
+  --pf-dark: #4A4A47;   /* brief: selected designer in the trigger */
+  --pf-gray: #6B6B66;   /* brief: counts, secondary text, categories in the trigger */
+  --pf-line: #D9D8D2;   /* brief: panel and search lines */
+  --pf-dash: #CFCDC6;   /* brief: dashed rules, scrollbars */
+  --pf-hover: var(--orange-ink, #C23B05);
+}
+
+/* ---- Trigger (top left of the strip) ---- */
+.plp-trigger {
+  display: inline-flex; align-items: center; box-sizing: border-box; min-height: 44px; max-width: 520px; margin: 0; padding: 0;
+  background: none; border: 0; border-radius: 0; cursor: pointer; text-align: left;
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--pf-ink);
+}
+.plp-trigger__t { display: block; min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.plp-t__d { color: var(--pf-ink); }
+.plp-t__d--sel { color: var(--pf-ink); }
+.plp-t__r { color: var(--pf-gray); }
+.plp-trigger:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 2px; }
+@media (max-width: 767px) { .plp-trigger { max-width: 170px; } }
+
+/* ---- Panel shell ---- */
+.plp-fp {
+  box-sizing: border-box; overflow: hidden; opacity: 0; visibility: hidden;
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace);
+}
+.plp-fp[data-open] { opacity: 1; visibility: visible; }
+.plp-fp__in { display: flex; flex-direction: column; }
+.plp-fp__sheet { background: var(--pf-paper); box-sizing: border-box; }
+@media (prefers-reduced-motion: reduce) { .plp-fp, .plp-fp[data-open], body { transition: none !important; } }
+
+/* z-index 19 on purpose: the header section (z-index 20) holds the top bar, the sidebar and the Menu and Cart windows, which must stay above the panel */
+/* ---- Desktop: left-docked, full-height column right of the sidebar and under the top bar; the page moves right to make room ---- */
+@media (min-width: 768px) {
+  .plp-fp {
+    position: fixed; z-index: 19; top: var(--strip-h, 56px); bottom: 0; left: var(--rail-w, 0px);
+    width: var(--pf-w); max-width: 0;
+    transition: max-width 0.24s ease-out, opacity 0.24s ease-out, visibility 0s linear 0.24s;
+  }
+  .plp-fp[data-open] { max-width: var(--pf-w); transition: max-width 0.24s ease-out, opacity 0.24s ease-out, visibility 0s; }
+  .plp-fp__in { width: var(--pf-w); height: 100%; }
+  .plp-fp__gap { display: none; }
+  .plp-fp__sheet { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+  /* the grid (and the rest of the page) moves right by the panel's width */
+  html.plp-fp-open body { padding-left: calc(var(--rail-w, 0px) + var(--pf-w, 342px)); }
+  /* Gallery view: the padding itself eases (its listing is hidden, so nothing heavy re-lays out) */
+  html.plp-gallery-on.plp-fp-used body { transition: padding-left 0.24s ease-out; }
+  /* Grid view: the new width is applied at once and the page only slides into place with a transform. Easing the padding made
+     every product tile and image re-lay out on every frame, which showed as juddering. */
+  html:not(.plp-gallery-on).plp-fp-used body { overflow-x: clip; }
+  html:not(.plp-gallery-on).plp-fp-open #MainContent { animation: plp-main-in 0.24s ease-out; }
+  html:not(.plp-gallery-on).plp-fp-used:not(.plp-fp-open) #MainContent { animation: plp-main-out 0.24s ease-out; }
+  @keyframes plp-main-in { from { transform: translateX(calc(-1 * var(--pf-w, 342px))); } to { transform: none; } }
+  @keyframes plp-main-out { from { transform: translateX(var(--pf-w, 342px)); } to { transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) { #MainContent { animation: none !important; } }
+
+/* ---- Phones: drops down over the page (nothing underneath moves or squeezes). The sheet starts at the very top of the screen,
+   so the top bar sits on the same paper as the panel while it is open. ---- */
+@media (max-width: 767px) {
+  .plp-fp {
+    position: fixed; z-index: 19; top: 0; left: var(--rail-w, 0px); right: 0; max-height: 0;
+    transition: max-height 0.24s ease-out, opacity 0.24s ease-out, visibility 0s linear 0.24s;
+  }
+  .plp-fp[data-open] { transition: max-height 0.24s ease-out, opacity 0.24s ease-out, visibility 0s; }
+  .plp-fp__gap { height: var(--strip-h, 41px); background: var(--pf-paper); }   /* the top bar's own row, same paper */
+  .plp-fp__sheet { border-bottom: 1px solid var(--pf-line); }
+}
+
+/* ---- Search row (top of the panel, stays put while the lists scroll) ---- */
+.plp-s { flex: none; margin: 0; padding: 6px 12px 0; }
+.plp-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.plp-s__row { display: flex; align-items: center; gap: 10px; box-sizing: border-box; height: 32px; border-bottom: 1px solid var(--pf-line); }
+.plp-s__row:focus-within { border-bottom-color: var(--pf-ink); }
+.plp-s__fw { position: relative; flex: 1 1 auto; min-width: 0; height: 32px; overflow: hidden; }
+.plp-s__q {
+  display: block; box-sizing: border-box; width: 100%; height: 32px; margin: 0; padding: 0 !important;
+  border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none;
+  -webkit-appearance: none; appearance: none;
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 32px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-ink);
+}
+.plp-s__q::placeholder { color: var(--pf-gray); opacity: 1; }
+.plp-s__q::-webkit-search-cancel-button, .plp-s__q::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.plp-s__ic { flex: none; color: var(--pf-ink); }
+.plp-s__x {
+  flex: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 44px; height: 44px; margin: -6px -6px -6px -4px; padding: 0;
+  background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--pf-ink);
+}
+.plp-s__x[hidden] { display: none; }
+.plp-s__x:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -4px; }
+
+.plp-s__r:empty { display: none; }
+.plp-r {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; min-height: 28px;
+  border-bottom: 1px dashed var(--pf-dash); text-decoration: none; color: var(--pf-ink);
+  font-size: 9px; line-height: 13px; letter-spacing: 0.02em; text-transform: uppercase; font-variant-numeric: tabular-nums;
+}
+.plp-r__i { flex: none; width: 40px; height: 50px; margin: 6px 0; background: #E6E5DF; overflow: hidden; }
+.plp-r__i img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.plp-r__n { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.plp-r__p { flex: none; color: var(--pf-gray); }
+.plp-r--none { color: var(--pf-gray); border-bottom: 0; }
+.plp-r:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 0; }
+
+/* ---- Archive list: Designer on the left; Category, Gender and Sort stacked on the right. Each column scrolls on its own and keeps its headers in view. ---- */
+.plp-f { margin: 0; }
+.plp-f__cols { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 0 20px; align-items: stretch; box-sizing: border-box; padding: 18px 12px 0; }
+.plp-f__c { min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+/* No visible scrollbar; the columns still scroll with the wheel, trackpad, touch and keyboard */
+.plp-f__c { scrollbar-width: none; -ms-overflow-style: none; }
+.plp-f__c::-webkit-scrollbar { display: none; }
+.plp-f__c:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -2px; }
+/* Desktop: the columns fill the docked panel */
+@media (min-width: 768px) {
+  .plp-f { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+  .plp-f__cols { flex: 1 1 auto; min-height: 0; }
+}
+/* Phones: a fixed height (the row needs one to let the columns scroll) */
+@media (max-width: 767px) {
+  .plp-f__cols { height: 520px; height: min(520px, 60vh); height: min(520px, 60dvh); padding-bottom: 6px; }
+}
+
+.plp-h {
+  position: sticky; top: 0; z-index: 1; margin: 0; padding: 0; background: var(--pf-paper);
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 10px; font-weight: 500; line-height: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-ink);
+}
+.plp-f__c > .plp-h:first-child { padding-bottom: 6px; }
+.plp-h--rule { padding-bottom: 6px; border-bottom: 1px dashed var(--pf-dash); }
+.plp-h--rule + .plp-f__list { margin-top: 6px; }
+.plp-f__list + .plp-h { margin-top: 18px; }   /* Gender and Sort sit 18px below the group above */
+
+/* Rows: marker (circle = one choice, square = several), name, footnote count. No lines between rows, no hover effect. */
+.plp-o {
+  display: flex; align-items: center; box-sizing: border-box; width: 100%; min-height: 28px; margin: 0; padding: 0;
+  background: none; border: 0; border-radius: 0; cursor: pointer; text-align: left;
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 13px; letter-spacing: 0.02em; text-transform: uppercase; font-variant-numeric: tabular-nums;
+  color: var(--pf-text);
+}
+.plp-o:hover { color: var(--pf-text); background: none; text-decoration: none; }
+.plp-o[aria-pressed='true'], .plp-o[aria-pressed='true']:hover { color: var(--pf-ink); font-weight: 500; }
+.plp-o__m { flex: none; box-sizing: border-box; width: 7px; height: 7px; margin-right: 8px; border: 1px solid currentColor; background: transparent; }
+.plp-o--single .plp-o__m { border-radius: 50%; }
+.plp-o[aria-pressed='true'] .plp-o__m { background: currentColor; }
+.plp-o__l { flex: 0 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* the count is a footnote mark straight after the name: 7px, gray, raised about 4px, 3px from the name */
+.plp-o__c { flex: none; margin-left: 3px; position: relative; top: -4px; font-size: 7px; line-height: 1; font-weight: 400; letter-spacing: 0; color: var(--pf-gray); }
+.plp-o[aria-disabled='true'] { cursor: default; }
+.plp-o:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -2px; }
+
+/* Footer: one thin row, about 24px high */
+.plp-f__foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; min-height: 24px; padding: 0 12px; border-top: 1px dashed var(--pf-dash); }
+.plp-f__clear {
+  display: inline-flex; align-items: center; font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--pf-ink); text-decoration: underline; text-underline-offset: 3px;
+}
+.plp-f__clear:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: 2px; }
+.plp-f__end { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.plp-f__x { flex: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 28px; height: 28px; margin: -2px -6px -2px 0; padding: 0; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--pf-ink); }
+.plp-f__x:focus-visible { outline: 1px solid var(--pf-ink); outline-offset: -4px; }
+.plp-f__n { font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-gray); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* No JavaScript: plain inputs and a visible submit button */
+.plp-f__plain { padding: 18px 12px 12px; font-size: 9px; text-transform: uppercase; overflow-y: auto; }
+.plp-f__fs { margin: 0 0 12px; padding: 0; border: 0; }
+.plp-f__plain .plp-o { min-height: 20px; }
+.plp-f__submit { margin-top: 6px; padding: 6px 12px; border: 1px solid var(--pf-ink); background: transparent; color: var(--pf-ink); font: inherit; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+
+@media (max-width: 767px) {
+  /* iOS zooms into inputs under 16px: the field is 18px, drawn at half size so it reads as 9px */
+  .plp-s__q { position: absolute; left: 0; top: 0; width: 200%; height: 64px; font-size: 18px; line-height: 64px; transform: scale(0.5); transform-origin: 0 0; }
+}
+
+/* ---- Sidebar: In stock switch (circle above the vertical label). Off: empty circle. On: filled. ---- */
+.edge-rail__stock { color: var(--ink); cursor: pointer; }
+.edge-rail__dot { display: inline-block; flex: none; box-sizing: border-box; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--ink); background: transparent; }
+.edge-rail__stock[aria-checked='true'] .edge-rail__dot { background: #111111; }
+.edge-rail__stock:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+
+/* Orange is only a mouse-hover colour (trigger, Clear all, the search ×); a tap on a phone never leaves it behind */
+@media (hover: hover) and (pointer: fine) {
+  .plp-trigger:hover .plp-t__d, .plp-trigger:hover .plp-t__r { color: var(--pf-hover); }
+  .plp-s__x:hover { color: var(--pf-hover); }
+  .plp-f__clear:hover { color: var(--pf-hover); }
+  .plp-f__x:hover { color: var(--pf-hover); }
+}
+
+/* Phones: the selected designer in the trigger is full ink (#111111) */
+@media (max-width: 767px) {
+  .plp-t__d, .plp-t__d--sel { color: #111111; }
+}
+
+/* Desktop: no right padding, so the search line and the dashed rules run into the panel's right border */
+@media (min-width: 768px) {
+  .plp-s, .plp-f__cols { padding-right: 0; }
+  .plp-s__ic { margin-right: 12px; padding-left: 8px; }
+  .plp-s__x { margin-right: 6px; }
+  .plp-r { padding-right: 12px; }
+}
+
+/* Close: on desktop it sits in the top bar on the same line as the <Filter> title, at the right end of the panel; on phones it stays in the footer */
+.plp-strip-x { display: none; }
+@media (min-width: 768px) {
+  .plp-f__x { display: none; }
+  .plp-strip-x {
+    position: absolute; top: 0; bottom: 0; left: calc(var(--rail-w, 0px) + var(--pf-w, 342px) - 42px); width: 36px; box-sizing: border-box; padding: 0;
+    display: flex; align-items: center; justify-content: center; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--ink, #111111);
+    opacity: 0; visibility: hidden; transition: opacity 0.24s ease-out, visibility 0s linear 0.24s;
+  }
+  html.plp-fp-open .plp-strip-x { opacity: 1; visibility: visible; transition: opacity 0.24s ease-out, visibility 0s; }
+  .edge-strip[data-sticky='true'] .plp-strip-x { left: calc(var(--pf-w, 342px) - 42px); }
+  .plp-strip-x:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -6px; }
+}
+@media (hover: hover) and (pointer: fine) { .plp-strip-x:hover { color: var(--orange-ink, #C23B05); } }
+
+/* Search results page: clicking <Search> in the top bar opens the field in place, on the same line (no panel). Desktop: it grows to the right of the title.
+   Phones: it covers the top bar row. */
+.plp-strip-s { display: none; }
+.plp-strip-st:hover .plp-t__d { color: var(--orange-ink, #C23B05); }
+.plp-trigger + .plp-strip-st { margin-left: 16px; }
+.plp-strip-s__q {
+  flex: 1 1 auto; min-width: 0; height: 28px; margin: 0; padding: 0 !important; border: 0 !important; border-radius: 0; background: transparent !important; box-shadow: none !important; outline: none;
+  -webkit-appearance: none; appearance: none;
+  font-family: var(--font-mono, 'IBM Plex Mono', ui-monospace, monospace); font-size: 9px; font-weight: 400; line-height: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink, #111111);
+}
+.plp-strip-s__q::placeholder { color: var(--gray, #6B6B66); opacity: 1; }
+.plp-strip-s__q::-webkit-search-cancel-button, .plp-strip-s__q::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.plp-strip-s__go, .plp-strip-s__x { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 28px; padding: 0; background: none; border: 0; border-radius: 0; cursor: pointer; color: var(--ink, #111111); }
+.plp-strip-s__go:focus-visible, .plp-strip-s__x:focus-visible { outline: 1px solid var(--ink, #111111); outline-offset: -2px; }
+@media (min-width: 768px) {
+  .plp-strip-s {
+    display: flex; align-items: center; gap: 6px; box-sizing: border-box; height: 28px; overflow: hidden; margin-left: 0; border-bottom: 1px solid var(--pf-line, #D9D8D2);
+    width: var(--strip-s-w, clamp(160px, 26vw, 360px)); max-width: 0; opacity: 0; visibility: hidden; border-bottom-color: transparent;
+    transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s linear 0.24s;
+  }
+  .plp-strip-s.is-open { max-width: var(--strip-s-w, clamp(160px, 26vw, 360px)); opacity: 1; visibility: visible; margin-left: 16px; border-bottom-color: var(--pf-line, #D9D8D2); transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out, visibility 0s; }
+  .plp-strip-s.is-open:focus-within { border-bottom-color: var(--ink, #111111); }
+  .plp-strip-s__x { display: none; }
+}
+@media (max-width: 767px) {
+  .plp-strip-s.is-open {
+    display: flex; align-items: center; gap: 6px; position: fixed; z-index: 35; top: 0; left: var(--rail-w, 0px); right: 0; height: var(--strip-h, 44px); box-sizing: border-box; padding: 0 var(--gut, 16px) 0 calc(var(--gut, 16px) - 6px);
+    background: var(--paper, #F4F3EF);
+  }
+}
+@media (prefers-reduced-motion: reduce) { .plp-strip-s, .plp-strip-s.is-open { transition: none; } }
+@media (hover: hover) and (pointer: fine) { .plp-strip-s__go:hover, .plp-strip-s__x:hover { color: var(--orange-ink, #C23B05); } }

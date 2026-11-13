@@ -185,6 +185,58 @@
   </section>
 {%- endif -%}
 
+{%- comment -%} Styles first: everything that positions the grid must be known before the grid is painted (no jump while loading) {%- endcomment -%}
+{{ 'plp-infinite.css' | asset_url | stylesheet_tag }}
+{% style %}
+/* The template's "Custom CSS" (.collection {margin-top: 40px}) is printed by Shopify after the section, so on a slow
+   connection the product grid was painted at the top and then jumped down. The same offset is declared here, before the
+   markup; the Custom CSS still wins if it is changed later. */
+{% if template.suffix == blank %}#shopify-section-{{ section.id }} .collection { margin-top: 40px; }{% endif %}
+/* description under the title: three quarters of the page on desktop (overrides the 56ch limit on .rte) */
+@media (min-width: 768px) {
+  .collection-description { max-width: none !important; width: 75% !important; margin-bottom: 32px; }
+}
+/* phones: a long description shows five lines, tap to read the rest; more room above the product grid */
+@media (max-width: 767px) {
+  .collection-description[data-desc-clamp] { margin-bottom: 20px; }
+  #results { padding-top: 12px; }
+  .collection-description[data-desc-clamp]:not(.is-open) { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+  .collection-description[data-desc-clamp].is-long { cursor: pointer; }
+  .collection-description[data-desc-clamp].is-long::after { content: 'Read more +'; display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B66; }
+  .collection-description[data-desc-clamp].is-long.is-open::after { content: 'Read less \2212'; }
+}
+@media (max-width: 1023px) {
+  .collection-page-title {
+    font-weight: 700;
+    font-size: calc(var(--font-body-size, 16px) + 2pt);
+  }
+}
+{% endstyle %}
+
+<div
+  id="plp-config"
+  data-infinite="{{ section.settings.infinite_scroll }}"
+  data-top="{{ section.settings.back_to_top }}"
+  hidden
+></div>
+
+  {% if section.settings.infinite_scroll %}
+    <script>
+      /* Returning from a product page: hide the listing until the saved scroll position is rebuilt */
+      (function () {
+        try {
+          var nav = performance.getEntriesByType('navigation')[0];
+          var u = new URL(location.href);
+          u.searchParams.delete('page');
+          if (nav && nav.type === 'back_forward' && sessionStorage.getItem('plp-state:' + u.pathname + u.search)) {
+            document.documentElement.classList.add('plp-restoring');
+            setTimeout(function () { document.documentElement.classList.remove('plp-restoring'); }, 5000);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  {% endif %}
+
 {% paginate collection.products by product_limit %}
   <section
     id="filterable"
@@ -197,6 +249,13 @@
     data-color-scheme="{{ section_color }}"
     @keydown.escape.document="onEscape"
   >
+    <div data-plp-head>
+    {%- if hide_title -%}
+      {%- comment -%} The visible title is switched off in the theme editor: keep a heading for search engines and screen readers {%- endcomment -%}
+      <h1 class="sr-only">
+        {%- if collection.handle == 'all' -%}{{ shop.name }} &ndash; {% endif -%}{{ collection.title }}
+      </h1>
+    {%- endif -%}
     {%- if show_heading_container -%}
       <div class="grid grid-flow-row-dense grid-cols-1 gap-gutter overflow-hidden bg-gridline-color lg:grid-cols-12">
         {% if show_image and collection.image %}
@@ -220,12 +279,13 @@
             {% if description_position == 'under_title'
               and collection.description != blank
             %}
-              <div class="rte mt-4 text-left lg:w-3/4">{{ collection.description }}</div>
+              <div class="rte collection-description mt-4 text-left lg:w-3/4" data-desc-clamp>{{ collection.description }}</div>
             {% endif %}
           </div>
         </div>
       </div>
     {%- endif -%}
+    </div>
 
     {%- if show_scrolling_text and scrolling_text_position == 'under_title' -%}
       <aside
@@ -357,48 +417,6 @@
           </form>
         {% endif %}
 
-        <div class="relative flex items-center justify-between px-section-horizontal-spacing py-2{% if filters_layout_on_desktop == 'sidebar' %} md:hidden{% endif %}">
-          {%- liquid
-            if show_filters
-              if filters_layout_on_desktop == 'drop_down'
-                # Drop-down used at every size.
-                render 'filterable-filters-drop-down', filters: collection.filters, total_active_values: total_active_values, section_color: section_color, clear_url: clear_url, container_classes: 'block'
-              else
-                # Sidebar layout: desktop keeps the sidebar column;
-                # mobile uses the inline drop-down so the bar and the
-                # expansion are one scrolling section.
-                render 'filterable-filters-drop-down', filters: collection.filters, total_active_values: total_active_values, section_color: section_color, clear_url: clear_url, container_classes: 'block md:hidden'
-              endif
-            endif
-
-          -%}
-
-          {%- if show_filters -%}
-            {%- assign availability_filter = collection.filters | where: 'param_name', 'filter.v.availability' | first -%}
-            {%- if availability_filter -%}
-              {%- assign in_stock_value = availability_filter.values | where: 'value', '1' | first -%}
-              {%- if in_stock_value -%}
-                <a
-                  href="{% if in_stock_value.active %}{{ in_stock_value.url_to_remove }}{% else %}{{ in_stock_value.url_to_add }}{% endif %}"
-                  class="availability-toggle ml-auto flex items-center gap-2 py-2{% if show_sort %} mr-6{% endif %}{% if settings.links_uppercase %} uppercase{% endif %}"
-                  role="switch"
-                  aria-checked="{{ in_stock_value.active }}"
-                >
-                  <span
-                    class="inline-block rounded-full"
-                    style="width: 10px; height: 10px; background: {% if in_stock_value.active %}rgb(var(--color-scheme-text)){% else %}rgb(var(--color-scheme-text) / 0.25){% endif %};"
-                    aria-hidden="true"
-                  ></span>
-                  <span>Available</span>
-                </a>
-              {%- endif -%}
-            {%- endif -%}
-          {%- endif -%}
-
-          {%- if show_sort -%}
-            {%- render 'filterable-sort-drop-down', sort_options: collection.sort_options, sort_by: sort_by -%}
-          {%- endif -%}
-        </div>
       {% endif %}
 
       <div
@@ -407,6 +425,7 @@
         x-html-if-set="resultsHTML"
         :class="{ 'opacity-10' : loading }"
       >
+        {%- render 'brand-note' -%}
         {%- if collection.products.size > 0 -%}
           {%- liquid
             assign grid_gap = section.settings.product_grid_gap | default: 0
@@ -561,7 +580,9 @@
         {%- endif -%}
         {% liquid
           if paginate.pages > 1
+            echo '<div data-plp-pagination>'
             render 'pagination' with paginate, paginate: paginate, section_color: section_color
+            echo '</div>'
           endif
         %}
       </div>
@@ -620,6 +641,8 @@
   {% endunless %}
 {% endif %}
 
+<script src="{{ 'plp-infinite.js' | asset_url }}" defer></script>
+
 {% unless request.design_mode %}
   {% if show_filters or show_sort %}
     <script src="{{ 'filterable.js' | asset_url }}" type="module"></script>
@@ -642,14 +665,31 @@
   {{ 'modules-product.bundle.css' | asset_url | stylesheet_tag }}
 {% endif %}
 
-{% style %}
-@media (max-width: 1023px) {
-  .collection-page-title {
-    font-weight: 700;
-    font-size: calc(var(--font-body-size, 16px) + 2pt);
-  }
-}
-{% endstyle %}
+<script>
+  (function () {
+    function check() {
+      var d = document.querySelector('[data-desc-clamp]');
+      if (!d) return;
+      if (window.innerWidth > 767) { d.classList.remove('is-long'); return; }
+      var open = d.classList.contains('is-open');
+      d.classList.remove('is-open');
+      var long = d.scrollHeight > d.clientHeight + 1;
+      d.classList.toggle('is-long', long);
+      if (open && long) d.classList.add('is-open');
+    }
+    document.addEventListener('click', function (e) {
+      var d = e.target.closest && e.target.closest('[data-desc-clamp]');
+      if (!d || e.target.closest('a')) return;
+      if (d.classList.contains('is-long')) d.classList.toggle('is-open');
+    });
+    check();
+    window.addEventListener('load', check);
+    window.addEventListener('resize', check);
+    // the header is replaced when a designer is chosen on a brand page
+    document.addEventListener('plp:results-updated', check);
+  })();
+</script>
+
 
 {% schema %}
 {
@@ -841,6 +881,23 @@
       "unit": "px",
       "default": 0,
       "info": "Equal left and right margin around the product grid on mobile."
+    },
+    {
+      "type": "header",
+      "content": "Loading more products"
+    },
+    {
+      "type": "checkbox",
+      "id": "infinite_scroll",
+      "label": "Infinite scrolling",
+      "info": "Loads the next page automatically while scrolling instead of showing page numbers. Going back from a product returns to the same spot.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "back_to_top",
+      "label": "Show a back to top button",
+      "default": true
     },
     {
       "type": "header",

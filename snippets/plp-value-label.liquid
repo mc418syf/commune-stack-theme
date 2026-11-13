@@ -1,0 +1,21 @@
+{%- comment -%}
+  Display label of one filter value.
+  Params: kind ('designer', 'category' or 'gender'), label (the value's label from Search & Discovery).
+  Category tags are written Category_Outerwear: the prefix is dropped. Gender comes from the plain tags mens / womens
+  (or a gender_ prefix, if those are added later) and is shown as Men / Women.
+{%- endcomment -%}
+{%- liquid
+  assign out = label | strip
+  if kind == 'category'
+    assign out = out | replace: 'Category_', '' | replace: 'category_', '' | replace: '_', ' '
+  elsif kind == 'gender'
+    assign out = out | replace: 'Gender_', '' | replace: 'gender_', ''
+    assign low = out | downcase
+    if low == 'mens' or low == 'men' or low == "men's"
+      assign out = 'Men'
+    elsif low == 'womens' or low == 'women' or low == "women's"
+      assign out = 'Women'
+    endif
+  endif
+-%}
+{{- out -}}

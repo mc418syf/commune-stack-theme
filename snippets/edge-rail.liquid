@@ -1,0 +1,359 @@
+{%- comment -%}
+  Edge rail: left rail (Menu, View, In stock, Cart), top strip (filter button · logo) and tools panel (Menu / Cart / Try-on).
+  The filter and search panel itself is snippets/plp-filter-panel.liquid.
+  Cart and Try-on lines are drawn by assets/edge-rail.js from /cart.js and $store.tryOnList.
+  Params: header_logo (captured logo markup)
+{%- endcomment -%}
+
+{%- liquid
+  assign cfg = section.settings
+  assign show_cart = cfg.show_cart
+  assign tab_menu = cfg.tab_menu
+  assign tab_cart = cfg.tab_cart
+  assign rail_menu = linklists[section.settings.edge_menu]
+
+  assign filter_source = nil
+  if template.name == 'collection'
+    assign filter_source = collection.filters
+  endif
+
+  comment
+    Gender is a product metafield. Its name lives in one place: Theme settings > Filter > Gender (default custom.gender).
+    Search & Discovery names the filter parameter filter.p.m.<namespace>.<key>.
+  endcomment
+  assign gender_meta = settings.plp_gender_metafield | default: 'custom.gender'
+  assign gender_param = 'filter.p.m.' | append: gender_meta
+
+  assign on_plp = false
+  if filter_source != blank
+    assign on_plp = true
+  endif
+
+  comment
+    Text of the filter button at the top left: <FILTER>, or the selected designer, followed by the selected categories and genders.
+  endcomment
+  assign t_designer = ''
+  assign t_cat = ''
+  assign t_gen = ''
+  assign avail_value = nil
+  if on_plp
+    for f in filter_source
+      assign fl = f.label | downcase
+      assign kind = ''
+      if f.param_name == 'filter.v.availability'
+        assign avail_value = f.values | where: 'value', '1' | first
+      elsif f.param_name == 'filter.p.vendor'
+        assign kind = 'designer'
+      elsif fl contains 'categ' or f.param_name == 'filter.p.product_type'
+        assign kind = 'category'
+      elsif f.param_name == gender_param
+        assign kind = 'gender'
+      endif
+      if kind != ''
+        for v in f.active_values
+          capture lbl
+            render 'plp-value-label', kind: kind, label: v.label
+          endcapture
+          assign lbl = lbl | strip
+          if kind == 'designer'
+            assign t_designer = lbl
+          elsif kind == 'category'
+            if t_cat == ''
+              assign t_cat = lbl
+            else
+              assign t_cat = t_cat | append: ' / ' | append: lbl
+            endif
+          else
+            if t_gen == ''
+              assign t_gen = lbl
+            else
+              assign t_gen = t_gen | append: ' / ' | append: lbl
+            endif
+          endif
+        endfor
+      endif
+    endfor
+  endif
+  assign t_rest = t_cat
+  if t_gen != ''
+    if t_rest != ''
+      assign t_rest = t_rest | append: ' / ' | append: t_gen
+    else
+      assign t_rest = t_gen
+    endif
+  endif
+-%}
+
+<div class="edge-strip__inner">
+  <div class="edge-strip__left">
+    {%- if template.name == 'product' -%}
+      {%- comment -%} Back to the listing the visitor came from; the label is filled from the saved listing (edge-rail.js) {%- endcomment -%}
+      <button type="button" class="plp-trigger edge-back" data-edge-back data-fallback="{{ routes.all_products_collection_url }}">
+        <span class="plp-trigger__t"><span class="plp-t__d">&lt;All&gt;</span></span>
+      </button>
+    {%- endif -%}
+    {%- unless template.name == 'index' or template.name == 'product' -%}
+    {%- unless template.name == 'search' and on_plp == false -%}
+    <button type="button" class="plp-trigger" data-plp-trigger aria-expanded="false" aria-controls="plp-fp">
+      <span class="plp-trigger__t" data-plp-trigger-label>
+        {%- if on_plp -%}
+          {%- if t_designer != '' -%}
+            <span class="plp-t__d plp-t__d--sel">&lt;{{ t_designer | escape }}&gt;</span>
+          {%- elsif template.name == 'collection' and collection.handle != 'all' and collection.title != blank -%}
+            {%- comment -%} On a brand (or any other real) collection page the title says where you are {%- endcomment -%}
+            <span class="plp-t__d plp-t__d--sel">&lt;{{ collection.title | escape }}&gt;</span>
+          {%- else -%}
+            <span class="plp-t__d">&lt;Filter&gt;</span>
+          {%- endif -%}
+          {%- if t_rest != '' -%}<span class="plp-t__r"> {{ t_rest | escape }}</span>{%- endif -%}
+        {%- else -%}
+          <span class="plp-t__d">&lt;Search&gt;</span>
+        {%- endif -%}
+      </span>
+    </button>
+    {%- endunless -%}
+    {%- if template.name == 'search' -%}
+    <button type="button" class="plp-trigger plp-strip-st" data-strip-search-toggle aria-expanded="false" aria-controls="plp-strip-s">
+      <span class="plp-trigger__t"><span class="plp-t__d">&lt;Search&gt;</span></span>
+    </button>
+    <form id="plp-strip-s" class="plp-strip-s" action="{{ routes.search_url }}" method="get" role="search">
+      <input type="hidden" name="options[prefix]" value="last">
+      <button type="submit" class="plp-strip-s__go" aria-label="Search">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><circle cx="6.8" cy="6.8" r="4.8"/><path d="M10.4 10.4 14.5 14.5" stroke-linecap="round"/></svg>
+      </button>
+      <label class="plp-sr" for="plp-strip-q">Search</label>
+      <input id="plp-strip-q" class="plp-strip-s__q" type="search" name="q" value="{{ search.terms | escape }}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button type="button" class="plp-strip-s__x" data-strip-search-close aria-label="Close search">
+        <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><path d="M2 2 12 12M12 2 2 12" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+    <script>
+      (function () {
+        if (window.__plpStripSearch) return;
+        window.__plpStripSearch = true;
+        function form() { return document.getElementById('plp-strip-s'); }
+        function fit() {
+          var f = form(), t = document.querySelector('[data-strip-search-toggle]');
+          if (!f || !t || window.innerWidth < 768) return;
+          var left = t.getBoundingClientRect().right + 16;
+          var li = document.querySelector('#results ul.collection-list > li');
+          var right = li ? li.getBoundingClientRect().right : 0;
+          if (!right) right = left + 280;
+          else if (right < left + 160) right = left + 160;
+          var logo = document.querySelector('.edge-strip__logo');
+          if (logo) { var lr = logo.getBoundingClientRect(); if (lr.width && lr.left - 16 > left + 160) right = Math.min(right, lr.left - 16); }
+          f.style.setProperty('--strip-s-w', Math.round(right - left) + 'px');
+        }
+        function set(open) {
+          var f = form(), t = document.querySelector('[data-strip-search-toggle]');
+          if (!f || !t) return;
+          if (open) fit();
+          f.classList.toggle('is-open', open);
+          t.setAttribute('aria-expanded', String(open));
+          if (open) {
+            var q = f.querySelector('input[type="search"]');
+            var end = function () { var n = q.value.length; try { q.setSelectionRange(n, n); } catch (e) {} };
+            q.focus();
+            end();
+            setTimeout(end, 0);
+          }
+        }
+        window.addEventListener('resize', function () { var f = form(); if (f && f.classList.contains('is-open')) fit(); });
+        document.addEventListener('click', function (e) {
+          var t = e.target.closest && e.target.closest('[data-strip-search-toggle]');
+          if (t) { var f = form(); return set(!(f && f.classList.contains('is-open'))); }
+          if (e.target.closest && e.target.closest('[data-strip-search-close]')) set(false);
+        });
+        document.addEventListener('keydown', function (e) {
+          var f = form();
+          if (e.key === 'Escape' && f && f.classList.contains('is-open')) { set(false); var t = document.querySelector('[data-strip-search-toggle]'); if (t) t.focus(); }
+        });
+      })();
+    </script>
+    {%- endif -%}
+    {%- endunless -%}
+  </div>
+  {%- if on_plp and template.name != 'index' and template.name != 'product' -%}
+  <button type="button" class="plp-strip-x" data-plp-close aria-label="Close filter">
+    <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><path d="M2 2 12 12M12 2 2 12" stroke-linecap="round"/></svg>
+  </button>
+  {%- endif -%}
+  <div class="edge-strip__logo">{{ header_logo }}</div>
+  <div class="edge-strip__right"></div>
+</div>
+
+<div class="edge-rail__bg" aria-hidden="true"></div>
+<nav class="edge-rail" aria-label="Edge rail" data-edge-rail data-cart-count="{{ cart.item_count }}"{% if customer %} data-customer-name="{{ customer.first_name | append: ' ' | append: customer.last_name | strip | escape }}" data-customer-email="{{ customer.email | escape }}"{% endif %} data-book-label="{{ cfg.book_button_label | default: 'Book a visit' | escape }}" data-hover="{% if cfg.hover_expand == false %}false{% else %}true{% endif %}">
+  <div class="edge-rail__group">
+    {%- if tab_menu != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="menu" aria-haspopup="dialog" aria-expanded="false" aria-label="Menu">
+      <span>Menu</span>
+    </button>
+    {%- endif -%}
+    {%- if on_plp or template.name == 'search' -%}
+    <span class="edge-rail__sep" aria-hidden="true"></span>
+    {%- if template.name == 'collection' or template.name == 'search' -%}
+    <button type="button" class="edge-rail__v edge-rail__view" data-plp-toggle aria-label="Switch to gallery view" title="Gallery view">
+      <span>View</span>
+      <svg data-ico="gallery" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false"><rect x="3" y="1" width="8" height="12"/></svg>
+      <svg data-ico="grid" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false" hidden><rect x="1" y="1" width="5" height="5"/><rect x="8" y="1" width="5" height="5"/><rect x="1" y="8" width="5" height="5"/><rect x="8" y="8" width="5" height="5"/></svg>
+    </button>
+    {%- endif -%}
+    {%- comment -%} With the Availability filter on in Search & Discovery the switch uses filter.v.availability (in the URL); without it, it hides sold-out cards on the page. {%- endcomment -%}
+    <button
+      type="button"
+      class="edge-rail__v edge-rail__stock"
+      role="switch"
+      aria-checked="{% if avail_value %}{{ avail_value.active }}{% else %}false{% endif %}"
+      aria-label="Hide sold out"
+      data-plp-stock
+      {% if avail_value %}data-param="filter.v.availability" data-value="1"{% else %}data-plp-stock-local{% endif %}
+    >
+      <span>In stock</span>
+      <i class="edge-rail__dot" aria-hidden="true"></i>
+    </button>
+    {%- endif -%}
+  </div>
+  <div class="edge-rail__group">
+    {%- if show_cart != false -%}
+    <button type="button" class="edge-rail__v" data-edge-open="cart" aria-haspopup="dialog" aria-expanded="false" aria-label="Cart"{% if cart.item_count == 0 %} hidden{% endif %}>
+      <span>Cart [<span data-edge-count="total">{{ cart.item_count }}</span>]</span>
+    </button>
+    <script>
+      /* paint the last known total before first paint, so the label does not flip (e.g. [1] to [2]) when a page opens */
+      (function () {
+        try {
+          var n = localStorage.getItem('commune_cart_total');
+          if (n === null) return;
+          var b = document.currentScript.previousElementSibling;
+          if (!b) return;
+          var c = b.querySelector('[data-edge-count="total"]');
+          if (c) c.textContent = n;
+          b.hidden = n === '0';
+        } catch (e) {}
+      })();
+    </script>
+    {%- endif -%}
+  </div>
+  <noscript>
+    <ul class="edge-noscript">
+      <li><a href="{{ routes.cart_url }}">Cart</a></li>
+      <li><a href="{{ routes.search_url }}">Search</a></li>
+    </ul>
+  </noscript>
+</nav>
+
+<div class="edge-scrim" data-edge-scrim hidden></div>
+
+<section class="edge-panel" role="dialog" aria-modal="true" aria-label="Tools" data-edge-panel data-tab="menu" tabindex="-1" hidden>
+  <div class="edge-panes">
+    <div role="region" id="edge-pane-menu" aria-label="Menu" data-edge-pane="menu">
+      <ol class="edge-menu">
+        {%- if rail_menu != blank and rail_menu.links.size > 0 -%}
+          {%- for link in rail_menu.links -%}
+            <li>
+              <a class="edge-row" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+                <span class="edge-row__l">{{ link.title }}</span>
+              </a>
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a class="edge-row" href="/collections/all"><span class="edge-row__l">Shop</span></a></li>
+          <li><a class="edge-row" href="/pages/book"><span class="edge-row__l">Appointment</span></a></li>
+          <li><a class="edge-row" href="/pages/information"><span class="edge-row__l">Information</span></a></li>
+          <li><a class="edge-row" href="{{ routes.account_url }}"><span class="edge-row__l">Customer information</span></a></li>
+        {%- endif -%}
+      </ol>
+      {%- assign footer_list = linklists[cfg.footer_menu] -%}
+      {%- if cfg.menu_footer_links != false and footer_list != blank and footer_list.links.size > 0 -%}
+        <hr class="edge-rule">
+        <ul class="edge-footlinks">
+          {%- for link in footer_list.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if cfg.menu_newsletter != false -%}
+        <hr class="edge-rule">
+        <div class="edge-news">
+          {%- form 'customer', id: 'EdgeNewsletter' -%}
+            {%- if form.posted_successfully? -%}
+              <p class="edge-news__ok" role="status" data-edge-news-ok>Thanks for subscribing.</p>
+            {%- else -%}
+              {%- if form.errors -%}<div class="edge-news__err" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <label class="edge-news__l" for="EdgeNewsletterEmail">Newsletter</label>
+              <div class="edge-news__row">
+                <input id="EdgeNewsletterEmail" type="email" name="contact[email]" placeholder="Email address" required autocomplete="email" autocapitalize="off" autocorrect="off" value="{% if customer.email != blank %}{{ customer.email }}{% endif %}">
+                <button type="submit">Sign up</button>
+              </div>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+      {%- assign legal_line = cfg.menu_legal_line -%}
+      {%- assign legal_address = cfg.menu_legal_address -%}
+      {%- assign has_bottom = false -%}
+      {%- capture social_html -%}{%- endcapture -%}
+      {%- if cfg.menu_social != false -%}
+        {%- assign social_accounts = 'Instagram, Facebook, X, TikTok, YouTube, Pinterest, Threads, Whatsapp, Discord, Tumblr, Snapchat, LinkedIn, Messenger, Email' | split: ', ' -%}
+        {%- capture social_html -%}
+          {%- for social in social_accounts -%}
+            {%- assign handle = social | handleize -%}
+            {%- assign key = 'social_' | append: handle | append: '_link' -%}
+            {%- if settings[key] != blank -%}
+              <li>
+                <a href="{% if handle == 'email' %}mailto:{% endif %}{{ settings[key] }}"{% unless handle == 'email' %} target="_blank" rel="noopener"{% endunless %} aria-label="{{ social }}">
+                  <span class="edge-social__icon" aria-hidden="true">
+                    {%- case handle -%}
+                      {%- when 'instagram' -%}{%- render 'icon-instagram' -%}
+                      {%- when 'facebook' -%}{%- render 'icon-facebook' -%}
+                      {%- when 'x' -%}{%- render 'icon-x' -%}
+                      {%- when 'tiktok' -%}{%- render 'icon-tiktok' -%}
+                      {%- when 'youtube' -%}{%- render 'icon-youtube' -%}
+                      {%- when 'pinterest' -%}{%- render 'icon-pinterest' -%}
+                      {%- when 'threads' -%}{%- render 'icon-threads' -%}
+                      {%- when 'whatsapp' -%}{%- render 'icon-whatsapp' -%}
+                      {%- when 'discord' -%}{%- render 'icon-discord' -%}
+                      {%- when 'tumblr' -%}{%- render 'icon-tumblr' -%}
+                      {%- when 'snapchat' -%}{%- render 'icon-snapchat' -%}
+                      {%- when 'linkedin' -%}{%- render 'icon-linkedin' -%}
+                      {%- when 'messenger' -%}{%- render 'icon-messenger' -%}
+                      {%- when 'email' -%}{%- render 'icon-email' -%}
+                    {%- endcase -%}
+                  </span>
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endcapture -%}
+      {%- endif -%}
+      {%- if social_html contains '<li>' or legal_line != blank -%}
+        {%- assign has_bottom = true -%}
+        {%- unless cfg.menu_newsletter != false -%}<hr class="edge-rule">{%- endunless -%}
+        <div class="edge-bottom">
+          {%- if legal_line != blank -%}<p class="edge-bottom__l">{{ legal_line | escape }}</p>{%- endif -%}
+          {%- if social_html contains '<li>' -%}<ul class="edge-social" style="margin-top: 0;">{{ social_html }}</ul>{%- endif -%}
+        </div>
+      {%- endif -%}
+      {%- if legal_address != blank -%}
+        {%- assign address_link = cfg.menu_legal_address_link -%}
+        {%- if address_link == blank -%}
+          {%- assign address_q = legal_address | url_encode -%}
+          {%- assign address_link = 'https://www.google.com/maps/search/?api=1&query=' | append: address_q -%}
+        {%- endif -%}
+        <div class="edge-legal"{% unless has_bottom %} style="margin-top: auto;"{% endunless %}>
+          <a href="{{ address_link }}" target="_blank" rel="noopener">{{ legal_address | escape }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div role="region" id="edge-pane-cart" aria-label="Cart" data-edge-pane="cart" hidden>
+      <div data-edge-list="cart"><p class="edge-empty">Loading…</p></div>
+      <section class="edge-sec" data-edge-try-sec aria-label="Try-on" hidden>
+        <h3 class="edge-sec__h">Try-on [<span data-edge-count="try">0</span>]</h3>
+        <div data-edge-list="try"></div>
+      </section>
+    </div>
+  </div>
+</section>

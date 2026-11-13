@@ -20,7 +20,7 @@
       }
     },
     "collapsible_rows_b33Gyd": {
-      "type": "collapsible-rows",
+      "type": "info-columns",
       "blocks": {
         "row_MzMMNK": {
           "type": "row",
@@ -59,9 +59,6 @@
       ],
       "settings": {
         "title": "",
-        "heading_font": "font-heading",
-        "heading_font_size": "text-heading-standard",
-        "expanded_content_max_width": "",
         "color_scheme": ""
       }
     }
@@ -71,3 +68,4 @@
     "collapsible_rows_b33Gyd"
   ]
 }
+

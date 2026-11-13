@@ -120,7 +120,20 @@ PLP product card
   endif
 -%}
 
+{%- capture plp_price -%}
+  {%- if settings.currency_code_enabled == true -%}{{ product.price | money_with_currency }}{%- else -%}{{ product.price | money }}{%- endif -%}
+{%- endcapture -%}
 <div
+  data-plp-item
+  data-plp-url="{{ product.url }}"
+  data-plp-title="{{ product.title | escape }}"
+  data-plp-vendor="{{ product.vendor | escape }}"
+  data-plp-price="{{ plp_price | strip | escape }}"
+  data-plp-image="{{ product.featured_media.preview_image | image_url: width: 1600 }}"
+  data-plp-thumb="{{ product.featured_media.preview_image | image_url: width: 240 }}"
+  data-plp-variant="{{ product.selected_or_first_available_variant.id }}"
+  data-plp-single="{{ product.has_only_default_variant }}"
+  data-plp-available="{{ product.available }}"
   class="group relative flex h-full flex-col text-center hover:text-scheme-accent{% if sold_out %} product-card--sold-out{% endif %}"
   {% if settings.enable_color_swatches_on_product_tiles and has_color_option %}
     x-data="{ currentSwatchVariantId: '{{ product.selected_or_first_available_variant.id }}', productUrl: '{{ product.url }}' }"
@@ -139,10 +152,8 @@ PLP product card
   {% endunless %}
 
   <div class="relative">
-    {%- if show_sold_out_badge and sold_out -%}
-      <div class="pointer-events-none absolute right-2 top-2 z-10 bg-scheme-accent p-2 text-scheme-background">
-        {{ 'products.product.sold_out' | t }}
-      </div>
+    {%- if sold_out -%}
+      <div class="edge-soldtag">{{ 'products.product.sold_out' | t }}</div>
     {%- elsif show_sale_badge and on_sale -%}
       <div class="pointer-events-none absolute right-2 top-2 z-10 bg-scheme-accent p-2 text-scheme-background">
         {{ 'products.product.on_sale' | t }}
@@ -181,6 +192,16 @@ PLP product card
           <div class="lg:hidden relative" id="plp-{{ section.id }}-{{ product.id }}">
             <ul class="plp-snap-track">
               {% for idstr in ordered_ids %}
+                {%- liquid
+                  assign slide_loading = 'lazy'
+                  assign slide_defer = true
+                  assign slide_preload = false
+                  if forloop.first
+                    assign slide_loading = loading
+                    assign slide_defer = false
+                    assign slide_preload = preload
+                  endif
+                -%}
                 {%- assign mid = idstr | plus: 0 -%}
                 {%- assign media = images_only | where: 'id', mid | first -%}
                 {% if media %}
@@ -188,10 +209,12 @@ PLP product card
                     <a href="{{ product.url }}">
                       <div class="relative" style="padding-top: {{ 1 | divided_by: _ratio | times: 100 }}%;">
                         {% render 'image-fit',
+                  widths: '300, 400, 500, 600, 750, 960, 1280',
                           image: media,
                           sizes: sizes,
-                          preload: preload,
-                          loading: loading,
+                          preload: slide_preload,
+                          loading: slide_loading,
+                          defer: slide_defer,
                           contain: _contain
                         %}
                       </div>
@@ -201,33 +224,8 @@ PLP product card
               {% endfor %}
             </ul>
 
-            {% if img_count > 1 %}
-              <!-- overlay dots on bottom of the image -->
-              <div class="plp-dots plp-dots--overlay" aria-hidden="true">
-                {% for i in (1..img_count) %}
-                  <span class="plp-dot{% if forloop.first %} is-active{% endif %}"></span>
-                {% endfor %}
-              </div>
-            {% endif %}
           </div>
 
-          <script>
-            (function(){
-              var root=document.getElementById('plp-{{ section.id }}-{{ product.id }}');
-              if(!root) return;
-              var track=root.querySelector('.plp-snap-track');
-              var dots=[].slice.call(root.querySelectorAll('.plp-dot'));
-              if(!track || !dots.length) return;
-              function setActive(i){ for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('is-active',k===i);} }
-              function onScroll(){
-                var i=Math.round(track.scrollLeft / track.clientWidth);
-                if(i<0) i=0; if(i>=dots.length) i=dots.length-1;
-                setActive(i);
-              }
-              track.addEventListener('scroll', onScroll, {passive:true});
-              setActive(0);
-            })();
-          </script>
         {% endif %}
 
 
@@ -255,6 +253,7 @@ PLP product card
             <div class="relative" style="padding-top: {{ 1 | divided_by: ratio | times: 100 }}%;">
               {% if product.featured_media != blank %}
                 {% render 'image-fit',
+                  widths: '300, 400, 500, 600, 750, 960, 1280',
                   image: product.featured_media,
                   sizes: sizes,
                   preload: preload,
@@ -285,11 +284,12 @@ PLP product card
 
           {% if output_second_image %}
             {% render 'image-fit',
+                  widths: '300, 400, 500, 600, 750, 960, 1280',
               image: product.media[1].preview_image,
               contain: contain,
               sizes: sizes,
               preload: false,
-              loading: loading,
+              loading: 'lazy',
               extra_classes: 'z-10 bg-scheme-background opacity-0 transition-opacity duration-200 ease-in-out group-hover:opacity-100 group-focus-within:opacity-100'
             %}
           {% endif %}
@@ -316,6 +316,7 @@ PLP product card
                 }"
               >
                 {% render 'image-fit',
+                  widths: '300, 400, 500, 600, 750, 960, 1280',
                   image: variant.featured_media.preview_image,
                   contain: object_contain_grid,
                   sizes: sizes,
@@ -356,7 +357,7 @@ PLP product card
       endif
     -%}
 
-    <div class="{{ meta_class }} {{ layout_class }}">
+    <div class="product-tile-meta {{ meta_class }} {{ layout_class }}">
       {% if enable_quick_buy and settings.quick_buy_position == 'over_image' %}
         <a
           href="{{ product.url }}"
@@ -370,18 +371,16 @@ PLP product card
       {%- unless hide_title -%}
         <div class="{{ title_class }} break-word">
           {% if settings.product_grid_show_vendor and product.vendor != '' %}
-            <p class="mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
+            <p class="product-tile-vendor mb-1 text-scheme-secondary{% if sold_out %} line-through{% endif %}">{{ product.vendor }}</p>
           {% endif %}
           <a href="{{ product.url }}" class="inline-block">
-            <p aria-hidden="true" class="{% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
+            <p aria-hidden="true" class="product-tile-title {% if sold_out %}text-scheme-secondary line-through{% endif %}">{{ product.title }}</p>
           </a>
         </div>
       {%- endunless -%}
 
-      <div class="{{ price_class }}">
-        {% if sold_out %}
-          <s class="text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</s>
-        {% else %}
+      <div class="product-tile-price {{ price_class }}">
+        {% comment %} A sold-out piece keeps its price; "Sold out" follows it and the card is dimmed (see .product-card--sold-out) {% endcomment %}
           {% if on_sale and sold_out != true %}
             <s class="block lg:inline">
               <span class="sr-only">{{- 'products.product.regular_price' | t -}}</span>
@@ -427,7 +426,9 @@ PLP product card
               <span>{%- if settings.currency_code_enabled == true -%}{{- product.price | money_with_currency -}}{%- else -%}{{- product.price | money -}}{%- endif -%}</span>
             {% endif %}
           {% endif %}
-        {% endif %}
+        {%- if sold_out -%}
+          <span class="edge-soldout text-scheme-secondary">{{- 'products.product.sold_out' | t -}}</span>
+        {%- endif -%}
 
         {% assign unit_price_variant = product.first_available_variant %}
         {% if unit_price_variant.unit_price %}
