@@ -105,15 +105,15 @@
     addEventListener('pointerup', end);
     addEventListener('pointercancel', end);
 
-    // A two-finger sideways swipe moves the strip from anywhere in the product block (for example with the pointer left on the description)
+    // A two-finger sideways swipe moves the strip from anywhere in the product block, including over the strip itself:
+    // it is applied here instead of leaving it to the browser, so it does not depend on which element was clicked last
     const block = list.closest('.product-strip');
     if (block) {
       block.addEventListener('wheel', (e) => {
         if (!DESKTOP.matches || e.defaultPrevented || e.ctrlKey) return;
         if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-        if (list.contains(e.target)) return; // already scrolls natively
         // leave anything that scrolls sideways itself (a table, a text field) alone
-        for (let el = e.target; el && el !== block; el = el.parentElement) {
+        for (let el = e.target; el && el !== block && el !== list; el = el.parentElement) {
           if (el.scrollWidth > el.clientWidth + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) return;
         }
         const base = frame ? target : list.scrollLeft;

@@ -293,3 +293,11 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 
 /* PDP: after the piece is in the cart the button turns grey ("Added to cart") */
 #addToCartButton.is-added { background-color: var(--gray, #6B6B66) !important; border-color: var(--gray, #6B6B66) !important; color: #fff !important; }
+
+/* PDP on phones: the browser keeps vertical scrolling, every sideways gesture goes straight to the image slider,
+   so the first swipe is not taken over by the browser (it used to need a tap on the image first) */
+@media (max-width: 1023px) {
+  .splide--product .splide__track,
+  .splide--product .splide__list,
+  .splide--product .splide__slide { touch-action: pan-y pinch-zoom; }
+}

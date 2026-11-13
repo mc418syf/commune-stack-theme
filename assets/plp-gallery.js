@@ -216,6 +216,19 @@
     }
     loading = false;
     ends();
+    watchEnd();
+  }
+
+  // A second way to notice the end is near, next to the scroll position: the last few slides coming into view.
+  // It does not depend on scroll events, so a phone browser that reports them late (or not at all) still loads the next page.
+  let endWatch = null;
+  function watchEnd() {
+    if (endWatch) { endWatch.disconnect(); endWatch = null; }
+    if (!feed || !next || !('IntersectionObserver' in window)) return;
+    endWatch = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) more();
+    }, { rootMargin: '0px 0px 600px 0px' });
+    $$('.plp-slide:not(.plp-slide--clone)', feed).slice(-6).forEach((slide) => endWatch.observe(slide));
   }
 
   async function add(i, btn) {
@@ -271,6 +284,7 @@
     feed.innerHTML = items.map((it, i) => slideHTML(it, i)).join('');
     thumbs.innerHTML = items.map((it, i) => thumbHTML(it, i)).join('');
     ends();
+    watchEnd();
     // the feed has a height only once the gallery is displayed
     setTimeout(() => {
       noSnap(() => { setTop(pos(index) * slideHeight()); });
