@@ -67,13 +67,13 @@
     "size_mark_desktop": 15,
     "size_mark_mobile": 13,
     "tracking_mark": 30,
-    "size_tab_desktop": 15,
-    "size_tab_mobile": 13,
-    "size_name_desktop": 15,
+    "size_tab_desktop": 16,
+    "size_tab_mobile": 14,
+    "size_name_desktop": 16,
     "size_name_mobile": 14,
     "lineheight_name": 130,
-    "size_price_desktop": 11,
-    "size_price_mobile": 11,
+    "size_price_desktop": 12,
+    "size_price_mobile": 12,
     "lineheight_price": 130,
     "size_label": 11,
     "lineheight_label": 140,
@@ -126,7 +126,7 @@
         "settings": {
           "background": "#f4f3ef",
           "text": "#111111",
-          "accent": "#FF5A1F",
+          "accent": "#ff5a1f",
           "accent_contrast": "#111111",
           "secondary": "#6b6b66"
         }
