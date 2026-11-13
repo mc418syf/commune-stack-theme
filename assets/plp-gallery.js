@@ -156,7 +156,9 @@
     const h = slideHeight();
     const top = getTop();
     const p = Math.round(top / h);
-    if (Math.abs(top - p * h) > 2) return;
+    // On a phone the slide height is rarely a whole number (browser bars, rounding), so p * h drifts by a few pixels
+    // over a long feed: a fixed 2px tolerance then never matched on the repeated slide at the end and the feed stopped there
+    if (Math.abs(top - p * h) > Math.max(2, h * 0.04)) return;
     if (p === 0) noSnap(() => { setTop(items.length * h); });
     else if (p === items.length + 1) noSnap(() => { setTop(h); });
   }
