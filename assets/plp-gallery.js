@@ -156,6 +156,11 @@
     const h = slideHeight();
     const top = getTop();
     const p = Math.round(top / h);
+    // The page can end before the repeated slide at the bottom is fully reached (slides shorter than the screen, browser bars):
+    // being at the very bottom of the page past the last real slide counts as having landed on the repeat
+    const maxTop = pageMode() ? document.documentElement.scrollHeight - window.innerHeight : feed.scrollHeight - feed.clientHeight;
+    const atBottom = (pageMode() ? window.scrollY : feed.scrollTop) >= maxTop - 3;
+    if (atBottom && top >= items.length * h - h * 0.5) { noSnap(() => { setTop(h); }); return; }
     // On a phone the slide height is rarely a whole number (browser bars, rounding), so p * h drifts by a few pixels
     // over a long feed: a fixed 2px tolerance then never matched on the repeated slide at the end and the feed stopped there
     if (Math.abs(top - p * h) > Math.max(2, h * 0.04)) return;
