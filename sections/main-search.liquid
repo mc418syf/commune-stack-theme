@@ -104,7 +104,9 @@
         :class="{ 'opacity-10' : loading }"
       >
         {% if search.results_count == 0 %}
-          <div class="bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text lg:col-span-12">
+          {%- comment -%} The page starts under the top bar (the bar is see-through), so the message gets its own room below it {%- endcomment -%}
+          <div class="search-empty bg-scheme-background px-section-horizontal-spacing py-section-vertical-spacing text-scheme-text lg:col-span-12">
+            <p>No results for &ldquo;{{ search.terms | escape }}&rdquo;.</p>
             <p>{{ 'general.search.no_results' | t }}</p>
           </div>
         {% else %}

@@ -307,3 +307,8 @@ html.edge-hide-soldout .collection-list > li:has(.product-card--sold-out) { disp
 @media (max-width: 767px) {
   .edge-back.is-hidden { opacity: 0; pointer-events: none; }
 }
+
+/* Search with no results: the message sits in the page, clear of the top bar, aligned with the product grid */
+.search-empty { padding-top: calc(var(--strip-h, 56px) + 32px) !important; padding-left: var(--gut, 16px); padding-right: var(--gut, 16px); }
+.search-empty p { margin: 0 0 8px; font-family: var(--font-mono); font-size: var(--body-size, 12px); line-height: var(--body-lh, 18px); letter-spacing: var(--body-ls, 0em); }
+.search-empty p:last-child { color: var(--gray, #6B6B66); }

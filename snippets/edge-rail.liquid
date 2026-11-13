@@ -114,7 +114,8 @@
     {%- endunless -%}
     {%- if template.name == 'search' -%}
     <button type="button" class="plp-trigger plp-strip-st" data-strip-search-toggle aria-expanded="false" aria-controls="plp-strip-s">
-      <span class="plp-trigger__t"><span class="plp-t__d">&lt;Search&gt;</span></span>
+      {%- comment -%} After a search, the bar shows what was searched for instead of the word Search {%- endcomment -%}
+      <span class="plp-trigger__t"><span class="plp-t__d{% if search.performed and search.terms != blank %} plp-t__d--sel{% endif %}">&lt;{% if search.performed and search.terms != blank %}{{ search.terms | escape }}{% else %}Search{% endif %}&gt;</span></span>
     </button>
     <form id="plp-strip-s" class="plp-strip-s" action="{{ routes.search_url }}" method="get" role="search">
       <input type="hidden" name="options[prefix]" value="last">
